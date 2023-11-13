@@ -14,6 +14,9 @@ plugins {
 
     /** ktlint **/
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
+
+    /** jacoco **/
+    id("jacoco")
 }
 
 group = "com.goofy"
@@ -96,6 +99,12 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:${DependencyVersion.KOTLIN_LOGGING_VERSION}")
     implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER_VERSION}")
 
+    /** test **/
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
+    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
@@ -145,3 +154,32 @@ when {
 }
 
 val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // 테스트 후 진행
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // 테스트 선행 필요
+    reports {
+        html.required.set(true)
+        csv.required.set(false)
+        xml.required.set(true)
+        xml.outputLocation.set(File("build/reports/jacoco.xml"))
+    }
+
+    classDirectories.setFrom(
+            files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/*Application*",
+                            "**/*Config*",
+                            "**/*Dto*",
+                            "**/*Request*",
+                            "**/*Response*",
+                            "**/*Interceptor*",
+                            "**/*Exception*" ,
+                            "**/Q*.class") // Query Dsl 용
+                }
+            })
+    )
+}
