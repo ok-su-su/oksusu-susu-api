@@ -25,4 +25,3 @@ class HealthResource(
         profile = environment.activeProfiles.contentToString()
     ).wrapOk()
 }
-

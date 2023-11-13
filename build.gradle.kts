@@ -11,6 +11,9 @@ plugins {
     kotlin("plugin.allopen") version kotlinVersion
     kotlin("kapt") version kotlinVersion
     idea
+
+    /** ktlint **/
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
 group = "com.goofy"

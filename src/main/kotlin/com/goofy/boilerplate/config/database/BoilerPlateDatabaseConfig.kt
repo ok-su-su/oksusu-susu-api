@@ -51,7 +51,7 @@ class BoilerPlateDatabaseConfig {
 
     @Bean
     fun boilerplateNamedParameterJdbcTemplate(
-        @Qualifier("boilerplateMasterHikariDataSource") dataSource: DataSource,
+        @Qualifier("boilerplateMasterHikariDataSource") dataSource: DataSource
     ): NamedParameterJdbcTemplate {
         return NamedParameterJdbcTemplate(dataSource)
     }
@@ -73,7 +73,7 @@ class BoilerPlateDatabaseConfig {
         return entityManagerFactoryBuilder
             .dataSource(boilerplateDataSource)
             .packages(
-                "com.goofy.boilerplate.user.domain",
+                "com.goofy.boilerplate.user.domain"
             )
             .properties(
                 mapOf(AvailableSettings.BEAN_CONTAINER to SpringBeanContainer(configurableListableBeanFactory))
