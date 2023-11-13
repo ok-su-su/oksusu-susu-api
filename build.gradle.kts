@@ -155,6 +155,10 @@ when {
 
 val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 tasks.test {
     finalizedBy(tasks.jacocoTestReport) // 테스트 후 진행
 }
@@ -165,7 +169,7 @@ tasks.jacocoTestReport {
         html.required.set(true)
         csv.required.set(false)
         xml.required.set(true)
-        xml.outputLocation.set(File("build/reports/jacoco.xml"))
+        xml.outputLocation.set(File("$buildDir/reports/jacoco.xml"))
     }
 
     classDirectories.setFrom(
