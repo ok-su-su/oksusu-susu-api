@@ -29,10 +29,21 @@ jobs:
           distribution: 'adopt'
 
       # 자동 Ktlint 체크 자동화
-      - name: ktlint
+      - name: ktlint check
         uses: ScaCap/action-ktlint@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-check
           ktlint_version: "1.8.22"
 #          fail_on_error: true # 오류 발생시 실패
+
+      # 빌드
+      - name: Gradle Clean & Build
+        run: ./gradlew clean build
+
+      # jacoco, sonarcube
+      - name: test and analyze
+        run: ./gradlew test sonar --info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

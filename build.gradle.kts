@@ -17,6 +17,9 @@ plugins {
 
     /** jacoco **/
     id("jacoco")
+
+    /** sonarqube **/
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "com.goofy"
@@ -155,6 +158,7 @@ when {
 
 val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
 
+/** jacoco **/
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -186,4 +190,23 @@ tasks.jacocoTestReport {
                 }
             })
     )
+}
+
+/** sonarqube **/
+sonarqube {
+    properties {
+        property("sonar.projectKey", "YAPP-Github_23rd_aos-1")
+        property("sonar.organization", "yapp-github")
+        property("sonar.host.url", "https://sonarcloud.io")
+
+        // sonar additional settings
+        property("sonar.sources", "src")
+        property("sonar.language", "Kotlin")
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.test.inclusions", "**/*Test.java")
+        property("sonar.exclusions", "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, **/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt")
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.java.binaries", "$buildDir/classes")
+        property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco.xml")
+    }
 }
