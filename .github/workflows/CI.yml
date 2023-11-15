@@ -34,8 +34,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUBTOKEN }}
           reporter: github-pr-check
-          ktlint_version: "0.50.0"
-#          fail_on_error: true # 오류 발생시 실패
+          ktlint_version: "1.0.0"
+          continue-on-error: true # 실패해도 계속 진행
 
       # 빌드
       - name: Gradle Clean & Build
