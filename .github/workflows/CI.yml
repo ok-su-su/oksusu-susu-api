@@ -41,6 +41,10 @@ jobs:
       - name: Gradle Clean & Build
         run: ./gradlew clean build
 
+      # 컨테이너 실행
+      - name: Start containers  # test 돌릴때 mysql 필요
+        run: docker-compose up -d
+
       # jacoco, sonarcube
       - name: test and analyze
         run: ./gradlew test sonar --info
