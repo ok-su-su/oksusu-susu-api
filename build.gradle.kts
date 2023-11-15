@@ -177,18 +177,22 @@ tasks.jacocoTestReport {
     }
 
     classDirectories.setFrom(
-            files(classDirectories.files.map {
+        files(
+            classDirectories.files.map {
                 fileTree(it) {
-                    exclude("**/*Application*",
-                            "**/*Config*",
-                            "**/*Dto*",
-                            "**/*Request*",
-                            "**/*Response*",
-                            "**/*Interceptor*",
-                            "**/*Exception*" ,
-                            "**/Q*.class") // Query Dsl 용
+                    exclude(
+                        "**/*Application*",
+                        "**/*Config*",
+                        "**/*Dto*",
+                        "**/*Request*",
+                        "**/*Response*",
+                        "**/*Interceptor*",
+                        "**/*Exception*",
+                        "**/Q*.class"
+                    ) // Query Dsl 용
                 }
-            })
+            }
+        )
     )
 }
 
