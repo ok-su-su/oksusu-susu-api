@@ -34,7 +34,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUBTOKEN }}
           reporter: github-pr-check
-          ktlint_version: "11.6.1"
+          ktlint_version: "0.50.0"
 #          fail_on_error: true # 오류 발생시 실패
 
       # 빌드

@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class JacocoTest @Autowired constructor(
-    private val jacoco: Jacoco
+    private val jacoco: Jacoco,
 ) : FunSpec({
     context("jacoco test") {
         test("test1") {

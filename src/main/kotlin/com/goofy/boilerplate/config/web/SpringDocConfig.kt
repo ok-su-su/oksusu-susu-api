@@ -18,7 +18,7 @@ import org.springframework.web.server.WebSession
  */
 @Configuration
 class SpringDocConfig(
-    private val buildProperties: BuildProperties
+    private val buildProperties: BuildProperties,
 ) {
     init {
         SpringDocUtils

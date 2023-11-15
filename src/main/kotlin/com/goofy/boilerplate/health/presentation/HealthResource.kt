@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class HealthResource(
-    private val environment: Environment
+    private val environment: Environment,
 ) {
     @Operation(summary = "health check")
     @GetMapping("/health")

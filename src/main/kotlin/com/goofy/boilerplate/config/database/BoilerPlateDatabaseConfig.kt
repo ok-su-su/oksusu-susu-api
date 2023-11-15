@@ -41,7 +41,7 @@ class BoilerPlateDatabaseConfig {
     @Primary
     @ConfigurationProperties(prefix = "boilerplate.master.datasource.hikari")
     fun boilerplateMasterHikariDataSource(
-        @Qualifier("boilerplateMasterDataSourceProperties") masterProperty: DataSourceProperties
+        @Qualifier("boilerplateMasterDataSourceProperties") masterProperty: DataSourceProperties,
     ): HikariDataSource {
         return masterProperty
             .initializeDataSourceBuilder()
@@ -51,7 +51,7 @@ class BoilerPlateDatabaseConfig {
 
     @Bean
     fun boilerplateNamedParameterJdbcTemplate(
-        @Qualifier("boilerplateMasterHikariDataSource") dataSource: DataSource
+        @Qualifier("boilerplateMasterHikariDataSource") dataSource: DataSource,
     ): NamedParameterJdbcTemplate {
         return NamedParameterJdbcTemplate(dataSource)
     }
@@ -68,7 +68,7 @@ class BoilerPlateDatabaseConfig {
     fun boilerplateEntityManager(
         entityManagerFactoryBuilder: EntityManagerFactoryBuilder,
         configurableListableBeanFactory: ConfigurableListableBeanFactory,
-        @Qualifier("boilerplateMasterHikariDataSource") boilerplateDataSource: DataSource
+        @Qualifier("boilerplateMasterHikariDataSource") boilerplateDataSource: DataSource,
     ): LocalContainerEntityManagerFactoryBean {
         return entityManagerFactoryBuilder
             .dataSource(boilerplateDataSource)
@@ -84,7 +84,7 @@ class BoilerPlateDatabaseConfig {
     @Bean
     @Primary
     fun boilerplateTransactionManager(
-        @Qualifier("boilerplateEntityManager") boilerplateEntityManager: EntityManagerFactory
+        @Qualifier("boilerplateEntityManager") boilerplateEntityManager: EntityManagerFactory,
     ): PlatformTransactionManager {
         return JpaTransactionManager(boilerplateEntityManager)
     }

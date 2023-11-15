@@ -22,7 +22,7 @@ class ExceptionHandler {
     @ExceptionHandler(WebExchangeBindException::class)
     protected fun handleWebExchangeBindException(
         e: WebExchangeBindException,
-        exchange: ServerWebExchange
+        exchange: ServerWebExchange,
     ): ResponseEntity<ErrorResponse> {
         logger.warn { "WebExchangeBindException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
@@ -34,7 +34,7 @@ class ExceptionHandler {
     @ExceptionHandler(DecodingException::class)
     protected fun handleDecodingException(
         e: DecodingException,
-        exchange: ServerWebExchange
+        exchange: ServerWebExchange,
     ): ResponseEntity<ErrorResponse> {
         logger.warn { "DecodingException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
@@ -46,7 +46,7 @@ class ExceptionHandler {
     @ExceptionHandler(ConstraintViolationException::class)
     protected fun handleConstraintViolationException(
         e: ConstraintViolationException,
-        exchange: ServerWebExchange
+        exchange: ServerWebExchange,
     ): ResponseEntity<ErrorResponse> {
         logger.warn { "ConstraintViolationException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
@@ -58,7 +58,7 @@ class ExceptionHandler {
     @ExceptionHandler(ServerWebInputException::class)
     protected fun handleServerWebInputException(
         e: ServerWebInputException,
-        exchange: ServerWebExchange
+        exchange: ServerWebExchange,
     ): ResponseEntity<ErrorResponse> {
         logger.warn { "ServerWebInputException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
@@ -70,7 +70,7 @@ class ExceptionHandler {
     @ExceptionHandler(TypeMismatchException::class)
     protected fun handleTypeMismatchException(
         e: TypeMismatchException,
-        exchange: ServerWebExchange
+        exchange: ServerWebExchange,
     ): ResponseEntity<ErrorResponse> {
         logger.warn { "TypeMismatchException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
@@ -86,7 +86,7 @@ class ExceptionHandler {
     @ExceptionHandler(CancellationException::class)
     protected fun handleCancellationException(
         e: CancellationException,
-        exchange: ServerWebExchange
+        exchange: ServerWebExchange,
     ): ResponseEntity<ErrorResponse> {
         logger.warn { "CancellationException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity

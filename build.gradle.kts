@@ -60,6 +60,8 @@ object DependencyVersion {
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
     const val KOTLIN_LOGGING_VERSION = "2.0.11"
     const val LOGBACK_ENCODER_VERSION = "6.6"
+    const val KOTEST_VERSION = "5.7.2"
+    const val KOTEST_EXTENSION_VERSION = "1.1.2"
 }
 
 dependencies {
@@ -104,9 +106,9 @@ dependencies {
 
     /** test **/
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
-    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+    testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST_VERSION}")
+    testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")

@@ -14,7 +14,7 @@ import java.util.*
 @SpringBootApplication
 class Application(
     private val buildProperties: BuildProperties,
-    private val environment: Environment
+    private val environment: Environment,
 ) : ApplicationListener<ApplicationReadyEvent> {
     private val logger = mu.KotlinLogging.logger { }
 
