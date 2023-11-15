@@ -13,5 +13,6 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_HOST=localhost
       - MYSQL_PORT=3306
+      - MYSQL_DATABASE=test
     ports:
       - "3307:3306"
