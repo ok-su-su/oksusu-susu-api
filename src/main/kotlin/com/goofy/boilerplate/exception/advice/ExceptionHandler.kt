@@ -1,6 +1,7 @@
 package com.goofy.boilerplate.exception.advice
 
 import com.goofy.boilerplate.common.dto.ErrorResponse
+import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.CancellationException
 import mu.KotlinLogging
 import org.hibernate.TypeMismatchException
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.ServerWebInputException
-import javax.validation.ConstraintViolationException
 
 @RestControllerAdvice
 class ExceptionHandler {

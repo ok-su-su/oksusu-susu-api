@@ -1,5 +1,5 @@
 # Spring Webflux + Coroutine Boilerplate
 
 ### Spec
-- SpringBoot v2.7.17
-- jdk 11
+- SpringBoot v3.1.5
+- jdk 17

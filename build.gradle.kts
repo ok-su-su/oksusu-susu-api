@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     val kotlinVersion = "1.8.22"
 
-    id("org.springframework.boot") version "2.7.17"
-    id("io.spring.dependency-management") version "1.0.15.RELEASE"
+    id("org.springframework.boot") version "3.1.5"
+    id("io.spring.dependency-management") version "1.1.3"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
@@ -23,7 +23,7 @@ plugins {
 }
 
 group = "com.goofy"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -56,7 +56,7 @@ object DependencyVersion {
     /** external */
     const val QUERYDSL_VERSION = "5.0.0"
     const val ARROW_FX_VERSION = "1.1.3"
-    const val SPRINGDOC_VERSION = "1.6.15"
+    const val SPRINGDOC_VERSION = "2.2.0"
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
     const val KOTLIN_LOGGING_VERSION = "2.0.11"
     const val LOGBACK_ENCODER_VERSION = "6.6"
@@ -92,9 +92,7 @@ dependencies {
     implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX_VERSION}")
 
     /** swagger */
-    implementation("org.springdoc:springdoc-openapi-webflux-ui:${DependencyVersion.SPRINGDOC_VERSION}")
-    implementation("org.springdoc:springdoc-openapi-kotlin:${DependencyVersion.SPRINGDOC_VERSION}")
-    implementation("org.springdoc:springdoc-openapi-javadoc:${DependencyVersion.SPRINGDOC_VERSION}")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC_VERSION}")
     kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE_VERSION}")
 
     /** database */
@@ -127,7 +125,7 @@ tasks.getByName<Jar>("jar") {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -210,7 +208,10 @@ sonarqube {
         property("sonar.language", "Kotlin")
         property("sonar.sourceEncoding", "UTF-8")
         property("sonar.test.inclusions", "**/*Test.java")
-        property("sonar.exclusions", "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, **/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt")
+        property(
+            "sonar.exclusions",
+            "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, **/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+        )
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.java.binaries", "$buildDir/classes")
         property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco.xml")
