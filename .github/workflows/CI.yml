@@ -32,7 +32,7 @@ jobs:
       - name: ktlint check
         uses: ScaCap/action-ktlint@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUBTOKEN }}
           reporter: github-pr-check
           ktlint_version: "1.8.22"
 #          fail_on_error: true # 오류 발생시 실패
@@ -45,5 +45,5 @@ jobs:
       - name: test and analyze
         run: ./gradlew test sonar --info
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

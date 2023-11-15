@@ -195,7 +195,7 @@ tasks.jacocoTestReport {
 /** sonarqube **/
 sonarqube {
     properties {
-        property("sonar.projectKey", "YAPP-Github_23rd_aos-1")
+        property("sonar.projectKey", "YAPP-Github_23rd-Android-Team-1-BE")
         property("sonar.organization", "yapp-github")
         property("sonar.host.url", "https://sonarcloud.io")
 
