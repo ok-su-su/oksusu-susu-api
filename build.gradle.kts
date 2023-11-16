@@ -62,6 +62,7 @@ object DependencyVersion {
     const val LOGBACK_ENCODER_VERSION = "6.6"
     const val KOTEST_VERSION = "5.7.2"
     const val KOTEST_EXTENSION_VERSION = "1.1.2"
+    const val MOCKK_VERSION = "1.4.1"
 }
 
 dependencies {
@@ -104,6 +105,9 @@ dependencies {
 
     /** test **/
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK_VERSION}")
+
+    /** kotest */
     testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST_VERSION}")
     testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
@@ -164,11 +168,12 @@ tasks.withType<Test> {
 }
 
 tasks.test {
-    finalizedBy(tasks.jacocoTestReport) // 테스트 후 진행
+    /** when finished test-all */
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
-    dependsOn(tasks.test) // 테스트 선행 필요
+    dependsOn(tasks.test)
     reports {
         html.required.set(true)
         csv.required.set(false)
@@ -189,7 +194,7 @@ tasks.jacocoTestReport {
                         "**/*Interceptor*",
                         "**/*Exception*",
                         "**/Q*.class"
-                    ) // Query Dsl 용
+                    )
                 }
             }
         )
@@ -203,7 +208,7 @@ sonarqube {
         property("sonar.organization", "yapp-github")
         property("sonar.host.url", "https://sonarcloud.io")
 
-        // sonar additional settings
+        /** sonar additional settings */
         property("sonar.sources", "src")
         property("sonar.language", "Kotlin")
         property("sonar.sourceEncoding", "UTF-8")

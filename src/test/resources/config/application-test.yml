@@ -1,0 +1,16 @@
+# ===================================================================
+# Spring Boot Configuration for the test profile
+# ===================================================================
+
+# SPRING
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  test:
+    database:
+      replace: none
+
+# LOGGING
+logging:
+  level:
+    root: INFO
