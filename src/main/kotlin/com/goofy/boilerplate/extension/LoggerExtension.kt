@@ -11,4 +11,3 @@ fun KLogger.resolveCancellation(name: String, throwable: Throwable, other: (KLog
         }
     }
 }
-

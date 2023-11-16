@@ -18,7 +18,7 @@ import java.nio.charset.Charset
 
 @Configuration
 class WebFluxConfig(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : WebFluxConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")

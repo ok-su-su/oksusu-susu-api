@@ -9,7 +9,7 @@ data class PageResponseDto<T>(
     val size: Int?,
     val totalPage: Int,
     val totalCount: Long,
-    val sort: Sort
+    val sort: Sort,
 ) {
     constructor(page: Page<T>) : this(
         data = page.content,

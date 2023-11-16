@@ -1,6 +1,7 @@
 package com.goofy.boilerplate.config.database
 
 import com.zaxxer.hikari.HikariDataSource
+import jakarta.persistence.EntityManagerFactory
 import org.hibernate.cfg.AvailableSettings
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
@@ -19,7 +20,6 @@ import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
-import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 @Configuration
@@ -41,7 +41,7 @@ class BoilerPlateDatabaseConfig {
     @Primary
     @ConfigurationProperties(prefix = "boilerplate.master.datasource.hikari")
     fun boilerplateMasterHikariDataSource(
-        @Qualifier("boilerplateMasterDataSourceProperties") masterProperty: DataSourceProperties
+        @Qualifier("boilerplateMasterDataSourceProperties") masterProperty: DataSourceProperties,
     ): HikariDataSource {
         return masterProperty
             .initializeDataSourceBuilder()
@@ -68,12 +68,12 @@ class BoilerPlateDatabaseConfig {
     fun boilerplateEntityManager(
         entityManagerFactoryBuilder: EntityManagerFactoryBuilder,
         configurableListableBeanFactory: ConfigurableListableBeanFactory,
-        @Qualifier("boilerplateMasterHikariDataSource") boilerplateDataSource: DataSource
+        @Qualifier("boilerplateMasterHikariDataSource") boilerplateDataSource: DataSource,
     ): LocalContainerEntityManagerFactoryBean {
         return entityManagerFactoryBuilder
             .dataSource(boilerplateDataSource)
             .packages(
-                "com.goofy.boilerplate.user.domain",
+                "com.goofy.boilerplate.user.domain"
             )
             .properties(
                 mapOf(AvailableSettings.BEAN_CONTAINER to SpringBeanContainer(configurableListableBeanFactory))
@@ -84,7 +84,7 @@ class BoilerPlateDatabaseConfig {
     @Bean
     @Primary
     fun boilerplateTransactionManager(
-        @Qualifier("boilerplateEntityManager") boilerplateEntityManager: EntityManagerFactory
+        @Qualifier("boilerplateEntityManager") boilerplateEntityManager: EntityManagerFactory,
     ): PlatformTransactionManager {
         return JpaTransactionManager(boilerplateEntityManager)
     }

@@ -3,18 +3,27 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     val kotlinVersion = "1.8.22"
 
-    id("org.springframework.boot") version "2.7.17"
-    id("io.spring.dependency-management") version "1.0.15.RELEASE"
+    id("org.springframework.boot") version "3.1.5"
+    id("io.spring.dependency-management") version "1.1.3"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     kotlin("plugin.allopen") version kotlinVersion
     kotlin("kapt") version kotlinVersion
     idea
+
+    /** ktlint **/
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
+
+    /** jacoco **/
+    id("jacoco")
+
+    /** sonarqube **/
+    id("org.sonarqube") version "4.3.1.3277"
 }
 
 group = "com.goofy"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -47,10 +56,12 @@ object DependencyVersion {
     /** external */
     const val QUERYDSL_VERSION = "5.0.0"
     const val ARROW_FX_VERSION = "1.1.3"
-    const val SPRINGDOC_VERSION = "1.6.15"
+    const val SPRINGDOC_VERSION = "2.2.0"
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
     const val KOTLIN_LOGGING_VERSION = "2.0.11"
     const val LOGBACK_ENCODER_VERSION = "6.6"
+    const val KOTEST_VERSION = "5.7.2"
+    const val KOTEST_EXTENSION_VERSION = "1.1.2"
 }
 
 dependencies {
@@ -81,9 +92,7 @@ dependencies {
     implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX_VERSION}")
 
     /** swagger */
-    implementation("org.springdoc:springdoc-openapi-webflux-ui:${DependencyVersion.SPRINGDOC_VERSION}")
-    implementation("org.springdoc:springdoc-openapi-kotlin:${DependencyVersion.SPRINGDOC_VERSION}")
-    implementation("org.springdoc:springdoc-openapi-javadoc:${DependencyVersion.SPRINGDOC_VERSION}")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC_VERSION}")
     kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE_VERSION}")
 
     /** database */
@@ -92,6 +101,12 @@ dependencies {
     /** logger */
     implementation("io.github.microutils:kotlin-logging:${DependencyVersion.KOTLIN_LOGGING_VERSION}")
     implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER_VERSION}")
+
+    /** test **/
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST_VERSION}")
+    testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -110,7 +125,7 @@ tasks.getByName<Jar>("jar") {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -142,3 +157,63 @@ when {
 }
 
 val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
+
+/** jacoco **/
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // 테스트 후 진행
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // 테스트 선행 필요
+    reports {
+        html.required.set(true)
+        csv.required.set(false)
+        xml.required.set(true)
+        xml.outputLocation.set(File("$buildDir/reports/jacoco.xml"))
+    }
+
+    classDirectories.setFrom(
+        files(
+            classDirectories.files.map {
+                fileTree(it) {
+                    exclude(
+                        "**/*Application*",
+                        "**/*Config*",
+                        "**/*Dto*",
+                        "**/*Request*",
+                        "**/*Response*",
+                        "**/*Interceptor*",
+                        "**/*Exception*",
+                        "**/Q*.class"
+                    ) // Query Dsl 용
+                }
+            }
+        )
+    )
+}
+
+/** sonarqube **/
+sonarqube {
+    properties {
+        property("sonar.projectKey", "YAPP-Github_23rd-Android-Team-1-BE")
+        property("sonar.organization", "yapp-github")
+        property("sonar.host.url", "https://sonarcloud.io")
+
+        // sonar additional settings
+        property("sonar.sources", "src")
+        property("sonar.language", "Kotlin")
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.test.inclusions", "**/*Test.java")
+        property(
+            "sonar.exclusions",
+            "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, **/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+        )
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.java.binaries", "$buildDir/classes")
+        property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco.xml")
+    }
+}

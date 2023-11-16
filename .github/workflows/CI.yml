@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kotlin-version: [ "1.8.22" ]
+        java-version: [ "17" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Kotlin
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java-version }}
+          kotlin-version: ${{ matrix.kotlin-version }}
+          distribution: 'adopt'
+
+      # 빌드, ktlint check도 진행됨
+      - name: Gradle Clean & Build
+        run: ./gradlew clean build
+
+      # 컨테이너 실행
+      - name: Start containers  # test 돌릴때 mysql 필요
+        run: docker-compose up -d
+
+      # jacoco, sonarcube
+      - name: test and analyze
+        run: ./gradlew test sonar --stacktrace
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

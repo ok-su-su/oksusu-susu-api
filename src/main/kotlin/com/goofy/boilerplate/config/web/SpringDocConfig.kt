@@ -2,7 +2,7 @@ package com.goofy.boilerplate.config.web
 
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
-import org.springdoc.core.SpringDocUtils
+import org.springdoc.core.utils.SpringDocUtils
 import org.springframework.boot.info.BuildProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,7 +18,7 @@ import org.springframework.web.server.WebSession
  */
 @Configuration
 class SpringDocConfig(
-    private val buildProperties: BuildProperties
+    private val buildProperties: BuildProperties,
 ) {
     init {
         SpringDocUtils

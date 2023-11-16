@@ -1,17 +1,17 @@
 package com.goofy.boilerplate.common.dto
 
 import com.goofy.boilerplate.exception.ErrorCode
+import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.CancellationException
 import org.hibernate.TypeMismatchException
 import org.springframework.core.codec.DecodingException
 import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ServerWebInputException
-import javax.validation.ConstraintViolationException
 
 data class ErrorResponse(
     val errorCode: String,
     val reason: String,
-    val extra: Map<String, Any>? = null
+    val extra: Map<String, Any>? = null,
 ) {
     companion object {
         private const val FAIL_TO_VALIDATE_MESSAGE = "fail to validate"

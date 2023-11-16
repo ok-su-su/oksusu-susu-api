@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    hostname: mysql
+    volumes:
+      - ./mysqldata:/var/lib/mysql
+    environment:
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_HOST=localhost
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=test
+    ports:
+      - "3307:3306"

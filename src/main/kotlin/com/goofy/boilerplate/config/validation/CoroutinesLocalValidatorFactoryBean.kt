@@ -1,5 +1,7 @@
 package com.goofy.boilerplate.config.validation
 
+import jakarta.validation.ClockProvider
+import jakarta.validation.ParameterNameProvider
 import org.hibernate.validator.internal.engine.DefaultClockProvider
 import org.springframework.core.KotlinReflectionParameterNameDiscoverer
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer
@@ -9,8 +11,6 @@ import org.springframework.core.StandardReflectionParameterNameDiscoverer
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
-import javax.validation.ClockProvider
-import javax.validation.ParameterNameProvider
 import kotlin.reflect.jvm.kotlinFunction
 
 class CoroutinesLocalValidatorFactoryBean : LocalValidatorFactoryBean() {
@@ -18,7 +18,7 @@ class CoroutinesLocalValidatorFactoryBean : LocalValidatorFactoryBean() {
         return DefaultClockProvider.INSTANCE
     }
 
-    override fun postProcessConfiguration(configuration: javax.validation.Configuration<*>) {
+    override fun postProcessConfiguration(configuration: jakarta.validation.Configuration<*>) {
         super.postProcessConfiguration(configuration)
 
         val discoverer = PrioritizedParameterNameDiscoverer().apply {
