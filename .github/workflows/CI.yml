@@ -28,7 +28,7 @@ jobs:
           kotlin-version: ${{ matrix.kotlin-version }}
           distribution: 'adopt'
 
-      # 빌드
+      # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
         run: ./gradlew clean build
 
@@ -38,7 +38,7 @@ jobs:
 
       # jacoco, sonarcube
       - name: test and analyze
-        run: ./gradlew test sonar --info
+        run: ./gradlew test sonar --stacktrace
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
