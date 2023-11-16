@@ -28,15 +28,6 @@ jobs:
           kotlin-version: ${{ matrix.kotlin-version }}
           distribution: 'adopt'
 
-      # 자동 Ktlint 체크 자동화
-#      - name: ktlint check
-#        uses: ScaCap/action-ktlint@master
-#        with:
-#          github_token: ${{ secrets.GITHUBTOKEN }}
-#          reporter: github-pr-check
-#          ktlint_version: "1.0.0"
-#          continue-on-error: true # 실패해도 계속 진행
-
       # 빌드
       - name: Gradle Clean & Build
         run: ./gradlew clean build
