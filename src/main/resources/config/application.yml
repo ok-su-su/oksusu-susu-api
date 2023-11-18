@@ -19,17 +19,17 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 5s # format : https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion-duration
   application:
-    name: goofy-boilerplate
+    name: oksusu-susu-api
 
 # DOCS
 springdoc:
   swagger-ui:
     operations-sorter: alpha
   model-and-view-allowed: true
-  packages-to-scan: com.goofy.boilerplate
+  packages-to-scan: com.oksusu.susu
 
 # DATABASE
-boilerplate:
+susu:
   master:
     datasource:
       driver-class-name: com.mysql.cj.jdbc.Driver

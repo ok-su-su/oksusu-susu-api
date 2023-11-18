@@ -1,1 +1,1 @@
-rootProject.name = "goofy-boilerplate"
+rootProject.name = "oksusu-susu-api"

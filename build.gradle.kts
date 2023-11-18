@@ -22,7 +22,7 @@ plugins {
     id("org.sonarqube") version "4.3.1.3277"
 }
 
-group = "com.goofy"
+group = "com.oksusu"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -215,7 +215,8 @@ sonarqube {
         property("sonar.test.inclusions", "**/*Test.java")
         property(
             "sonar.exclusions",
-            "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, **/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+            "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, " +
+                "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.java.binaries", "$buildDir/classes")
