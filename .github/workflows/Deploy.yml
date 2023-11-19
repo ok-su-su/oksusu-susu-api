@@ -57,9 +57,8 @@ jobs:
           push: true
           tags: $DOCKER_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
 
-
   deploy:
-    needs: build-and-push
+    needs: build_and_push
     runs-on: ubuntu-latest
     steps:
       - name: Get Public IP
