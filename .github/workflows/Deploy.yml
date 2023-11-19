@@ -8,7 +8,7 @@ env:
   ACTIVE_PROFILE: "prod"
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_IMAGE_NAME: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
 permissions:
   contents: read
@@ -47,15 +47,15 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
 
       - name: Docker Build and push
         uses: docker/build-push-action@v3
         with:
           context: ./
           push: true
-          tags: $DOCKER_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
+          tags: $DOCKERHUB_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
 
   deploy:
     needs: build_and_push
@@ -95,7 +95,7 @@ jobs:
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker rm $(sudo docker ps -a -q)
             sudo docker rmi $(sudo docker images -q)
-            sudo docker pull $DOCKER_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
+            sudo docker pull $DOCKERHUB_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
             sudo docker run --build -d \
               --restart unless-stopped \
               --name server \
@@ -107,7 +107,7 @@ jobs:
               --log-opt awslogs-group=susu \
               --log-opt awslogs-region=ap-northeast-2 \
               --log-opt awslogs-stream=server \
-              $DOCKER_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
+              $DOCKERHUB_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
             sudo docker system prune --all -f
 
       - name: Remove IP FROM security group
