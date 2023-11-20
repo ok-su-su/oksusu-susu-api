@@ -9,6 +9,7 @@ env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_IMAGE_NAME: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
   DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  TEST: ${{ secrets.TEST }}
 
 permissions:
   contents: read
@@ -33,7 +34,8 @@ jobs:
           distribution: 'adopt'
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x ./gradlew | echo "$TEST ${{ secrets.TEST }}"
+
 
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
