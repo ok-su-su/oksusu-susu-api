@@ -39,3 +39,5 @@ out/
 mysqldata/
 
 .env
+
+docker-compose.prod.yml
