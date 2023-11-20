@@ -1,6 +1,6 @@
 FROM amazoncorretto:17
 
-ARG JAR_FILE=Api/build/libs/Api.jar
+ARG JAR_FILE=./build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 
 ARG PROFILE=dev

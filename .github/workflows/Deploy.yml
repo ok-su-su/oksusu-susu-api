@@ -48,7 +48,7 @@ jobs:
       - name: Docker build and push
         run: |
           docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-          docker build -t $DOCKERHUB_USERNAME/$DOCKERHUB_IMAGE_NAME .
+          docker build -t $DOCKERHUB_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}} .
           docker push $DOCKERHUB_USERNAME/$DOCKERHUB_IMAGE_NAME:${{env.IMAGE_TAG}}
 
 #      - name: Login to Docker Hub
