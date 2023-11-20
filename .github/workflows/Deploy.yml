@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['develop', 'feature/issue-3/deploy']
+    branches: ['develop']
 
 env:
   ACTIVE_PROFILE: "prod"
