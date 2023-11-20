@@ -42,9 +42,8 @@ jobs:
       - name: Make image tag
         run: echo "IMAGE_TAG=$ACTIVE_PROFILE-${GITHUB_SHA::7}" >> $GITHUB_ENV # activeProfile-커밋 hash 값
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v2
 
       - name: Docker build and push
         run: |
