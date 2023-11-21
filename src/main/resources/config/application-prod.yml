@@ -1,0 +1,47 @@
+# ===================================================================
+# Spring Boot Configuration for the prod profile
+# ===================================================================
+
+# SERVER
+server:
+  error:
+    include-exception: true # Include the "exception" attribute.
+    include-stacktrace: always # When to include a "stacktrace" attribute.
+    whitelabel.enabled: true
+
+# LOGGING
+logging:
+  level:
+    root: INFO
+    com.oksusu: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: DEBUG
+    reactor.netty.http.client: DEBUG
+
+# SPRING
+spring:
+  jackson:
+    serialization:
+      indent_output: true
+
+# DEV-DATABASE-COMMON
+datasource: &prod-datasource
+  url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+  username: ${MYSQL_USERNAME}
+  password: ${MYSQL_PASSWORD}
+  hikari:
+    minimum-idle: 2
+    maximum-pool-size: 2
+
+# DATABASE
+susu:
+  master.datasource: *prod-datasource
+  jpa:
+    properties:
+      hibernate.format_sql: true
+      hibernate.hbm2ddl.auto: none
+  maximum-jdbc-thread-pool-size:
