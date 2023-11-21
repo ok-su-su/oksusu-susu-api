@@ -37,3 +37,7 @@ out/
 .vscode/
 
 mysqldata/
+
+.env
+
+docker-compose.prod.yml

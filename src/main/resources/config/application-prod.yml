@@ -1,5 +1,5 @@
 # ===================================================================
-# Spring Boot Configuration for the dev profile
+# Spring Boot Configuration for the prod profile
 # ===================================================================
 
 # SERVER
@@ -29,17 +29,17 @@ spring:
       indent_output: true
 
 # DEV-DATABASE-COMMON
-datasource: &dev-datasource
-  url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${DB_NAME:susu}?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
-  username: ${MYSQL_USERNAME:susu}
-  password: ${MYSQL_PASSWORD:susu}
+datasource: &prod-datasource
+  url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+  username: ${MYSQL_USERNAME}
+  password: ${MYSQL_PASSWORD}
   hikari:
     minimum-idle: 2
     maximum-pool-size: 2
 
 # DATABASE
 susu:
-  master.datasource: *dev-datasource
+  master.datasource: *prod-datasource
   jpa:
     properties:
       hibernate.format_sql: true
