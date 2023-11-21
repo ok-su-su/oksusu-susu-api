@@ -35,12 +35,12 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-#      - name: Cache Gradle packages
-#        uses: actions/cache@v3
-#        with:
-#          path: ~/.gradle/caches
-#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
-#          restore-keys: ${{ runner.os }}-gradle
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
 
       # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
@@ -56,3 +56,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: docker stop and remove mysqldata
+        run: |
+          sudo docker stop $(sudo docker ps -a -q)
+          sudo docker rm $(sudo docker ps -a -q)
+          sudo docker rmi $(sudo docker images -q)
+          rm -rf mysqldata
