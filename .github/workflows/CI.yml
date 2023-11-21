@@ -39,12 +39,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
       # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
-        run: ./gradlew clean build
+        run: ./gradlew clean build --no-daemon
 
       # 컨테이너 실행
       - name: Start containers  # test 돌릴때 mysql 필요
@@ -52,7 +52,7 @@ jobs:
 
       # jacoco, sonarcube
       - name: test and analyze
-        run: ./gradlew test sonar --stacktrace
+        run: ./gradlew test sonar --stacktrace --no-daemon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
