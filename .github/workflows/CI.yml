@@ -35,12 +35,12 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+#      - name: Cache Gradle packages
+#        uses: actions/cache@v3
+#        with:
+#          path: ~/.gradle/caches
+#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
+#          restore-keys: ${{ runner.os }}-gradle
 
       # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
