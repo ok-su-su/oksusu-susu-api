@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 class HealthResource(
     private val environment: Environment,
 ) {
+    /** health check */
     @Operation(summary = "health check")
     @GetMapping("/health")
     fun health() = HealthResponse(
