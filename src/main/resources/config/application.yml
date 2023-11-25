@@ -8,8 +8,8 @@ server:
   http2:
     enabled: true
   shutdown: graceful # timeout configuration property : spring.lifecycle.timeout-per-shutdown-phase
+  forward-headers-strategy: framework
 
-# LOGGING
 logging:
   level:
     root: INFO
