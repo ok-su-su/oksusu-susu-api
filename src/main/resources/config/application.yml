@@ -8,7 +8,6 @@ server:
   http2:
     enabled: true
   shutdown: graceful # timeout configuration property : spring.lifecycle.timeout-per-shutdown-phase
-  forward-headers-strategy: framework
 
 logging:
   level:
@@ -27,8 +26,6 @@ springdoc:
     operations-sorter: alpha
   model-and-view-allowed: true
   packages-to-scan: com.oksusu.susu
-  cache:
-    disabled: true
 
 # DATABASE
 susu:
