@@ -27,6 +27,8 @@ springdoc:
     operations-sorter: alpha
   model-and-view-allowed: true
   packages-to-scan: com.oksusu.susu
+  cache:
+    disabled: true
 
 # DATABASE
 susu:
