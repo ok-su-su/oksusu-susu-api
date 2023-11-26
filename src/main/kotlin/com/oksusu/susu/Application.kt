@@ -31,8 +31,8 @@ fun main(args: Array<String>) {
     /**
      * Initialize jvm level configuration
      */
-    com.oksusu.susu.init()
-    runApplication<com.oksusu.susu.Application>(*args)
+    init()
+    runApplication<Application>(*args)
 }
 
 fun init() {

@@ -19,6 +19,10 @@ spring:
   jackson:
     serialization:
       indent_output: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 # DATABASE
 susu:
