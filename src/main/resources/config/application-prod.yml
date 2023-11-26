@@ -20,19 +20,16 @@ spring:
     serialization:
       indent_output: true
 
-# TODO : 변경 필요.
-# DEV-DATABASE-COMMON
-datasource: &prod-datasource
-  url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
-  username: ${MYSQL_USERNAME}
-  password: ${MYSQL_PASSWORD}
-  hikari:
-    minimum-idle: 10
-    maximum-pool-size: 15
-
 # DATABASE
 susu:
-  master.datasource: *prod-datasource
+  master:
+    datasource:
+      url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+      username: ${MYSQL_USERNAME}
+      password: ${MYSQL_PASSWORD}
+      hikari:
+        minimum-idle: 10
+        maximum-pool-size: 15
   jpa:
     properties:
       hibernate.format_sql: true
