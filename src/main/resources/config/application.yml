@@ -19,6 +19,10 @@ spring:
     timeout-per-shutdown-phase: 5s # format : https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion-duration
   application:
     name: oksusu-susu-api
+  data:
+    redis:
+      repositories:
+        enabled: false
 
 # DOCS
 springdoc:

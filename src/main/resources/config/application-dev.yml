@@ -27,12 +27,16 @@ spring:
   jackson:
     serialization:
       indent_output: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 # DEV-DATABASE-COMMON
 datasource: &dev-datasource
-  url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${DB_NAME:susu}?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
-  username: ${MYSQL_USERNAME:susu}
-  password: ${MYSQL_PASSWORD:susu}
+  url: jdbc:mysql://localhost:3306/susu?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+  username: susu
+  password: susu
   hikari:
     minimum-idle: 2
     maximum-pool-size: 2
