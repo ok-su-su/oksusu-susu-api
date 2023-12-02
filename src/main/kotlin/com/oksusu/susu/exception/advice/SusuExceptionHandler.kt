@@ -13,7 +13,7 @@ class SusuExceptionHandler {
 
     @ExceptionHandler(BusinessException::class)
     protected fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse> {
-        logger.error { "BusinessException ${e.message}" }
+        logger.warn { "BusinessException ${e.message}" }
         val response = ErrorResponse(
             errorCode = e.errorCode.name,
             reason = e.message ?: e.errorCode.description,
