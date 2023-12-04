@@ -1,7 +1,7 @@
 package com.oksusu.susu.auth.application
 
-import com.oksusu.susu.auth.model.AuthUserToken
 import com.oksusu.susu.auth.model.AuthUserImpl
+import com.oksusu.susu.auth.model.AuthUserToken
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.user.infrastructure.UserRepository

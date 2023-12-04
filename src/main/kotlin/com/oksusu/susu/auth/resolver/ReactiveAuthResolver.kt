@@ -2,8 +2,8 @@ package com.oksusu.susu.auth.resolver
 
 import com.oksusu.susu.auth.application.AuthService
 import com.oksusu.susu.auth.model.AUTH_TOKEN_KEY
-import com.oksusu.susu.auth.model.AuthUserToken
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.auth.model.AuthUserToken
 import org.springframework.core.MethodParameter
 import org.springframework.core.ReactiveAdapterRegistry
 import org.springframework.http.server.reactive.ServerHttpRequest
