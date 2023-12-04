@@ -1,7 +1,11 @@
 package com.oksusu.susu.exception
 
-open class BusinessException(
+open class SusuException(
     val errorCode: ErrorCode,
     override val message: String? = errorCode.description,
     val extra: Map<String, Any>? = null,
 ) : RuntimeException(message ?: errorCode.description)
+
+class NotFoundException(errorCode: ErrorCode) : SusuException(errorCode)
+
+class InvalidTokenException(errorCode: ErrorCode) : SusuException(errorCode)
