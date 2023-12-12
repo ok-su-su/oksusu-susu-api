@@ -1,54 +1,39 @@
 package com.oksusu.susu.auth.application
 
 import com.oksusu.susu.auth.helper.KakaoOauthHelper
-import com.oksusu.susu.auth.model.AuthUserImpl
-import com.oksusu.susu.auth.model.AuthUserToken
 import com.oksusu.susu.auth.model.OauthProvider
+import com.oksusu.susu.auth.model.dto.AbleRegisterResponse
 import com.oksusu.susu.auth.model.dto.OauthLoginLinkResponse
-import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.user.infrastructure.UserRepository
-import org.springframework.data.repository.findByIdOrNull
+import com.oksusu.susu.auth.model.dto.OauthTokenResponse
+import kotlinx.coroutines.*
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 
 @Service
 class OauthService(
     private val kakaoOauthHelper: KakaoOauthHelper
 ) {
+    private val logger = mu.KotlinLogging.logger { }
 
     /** oauth login link 가져오기 */
-    fun getOauthLoginLinkDev(provider: OauthProvider): OauthLoginLinkResponse {
-        return when (provider) {
-            OauthProvider.KAKAO -> kakaoOauthHelper.getOauthLoginLinkDev()
+    suspend fun getOauthLoginLinkDev(provider: OauthProvider): OauthLoginLinkResponse = when (provider) {
+        OauthProvider.KAKAO -> kakaoOauthHelper.getOauthLoginLinkDev()
+    }
+
+    /** oauth token 가져오기 */
+    suspend fun getOauthTokenDev(provider: OauthProvider, code: String): OauthTokenResponse {
+        return withContext(Dispatchers.IO) {
+            val tokenDeferred = async {
+                when (provider) {
+                    OauthProvider.KAKAO -> kakaoOauthHelper.getOauthTokenDev(code)
+                }
+            }
+            tokenDeferred.await()
         }
     }
 
-//    /** idtoken 가져오기 *  */
-//    fun getCredential(provider: OauthProvider, code: String, referer: String?): OauthTokenResponse {
-//        return when (provider) {
-//            OauthProvider.KAKAO -> TODO()
-//        }
-//    }
-//
-//    fun getCredentialDev(provider: OauthProvider, code: String): OauthTokenResponse {
-//        return when (provider) {
-//            OauthProvider.KAKAO -> TODO()
-//        }
-//    }
-//
-//    /** 회원탈퇴 *  */
-//    fun withdraw(
-//        provider: OauthProvider, oid: String?, appleAccessToken: String?, referer: String?,
-//    ) {
-//        return when (provider) {
-//            OauthProvider.KAKAO -> TODO()
-//        }
-//    }
-//
-//    fun withdrawDev(provider: OauthProvider, oid: String?, appleAccessToken: String?) {
-//        when (provider) {
-//            KAKAO -> kakaoOauthHelper.withdrawKakaoOauthUser(oid)
-//        }
-//    }
+    /** 회원가입 가능 여부 체크. */
+    suspend fun checkRegisterValid(provider: OauthProvider, accessToken: String): AbleRegisterResponse =
+        when (provider) {
+            OauthProvider.KAKAO -> kakaoOauthHelper.checkRegisterValid(accessToken)
+        }
 }

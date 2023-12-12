@@ -18,5 +18,5 @@ class User(
     val nickname: String,
 
     @Embedded
-    val oauthInfo: OauthInfo
+    val oauthInfo: OauthInfo,
 ) : BaseEntity()
