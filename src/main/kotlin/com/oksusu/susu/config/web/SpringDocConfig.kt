@@ -1,7 +1,11 @@
 package com.oksusu.susu.config.web
 
+import com.oksusu.susu.auth.model.AUTH_TOKEN_KEY
+import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.security.SecurityRequirement
+import io.swagger.v3.oas.models.security.SecurityScheme
 import io.swagger.v3.oas.models.servers.Server
 import org.springdoc.core.utils.SpringDocUtils
 import org.springframework.boot.info.BuildProperties
@@ -9,6 +13,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.result.view.RequestContext
 import org.springframework.web.server.WebSession
+import java.util.*
 
 /**
  * **Swagger**
@@ -32,7 +37,10 @@ class SpringDocConfig(
 
     @Bean
     fun openApi(): OpenAPI {
+        val securityRequirement = SecurityRequirement().addList("access-token")
         return OpenAPI()
+            .components(authSetting())
+            .security(listOf(securityRequirement))
             .addServersItem(Server().url("/"))
             .info(
                 Info()
@@ -41,4 +49,17 @@ class SpringDocConfig(
                     .description("Susu Rest API Docs")
             )
     }
+
+    private fun authSetting(): Components {
+        return Components()
+            .addSecuritySchemes(
+                "access-token",
+                SecurityScheme()
+                    .description("Access Token")
+                    .type(SecurityScheme.Type.APIKEY)
+                    .`in`(SecurityScheme.In.HEADER)
+                    .name(AUTH_TOKEN_KEY),
+            )
+    }
+
 }

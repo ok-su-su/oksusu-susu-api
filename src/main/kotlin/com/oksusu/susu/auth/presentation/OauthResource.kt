@@ -53,4 +53,14 @@ class OauthResource(
     ): TokenDto {
         return oauthService.register(provider, accessToken, oauthRegisterRequest)
     }
+
+    /** 로그인을 합니다. */
+    @Operation(summary = "login")
+    @PostMapping("/v1/oauth/{provider}/login")
+    suspend fun login(
+        @PathVariable provider: OauthProvider,
+        @RequestParam accessToken: String,
+    ): TokenDto {
+        return oauthService.login(provider, accessToken)
+    }
 }

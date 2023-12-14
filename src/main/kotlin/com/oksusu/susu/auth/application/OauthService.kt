@@ -84,4 +84,32 @@ class OauthService(
 
             tokenDto
         }
+
+    /** 로그인 */
+    @Transactional
+    suspend fun login(provider: OauthProvider, accessToken: String): TokenDto =
+        withContext(Dispatchers.IO) {
+            val oauthInfo = async {
+                when (provider) {
+                    OauthProvider.KAKAO -> kakaoOauthHelper.getKakaoUserInfo(accessToken)
+                }
+            }.await().oauthInfo
+
+            val user = async {
+                userRepository.findByOauthInfo(oauthInfo)
+            }.await() ?: throw NotFoundException(ErrorCode.USER_NOT_FOUND_ERROR)
+
+            val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(user.id)
+
+            val refreshTokenRedisEntity = RefreshTokenRedisEntity(
+                id = user.id,
+                refreshToken = tokenDto.refreshToken,
+                ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
+            )
+            async {
+                refreshTokenRedisEntityRepository.save(refreshTokenRedisEntity)
+            }.await()
+
+            tokenDto
+        }
 }

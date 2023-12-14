@@ -31,4 +31,5 @@ data class AuthUserTokenPayload(
     val aud: String,
     val iss: String,
     val exp: Long,
+    val type: String,
 )
