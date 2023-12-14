@@ -16,6 +16,9 @@ import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 import java.util.*
 
+private const val ACCESS_TOKEN = "accessToken"
+private const val REFRESH_TOKEN = "refreshToken"
+
 @Service
 class JwtTokenService(
     private val jwtConfig: JwtConfig,
@@ -33,6 +36,7 @@ class JwtTokenService(
             this.withIssuer(jwtConfig.issuer)
             this.withAudience(jwtConfig.audience)
             this.withClaim("id", id)
+            this.withClaim("type", ACCESS_TOKEN)
             this.withExpiresAt(Date.from(tokenExpiredAt.toInstant()))
         }.sign(Algorithm.HMAC256(jwtConfig.secretKey))
     }
@@ -53,5 +57,15 @@ class JwtTokenService(
                     Mono.error(InvalidTokenException(ErrorCode.FAIL_TO_VERIFY_TOKEN_ERROR))
                 }
         }
+    }
+
+    fun createRefreshToken(id: Long, refreshTokenExpiresAt: LocalDateTime): String {
+        return JWT.create().apply {
+            this.withIssuer(jwtConfig.issuer)
+            this.withAudience(jwtConfig.audience)
+            this.withClaim("id", id)
+            this.withClaim("type", REFRESH_TOKEN)
+            this.withExpiresAt(Date.from(refreshTokenExpiresAt.toInstant()))
+        }.sign(Algorithm.HMAC256(jwtConfig.secretKey))
     }
 }

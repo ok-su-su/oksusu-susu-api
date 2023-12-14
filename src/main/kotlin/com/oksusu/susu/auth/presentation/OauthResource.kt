@@ -2,9 +2,7 @@ package com.oksusu.susu.auth.presentation
 
 import com.oksusu.susu.auth.application.OauthService
 import com.oksusu.susu.auth.model.OauthProvider
-import com.oksusu.susu.auth.model.dto.AbleRegisterResponse
-import com.oksusu.susu.auth.model.dto.OauthLoginLinkResponse
-import com.oksusu.susu.auth.model.dto.OauthTokenResponse
+import com.oksusu.susu.auth.model.dto.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
@@ -43,5 +41,16 @@ class OauthResource(
         @RequestParam accessToken: String,
     ): AbleRegisterResponse {
         return oauthService.checkRegisterValid(provider, accessToken)
+    }
+
+    /** 회원가입을 합니다. */
+    @Operation(summary = "register")
+    @PostMapping("/v1/oauth/{provider}/register")
+    suspend fun register(
+        @PathVariable provider: OauthProvider,
+        @RequestBody oauthRegisterRequest: OauthRegisterRequest,
+        @RequestParam accessToken: String,
+    ): TokenDto {
+        return oauthService.register(provider, accessToken, oauthRegisterRequest)
     }
 }

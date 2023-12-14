@@ -49,8 +49,3 @@ susu:
       hibernate.hbm2ddl.auto: none
     show-sql: false
     database: mysql
-
-# AUTH
-auth:
-  jwt:
-    secret-key: 27a68785a3597923c505668253cbad2ce42adfbac558611b272aa44684436e7e6a4f83a59bf89cf413a957638a4558acd58dac5d8da497d6e84fa08094ee2203

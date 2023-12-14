@@ -1,10 +1,12 @@
 package com.oksusu.susu.auth.helper
 
 import com.oksusu.susu.auth.infrastructure.oauth.kakao.client.KakaoClient
+import com.oksusu.susu.auth.infrastructure.oauth.kakao.dto.KakaoOauthUserInfoResponse
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.AbleRegisterResponse
 import com.oksusu.susu.auth.model.dto.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.OauthTokenResponse
+import com.oksusu.susu.auth.model.dto.OauthUserInfoDto
 import com.oksusu.susu.common.properties.KakaoOauthProperties
 import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.infrastructure.UserRepository
@@ -45,13 +47,18 @@ class KakaoOauthHelper(
     suspend fun checkRegisterValid(accessToken: String): AbleRegisterResponse {
         return withContext(Dispatchers.IO) {
             val userInfoDeferred = async {
-                kakaoClient.kakaoUserInfoClient(accessToken)
+                getKakaoUserInfo(accessToken)
             }
-            val oauthInfo = OauthInfo(OauthProvider.KAKAO, userInfoDeferred.await().id)
+            val oauthInfo = userInfoDeferred.await().oauthInfo
             val canRegisterDeferred = async {
                 userRepository.existsByOauthInfo(oauthInfo)
             }
-            AbleRegisterResponse(canRegisterDeferred.await())
+            AbleRegisterResponse(!canRegisterDeferred.await())
         }
     }
+
+    /** 유저 정보를 가져옵니다. */
+    suspend fun getKakaoUserInfo(accessToken: String): OauthUserInfoDto =
+        OauthUserInfoDto.fromKakao(kakaoClient.kakaoUserInfoClient(accessToken))
+
 }

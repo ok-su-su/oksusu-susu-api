@@ -59,3 +59,10 @@ oauth:
     redirect-url: ${KAKAO_REDIRECT_URL}
     app-key: ${KAKAO_APP_KEY}
     admin-key: ${KAKAO_ADMIN_KEY}
+
+# AUTH
+auth:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-exp: ${JWT_ACCESS_EXP}
+    refresh-exp: ${JWT_REFRESH_EXP}

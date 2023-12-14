@@ -17,5 +17,6 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** User Error Code */
     USER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
+    ALREADY_REGISTERED_USER(HttpStatus.NOT_FOUND, "이미 가입된 유저입니다."),
     ;
 }
