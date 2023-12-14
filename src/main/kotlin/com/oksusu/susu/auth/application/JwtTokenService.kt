@@ -25,10 +25,18 @@ class JwtTokenService(
 ) {
     private val logger = mu.KotlinLogging.logger {}
 
-    private val jwtVerifier = JWT
+    private val accessJwtVerifier = JWT
         .require(Algorithm.HMAC256(jwtConfig.secretKey))
         .withIssuer(jwtConfig.issuer)
         .withAudience(jwtConfig.audience)
+        .withClaim("type", ACCESS_TOKEN)
+        .build()
+
+    private val refreshJwtVerifier = JWT
+        .require(Algorithm.HMAC256(jwtConfig.secretKey))
+        .withIssuer(jwtConfig.issuer)
+        .withAudience(jwtConfig.audience)
+        .withClaim("type", REFRESH_TOKEN)
         .build()
 
     fun createToken(id: Long, tokenExpiredAt: LocalDateTime): String {
@@ -42,7 +50,7 @@ class JwtTokenService(
     }
 
     fun verifyToken(token: AuthUserToken): AuthUserTokenPayload {
-        val payload = jwtVerifier.verify(token.value)
+        val payload = accessJwtVerifier.verify(token.value)
             .payload
             .decodeBase64()
 
@@ -67,5 +75,10 @@ class JwtTokenService(
             this.withClaim("type", REFRESH_TOKEN)
             this.withExpiresAt(Date.from(refreshTokenExpiresAt.toInstant()))
         }.sign(Algorithm.HMAC256(jwtConfig.secretKey))
+    }
+
+    suspend fun verifyRefreshToken(refreshToken: String) {
+        runCatching { refreshJwtVerifier.verify(refreshToken) }
+            .onFailure { throw InvalidTokenException(ErrorCode.NOT_REFRESH_TOKEN) }
     }
 }
