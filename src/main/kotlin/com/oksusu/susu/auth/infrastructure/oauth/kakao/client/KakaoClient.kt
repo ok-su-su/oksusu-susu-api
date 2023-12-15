@@ -8,10 +8,6 @@ import com.oksusu.susu.config.webClient.SusuWebClient
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Component
 
-private const val KAKAO_TOKEN_URL = "/oauth/token?grant_type=authorization_code&client_id=%s&redirect_uri=%s&code=%s&client_secret=%s"
-private const val KAKAO_KAUTH_URL = "https://kauth.kakao.com"
-private const val KAKAO_KAPI_URL = "https://kapi.kakao.com"
-
 @Component
 class KakaoClient(
     private val kakaoOauthProperties: KakaoOauthProperties,
@@ -24,8 +20,8 @@ class KakaoClient(
         code: String,
     ): KakaoOauthTokenResponse {
         val url =
-            KAKAO_KAUTH_URL + String.format(
-                KAKAO_TOKEN_URL,
+            kakaoOauthProperties.kauthUrl + String.format(
+                kakaoOauthProperties.tokenUrl,
                 kakaoOauthProperties.clientId,
                 redirectUrl,
                 code,
@@ -41,7 +37,7 @@ class KakaoClient(
     suspend fun kakaoUserInfoClient(
         accessToken: String,
     ): KakaoOauthUserInfoResponse {
-        val url = "$KAKAO_KAPI_URL/v2/user/me"
+        val url = "${kakaoOauthProperties.kapiUrl}/v2/user/me"
         return susuWebClient.webClient().get()
             .uri(url)
             .header("Authorization", BEARER + accessToken)

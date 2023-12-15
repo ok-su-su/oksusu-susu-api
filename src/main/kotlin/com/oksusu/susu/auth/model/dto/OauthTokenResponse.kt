@@ -9,8 +9,8 @@ class OauthTokenResponse(
     companion object {
         fun fromKakao(kakaoOauthTokenResponse: KakaoOauthTokenResponse): OauthTokenResponse {
             return OauthTokenResponse(
-                accessToken = kakaoOauthTokenResponse.access_token,
-                refreshToken = kakaoOauthTokenResponse.refresh_token,
+                accessToken = kakaoOauthTokenResponse.accessToken,
+                refreshToken = kakaoOauthTokenResponse.refreshToken,
             )
         }
     }

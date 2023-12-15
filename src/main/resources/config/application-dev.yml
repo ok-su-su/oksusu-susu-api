@@ -53,7 +53,9 @@ susu:
 # OAUTH
 oauth:
   kakao:
-    base-url: ${KAKAO_BASE_URL}
+    token-url: ${KAKAO_TOKEN_URL}
+    kauth-url: ${KAKAO_KAUTH_URL}
+    kapi-url: ${KAKAO_KAPI_URL}
     client-id: ${KAKAO_CLIENT_ID}
     client-secret: ${KAKAO_CLIENT_SECRET}
     redirect-url: ${KAKAO_REDIRECT_URL}

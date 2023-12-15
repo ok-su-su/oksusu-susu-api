@@ -27,7 +27,5 @@ class TokenGenerateHelper(
         )
     }
 
-    fun getRefreshTokenTtlSecond(): Int {
-        return jwtConfig.refreshExp
-    }
+    fun getRefreshTokenTtlSecond(): Int = jwtConfig.refreshExp
 }
