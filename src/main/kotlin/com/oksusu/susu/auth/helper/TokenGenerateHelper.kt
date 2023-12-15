@@ -23,7 +23,7 @@ class TokenGenerateHelper(
             accessToken = accessToken,
             accessTokenExp = accessTokenExpiresIn,
             refreshToken = refreshToken,
-            refreshTokenExp = refreshTokenExpiresIn,
+            refreshTokenExp = refreshTokenExpiresIn
         )
     }
 

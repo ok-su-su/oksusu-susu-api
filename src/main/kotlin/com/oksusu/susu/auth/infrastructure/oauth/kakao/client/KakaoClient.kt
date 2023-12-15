@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class KakaoClient(
     private val kakaoOauthProperties: KakaoOauthProperties,
-    private val susuWebClient: SusuWebClient
+    private val susuWebClient: SusuWebClient,
 ) {
     private val logger = mu.KotlinLogging.logger { }
 
@@ -25,7 +25,7 @@ class KakaoClient(
                 kakaoOauthProperties.clientId,
                 redirectUrl,
                 code,
-                kakaoOauthProperties.clientSecret,
+                kakaoOauthProperties.clientSecret
             )
         return susuWebClient.webClient().post()
             .uri(url)
@@ -45,5 +45,4 @@ class KakaoClient(
             .bodyToMono(KakaoOauthUserInfoResponse::class.java)
             .awaitSingle()
     }
-
 }

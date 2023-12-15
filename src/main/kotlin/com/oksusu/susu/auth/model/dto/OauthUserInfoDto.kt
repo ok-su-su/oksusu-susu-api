@@ -12,10 +12,9 @@ class OauthUserInfoDto(
             return OauthUserInfoDto(
                 OauthInfo(
                     oauth_id = kakaoOauthUserInfoResponse.id,
-                    oauth_provider = OauthProvider.KAKAO,
+                    oauth_provider = OauthProvider.KAKAO
                 )
             )
         }
     }
 }
-

@@ -14,7 +14,6 @@ import com.oksusu.susu.user.infrastructure.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import org.springframework.cglib.proxy.Dispatcher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -70,5 +69,4 @@ class AuthService(
             tokenDto
         }
     }
-
 }

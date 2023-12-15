@@ -1,6 +1,5 @@
 package com.oksusu.susu.auth.model.dto
 
-import jakarta.validation.constraints.Positive
 import java.time.LocalDate
 
 class OauthRegisterRequest(
@@ -12,4 +11,3 @@ class OauthRegisterRequest(
         return this.birth ?.let { LocalDate.of(it, 1, 1) }
     }
 }
-

@@ -13,4 +13,3 @@ class KakaoOauthProperties(
     val appKey: String,
     val adminKey: String,
 )
-

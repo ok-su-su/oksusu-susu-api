@@ -13,8 +13,6 @@ import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
-
 
 @Configuration
 class SusuWebClient {
@@ -60,7 +58,7 @@ class SusuWebClient {
 //                    }
                     Mono.just(clientRequest)
                 }
-            ) //Response Header 로깅 필터
+            ) // Response Header 로깅 필터
             .filter(
                 ExchangeFilterFunction.ofResponseProcessor { clientResponse: ClientResponse -> // response logging
 //                    logger.info(">>>>>>>>>> RESPONSE <<<<<<<<<<")

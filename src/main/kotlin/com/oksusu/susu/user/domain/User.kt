@@ -30,7 +30,7 @@ class User(
                 oauthInfo = oauthInfo,
                 name = oauthRegisterRequest.name,
                 age = oauthRegisterRequest.age,
-                birth = oauthRegisterRequest.getBirth(),
+                birth = oauthRegisterRequest.getBirth()
             )
         }
     }

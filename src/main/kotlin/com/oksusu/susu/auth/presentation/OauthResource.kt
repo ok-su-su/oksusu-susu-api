@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping(value = ["/api/v1/oauth"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class OauthResource(
-    private val oauthService: OauthService
+    private val oauthService: OauthService,
 ) {
     private val logger = mu.KotlinLogging.logger { }
 

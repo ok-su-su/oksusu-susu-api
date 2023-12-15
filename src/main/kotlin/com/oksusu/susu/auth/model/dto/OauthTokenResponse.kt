@@ -10,7 +10,7 @@ class OauthTokenResponse(
         fun fromKakao(kakaoOauthTokenResponse: KakaoOauthTokenResponse): OauthTokenResponse {
             return OauthTokenResponse(
                 accessToken = kakaoOauthTokenResponse.accessToken,
-                refreshToken = kakaoOauthTokenResponse.refreshToken,
+                refreshToken = kakaoOauthTokenResponse.refreshToken
             )
         }
     }

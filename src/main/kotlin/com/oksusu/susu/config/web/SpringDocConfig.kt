@@ -58,8 +58,7 @@ class SpringDocConfig(
                     .description("Access Token")
                     .type(SecurityScheme.Type.APIKEY)
                     .`in`(SecurityScheme.In.HEADER)
-                    .name(AUTH_TOKEN_KEY),
+                    .name(AUTH_TOKEN_KEY)
             )
     }
-
 }
