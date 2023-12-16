@@ -23,14 +23,16 @@ class KakaoOauthHelper(
     private val logger = mu.KotlinLogging.logger { }
 
     /** link */
-    suspend fun getOauthLoginLinkDev(): OauthLoginLinkResponse = OauthLoginLinkResponse(
-        KAKAO_KAUTH_URL +
-            String.format(
-                KAKAO_OAUTH_QUERY_STRING,
-                kakaoOauthProperties.clientId,
-                kakaoOauthProperties.redirectUrl
-            )
-    )
+    suspend fun getOauthLoginLinkDev(): OauthLoginLinkResponse {
+        return OauthLoginLinkResponse(
+            KAKAO_KAUTH_URL +
+                String.format(
+                    KAKAO_OAUTH_QUERY_STRING,
+                    kakaoOauthProperties.clientId,
+                    kakaoOauthProperties.redirectUrl
+                )
+        )
+    }
 
     /** oauth token 받아오기 */
     suspend fun getOauthTokenDev(code: String): OauthTokenResponse {
@@ -39,12 +41,12 @@ class KakaoOauthHelper(
     }
 
     /** 회원가입 가능 여부 체크. */
-    suspend fun checkRegisterValid(accessToken: String): AbleRegisterResponse = withContext(Dispatchers.IO) {
+    suspend fun checkRegisterValid(accessToken: String): AbleRegisterResponse {
         val userInfoDeferred = getKakaoUserInfo(accessToken)
         val oauthInfo = userInfoDeferred.oauthInfo
         val canRegisterDeferred = userService.existsByOauthInfo(oauthInfo)
 
-        AbleRegisterResponse(!canRegisterDeferred)
+        return AbleRegisterResponse(!canRegisterDeferred)
     }
 
     /** 유저 정보를 가져옵니다. */

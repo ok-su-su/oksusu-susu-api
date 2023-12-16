@@ -10,8 +10,6 @@ import com.oksusu.susu.auth.model.dto.response.TokenRefreshRequest
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.user.application.UserService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
@@ -36,7 +34,7 @@ class AuthFacade(
     }
 
     @Transactional
-    suspend fun logout(authUser: AuthUser) = withContext(Dispatchers.IO) {
+    suspend fun logout(authUser: AuthUser) {
         refreshTokenService.deleteById(authUser.id)
     }
 

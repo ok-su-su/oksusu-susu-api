@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
@@ -18,6 +19,19 @@ class UserService(
         return withContext(Dispatchers.IO) {
             userRepository.existsByOauthInfo(oauthInfo)
         }
+    }
+
+    @Transactional
+    fun saveSync(user: User): User {
+        return userRepository.save(user)
+    }
+
+    suspend fun findByOauthInfoOrThrow(oauthInfo: OauthInfo): User {
+        return findByOauthInfoOrNull(oauthInfo) ?: throw NotFoundException(ErrorCode.USER_NOT_FOUND_ERROR)
+    }
+
+    suspend fun findByOauthInfoOrNull(oauthInfo: OauthInfo): User? {
+        return withContext(Dispatchers.IO) { userRepository.findByOauthInfo(oauthInfo) }
     }
 
     suspend fun findByIdOrThrow(uid: Long): User {

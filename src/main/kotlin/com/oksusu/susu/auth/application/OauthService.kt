@@ -3,7 +3,6 @@ package com.oksusu.susu.auth.application
 import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.helper.KakaoOauthHelper
 import com.oksusu.susu.auth.helper.TokenGenerateHelper
-import com.oksusu.susu.auth.infrastructure.repository.RefreshTokenRepository
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.TokenDto
 import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
@@ -13,11 +12,8 @@ import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.domain.User
-import com.oksusu.susu.user.infrastructure.UserRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -25,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional
 class OauthService(
     private val kakaoOauthHelper: KakaoOauthHelper,
     private val tokenGenerateHelper: TokenGenerateHelper,
-    val userRepository: UserRepository,
-    val refreshTokenRepository: RefreshTokenRepository,
+    private val refreshTokenService: RefreshTokenService,
+    private val userService: UserService,
 ) {
     private val logger = mu.KotlinLogging.logger { }
 
@@ -39,22 +35,18 @@ class OauthService(
 
     /** oauth token 가져오기 */
     suspend fun getOauthTokenDev(provider: OauthProvider, code: String): OauthTokenResponse {
-        return withContext(Dispatchers.IO) {
-            val tokenDeferred = async {
-                when (provider) {
-                    OauthProvider.KAKAO -> kakaoOauthHelper.getOauthTokenDev(code)
-                }
-            }
-            tokenDeferred.await()
+        return when (provider) {
+            OauthProvider.KAKAO -> kakaoOauthHelper.getOauthTokenDev(code)
         }
     }
 
     /** 회원가입 가능 여부 체크. */
     @Transactional(readOnly = true)
-    suspend fun checkRegisterValid(provider: OauthProvider, accessToken: String): AbleRegisterResponse =
-        when (provider) {
+    suspend fun checkRegisterValid(provider: OauthProvider, accessToken: String): AbleRegisterResponse {
+        return when (provider) {
             OauthProvider.KAKAO -> kakaoOauthHelper.checkRegisterValid(accessToken)
         }
+    }
 
     /** 회원가입 */
     @Transactional
@@ -62,63 +54,50 @@ class OauthService(
         provider: OauthProvider,
         accessToken: String,
         oauthRegisterRequest: OauthRegisterRequest,
-    ): TokenDto =
-        withContext(Dispatchers.IO) {
-            val oauthInfo = async {
-                when (provider) {
-                    OauthProvider.KAKAO -> kakaoOauthHelper.getKakaoUserInfo(accessToken)
-                }
-            }.await().oauthInfo
+    ): TokenDto {
+        val oauthInfo = when (provider) {
+            OauthProvider.KAKAO -> kakaoOauthHelper.getKakaoUserInfo(accessToken)
+        }.oauthInfo
 
-            val canRegisterDeferred = async {
-                userRepository.existsByOauthInfo(oauthInfo)
-            }
-            if (canRegisterDeferred.await()) {
-                throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
-            }
-
-            val user = async {
-                userRepository.save(User.toEntity(oauthRegisterRequest, oauthInfo))
-            }.await()
-            val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(user.id)
-
-            val refreshToken = RefreshToken(
-                id = user.id,
-                refreshToken = tokenDto.refreshToken,
-                ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
-            )
-            async {
-                refreshTokenRepository.save(refreshToken)
-            }.await()
-
-            tokenDto
+        val canRegisterDeferred = userService.existsByOauthInfo(oauthInfo)
+        if (canRegisterDeferred) {
+            throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
         }
+
+        val user = User.toEntity(oauthRegisterRequest, oauthInfo)
+            .run { userService.saveSync(this) }
+
+        val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(user.id)
+
+        val refreshToken = RefreshToken(
+            id = user.id,
+            refreshToken = tokenDto.refreshToken,
+            ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
+        )
+
+        refreshTokenService.save(refreshToken)
+
+        return tokenDto
+    }
 
     /** 로그인 */
     @Transactional
-    suspend fun login(provider: OauthProvider, request: OAuthLoginRequest): TokenDto =
-        withContext(Dispatchers.IO) {
-            val oauthInfo = async {
-                when (provider) {
-                    OauthProvider.KAKAO -> kakaoOauthHelper.getKakaoUserInfo(request.accessToken)
-                }
-            }.await().oauthInfo
+    suspend fun login(provider: OauthProvider, request: OAuthLoginRequest): TokenDto {
+        val oauthInfo = when (provider) {
+            OauthProvider.KAKAO -> kakaoOauthHelper.getKakaoUserInfo(request.accessToken)
+        }.oauthInfo
 
-            val user = async {
-                userRepository.findByOauthInfo(oauthInfo)
-            }.await() ?: throw NotFoundException(ErrorCode.USER_NOT_FOUND_ERROR)
+        val user = userService.findByOauthInfoOrThrow(oauthInfo)
+        val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(user.id)
 
-            val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(user.id)
+        val refreshToken = RefreshToken(
+            id = user.id,
+            refreshToken = tokenDto.refreshToken,
+            ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
+        )
 
-            val refreshToken = RefreshToken(
-                id = user.id,
-                refreshToken = tokenDto.refreshToken,
-                ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
-            )
-            async {
-                refreshTokenRepository.save(refreshToken)
-            }.await()
+        refreshTokenService.save(refreshToken)
 
-            tokenDto
-        }
+        return tokenDto
+    }
 }
