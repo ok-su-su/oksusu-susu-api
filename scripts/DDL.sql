@@ -5,9 +5,9 @@ CREATE DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 CREATE TABLE `user`
 (
     `id`                bigint       NOT NULL AUTO_INCREMENT COMMENT 'user id',
-    `oauth_provider`    varchar(30)  NOT NULL COMMENT 'oauth 제공자',
-    `oauth_id`          varchar(255) NOT NULL COMMENT 'oauth id',
-    `name`              varchar(255) NOT NULL COMMENT 'user 이름',
+    `oauth_provider`    varchar(32)  NOT NULL COMMENT 'oauth 제공자',
+    `oauth_id`          varchar(256) NOT NULL COMMENT 'oauth id',
+    `name`              varchar(256) NOT NULL COMMENT 'user 이름',
     `age`               int COMMENT 'user 나이',
     `birth`             date COMMENT 'user 생년',
     `profile_image_url` varchar(512) DEFAULT NULL COMMENT '프로필 이미지',
