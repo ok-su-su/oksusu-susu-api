@@ -3,16 +3,24 @@ version: '3.7'
 services:
   mysql:
     image: mysql
-    container_name: mysql
-    hostname: mysql
+    container_name: susu_mysql
+    hostname: susu_mysql
     volumes:
       - ./mysqldata:/var/lib/mysql
     environment:
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=user
+      - MYSQL_USER=susu
+      - MYSQL_PASSWORD=susu
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_HOST=localhost
       - MYSQL_PORT=3306
-      - MYSQL_DATABASE=test
+      - MYSQL_DATABASE=susu
     ports:
-      - "3307:3306"
+      - "3306:3306"
+
+
+  redis:
+    image: redis
+    container_name: susu_redis
+    hostname: susu_redis
+    ports:
+      - "6379:6379"

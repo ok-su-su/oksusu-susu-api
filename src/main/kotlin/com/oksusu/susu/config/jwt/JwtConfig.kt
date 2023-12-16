@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Configuration
 data class JwtConfig(
     @field:NotBlank
     var secretKey: String = "",
+    @field:NotBlank
+    var accessExp: Int = 0,
+    @field:NotBlank
+    var refreshExp: Int = 0,
     val issuer: String = "oksusu-susu-api",
     val audience: String = "oksusu-susu-api",
 )

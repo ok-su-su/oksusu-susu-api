@@ -39,3 +39,22 @@ susu:
       hibernate.format_sql: true
       hibernate.hbm2ddl.auto: none
   maximum-jdbc-thread-pool-size:
+
+# OAUTH
+oauth:
+  kakao:
+    token-url: ${KAKAO_TOKEN_URL}
+    kauth-url: ${KAKAO_KAUTH_URL}
+    kapi-url: ${KAKAO_KAPI_URL}
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-url: ${KAKAO_REDIRECT_URL}
+    app-key: ${KAKAO_APP_KEY}
+    admin-key: ${KAKAO_ADMIN_KEY}
+
+# AUTH
+auth:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-exp: ${JWT_ACCESS_EXP}
+    refresh-exp: ${JWT_REFRESH_EXP}

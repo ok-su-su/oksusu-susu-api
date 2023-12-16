@@ -1,7 +1,7 @@
 package com.oksusu.susu.config.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.oksusu.susu.auth.application.AuthService
+import com.oksusu.susu.auth.application.AuthFacade
 import com.oksusu.susu.auth.resolver.ReactiveAuthResolver
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.ReactiveAdapterRegistry
@@ -22,7 +22,7 @@ import java.nio.charset.Charset
 @Configuration
 class WebFluxConfig(
     private val objectMapper: ObjectMapper,
-    private val authService: AuthService,
+    private val authFacade: AuthFacade,
 ) : WebFluxConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
@@ -50,7 +50,7 @@ class WebFluxConfig(
         configureHttpMessageCodecs(serverCodecConfigurer)
 
         configurer.addCustomResolver(
-            ReactiveAuthResolver(registry, authService),
+            ReactiveAuthResolver(registry, authFacade),
             ReactiveSortHandlerMethodArgumentResolver(),
             ReactivePageableHandlerMethodArgumentResolver()
         )

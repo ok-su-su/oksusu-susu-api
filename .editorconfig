@@ -1,4 +1,5 @@
 [*.{kt,kts}]
 insert_final_newline=true
 ij_kotlin_allow_trailing_comma = true
-# ij_kotlin_allow_trailing_comma_on_call_site = true
+ktlint_disabled_rules=no-wildcard-imports
+ij_kotlin_packages_to_use_import_on_demand=unset
