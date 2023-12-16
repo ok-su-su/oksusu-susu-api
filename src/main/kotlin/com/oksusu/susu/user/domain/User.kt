@@ -1,7 +1,8 @@
 package com.oksusu.susu.user.domain
 
-import com.oksusu.susu.auth.model.dto.OauthRegisterRequest
+import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.common.domain.BaseEntity
+import jakarta.persistence.Column
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -21,8 +22,13 @@ class User(
     val oauthInfo: OauthInfo,
 
     val name: String,
+
     val age: Int?,
+
     val birth: LocalDate?,
+
+    @Column(name = "profile_image_url")
+    val profileImageUrl: String? = null,
 ) : BaseEntity() {
     companion object {
         fun toEntity(oauthRegisterRequest: OauthRegisterRequest, oauthInfo: OauthInfo): User {

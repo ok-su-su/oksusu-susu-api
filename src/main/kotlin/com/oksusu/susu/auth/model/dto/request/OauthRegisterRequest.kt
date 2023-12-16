@@ -1,4 +1,4 @@
-package com.oksusu.susu.auth.model.dto
+package com.oksusu.susu.auth.model.dto.request
 
 import java.time.LocalDate
 

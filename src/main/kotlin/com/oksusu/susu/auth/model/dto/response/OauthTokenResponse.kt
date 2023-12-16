@@ -1,6 +1,6 @@
-package com.oksusu.susu.auth.model.dto
+package com.oksusu.susu.auth.model.dto.response
 
-import com.oksusu.susu.auth.infrastructure.oauth.kakao.dto.KakaoOauthTokenResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthTokenResponse
 
 class OauthTokenResponse(
     val accessToken: String,

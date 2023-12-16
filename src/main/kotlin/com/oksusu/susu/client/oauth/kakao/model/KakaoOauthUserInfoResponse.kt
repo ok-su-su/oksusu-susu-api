@@ -1,4 +1,4 @@
-package com.oksusu.susu.auth.infrastructure.oauth.kakao.dto
+package com.oksusu.susu.client.oauth.kakao.model
 
 class KakaoOauthUserInfoResponse(
     val id: String,

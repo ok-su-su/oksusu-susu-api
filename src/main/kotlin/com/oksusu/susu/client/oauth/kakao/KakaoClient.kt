@@ -1,7 +1,7 @@
-package com.oksusu.susu.auth.infrastructure.oauth.kakao.client
+package com.oksusu.susu.client.oauth.kakao
 
-import com.oksusu.susu.auth.infrastructure.oauth.kakao.dto.KakaoOauthTokenResponse
-import com.oksusu.susu.auth.infrastructure.oauth.kakao.dto.KakaoOauthUserInfoResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthTokenResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthUserInfoResponse
 import com.oksusu.susu.common.consts.BEARER
 import com.oksusu.susu.common.properties.KakaoOauthProperties
 import com.oksusu.susu.config.webClient.SusuWebClient
@@ -19,14 +19,13 @@ class KakaoClient(
         redirectUrl: String,
         code: String,
     ): KakaoOauthTokenResponse {
-        val url =
-            kakaoOauthProperties.kauthUrl + String.format(
-                kakaoOauthProperties.tokenUrl,
-                kakaoOauthProperties.clientId,
-                redirectUrl,
-                code,
-                kakaoOauthProperties.clientSecret
-            )
+        val url = kakaoOauthProperties.kauthUrl + String.format(
+            kakaoOauthProperties.tokenUrl,
+            kakaoOauthProperties.clientId,
+            redirectUrl,
+            code,
+            kakaoOauthProperties.clientSecret
+        )
         return susuWebClient.webClient().post()
             .uri(url)
             .retrieve()

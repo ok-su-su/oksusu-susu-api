@@ -9,5 +9,6 @@ import jakarta.persistence.Enumerated
 class OauthInfo(
     @Enumerated(EnumType.STRING)
     val oauth_provider: OauthProvider,
+
     val oauth_id: String,
 )

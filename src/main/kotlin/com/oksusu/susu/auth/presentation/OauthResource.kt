@@ -3,6 +3,8 @@ package com.oksusu.susu.auth.presentation
 import com.oksusu.susu.auth.application.OauthService
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.*
+import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
+import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
 import io.swagger.v3.oas.annotations.Operation
@@ -16,26 +18,9 @@ import org.springframework.web.bind.annotation.*
 class OauthResource(
     private val oauthService: OauthService,
 ) {
-    private val logger = mu.KotlinLogging.logger { }
-
-    /** oauth login link를 반환해줍니다. 개발용 */
-    @Operation(summary = "oauth link", deprecated = true)
-    @GetMapping("/{provider}/link/dev")
-    suspend fun getOauthLoginLinkDev(
-        @PathVariable provider: OauthProvider,
-    ) = oauthService.getOauthLoginLinkDev(provider).wrapOk()
-
-    /** oauth 토큰 받아옵니다. 개발용 */
-    @Operation(summary = "oauth link", deprecated = true)
-    @GetMapping("/{provider}/token/dev")
-    suspend fun getOauthLogin(
-        @PathVariable provider: OauthProvider,
-        @RequestParam code: String,
-    ) = oauthService.getOauthTokenDev(provider, code).wrapOk()
-
     /** 가입된 유저인지 체크합니다. */
     @Operation(summary = "register valid check")
-    @GetMapping("/{provider}/register/valid")
+    @GetMapping("/{provider}/sign-up/valid")
     suspend fun checkRegisterValid(
         @PathVariable provider: OauthProvider,
         @RequestParam accessToken: String,
@@ -43,7 +28,7 @@ class OauthResource(
 
     /** 회원가입을 합니다. */
     @Operation(summary = "register")
-    @PostMapping("/{provider}/register")
+    @PostMapping("/{provider}/sign-up")
     suspend fun register(
         @PathVariable provider: OauthProvider,
         @RequestBody oauthRegisterRequest: OauthRegisterRequest,
@@ -55,6 +40,6 @@ class OauthResource(
     @PostMapping("/{provider}/login")
     suspend fun login(
         @PathVariable provider: OauthProvider,
-        @RequestParam accessToken: String,
-    ) = oauthService.login(provider, accessToken).wrapOk()
+        @RequestBody request: OAuthLoginRequest,
+    ) = oauthService.login(provider, request).wrapOk()
 }

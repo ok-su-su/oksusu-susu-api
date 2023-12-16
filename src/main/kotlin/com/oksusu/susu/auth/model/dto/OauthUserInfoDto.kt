@@ -1,7 +1,7 @@
 package com.oksusu.susu.auth.model.dto
 
-import com.oksusu.susu.auth.infrastructure.oauth.kakao.dto.KakaoOauthUserInfoResponse
 import com.oksusu.susu.auth.model.OauthProvider
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthUserInfoResponse
 import com.oksusu.susu.user.domain.OauthInfo
 
 class OauthUserInfoDto(

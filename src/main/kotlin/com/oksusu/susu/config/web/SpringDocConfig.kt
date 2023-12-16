@@ -1,6 +1,7 @@
 package com.oksusu.susu.config.web
 
 import com.oksusu.susu.auth.model.AUTH_TOKEN_KEY
+import com.oksusu.susu.auth.model.AuthUser
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.result.view.RequestContext
 import org.springframework.web.server.WebSession
-import java.util.*
 
 /**
  * **Swagger**
@@ -30,6 +30,7 @@ class SpringDocConfig(
         SpringDocUtils
             .getConfig()
             .addRequestWrapperToIgnore(
+                AuthUser::class.java,
                 WebSession::class.java,
                 RequestContext::class.java
             )
@@ -37,7 +38,7 @@ class SpringDocConfig(
 
     @Bean
     fun openApi(): OpenAPI {
-        val securityRequirement = SecurityRequirement().addList("access-token")
+        val securityRequirement = SecurityRequirement().addList(AUTH_TOKEN_KEY)
         return OpenAPI()
             .components(authSetting())
             .security(listOf(securityRequirement))
@@ -53,7 +54,7 @@ class SpringDocConfig(
     private fun authSetting(): Components {
         return Components()
             .addSecuritySchemes(
-                "access-token",
+                AUTH_TOKEN_KEY,
                 SecurityScheme()
                     .description("Access Token")
                     .type(SecurityScheme.Type.APIKEY)

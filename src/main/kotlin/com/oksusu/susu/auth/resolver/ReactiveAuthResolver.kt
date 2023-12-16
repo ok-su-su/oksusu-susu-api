@@ -1,6 +1,6 @@
 package com.oksusu.susu.auth.resolver
 
-import com.oksusu.susu.auth.application.AuthService
+import com.oksusu.susu.auth.application.AuthFacade
 import com.oksusu.susu.auth.model.AUTH_TOKEN_KEY
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.AuthUserToken
@@ -15,7 +15,7 @@ import reactor.kotlin.core.publisher.toMono
 
 class ReactiveAuthResolver(
     adapterRegistry: ReactiveAdapterRegistry,
-    private val authService: AuthService,
+    private val authFacade: AuthFacade,
 ) : HandlerMethodArgumentResolverSupport(adapterRegistry) {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.parameterType == AuthUser::class.java
@@ -27,7 +27,7 @@ class ReactiveAuthResolver(
         exchange: ServerWebExchange,
     ): Mono<Any> {
         val tokenMono = resolveToken(exchange.request)
-        return authService.resolveAuthUser(tokenMono)
+        return authFacade.resolveAuthUser(tokenMono)
     }
 
     private fun resolveToken(request: ServerHttpRequest): Mono<AuthUserToken> {
