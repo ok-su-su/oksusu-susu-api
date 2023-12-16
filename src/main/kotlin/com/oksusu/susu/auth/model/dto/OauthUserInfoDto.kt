@@ -11,8 +11,8 @@ class OauthUserInfoDto(
         fun fromKakao(kakaoOauthUserInfoResponse: KakaoOauthUserInfoResponse): OauthUserInfoDto {
             return OauthUserInfoDto(
                 OauthInfo(
-                    oauth_id = kakaoOauthUserInfoResponse.id,
-                    oauth_provider = OauthProvider.KAKAO
+                    oauthId = kakaoOauthUserInfoResponse.id,
+                    oauthProvider = OauthProvider.KAKAO
                 )
             )
         }

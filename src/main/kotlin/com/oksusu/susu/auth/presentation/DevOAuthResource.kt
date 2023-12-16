@@ -19,16 +19,16 @@ class DevOAuthResource(
     private val oauthService: OauthService,
 ) {
     /** oauth login link를 반환해줍니다. 개발용 */
-    @Operation(summary = "oauth link", deprecated = true)
+    @Operation(summary = "dev oauth link", deprecated = true)
     @GetMapping("/{provider}/link")
-    suspend fun getOauthLoginLinkDev(
+    suspend fun getDevOAuthLoginLink(
         @PathVariable provider: OauthProvider,
     ) = oauthService.getOauthLoginLinkDev(provider).wrapOk()
 
     /** oauth 토큰 받아옵니다. 개발용 */
-    @Operation(summary = "oauth link", deprecated = true)
+    @Operation(summary = "dev oauth link", deprecated = true)
     @GetMapping("/{provider}/token")
-    suspend fun getOauthLogin(
+    suspend fun getDevOauthLogin(
         @PathVariable provider: OauthProvider,
         @RequestParam code: String,
     ) = oauthService.getOauthTokenDev(provider, code).wrapOk()
