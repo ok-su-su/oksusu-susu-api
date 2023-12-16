@@ -56,6 +56,7 @@ object DependencyVersion {
     /** external */
     const val QUERYDSL_VERSION = "5.0.0"
     const val ARROW_FX_VERSION = "1.1.3"
+    const val JWT_VERSION = "4.1.0"
     const val SPRINGDOC_VERSION = "2.2.0"
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
     const val KOTLIN_LOGGING_VERSION = "2.0.11"
@@ -87,11 +88,14 @@ dependencies {
     implementation("com.querydsl:querydsl-collections:${DependencyVersion.QUERYDSL_VERSION}")
     implementation("com.querydsl:querydsl-sql:${DependencyVersion.QUERYDSL_VERSION}")
     implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL_VERSION}")
-    kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL_VERSION}:jpa")
+    kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
 
     /** arrow-kt */
     implementation("io.arrow-kt:arrow-fx-coroutines:${DependencyVersion.ARROW_FX_VERSION}")
     implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX_VERSION}")
+
+    /** jwt */
+    implementation("com.auth0:java-jwt:${DependencyVersion.JWT_VERSION}")
 
     /** swagger */
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC_VERSION}")
