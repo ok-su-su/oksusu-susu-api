@@ -15,4 +15,4 @@ fun <T> T.wrapOk() = ResponseEntity.ok(this)
 fun <T> T.wrapCreated() = ResponseEntity.status(HttpStatus.CREATED).body(this)
 
 /** Wrap Response Void */
-fun Unit.wrapVoid() = ResponseEntity.noContent()
+fun Unit.wrapVoid() = ResponseEntity.noContent().build<Unit>()
