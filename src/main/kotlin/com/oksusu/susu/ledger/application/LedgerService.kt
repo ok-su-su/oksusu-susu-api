@@ -10,7 +10,6 @@ import com.oksusu.susu.ledger.model.response.SearchLedgerResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,5 +36,13 @@ class LedgerService(
         return withContext(Dispatchers.IO) {
             ledgerRepository.findAllByUid(user.id, pageRequest.toDefault())
         }.map { ledger -> SearchLedgerResponse.from(ledger) }
+    }
+
+    @Transactional
+    suspend fun delete(user: AuthUser, ids: Set<Long>) {
+        // ids validate 추가 필요, 사이즈 체크
+        withContext(Dispatchers.IO) {
+            ledgerRepository.deleteAllByIdInBatch(ids)
+        }
     }
 }
