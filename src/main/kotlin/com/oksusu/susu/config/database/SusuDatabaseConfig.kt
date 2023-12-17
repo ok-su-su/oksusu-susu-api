@@ -25,7 +25,10 @@ import javax.sql.DataSource
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-    basePackages = ["com.oksusu.susu.user.infrastructure"],
+    basePackages = [
+        "com.oksusu.susu.user.infrastructure",
+        "com.oksusu.susu.ledger.infrastructure",
+    ],
     entityManagerFactoryRef = "susuEntityManager",
     transactionManagerRef = "susuTransactionManager"
 )
@@ -73,7 +76,8 @@ class SusuDatabaseConfig {
         return entityManagerFactoryBuilder
             .dataSource(susuDataSource)
             .packages(
-                "com.oksusu.susu.user.domain"
+                "com.oksusu.susu.user.domain",
+                "com.oksusu.susu.ledger.domain"
             )
             .properties(
                 mapOf(AvailableSettings.BEAN_CONTAINER to SpringBeanContainer(configurableListableBeanFactory))
