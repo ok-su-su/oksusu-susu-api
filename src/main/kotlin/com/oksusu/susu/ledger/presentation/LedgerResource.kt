@@ -23,26 +23,26 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(value = ["/api/v1/ledger"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class LedgerResource(
-    private val ledgerService: LedgerService
+    private val ledgerService: LedgerService,
 ) {
     @Operation(summary = "장부 생성")
     @PostMapping
     suspend fun create(
         user: AuthUser,
-        @RequestBody request: CreateLedgerRequest
+        @RequestBody request: CreateLedgerRequest,
     ) = ledgerService.create(user, request).wrapCreated()
 
     @Operation(summary = "장부 검색")
     @GetMapping
     suspend fun getAll(
         user: AuthUser,
-        @ParameterObject pageRequest: SusuPageRequest
+        @ParameterObject pageRequest: SusuPageRequest,
     ) = ledgerService.getAll(user, pageRequest).wrapPage()
 
     @Operation(summary = "장부 삭제")
     @DeleteMapping
     suspend fun delete(
         user: AuthUser,
-        @RequestParam ids: Set<Long>
+        @RequestParam ids: Set<Long>,
     ) = ledgerService.delete(user, ids).wrapVoid()
 }

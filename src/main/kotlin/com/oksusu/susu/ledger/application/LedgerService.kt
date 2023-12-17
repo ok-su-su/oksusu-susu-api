@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LedgerService(
-    private val ledgerRepository: LedgerRepository
+    private val ledgerRepository: LedgerRepository,
 ) {
     suspend fun create(user: AuthUser, request: CreateLedgerRequest): CreateLedgerResponse {
         val createdLedger = Ledger(

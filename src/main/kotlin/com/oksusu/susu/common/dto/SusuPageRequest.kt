@@ -6,7 +6,7 @@ import org.springframework.data.domain.Sort
 
 data class SusuPageRequest(
     val page: Int?,
-    val size: Int?
+    val size: Int?,
 ) {
     fun toDefault(): Pageable {
         val page = this.page ?: 0

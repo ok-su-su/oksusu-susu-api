@@ -27,7 +27,7 @@ import javax.sql.DataSource
 @EnableJpaRepositories(
     basePackages = [
         "com.oksusu.susu.user.infrastructure",
-        "com.oksusu.susu.ledger.infrastructure",
+        "com.oksusu.susu.ledger.infrastructure"
     ],
     entityManagerFactoryRef = "susuEntityManager",
     transactionManagerRef = "susuTransactionManager"
