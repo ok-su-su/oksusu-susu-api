@@ -4,6 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "oauth.kakao")
 class KakaoOauthProperties(
+    val unlinkUrl: String,
+    val userInfoUrl: String,
     val tokenUrl: String,
     val kauthUrl: String,
     val kapiUrl: String,

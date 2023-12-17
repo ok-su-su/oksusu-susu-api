@@ -13,6 +13,7 @@ import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.user.application.UserService
+import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -99,5 +100,11 @@ class OauthService(
         refreshTokenService.save(refreshToken)
 
         return tokenDto
+    }
+
+    suspend fun withdraw(oauthInfo: OauthInfo) {
+        when (oauthInfo.oauthProvider) {
+            OauthProvider.KAKAO -> kakaoOauthHelper.withdraw(oauthInfo.oauthId)
+        }
     }
 }

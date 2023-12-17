@@ -20,6 +20,7 @@ class AuthFacade(
     private val jwtTokenService: JwtTokenService,
     private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
+    private val oauthService: OauthService,
 ) {
     fun resolveAuthUser(token: Mono<AuthUserToken>): Mono<Any> {
         return jwtTokenService.verifyTokenMono(token)
@@ -53,5 +54,13 @@ class AuthFacade(
         ).run { refreshTokenService.save(this) }
 
         return tokenDto
+    }
+
+    @Transactional
+    suspend fun withdraw(authUser: AuthUser) {
+        val user = userService.findByIdOrThrow(authUser.id)
+
+        oauthService.withdraw(user.oauthInfo)
+        userService.deleteById(authUser.id)
     }
 }

@@ -49,4 +49,8 @@ class UserService(
     fun findByIdOrNullSync(uid: Long): User? {
         return userRepository.findByIdOrNull(uid)
     }
+
+    suspend fun deleteById(uid: Long) {
+        withContext(Dispatchers.IO) { userRepository.deleteById(uid) }
+    }
 }

@@ -5,6 +5,7 @@ import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
 import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.KakaoClient
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthWithdrawRequest
 import com.oksusu.susu.common.properties.KakaoOauthProperties
 import com.oksusu.susu.user.application.UserService
 import kotlinx.coroutines.Dispatchers
@@ -54,5 +55,12 @@ class KakaoOauthHelper(
         return withContext(Dispatchers.IO) {
             kakaoClient.kakaoUserInfoClient(accessToken)
         }.run { OauthUserInfoDto.fromKakao(this) }
+    }
+
+    /** 회원 탈퇴합니다 */
+    suspend fun withdraw(oauthId: String) {
+        withContext(Dispatchers.IO) {
+            kakaoClient.kakaoWithdrawClient(oauthId)
+        }
     }
 }
