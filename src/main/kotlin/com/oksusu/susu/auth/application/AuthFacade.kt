@@ -20,7 +20,7 @@ class AuthFacade(
     private val jwtTokenService: JwtTokenService,
     private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
-    private val oauthService: OauthService,
+    private val oauthService: OAuthService,
 ) {
     fun resolveAuthUser(token: Mono<AuthUserToken>): Mono<Any> {
         return jwtTokenService.verifyTokenMono(token)

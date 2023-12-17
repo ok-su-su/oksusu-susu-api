@@ -1,8 +1,7 @@
 package com.oksusu.susu.auth.presentation
 
-import com.oksusu.susu.auth.application.OauthService
+import com.oksusu.susu.auth.application.OAuthFacade
 import com.oksusu.susu.auth.model.OauthProvider
-import com.oksusu.susu.auth.model.dto.*
 import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.extension.wrapCreated
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping(value = ["/api/v1/oauth"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class OauthResource(
-    private val oauthService: OauthService,
+    private val oAuthFacade: OAuthFacade,
 ) {
     /** 가입된 유저인지 체크합니다. */
     @Operation(summary = "register valid check")
@@ -24,7 +23,7 @@ class OauthResource(
     suspend fun checkRegisterValid(
         @PathVariable provider: OauthProvider,
         @RequestParam accessToken: String,
-    ) = oauthService.checkRegisterValid(provider, accessToken).wrapOk()
+    ) = oAuthFacade.checkRegisterValid(provider, accessToken).wrapOk()
 
     /** 회원가입을 합니다. */
     @Operation(summary = "register")
@@ -33,7 +32,7 @@ class OauthResource(
         @PathVariable provider: OauthProvider,
         @RequestBody oauthRegisterRequest: OauthRegisterRequest,
         @RequestParam accessToken: String,
-    ) = oauthService.register(provider, accessToken, oauthRegisterRequest).wrapCreated()
+    ) = oAuthFacade.register(provider, accessToken, oauthRegisterRequest).wrapCreated()
 
     /** 로그인을 합니다. */
     @Operation(summary = "login")
@@ -41,5 +40,5 @@ class OauthResource(
     suspend fun login(
         @PathVariable provider: OauthProvider,
         @RequestBody request: OAuthLoginRequest,
-    ) = oauthService.login(provider, request).wrapOk()
+    ) = oAuthFacade.login(provider, request).wrapOk()
 }
