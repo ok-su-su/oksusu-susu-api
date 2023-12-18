@@ -28,7 +28,8 @@ import javax.sql.DataSource
     basePackages = [
         "com.oksusu.susu.user.infrastructure",
         "com.oksusu.susu.ledger.infrastructure",
-        "com.oksusu.susu.relationship.infrastructure"
+        "com.oksusu.susu.relationship.infrastructure",
+        "com.oksusu.susu.category.infrastructure"
     ],
     entityManagerFactoryRef = "susuEntityManager",
     transactionManagerRef = "susuTransactionManager"
@@ -79,7 +80,8 @@ class SusuDatabaseConfig {
             .packages(
                 "com.oksusu.susu.user.domain",
                 "com.oksusu.susu.ledger.domain",
-                "com.oksusu.susu.relationship.domain"
+                "com.oksusu.susu.relationship.domain",
+                "com.oksusu.susu.category.domain"
             )
             .properties(
                 mapOf(AvailableSettings.BEAN_CONTAINER to SpringBeanContainer(configurableListableBeanFactory))
