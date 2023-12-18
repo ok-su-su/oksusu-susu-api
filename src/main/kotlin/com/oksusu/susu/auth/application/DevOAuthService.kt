@@ -4,7 +4,6 @@ import com.oksusu.susu.auth.helper.KakaoOauthHelper
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
-import com.oksusu.susu.user.domain.OauthInfo
 import org.springframework.stereotype.Service
 
 @Service

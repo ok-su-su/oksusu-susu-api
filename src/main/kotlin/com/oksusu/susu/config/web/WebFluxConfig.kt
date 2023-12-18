@@ -18,7 +18,6 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.reactive.config.CorsRegistry
 import org.springframework.web.reactive.config.ViewResolverRegistry
 import org.springframework.web.reactive.config.WebFluxConfigurer
-import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer
 import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine
 import org.thymeleaf.spring6.SpringWebFluxTemplateEngine

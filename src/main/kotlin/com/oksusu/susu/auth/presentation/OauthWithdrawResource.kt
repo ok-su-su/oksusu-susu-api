@@ -3,8 +3,6 @@ package com.oksusu.susu.auth.presentation
 import com.oksusu.susu.auth.application.OAuthFacade
 import com.oksusu.susu.auth.application.OAuthService
 import com.oksusu.susu.auth.model.OauthProvider
-import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
-import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Controller
@@ -41,7 +39,7 @@ class OauthWithdrawResource(
     ): RedirectView {
         val request = serverHttpRequest as AbstractServerHttpRequest
         val susuToken = oAuthFacade.loginWithCode(OauthProvider.KAKAO, code, request)
-        return RedirectView("/withdraw?xSusuAuthToken=${susuToken}")
+        return RedirectView("/withdraw?xSusuAuthToken=$susuToken")
     }
 
     /** 회원 탈퇴 페이지 */

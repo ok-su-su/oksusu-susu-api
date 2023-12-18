@@ -80,7 +80,7 @@ class OAuthFacade(
     suspend fun loginWithCode(
         provider: OauthProvider,
         code: String,
-        request: AbstractServerHttpRequest
+        request: AbstractServerHttpRequest,
     ): String {
         val oauthToken = oAuthService.getOauthToken(provider, code, request)
 

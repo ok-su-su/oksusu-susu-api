@@ -36,11 +36,11 @@ class KakaoOauthHelper(
         val redirectUrl = domainName + kakaoOauthProperties.withdrawCallbackUrl
         return OauthLoginLinkResponse(
             kakaoOauthProperties.kauthUrl +
-                    String.format(
-                        kakaoOauthProperties.authorizeUrl,
-                        kakaoOauthProperties.clientId,
-                        redirectUrl
-                    )
+                String.format(
+                    kakaoOauthProperties.authorizeUrl,
+                    kakaoOauthProperties.clientId,
+                    redirectUrl
+                )
         )
     }
 

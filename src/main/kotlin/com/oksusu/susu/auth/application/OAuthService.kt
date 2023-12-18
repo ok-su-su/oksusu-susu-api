@@ -5,8 +5,6 @@ import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
 import com.oksusu.susu.user.domain.OauthInfo
-import org.springframework.http.server.ServerHttpRequest
-import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
 

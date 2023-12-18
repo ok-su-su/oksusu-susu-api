@@ -55,7 +55,8 @@ class SusuWebClient {
                                     name,
                                     value
                                 )
-                            })
+                            }
+                        )
                     }
                     Mono.just(clientRequest)
                 }

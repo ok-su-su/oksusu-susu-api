@@ -2,7 +2,6 @@ package com.oksusu.susu.client.oauth.kakao
 
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthUserInfoResponse
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthWithdrawRequest
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthWithdrawResponse
 import com.oksusu.susu.common.consts.BEARER
 import com.oksusu.susu.common.consts.KAKAO_AK
@@ -11,8 +10,6 @@ import com.oksusu.susu.config.webClient.SusuWebClient
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
-import org.springframework.web.reactive.function.BodyInserter
 import org.springframework.web.reactive.function.BodyInserters
 
 @Component
@@ -58,7 +55,8 @@ class KakaoClient(
                     "target_id_type" to "user_id",
                     "target_id" to targetId
                 )
-            ) }
+            )
+        }
         return susuWebClient.webClient().post()
             .uri(kakaoOauthProperties.kapiUrl + kakaoOauthProperties.unlinkUrl)
             .header("Authorization", KAKAO_AK + kakaoOauthProperties.adminKey)
