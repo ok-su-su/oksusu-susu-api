@@ -11,6 +11,7 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.domain.User
+import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,12 +20,12 @@ class OAuthFacade(
     private val userService: UserService,
     private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
-    private val oauthService: OAuthService,
+    private val oAuthService: OAuthService,
 ) {
     /** 회원가입 가능 여부 체크. */
     @Transactional(readOnly = true)
     suspend fun checkRegisterValid(provider: OauthProvider, accessToken: String): AbleRegisterResponse {
-        val oauthInfo = oauthService.getOauthUserInfo(provider, accessToken)
+        val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
 
         val isExistUser = userService.existsByOauthInfo(oauthInfo)
 
@@ -38,7 +39,7 @@ class OAuthFacade(
         accessToken: String,
         oauthRegisterRequest: OauthRegisterRequest,
     ): TokenDto {
-        val oauthInfo = oauthService.getOauthUserInfo(provider, accessToken)
+        val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
 
         if (userService.existsByOauthInfo(oauthInfo)) {
             throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
@@ -53,7 +54,7 @@ class OAuthFacade(
     /** 로그인 */
     @Transactional
     suspend fun login(provider: OauthProvider, request: OAuthLoginRequest): TokenDto {
-        val oauthInfo = oauthService.getOauthUserInfo(provider, request.accessToken)
+        val oauthInfo = oAuthService.getOauthUserInfo(provider, request.accessToken)
 
         val user = userService.findByOauthInfoOrThrow(oauthInfo)
 
@@ -72,5 +73,17 @@ class OAuthFacade(
         refreshTokenService.save(refreshToken)
 
         return tokenDto
+    }
+
+    /** 회원탈퇴 callback 페이지용 oauth 토큰 받아오기 + susu token 발급해주기 */
+    @Transactional
+    suspend fun loginWithCode(
+        provider: OauthProvider,
+        code: String,
+        request: AbstractServerHttpRequest
+    ): String {
+        val oauthToken = oAuthService.getOauthToken(provider, code, request)
+
+        return this.login(OauthProvider.KAKAO, OAuthLoginRequest(oauthToken.accessToken)).accessToken
     }
 }

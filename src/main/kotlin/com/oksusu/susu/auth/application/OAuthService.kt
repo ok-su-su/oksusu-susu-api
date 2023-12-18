@@ -5,6 +5,9 @@ import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
 import com.oksusu.susu.user.domain.OauthInfo
+import org.springframework.http.server.ServerHttpRequest
+import org.springframework.http.server.ServletServerHttpRequest
+import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,16 +17,16 @@ class OAuthService(
     private val logger = mu.KotlinLogging.logger { }
 
     /** oauth login link 가져오기 */
-    suspend fun getOauthLoginLinkDev(provider: OauthProvider): OauthLoginLinkResponse {
+    suspend fun getOauthLoginLink(provider: OauthProvider, uri: String): OauthLoginLinkResponse {
         return when (provider) {
-            OauthProvider.KAKAO -> kakaoOauthHelper.getOauthLoginLinkDev()
+            OauthProvider.KAKAO -> kakaoOauthHelper.getOauthLoginLink(uri)
         }
     }
 
     /** oauth token 가져오기 */
-    suspend fun getOauthTokenDev(provider: OauthProvider, code: String): OauthTokenResponse {
+    suspend fun getOauthToken(provider: OauthProvider, code: String, request: AbstractServerHttpRequest): OauthTokenResponse {
         return when (provider) {
-            OauthProvider.KAKAO -> kakaoOauthHelper.getOauthTokenDev(code)
+            OauthProvider.KAKAO -> kakaoOauthHelper.getOauthToken(code, request.uri.toString())
         }
     }
 
