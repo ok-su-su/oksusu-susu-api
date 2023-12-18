@@ -58,7 +58,7 @@ class KakaoOauthHelper(
     private suspend fun getKakaoToken(redirectUrl: String, code: String): OauthTokenResponse {
         return withContext(Dispatchers.IO) {
             kakaoClient.kakaoTokenClient(redirectUrl, code)
-        }. run { OauthTokenResponse.fromKakao(this) }
+        }.run { OauthTokenResponse.fromKakao(this) }
     }
 
     /** 유저 정보를 가져옵니다. */
