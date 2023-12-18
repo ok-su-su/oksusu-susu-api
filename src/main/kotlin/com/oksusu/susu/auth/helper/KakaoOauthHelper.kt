@@ -32,7 +32,7 @@ class KakaoOauthHelper(
         )
     }
 
-    fun getOauthLoginLink(uri: String): OauthLoginLinkResponse {
+    suspend fun getOauthLoginLink(uri: String): OauthLoginLinkResponse {
         val redirectUrl = domainName + kakaoOauthProperties.withdrawCallbackUrl
         return OauthLoginLinkResponse(
             kakaoOauthProperties.kauthUrl +
@@ -47,14 +47,18 @@ class KakaoOauthHelper(
     /** oauth token 받아오기 */
     suspend fun getOauthTokenDev(code: String): OauthTokenResponse {
         val redirectUrl = domainName + kakaoOauthProperties.redirectUrl
-        val response = kakaoClient.kakaoTokenClient(redirectUrl, code)
-        return OauthTokenResponse.fromKakao(response)
+        return getKakaoToken(redirectUrl, code)
     }
 
     suspend fun getOauthToken(code: String, uri: String): OauthTokenResponse {
         val redirectUrl = domainName + kakaoOauthProperties.withdrawCallbackUrl
-        val response = kakaoClient.kakaoTokenClient(redirectUrl, code)
-        return OauthTokenResponse.fromKakao(response)
+        return getKakaoToken(redirectUrl, code)
+    }
+
+    private suspend fun getKakaoToken(redirectUrl: String, code: String): OauthTokenResponse {
+        return withContext(Dispatchers.IO) {
+            kakaoClient.kakaoTokenClient(redirectUrl, code)
+        }. run { OauthTokenResponse.fromKakao(this) }
     }
 
     /** 유저 정보를 가져옵니다. */
