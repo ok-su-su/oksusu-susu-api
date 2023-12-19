@@ -70,7 +70,7 @@ class OAuthFacade(
             ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
         )
 
-        refreshTokenService.save(refreshToken)
+        refreshTokenService.saveSync(refreshToken)
 
         return tokenDto
     }

@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
 @Configuration
 class SusuWebClient {
@@ -45,19 +44,19 @@ class SusuWebClient {
             .exchangeStrategies(exchangeStrategies)
             .filter(
                 ExchangeFilterFunction.ofRequestProcessor { clientRequest: ClientRequest -> // request logging
-                    logger.info(">>>>>>>>> REQUEST <<<<<<<<<<")
-                    logger.info("Request: {} {}", clientRequest.method(), clientRequest.url())
-                    clientRequest.headers().forEach { name: String?, values: List<String?> ->
-                        values.forEach(
-                            Consumer<String?> { value: String? ->
-                                logger.info(
-                                    "{} : {}",
-                                    name,
-                                    value
-                                )
-                            }
-                        )
-                    }
+//                    logger.info(">>>>>>>>> REQUEST <<<<<<<<<<")
+//                    logger.info("Request: {} {}", clientRequest.method(), clientRequest.url())
+//                    clientRequest.headers().forEach { name: String?, values: List<String?> ->
+//                        values.forEach(
+//                            Consumer<String?> { value: String? ->
+//                                logger.info(
+//                                    "{} : {}",
+//                                    name,
+//                                    value
+//                                )
+//                            }
+//                        )
+//                    }
                     Mono.just(clientRequest)
                 }
             ) // Response Header 로깅 필터

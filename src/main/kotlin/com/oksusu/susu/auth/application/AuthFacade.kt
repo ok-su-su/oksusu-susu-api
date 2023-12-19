@@ -36,14 +36,14 @@ class AuthFacade(
 
     @Transactional
     suspend fun logout(authUser: AuthUser) {
-        refreshTokenService.deleteById(authUser.id)
+        refreshTokenService.deleteByIdSync(authUser.id)
     }
 
     @Transactional
     suspend fun refreshToken(authUser: AuthUser, request: TokenRefreshRequest): TokenDto {
         jwtTokenService.verifyRefreshToken(request.refreshToken)
 
-        refreshTokenService.deleteById(authUser.id)
+        refreshTokenService.deleteByIdSync(authUser.id)
 
         val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(authUser.id)
 
@@ -51,7 +51,7 @@ class AuthFacade(
             id = authUser.id,
             refreshToken = tokenDto.refreshToken,
             ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
-        ).run { refreshTokenService.save(this) }
+        ).run { refreshTokenService.saveSync(this) }
 
         return tokenDto
     }
@@ -61,6 +61,7 @@ class AuthFacade(
         val user = userService.findByIdOrThrow(authUser.id)
 
         oauthService.withdraw(user.oauthInfo)
-        userService.deleteById(authUser.id)
+
+        userService.withdraw(authUser.id)
     }
 }
