@@ -61,5 +61,7 @@ class UserService(
             birth = null
             profileImageUrl = null
         }
+
+        saveSync(user)
     }
 }
