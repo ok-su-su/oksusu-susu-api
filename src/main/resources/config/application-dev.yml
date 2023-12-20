@@ -4,6 +4,7 @@
 
 # SERVER
 server:
+  domain-name: http://localhost:8080
   error:
     include-exception: true # Include the "exception" attribute.
     include-stacktrace: always # When to include a "stacktrace" attribute.
@@ -53,6 +54,10 @@ susu:
 # OAUTH
 oauth:
   kakao:
+    withdraw-callback-url: ${KAKAO_WITHDRAW_CALLBACK_URL}
+    unlink-url: ${KAKAO_UNLINK_URL}
+    user-info-url: ${KAKAO_USER_INFO_URL}
+    authorize-url: ${KAKAO_AUTHORIZE_URL}
     token-url: ${KAKAO_TOKEN_URL}
     kauth-url: ${KAKAO_KAUTH_URL}
     kapi-url: ${KAKAO_KAPI_URL}

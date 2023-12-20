@@ -4,6 +4,7 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.User
+import com.oksusu.susu.user.domain.UserState
 import com.oksusu.susu.user.infrastructure.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -48,5 +49,19 @@ class UserService(
 
     fun findByIdOrNullSync(uid: Long): User? {
         return userRepository.findByIdOrNull(uid)
+    }
+
+    suspend fun withdraw(uid: Long) {
+        val user = findByIdOrThrow(uid)
+        user.apply {
+            userState = UserState.DELETED
+            oauthInfo = oauthInfo.withdrawOauthInfo()
+            name = "탈퇴 유저"
+            age = null
+            birth = null
+            profileImageUrl = null
+        }
+
+        saveSync(user)
     }
 }

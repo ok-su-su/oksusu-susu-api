@@ -33,4 +33,11 @@ class AuthResource(
         authUser: AuthUser,
         @RequestBody request: TokenRefreshRequest,
     ) = authFacade.refreshToken(authUser, request).wrapOk()
+
+    /** 회원 탈퇴 */
+    @Operation(summary = "withdraw")
+    @PostMapping("/withdraw")
+    suspend fun tokenRefresh(
+        authUser: AuthUser,
+    ) = authFacade.withdraw(authUser).wrapVoid()
 }

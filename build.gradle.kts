@@ -120,6 +120,9 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
 
+    /** thymeleaf */
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

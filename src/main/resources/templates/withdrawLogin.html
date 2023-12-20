@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link
+            rel="stylesheet"
+            as="style"
+            crossorigin
+            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/withdrawLogin.css}" />
+    <meta charset="utf-8" />
+    <title>SUSU 회원 탈퇴</title>
+</head>
+<body>
+<div class="BackGround">
+    <div class="Frame">
+        <div class="Box">
+            <p>
+                <span>가입한 계정을 알려주세요</span>
+                <br/>
+                회원 탈퇴가 필요한 계정으로 로그인해주세요
+            </p>
+            <div class="kakaoButton">
+                <a th:href="${kakaoRedirectUrl}">
+                    <img class="Button" th:src="@{/kakaoLogin.png}">
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="Logo">
+        <svg th:replace="~{component/logo}">logo</svg>
+    </div>
+</div>
+</body>
+</html>

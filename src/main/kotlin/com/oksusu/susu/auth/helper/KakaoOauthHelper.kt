@@ -1,52 +1,64 @@
 package com.oksusu.susu.auth.helper
 
 import com.oksusu.susu.auth.model.dto.OauthUserInfoDto
-import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
 import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.KakaoClient
 import com.oksusu.susu.common.properties.KakaoOauthProperties
-import com.oksusu.susu.user.application.UserService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-
-private const val KAKAO_OAUTH_QUERY_STRING = "/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code"
-private const val KAKAO_KAUTH_URL = "https://kauth.kakao.com"
 
 @Component
 class KakaoOauthHelper(
     val kakaoOauthProperties: KakaoOauthProperties,
     val kakaoClient: KakaoClient,
-    private val userService: UserService,
+    @Value("\${server.domain-name}")
+    private val domainName: String,
 ) {
     private val logger = mu.KotlinLogging.logger { }
 
     /** link */
     suspend fun getOauthLoginLinkDev(): OauthLoginLinkResponse {
+        val redirectUrl = domainName + kakaoOauthProperties.redirectUrl
         return OauthLoginLinkResponse(
-            KAKAO_KAUTH_URL +
+            kakaoOauthProperties.kauthUrl +
                 String.format(
-                    KAKAO_OAUTH_QUERY_STRING,
+                    kakaoOauthProperties.authorizeUrl,
                     kakaoOauthProperties.clientId,
-                    kakaoOauthProperties.redirectUrl
+                    redirectUrl
+                )
+        )
+    }
+
+    suspend fun getOauthLoginLink(uri: String): OauthLoginLinkResponse {
+        val redirectUrl = domainName + kakaoOauthProperties.withdrawCallbackUrl
+        return OauthLoginLinkResponse(
+            kakaoOauthProperties.kauthUrl +
+                String.format(
+                    kakaoOauthProperties.authorizeUrl,
+                    kakaoOauthProperties.clientId,
+                    redirectUrl
                 )
         )
     }
 
     /** oauth token 받아오기 */
     suspend fun getOauthTokenDev(code: String): OauthTokenResponse {
-        val response = kakaoClient.kakaoTokenClient(kakaoOauthProperties.redirectUrl, code)
-        return OauthTokenResponse.fromKakao(response)
+        val redirectUrl = domainName + kakaoOauthProperties.redirectUrl
+        return getKakaoToken(redirectUrl, code)
     }
 
-    /** 회원가입 가능 여부 체크. */
-    suspend fun checkRegisterValid(accessToken: String): AbleRegisterResponse {
-        val userInfoDeferred = getKakaoUserInfo(accessToken)
-        val oauthInfo = userInfoDeferred.oauthInfo
-        val canRegisterDeferred = userService.existsByOauthInfo(oauthInfo)
+    suspend fun getOauthToken(code: String, uri: String): OauthTokenResponse {
+        val redirectUrl = domainName + kakaoOauthProperties.withdrawCallbackUrl
+        return getKakaoToken(redirectUrl, code)
+    }
 
-        return AbleRegisterResponse(!canRegisterDeferred)
+    private suspend fun getKakaoToken(redirectUrl: String, code: String): OauthTokenResponse {
+        return withContext(Dispatchers.IO) {
+            kakaoClient.kakaoTokenClient(redirectUrl, code)
+        }.run { OauthTokenResponse.fromKakao(this) }
     }
 
     /** 유저 정보를 가져옵니다. */
@@ -54,5 +66,12 @@ class KakaoOauthHelper(
         return withContext(Dispatchers.IO) {
             kakaoClient.kakaoUserInfoClient(accessToken)
         }.run { OauthUserInfoDto.fromKakao(this) }
+    }
+
+    /** 회원 탈퇴합니다 */
+    suspend fun withdraw(oauthId: String) {
+        withContext(Dispatchers.IO) {
+            kakaoClient.kakaoWithdrawClient(oauthId)
+        }
     }
 }
