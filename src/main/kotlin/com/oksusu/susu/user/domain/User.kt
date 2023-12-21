@@ -21,6 +21,7 @@ class User(
 
     var name: String,
 
+    @Enumerated(EnumType.ORDINAL)
     var gender: Gender? = null,
 
     var birth: LocalDate? = null,
