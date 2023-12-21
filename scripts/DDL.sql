@@ -10,7 +10,7 @@ CREATE TABLE `user`
     `user_state`        int          NOT NULL COMMENT '유저 계정 상태, 활동 유저: 0, 탈퇴한 유저: 1, 정지 유저: 2, 영구 정지: 3',
     `name`              varchar(256) NOT NULL COMMENT 'user 이름',
     `gender`            int          DEFAULT NULL COMMENT 'user 성별, 남성: 0, 여성: 1',
-    `birth`             date         DEFAULT NULL COMMENT 'user 출생년도',
+    `birth`             date         DEFAULT NvULL COMMENT 'user 출생년도',
     `profile_image_url` varchar(512) DEFAULT NULL COMMENT '프로필 이미지',
     `created_at`        datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at`       datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',

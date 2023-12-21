@@ -6,4 +6,5 @@ enum class Gender {
 
     // 여성
     F,
+    ;
 }

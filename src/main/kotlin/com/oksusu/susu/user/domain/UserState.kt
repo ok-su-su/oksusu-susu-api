@@ -12,4 +12,5 @@ enum class UserState {
 
     // 영구정지
     BANISHED,
+    ;
 }

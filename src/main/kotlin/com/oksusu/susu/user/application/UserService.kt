@@ -56,10 +56,6 @@ class UserService(
         user.apply {
             userState = UserState.DELETED
             oauthInfo = oauthInfo.withdrawOauthInfo()
-            name = "탈퇴 유저"
-            gender = null
-            birth = null
-            profileImageUrl = null
         }
 
         saveSync(user)
