@@ -5,5 +5,5 @@ enum class Gender {
     M,
 
     // 여성
-    F
+    F,
 }
