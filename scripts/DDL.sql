@@ -71,10 +71,25 @@ CREATE INDEX idx__uid ON friend (uid);
 -- 지인 관계
 CREATE TABLE `friend_relationship`
 (
-    `friend_id`       int NOT NULL COMMENT '지인 id',
-    `relationship_id` int NOT NULL COMMENT '관계 id',
+    `id`              bigint NOT NULL AUTO_INCREMENT COMMENT 'friend_relationship id',
+    `friend_id`       int    NOT NULL COMMENT '지인 id',
+    `relationship_id` int    NOT NULL COMMENT '관계 id',
     `custom_relation` varchar(512) DEFAULT NULL COMMENT '기타 항목인 경우, 별도 입력을 위한 컬럼',
     `created_at`      datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at`     datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
-    PRIMARY KEY (`friend_id`, `relationship_id`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='지인 관계 매핑 테이블';
+CREATE UNIQUE INDEX uidx__friend_id__relationship_id ON friend_relationship (friend_id, relationship_id);
+
+-- 카테고리 매핑
+CREATE TABLE `category_assignment`
+(
+    `id`              bigint       NOT NULL AUTO_INCREMENT COMMENT 'category_assignment id',
+    `target_id`       int          NOT NULL COMMENT '대상 id',
+    `target_type`     varchar(256) NOT NULL COMMENT '대상 type (LEDGER, ENVELOPE)',
+    `custom_category` varchar(256) NOT NULL COMMENT '기타 항목인 경우, 별도 입력을 위한 컬럼',
+    `created_at`      datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`     datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='카테고리 매핑 테이블';
+CREATE UNIQUE INDEX uidx__target_id__target_type ON category_assignment (target_id, target_type);
