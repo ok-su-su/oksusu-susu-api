@@ -54,7 +54,8 @@ class SusuWebClient {
 //                                    name,
 //                                    value
 //                                )
-//                            })
+//                            }
+//                        )
 //                    }
                     Mono.just(clientRequest)
                 }
@@ -75,7 +76,7 @@ class SusuWebClient {
                     Mono.just(clientResponse)
                 }
             )
-            .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+            .defaultHeader("Content-type", "application/x-www-form-urlencoded")
             .build()
     }
 }

@@ -2,11 +2,15 @@ package com.oksusu.susu.client.oauth.kakao
 
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthUserInfoResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthWithdrawResponse
 import com.oksusu.susu.common.consts.BEARER
+import com.oksusu.susu.common.consts.KAKAO_AK
 import com.oksusu.susu.common.properties.KakaoOauthProperties
 import com.oksusu.susu.config.webClient.SusuWebClient
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Component
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.reactive.function.BodyInserters
 
 @Component
 class KakaoClient(
@@ -36,12 +40,29 @@ class KakaoClient(
     suspend fun kakaoUserInfoClient(
         accessToken: String,
     ): KakaoOauthUserInfoResponse {
-        val url = "${kakaoOauthProperties.kapiUrl}/v2/user/me"
         return susuWebClient.webClient().get()
-            .uri(url)
+            .uri(kakaoOauthProperties.kapiUrl + kakaoOauthProperties.userInfoUrl)
             .header("Authorization", BEARER + accessToken)
             .retrieve()
             .bodyToMono(KakaoOauthUserInfoResponse::class.java)
+            .awaitSingle()
+    }
+
+    suspend fun kakaoWithdrawClient(targetId: String): KakaoOauthWithdrawResponse? {
+        val multiValueMap = LinkedMultiValueMap<String, String>().apply {
+            setAll(
+                mapOf(
+                    "target_id_type" to "user_id",
+                    "target_id" to targetId
+                )
+            )
+        }
+        return susuWebClient.webClient().post()
+            .uri(kakaoOauthProperties.kapiUrl + kakaoOauthProperties.unlinkUrl)
+            .header("Authorization", KAKAO_AK + kakaoOauthProperties.adminKey)
+            .body(BodyInserters.fromFormData(multiValueMap))
+            .retrieve()
+            .bodyToMono(KakaoOauthWithdrawResponse::class.java)
             .awaitSingle()
     }
 }

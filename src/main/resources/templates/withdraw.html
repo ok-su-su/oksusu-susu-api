@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link
+            rel="stylesheet"
+            as="style"
+            crossorigin
+            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/withdraw.css}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function withdrawUser(xSusuAuthToken) {
+            $.ajax({
+                url: `/api/v1/auth/withdraw`,
+                type: 'post',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'application/json',
+                headers: {"X-SUSU-AUTH-TOKEN": xSusuAuthToken},
+                async: false,
+                success: function (response) {
+                    console.log(response)
+                    alert("탈퇴에 성공했습니다!")
+                },
+                error: function (request, status, error) {
+                    console.log(error)
+                    alert("다시 시도해주세요!")
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+    <meta charset="utf-8" />
+    <title>SUSU 회원 탈퇴</title>
+</head>
+<body>
+<div class="BackGround">
+    <div class="Frame">
+        <div class="Box">
+            <p>
+                <span>수수를 탈퇴하시겠어요?</span>
+                <br/>
+                탈퇴 시 작성했던 데이터를 복구할 수 없어요
+            </p>
+            <div class="withdrawButton"
+                 th:attr="xSusuAuthToken=${xSusuAuthToken}"
+                 th:onclick="withdrawUser(this.getAttribute('xSusuAuthToken'))" />
+                <p>탈퇴</p>
+            </div>
+        </div>
+    </div>
+    <div class="Logo">
+        <svg th:replace="~{component/logo}">logo</svg>
+    </div>
+</div>
+</body>
+</html>

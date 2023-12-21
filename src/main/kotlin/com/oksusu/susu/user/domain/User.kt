@@ -2,13 +2,7 @@ package com.oksusu.susu.user.domain
 
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.common.domain.BaseEntity
-import jakarta.persistence.Column
-import jakarta.persistence.Embedded
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
@@ -19,23 +13,29 @@ class User(
     val id: Long = -1,
 
     @Embedded
-    val oauthInfo: OauthInfo,
+    var oauthInfo: OauthInfo,
 
-    val name: String,
+    @Column(name = "user_state")
+    @Enumerated(EnumType.ORDINAL)
+    var userState: UserState = UserState.ACTIVE,
 
-    val age: Int?,
+    var name: String,
 
-    val birth: LocalDate?,
+    @Enumerated(EnumType.ORDINAL)
+    var gender: Gender? = null,
+
+    var birth: LocalDate? = null,
 
     @Column(name = "profile_image_url")
-    val profileImageUrl: String? = null,
+    var profileImageUrl: String? = null,
 ) : BaseEntity() {
+
     companion object {
         fun toEntity(oauthRegisterRequest: OauthRegisterRequest, oauthInfo: OauthInfo): User {
             return User(
                 oauthInfo = oauthInfo,
                 name = oauthRegisterRequest.name,
-                age = oauthRegisterRequest.age,
+                gender = oauthRegisterRequest.gender,
                 birth = oauthRegisterRequest.getBirth()
             )
         }
