@@ -80,7 +80,7 @@ class SusuDatabaseConfig {
             .packages(
                 "com.oksusu.susu.user.domain",
                 "com.oksusu.susu.ledger.domain",
-                "com.oksusu.susu.relationship.domain",
+                "com.oksusu.susu.friend.domain",
                 "com.oksusu.susu.category.domain"
             )
             .properties(

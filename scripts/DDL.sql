@@ -55,3 +55,26 @@ CREATE TABLE `category`
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='카테고리';
+
+-- 지인
+CREATE TABLE `friend`
+(
+    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '지인 정보 id',
+    `uid`         int          NOT NULL COMMENT 'user id',
+    `name`        varchar(512) NOT NULL COMMENT '지인 이름',
+    `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='지인 정보';
+CREATE INDEX idx__uid ON friend (uid);
+
+-- 지인 관계
+CREATE TABLE `friend_relationship`
+(
+    `friend_id`       int NOT NULL COMMENT '지인 id',
+    `relationship_id` int NOT NULL COMMENT '관계 id',
+    `custom_relation` varchar(512) DEFAULT NULL COMMENT '기타 항목인 경우, 별도 입력을 위한 컬럼',
+    `created_at`      datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`     datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`friend_id`, `relationship_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='지인 관계 매핑 테이블';

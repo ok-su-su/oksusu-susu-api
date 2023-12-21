@@ -1,6 +1,6 @@
-package com.oksusu.susu.relationship.infrastructure
+package com.oksusu.susu.friend.infrastructure
 
-import com.oksusu.susu.relationship.domain.Relationship
+import com.oksusu.susu.friend.domain.Relationship
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
