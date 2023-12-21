@@ -57,7 +57,7 @@ class UserService(
             userState = UserState.DELETED
             oauthInfo = oauthInfo.withdrawOauthInfo()
             name = "탈퇴 유저"
-            age = null
+            gender = null
             birth = null
             profileImageUrl = null
         }

@@ -1,10 +1,11 @@
 package com.oksusu.susu.auth.model.dto.request
 
+import com.oksusu.susu.user.domain.Gender
 import java.time.LocalDate
 
 class OauthRegisterRequest(
     val name: String,
-    val age: Int?,
+    val gender: Gender?,
     val birth: Int?,
 ) {
     fun getBirth(): LocalDate? {

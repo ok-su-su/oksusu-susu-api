@@ -21,7 +21,7 @@ class User(
 
     var name: String,
 
-    var age: Int? = null,
+    var gender: Gender? = null,
 
     var birth: LocalDate? = null,
 
@@ -34,7 +34,7 @@ class User(
             return User(
                 oauthInfo = oauthInfo,
                 name = oauthRegisterRequest.name,
-                age = oauthRegisterRequest.age,
+                gender = oauthRegisterRequest.gender,
                 birth = oauthRegisterRequest.getBirth()
             )
         }
