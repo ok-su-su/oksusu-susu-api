@@ -25,6 +25,9 @@ class CategoryAssignment(
     @Column(name = "target_type")
     val targetType: CategoryAssignmentType,
 
+    @Column(name = "category_id")
+    val categoryId: Long,
+
     @Column(name = "custom_category")
     val customCategory: String? = null,
 ) : BaseEntity()

@@ -9,3 +9,7 @@ open class SusuException(
 class NotFoundException(errorCode: ErrorCode) : SusuException(errorCode)
 
 class InvalidTokenException(errorCode: ErrorCode) : SusuException(errorCode)
+
+class InvalidRequestException(errorCode: ErrorCode) : SusuException(errorCode)
+
+class FailToCreateException(errorCode: ErrorCode) : SusuException(errorCode)

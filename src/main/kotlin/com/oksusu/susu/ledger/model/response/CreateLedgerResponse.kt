@@ -1,20 +1,23 @@
 package com.oksusu.susu.ledger.model.response
 
+import com.oksusu.susu.category.model.CategoryModel
+import com.oksusu.susu.category.model.CategoryWithCustomModel
 import com.oksusu.susu.ledger.domain.Ledger
+import com.oksusu.susu.ledger.model.LedgerModel
 
 data class CreateLedgerResponse(
-    val id: Long,
-    val uid: Long,
-    val title: String,
-    val description: String?,
+    val ledger: LedgerModel,
+    val category: CategoryWithCustomModel,
 ) {
     companion object {
-        fun from(ledger: Ledger): CreateLedgerResponse {
+        fun of(
+            ledger: Ledger,
+            category: CategoryModel,
+            customCategory: String?,
+        ): CreateLedgerResponse {
             return CreateLedgerResponse(
-                id = ledger.id,
-                uid = ledger.uid,
-                title = ledger.title,
-                description = ledger.description
+                ledger = LedgerModel.from(ledger),
+                category = CategoryWithCustomModel.of(category, customCategory)
             )
         }
     }

@@ -28,7 +28,7 @@ import javax.sql.DataSource
     basePackages = [
         "com.oksusu.susu.user.infrastructure",
         "com.oksusu.susu.ledger.infrastructure",
-        "com.oksusu.susu.relationship.infrastructure",
+        "com.oksusu.susu.friend.infrastructure",
         "com.oksusu.susu.category.infrastructure"
     ],
     entityManagerFactoryRef = "susuEntityManager",
