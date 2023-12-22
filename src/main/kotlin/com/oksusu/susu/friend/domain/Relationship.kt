@@ -1,4 +1,4 @@
-package com.oksusu.susu.relationship.domain
+package com.oksusu.susu.friend.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
 import jakarta.persistence.Column

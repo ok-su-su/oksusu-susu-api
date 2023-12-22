@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "장부")
 @RestController
-@RequestMapping(value = ["/api/v1/ledger"], produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping(value = ["/api/v1/ledgers"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class LedgerResource(
     private val ledgerService: LedgerService,
 ) {

@@ -22,7 +22,11 @@ class OAuthService(
     }
 
     /** oauth token 가져오기 */
-    suspend fun getOauthToken(provider: OauthProvider, code: String, request: AbstractServerHttpRequest): OauthTokenResponse {
+    suspend fun getOauthToken(
+        provider: OauthProvider,
+        code: String,
+        request: AbstractServerHttpRequest,
+    ): OauthTokenResponse {
         return when (provider) {
             OauthProvider.KAKAO -> kakaoOauthHelper.getOauthToken(code, request.uri.toString())
         }

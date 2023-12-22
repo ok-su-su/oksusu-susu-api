@@ -1,4 +1,4 @@
-package com.oksusu.susu.ledger.domain
+package com.oksusu.susu.friend.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
 import jakarta.persistence.Column
@@ -7,24 +7,20 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.time.LocalDateTime
 
 @Entity
-@Table(name = "ledger")
-class Ledger(
+@Table(name = "friend_relationship")
+data class FriendRelationship(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
-    val uid: Long,
+    @Column(name = "friend_id")
+    val friendId: Long = -1L,
 
-    val title: String,
+    @Column(name = "relationship_id")
+    val relationshipId: Long = -1L,
 
-    val description: String? = null,
-
-    @Column(name = "start_at")
-    val startAt: LocalDateTime,
-
-    @Column(name = "end_at")
-    val endAt: LocalDateTime,
+    @Column(name = "custom_relation")
+    val customRelation: String? = null,
 ) : BaseEntity()
