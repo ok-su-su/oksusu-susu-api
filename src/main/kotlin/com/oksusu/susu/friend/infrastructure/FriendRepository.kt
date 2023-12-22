@@ -23,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional
 interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository {
     @Transactional(readOnly = true)
     fun findByIdAndUid(id: Long, uid: Long): Friend?
+
+    @Transactional(readOnly = true)
+    fun existsByUidAndPhoneNumber(uid: Long, phoneNumber: String): Boolean
 }
 
 interface FriendCustomRepository {
