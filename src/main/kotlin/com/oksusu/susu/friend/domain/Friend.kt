@@ -20,5 +20,5 @@ class Friend(
     val name: String,
 
     @Column(name = "phone_number")
-    val phoneNumber: String,
+    val phoneNumber: String? = null,
 ) : BaseEntity()
