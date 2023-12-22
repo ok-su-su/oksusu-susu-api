@@ -60,11 +60,12 @@ CREATE TABLE `category`
 -- 지인
 CREATE TABLE `friend`
 (
-    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '지인 정보 id',
-    `uid`         int          NOT NULL COMMENT 'user id',
-    `name`        varchar(512) NOT NULL COMMENT '지인 이름',
-    `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT '지인 정보 id',
+    `uid`          int          NOT NULL COMMENT 'user id',
+    `name`         varchar(512) NOT NULL COMMENT '지인 이름',
+    `phone_number` varchar(512) NOT NULL COMMENT '전화번호',
+    `created_at`   datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='지인 정보';
 CREATE INDEX idx__uid ON friend (uid);
@@ -95,3 +96,21 @@ CREATE TABLE `category_assignment`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='카테고리 매핑 테이블';
 CREATE UNIQUE INDEX uidx__target_id__target_type ON category_assignment (target_id, target_type);
+
+-- 봉투
+CREATE TABLE `envelope`
+(
+    `id`             bigint       NOT NULL AUTO_INCREMENT COMMENT '장부 id',
+    `uid`            int          NOT NULL COMMENT 'user id',
+    `type`           varchar(128) NOT NULL COMMENT 'type: SENT, RECEIVED',
+    `friend_id`      int          NOT NULL COMMENT '친구 id',
+    `amount`         int          NOT NULL COMMENT '금액',
+    `gift`           varchar(512) NOT NULL COMMENT '선물',
+    `memo`           varchar(512) NOT NULL COMMENT '메모',
+    `has_visited`    tinyint      NOT NULL COMMENT '방문 : 1, 미방문 : 0',
+    `handed_over_at` datetime     NOT NULL COMMENT '전달일',
+    `created_at`     datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 200000 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='장부';
+CREATE INDEX idx__uid ON envelope (uid);
