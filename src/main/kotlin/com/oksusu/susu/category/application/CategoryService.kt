@@ -3,8 +3,6 @@ package com.oksusu.susu.category.application
 import com.oksusu.susu.category.domain.Category
 import com.oksusu.susu.category.infrastructure.CategoryRepository
 import com.oksusu.susu.category.model.CategoryModel
-import com.oksusu.susu.category.model.response.CategoriesResponse
-import com.oksusu.susu.category.model.response.CategoryResponse
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
@@ -42,10 +40,8 @@ class CategoryService(
         }
     }
 
-    suspend fun getAll(): CategoriesResponse {
-        return findAllByIsActive(isActive = true)
-            .map { category -> CategoryResponse.from(category) }
-            .run { CategoriesResponse(this) }
+    suspend fun getAll(): List<CategoryModel> {
+        return categories.values.toList()
     }
 
     suspend fun findAllByIsActive(isActive: Boolean): List<Category> {

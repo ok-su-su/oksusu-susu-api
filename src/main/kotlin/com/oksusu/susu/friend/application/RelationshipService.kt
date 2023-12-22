@@ -47,4 +47,8 @@ class RelationshipService(
     fun getRelationship(id: Long): RelationshipModel {
         return relationships[id] ?: throw NotFoundException(ErrorCode.NOT_FOUND_RELATIONSHIP_ERROR)
     }
+
+    fun getAll(): List<RelationshipModel> {
+        return relationships.values.toList()
+    }
 }
