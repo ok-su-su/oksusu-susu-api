@@ -2,6 +2,9 @@ package com.oksusu.susu.friend.application
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.infrastructure.FriendRepository
 import com.oksusu.susu.friend.infrastructure.model.FriendAndFriendRelationshipModel
 import com.oksusu.susu.friend.infrastructure.model.SearchFriendRequestModel
@@ -48,5 +51,13 @@ class FriendService(
         pageable: Pageable,
     ): Page<FriendAndFriendRelationshipModel> {
         return withContext(Dispatchers.IO) { friendRepository.search(searchRequest, pageable) }
+    }
+
+    suspend fun findByIdAndUidOrThrow(id: Long, uid: Long): Friend {
+        return findByIdAndUidOrNull(id, uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_FRIEND_ERROR)
+    }
+
+    suspend fun findByIdAndUidOrNull(id: Long, uid: Long): Friend? {
+        return withContext(Dispatchers.IO) { friendRepository.findByIdAndUid(id, uid) }
     }
 }

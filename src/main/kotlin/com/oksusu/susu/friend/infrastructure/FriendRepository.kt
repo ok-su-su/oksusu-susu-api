@@ -20,7 +20,10 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository
+interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository {
+    @Transactional(readOnly = true)
+    fun findByIdAndUid(id: Long, uid: Long): Friend?
+}
 
 interface FriendCustomRepository {
     @Transactional(readOnly = true)
