@@ -1,6 +1,7 @@
 package com.oksusu.susu.community.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
+import com.oksusu.susu.community.model.VoteOptionModel
 import jakarta.persistence.*
 
 @Entity
@@ -16,4 +17,14 @@ class VoteOption(
     val content: String,
 
     val seq: Int,
-) : BaseEntity()
+) : BaseEntity() {
+    companion object {
+        fun of(voteOptionModel: VoteOptionModel, communityId: Long): VoteOption {
+            return VoteOption(
+                communityId = communityId,
+                content = voteOptionModel.content,
+                seq = voteOptionModel.seq,
+            )
+        }
+    }
+}

@@ -122,6 +122,7 @@ CREATE INDEX idx__uid ON envelope (uid);
 CREATE TABLE `community`
 (
     `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '커뮤니티 id',
+    `uid`         bigint       NOT NULL COMMENT 'user id',
     `type`        int          NOT NULL COMMENT '커뮤니티 타입, 0: 투표',
     `title`       varchar(256) DEFAULT NULL COMMENT '제목',
     `content`     varchar(512) NOT NULL COMMENT '내용',
@@ -131,7 +132,6 @@ CREATE TABLE `community`
     `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='커뮤니티';
-CREATE UNIQUE INDEX idx__type__is_active ON community (type, is_active);
 
 -- 투표 선택지
 CREATE TABLE `vote_option`
@@ -144,7 +144,6 @@ CREATE TABLE `vote_option`
     `modified_at`  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='투표 선택지';
-CREATE UNIQUE INDEX idx__community_id ON vote_option (community_id);
 
 -- 투표 유저 매핑
 CREATE TABLE `vote_history`

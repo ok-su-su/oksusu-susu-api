@@ -12,14 +12,16 @@ class Community(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
+    val uid: Long,
+
     val type: CommunityType,
-
-    val title: String,
-
-    val content: String,
 
     val category: CommunityCategory,
 
+    val title: String? = null,
+
+    val content: String,
+
     @Column(name = "is_active")
-    val isActive: Boolean,
+    val isActive: Boolean = true,
 ) : BaseEntity()
