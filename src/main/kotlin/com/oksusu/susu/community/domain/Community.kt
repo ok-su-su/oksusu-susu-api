@@ -23,5 +23,5 @@ class Community(
     val content: String,
 
     @Column(name = "is_active")
-    val isActive: Boolean = true,
+    var isActive: Boolean = true,
 ) : BaseEntity()

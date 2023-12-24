@@ -11,6 +11,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     INVALID_MEDIA_TYPE_ERROR(HttpStatus.BAD_REQUEST, "invalid media type"),
     QUERY_DSL_NOT_EXISTS_ERROR(HttpStatus.NOT_FOUND, "not found query dsl"),
     COROUTINE_CANCELLATION_ERROR(HttpStatus.BAD_REQUEST, "coroutine cancellation error"),
+    NO_AUTHORITY_ERROR(HttpStatus.FORBIDDEN, "수정 권한이 없습니다."),
 
     /** Auth Error Code */
     FAIL_TO_VERIFY_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "fail to verify token"),
@@ -45,5 +46,6 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     FAIL_TO_CREATE_COMMUNITY_ERROR(HttpStatus.BAD_REQUEST, "커뮤니티 생성을 실패했습니다."),
     NOT_FOUND_VOTE_ERROR(HttpStatus.NOT_FOUND, "투표 정보를 찾을 수 없습니다."),
     DUPLICATED_VOTE_ERROR(HttpStatus.NOT_FOUND, "중복 투표를 할 수 없습니다."),
+
     ;
 }

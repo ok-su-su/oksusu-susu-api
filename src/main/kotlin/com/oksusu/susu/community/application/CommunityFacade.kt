@@ -18,6 +18,7 @@ import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.user.application.UserService
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,6 +32,7 @@ class CommunityFacade(
     private val voteSummaryService: VoteSummaryService,
     private val voteOptionSummaryService: VoteOptionSummaryService,
     private val voteHistoryService: VoteHistoryService,
+    private val userService: UserService,
 ) {
     @Transactional
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateVoteResponse {
@@ -84,6 +86,8 @@ class CommunityFacade(
         val vote = voteInfos[0].community
         val options = voteInfos.map { it.voteOption }
 
+        val creator = userService.findByIdOrThrow(vote.uid)
+
         val voteSummary = voteSummaryService.getSummaryByCommunityId(id)
         val optionSummaries = voteOptionSummaryService.getSummariesByOptionIdIn(options.map { it.id })
 
@@ -91,7 +95,12 @@ class CommunityFacade(
             VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
         }
 
-        return VoteCountResponse.of(VoteCountModel.of(vote, voteSummary), optionCountModels)
+        return VoteCountResponse.of(
+            VoteCountModel.of(vote, voteSummary),
+            optionCountModels,
+            creator,
+            user.id == creator.id
+        )
     }
 
     @Transactional
@@ -123,5 +132,14 @@ class CommunityFacade(
 
         voteSummaryService.decreaseCount(communityId)
         voteOptionSummaryService.decreaseCount(optionId)
+    }
+
+    @Transactional
+    suspend fun deleteVote(user: AuthUser, id: Long) {
+        val softDeletedVote = voteService.softDeleteVote(user.id, id)
+
+        txTemplates.writer.executeWithContext {
+            communityService.saveSync(softDeletedVote)
+        }
     }
 }

@@ -6,10 +6,7 @@ import com.oksusu.susu.common.dto.SusuSliceRequest
 import com.oksusu.susu.community.application.CommunityFacade
 import com.oksusu.susu.community.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.community.model.request.CreateVoteRequest
-import com.oksusu.susu.extension.wrapCreated
-import com.oksusu.susu.extension.wrapOk
-import com.oksusu.susu.extension.wrapPage
-import com.oksusu.susu.extension.wrapSlice
+import com.oksusu.susu.extension.*
 import com.oksusu.susu.friend.model.request.CreateFriendRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -51,4 +48,11 @@ class CommunityResource (
         @PathVariable id: Long,
         @RequestBody request: CreateVoteHistoryRequest,
     ) = communityFacade.vote(user, id, request).wrapCreated()
+
+    @Operation(summary = "투표 삭제하기")
+    @DeleteMapping("/votes/{id}")
+    suspend fun deleteVote(
+        user: AuthUser,
+        @PathVariable id: Long,
+    ) = communityFacade.deleteVote(user, id).wrapVoid()
 }
