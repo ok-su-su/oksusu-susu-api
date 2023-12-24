@@ -2,6 +2,7 @@ package com.oksusu.susu.community.application
 
 import com.oksusu.susu.community.domain.VoteOption
 import com.oksusu.susu.community.infrastructure.repository.VoteOptionRepository
+import com.oksusu.susu.community.model.VoteOptionCountModel
 import com.oksusu.susu.community.model.VoteOptionModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
@@ -29,6 +30,12 @@ class VoteOptionService(
     suspend fun getOptionsByCommunityIdIn(communityIds: List<Long>): List<VoteOption> {
         return withContext(Dispatchers.IO) {
             voteOptionRepository.findAllByCommunityIdInOrderBySeq(communityIds);
+        }
+    }
+
+    suspend fun getVoteOptions(communityId: Long): List<VoteOption> {
+        return withContext(Dispatchers.IO) {
+            voteOptionRepository.findAllByCommunityIdOrderBySeq(communityId)
         }
     }
 }
