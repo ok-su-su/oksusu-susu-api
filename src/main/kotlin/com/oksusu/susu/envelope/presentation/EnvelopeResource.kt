@@ -1,7 +1,7 @@
 package com.oksusu.susu.envelope.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.envelope.application.EnvelopeService
+import com.oksusu.susu.envelope.application.EnvelopeFacade
 import com.oksusu.susu.envelope.model.request.CreateEnvelopeRequest
 import com.oksusu.susu.extension.wrapCreated
 import io.swagger.v3.oas.annotations.Operation
@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(value = ["/api/v1/envelopes"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class EnvelopeResource(
-    private val envelopeService: EnvelopeService,
+    private val envelopeFacade: EnvelopeFacade,
 ) {
     @Operation(summary = "생성")
     @PostMapping
     suspend fun create(
         user: AuthUser,
         @RequestBody request: CreateEnvelopeRequest,
-    ) = envelopeService.create(user, request).wrapCreated()
+    ) = envelopeFacade.create(user, request).wrapCreated()
 }
