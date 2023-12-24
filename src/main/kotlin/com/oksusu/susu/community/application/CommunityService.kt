@@ -22,16 +22,16 @@ class CommunityService(
         return communityRepository.save(community)
     }
 
-    fun findAllByIsActiveAndTypeOrderByCreatedAtDes(
+    suspend fun findAllByIsActiveAndTypeOrderByCreatedAtDes(
         isActive: Boolean,
         type: CommunityType,
         pageable: Pageable
     ): Slice<Community> {
-        return communityRepository.findAllByIsActiveAndTypeOrderByCreatedAtDesc(
-            true,
-            CommunityType.VOTE,
-            pageable
-        )
+        return withContext(Dispatchers.IO) {
+            communityRepository.findAllByIsActiveAndTypeOrderByCreatedAtDesc(
+                isActive, type, pageable
+            )
+        }
     }
 
     suspend fun findByIdOrThrow(id: Long): Community {

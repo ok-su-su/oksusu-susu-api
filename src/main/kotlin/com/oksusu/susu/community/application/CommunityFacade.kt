@@ -80,10 +80,13 @@ class CommunityFacade(
 
     @Transactional(readOnly = true)
     suspend fun getVote(user: AuthUser, id: Long): VoteCountResponse {
-        val vote = voteService.getVote(id)
+        val voteInfos = voteService.getVoteAndOptions(id)
+        val vote = voteInfos[0].community
+        val options = voteInfos.map { it.voteOption }
+
         val voteSummary = voteSummaryService.getSummaryByCommunityId(id)
-        val options = voteOptionService.getVoteOptions(vote.id)
         val optionSummaries = voteOptionSummaryService.getSummariesByOptionIdIn(options.map { it.id })
+
         val optionCountModels = options.map { option ->
             VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
         }
