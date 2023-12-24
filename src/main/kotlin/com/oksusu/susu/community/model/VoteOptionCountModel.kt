@@ -1,7 +1,7 @@
 package com.oksusu.susu.community.model
 
 import com.oksusu.susu.community.domain.VoteOption
-import com.oksusu.susu.community.domain.VoteOptionSummary
+import com.oksusu.susu.community.domain.vo.VoteOptionSummary
 
 
 class VoteOptionCountModel(

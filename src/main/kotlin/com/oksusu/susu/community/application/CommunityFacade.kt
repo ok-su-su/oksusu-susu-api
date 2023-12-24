@@ -2,11 +2,10 @@ package com.oksusu.susu.community.application
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuSliceRequest
-import com.oksusu.susu.community.domain.Community
-import com.oksusu.susu.community.domain.VoteOption
-import com.oksusu.susu.community.domain.VoteOptionSummary
-import com.oksusu.susu.community.domain.VoteSummary
+import com.oksusu.susu.community.domain.*
 import com.oksusu.susu.community.domain.vo.CommunityType
+import com.oksusu.susu.community.domain.vo.VoteOptionSummary
+import com.oksusu.susu.community.domain.vo.VoteSummary
 import com.oksusu.susu.community.model.VoteCountModel
 import com.oksusu.susu.community.model.VoteOptionCountModel
 import com.oksusu.susu.community.model.VoteOptionModel
@@ -31,11 +30,11 @@ class CommunityFacade(
     private val voteOptionService: VoteOptionService,
     private val voteSummaryService: VoteSummaryService,
     private val voteOptionSummaryService: VoteOptionSummaryService,
+    private val voteHistoryService: VoteHistoryService,
 ) {
     @Transactional
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateVoteResponse {
         voteOptionService.validateSeq(request.options)
-
 
         val response = txTemplates.writer.executeWithContext {
             val createdCommunity = Community(
@@ -85,14 +84,41 @@ class CommunityFacade(
         val voteSummary = voteSummaryService.getSummaryByCommunityId(id)
         val options = voteOptionService.getVoteOptions(vote.id)
         val optionSummaries = voteOptionSummaryService.getSummariesByOptionIdIn(options.map { it.id })
-        val optionCountModels = options.map { option->
+        val optionCountModels = options.map { option ->
             VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
         }
 
-        return VoteCountResponse.of(VoteCountModel.of(vote,voteSummary), optionCountModels)
+        return VoteCountResponse.of(VoteCountModel.of(vote, voteSummary), optionCountModels)
     }
 
-    fun createVoteHistory(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
+    @Transactional
+    suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
+        when (request.isCancel) {
+            true -> cancelVote(user.id, id, request.optionId)
+            false -> castVote(user.id, id, request.optionId)
+        }
+    }
 
+    private suspend fun castVote(uid: Long, communityId: Long, optionId: Long) {
+        voteHistoryService.validateVoteNotExist(uid, communityId)
+
+        txTemplates.writer.executeWithContext {
+            VoteHistory(uid = uid, communityId = communityId, voteOptionId = optionId)
+                .run { voteHistoryService.saveSync(this) }
+        }
+
+        voteSummaryService.increaseCount(communityId)
+        voteOptionSummaryService.increaseCount(optionId)
+    }
+
+    private suspend fun cancelVote(uid: Long, communityId: Long, optionId: Long) {
+        voteHistoryService.validateVoteExist(uid, communityId, optionId)
+
+        txTemplates.writer.executeWithContext {
+            voteHistoryService.deleteByUidAndCommunityId(uid, communityId)
+        }
+
+        voteSummaryService.decreaseCount(communityId)
+        voteOptionSummaryService.decreaseCount(optionId)
     }
 }

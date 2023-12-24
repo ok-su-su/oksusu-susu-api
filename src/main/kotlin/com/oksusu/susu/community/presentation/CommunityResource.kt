@@ -50,5 +50,5 @@ class CommunityResource (
         user: AuthUser,
         @PathVariable id: Long,
         @RequestBody request: CreateVoteHistoryRequest,
-    ) = communityFacade.createVoteHistory(user, id, request).wrapCreated()
+    ) = communityFacade.vote(user, id, request).wrapCreated()
 }
