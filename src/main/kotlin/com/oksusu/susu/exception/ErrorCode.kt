@@ -27,5 +27,16 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Category Error Code */
     NOT_FOUND_CATEGORY_ERROR(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
+
+    /** Relationship Error Code */
+    NOT_FOUND_RELATIONSHIP_ERROR(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."),
+
+    /** Friend Error Code */
+    NOT_FOUND_FRIEND_ERROR(HttpStatus.NOT_FOUND, "친구 정보를 찾을 수 없습니다."),
+    ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR(HttpStatus.BAD_REQUEST, "이미 등록된 전화번호 입니다."),
+    FAIL_TO_CREATE_FRIEND_ERROR(HttpStatus.BAD_REQUEST, "친구 생성을 실패했습니다."),
+
+    /** Envelope Error Code */
+    FAIL_TO_CREATE_ENVELOPE_ERROR(HttpStatus.BAD_REQUEST, "봉투 생성을 실패했습니다."),
     ;
 }

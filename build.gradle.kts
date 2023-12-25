@@ -45,9 +45,9 @@ idea {
  * jpa meta-annotations not automatically opened through the default settings of the plugin.spring
  */
 allOpen {
-    annotation("javax.persistence.Entity")
-    annotation("javax.persistence.MappedSuperclass")
-    annotation("javax.persistence.Embeddable")
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
 }
 
 springBoot.buildInfo { properties { } }
@@ -87,7 +87,7 @@ dependencies {
     /** querydsl */
     implementation("com.querydsl:querydsl-collections:${DependencyVersion.QUERYDSL_VERSION}")
     implementation("com.querydsl:querydsl-sql:${DependencyVersion.QUERYDSL_VERSION}")
-    implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL_VERSION}")
+    implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
     kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
 
     /** arrow-kt */

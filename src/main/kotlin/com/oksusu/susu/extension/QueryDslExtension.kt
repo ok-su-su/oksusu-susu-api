@@ -2,6 +2,8 @@ package com.oksusu.susu.extension
 
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.SusuException
+import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -15,4 +17,8 @@ fun <T> Querydsl?.execute(query: JPAQuery<T>, pageable: Pageable): Page<T> {
                 PageImpl(this.fetch(), pageable, this.fetchCount())
             }
         } ?: throw SusuException(ErrorCode.QUERY_DSL_NOT_EXISTS_ERROR)
+}
+
+fun StringPath.isEquals(parameter: String?): BooleanExpression? {
+    return parameter?.let { this.eq(parameter) }
 }

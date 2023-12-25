@@ -13,3 +13,5 @@ class InvalidTokenException(errorCode: ErrorCode) : SusuException(errorCode)
 class InvalidRequestException(errorCode: ErrorCode) : SusuException(errorCode)
 
 class FailToCreateException(errorCode: ErrorCode) : SusuException(errorCode)
+
+class AlreadyException(errorCode: ErrorCode) : SusuException(errorCode)
