@@ -5,19 +5,28 @@ import com.oksusu.susu.category.application.CategoryAssignmentService
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
+import com.oksusu.susu.category.model.CategoryWithCustomModel
+import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
+import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.ledger.domain.Ledger
+import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
+import com.oksusu.susu.ledger.model.LedgerModel
 import com.oksusu.susu.ledger.model.request.CreateLedgerRequest
+import com.oksusu.susu.ledger.model.request.SearchLedgerRequest
 import com.oksusu.susu.ledger.model.response.CreateLedgerResponse
+import com.oksusu.susu.ledger.model.response.SearchLedgerResponse
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
 @Service
 class LedgerFacade(
     private val ledgerService: LedgerService,
+    private val envelopeService: EnvelopeService,
     private val categoryService: CategoryService,
     private val categoryAssignmentService: CategoryAssignmentService,
     private val txTemplate: TransactionTemplates,
@@ -59,5 +68,36 @@ class LedgerFacade(
             category = category,
             customCategory = customCategory
         )
+    }
+
+    suspend fun search(
+        user: AuthUser,
+        request: SearchLedgerRequest,
+        pageRequest: SusuPageRequest,
+    ): Page<SearchLedgerResponse> {
+        val searchSpec = SearchLedgerSpec(
+            uid = user.id,
+            categoryId = request.categoryId,
+            fromStartAt = request.fromStartAt,
+            toStartAt = request.toEndAt
+        )
+
+        val response = ledgerService.search(searchSpec, pageRequest.toDefault())
+
+        val statistics = response.content.map { (ledger, _) -> ledger.id }
+            .run { envelopeService.countTotalAmountsAndCounts(this) }
+            .associateBy { ledger -> ledger.ledgerId }
+
+        return response.map { (ledger, categoryAssignment) ->
+            val category = categoryService.getCategory(categoryAssignment.categoryId)
+            val statistic = statistics[ledger.id]
+
+            SearchLedgerResponse(
+                ledger = LedgerModel.from(ledger),
+                category = CategoryWithCustomModel.of(category, categoryAssignment.customCategory),
+                totalAmounts = statistic?.totalAmounts ?: 0L,
+                totalCounts = statistic?.totalCounts ?: 0L
+            )
+        }
     }
 }
