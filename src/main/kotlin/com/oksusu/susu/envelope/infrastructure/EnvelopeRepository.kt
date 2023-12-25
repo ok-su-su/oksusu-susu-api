@@ -1,9 +1,15 @@
 package com.oksusu.susu.envelope.infrastructure
 
+import com.oksusu.susu.category.domain.QCategoryAssignment
+import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.QEnvelope
 import com.oksusu.susu.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
+import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailModel
 import com.oksusu.susu.envelope.infrastructure.model.QCountTotalAmountsAndCountsModel
+import com.oksusu.susu.envelope.infrastructure.model.QEnvelopeDetailModel
+import com.oksusu.susu.friend.domain.QFriend
+import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,11 +20,17 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepository
+interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepository {
+    @Transactional(readOnly = true)
+    fun findByIdAndUid(id: Long, uid: Long): Envelope?
+}
 
 interface EnvelopeCustomRepository {
     @Transactional(readOnly = true)
     fun countTotalAmountsAndCounts(ledgerIds: List<Long>): List<CountTotalAmountsAndCountsModel>
+
+    @Transactional(readOnly = true)
+    fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel?
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -29,6 +41,9 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
     }
 
     private val qEnvelope = QEnvelope.envelope
+    private val qFriend = QFriend.friend
+    private val qFriendRelationship = QFriendRelationship.friendRelationship
+    private val qCategoryAssignment = QCategoryAssignment.categoryAssignment
 
     override fun countTotalAmountsAndCounts(ledgerIds: List<Long>): List<CountTotalAmountsAndCountsModel> {
         return JPAQuery<QEnvelope>(entityManager)
@@ -43,5 +58,25 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 qEnvelope.ledgerId.`in`(ledgerIds)
             ).groupBy(qEnvelope.ledgerId)
             .fetch()
+    }
+
+    override fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel? {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QEnvelopeDetailModel(
+                    qEnvelope,
+                    qFriend,
+                    qFriendRelationship,
+                    qCategoryAssignment
+                )
+            ).from(qEnvelope)
+            .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
+            .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.id.eq(id),
+                qEnvelope.uid.eq(uid),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            ).fetchFirst()
     }
 }

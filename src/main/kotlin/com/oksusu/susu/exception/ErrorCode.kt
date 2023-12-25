@@ -28,6 +28,9 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** Category Error Code */
     NOT_FOUND_CATEGORY_ERROR(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
 
+    /** Category Assignment Error Code */
+    NOT_FOUND_CATEGORY_ASSIGNMENT_ERROR_CODE(HttpStatus.NOT_FOUND, "카테고리 매핑 정보를 찾을 수 없습니다."),
+
     /** Relationship Error Code */
     NOT_FOUND_RELATIONSHIP_ERROR(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."),
 
@@ -38,5 +41,6 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Envelope Error Code */
     FAIL_TO_CREATE_ENVELOPE_ERROR(HttpStatus.BAD_REQUEST, "봉투 생성을 실패했습니다."),
+    NOT_FOUND_ENVELOPE_ERROR(HttpStatus.NOT_FOUND, "봉투 정보를 찾을 수 없습니다."),
     ;
 }

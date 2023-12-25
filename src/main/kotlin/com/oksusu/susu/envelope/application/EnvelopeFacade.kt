@@ -5,20 +5,26 @@ import com.oksusu.susu.category.application.CategoryAssignmentService
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
+import com.oksusu.susu.category.model.CategoryWithCustomModel
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
+import com.oksusu.susu.envelope.model.EnvelopeModel
 import com.oksusu.susu.envelope.model.request.CreateEnvelopeRequest
 import com.oksusu.susu.envelope.model.response.CreateEnvelopeResponse
+import com.oksusu.susu.envelope.model.response.EnvelopeDetailResponse
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.friend.application.FriendService
+import com.oksusu.susu.friend.application.RelationshipService
+import com.oksusu.susu.friend.model.FriendModel
 import org.springframework.stereotype.Service
 
 @Service
 class EnvelopeFacade(
     private val envelopeService: EnvelopeService,
     private val friendService: FriendService,
+    private val relationshipService: RelationshipService,
     private val categoryService: CategoryService,
     private val categoryAssignmentService: CategoryAssignmentService,
     private val txTemplates: TransactionTemplates,
@@ -56,5 +62,18 @@ class EnvelopeFacade(
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_ENVELOPE_ERROR)
 
         return CreateEnvelopeResponse.from(createdEnvelope)
+    }
+
+    suspend fun getDetail(user: AuthUser, id: Long): EnvelopeDetailResponse {
+        val envelopeDetail = envelopeService.getDetail(id, user.id)
+        val category = categoryService.getCategory(envelopeDetail.categoryAssignment.categoryId)
+        val relation = relationshipService.getRelationship(envelopeDetail.friendRelationship.relationshipId)
+
+        return EnvelopeDetailResponse(
+            envelope = EnvelopeModel.from(envelopeDetail.envelope),
+            category = CategoryWithCustomModel.of(category, envelopeDetail.categoryAssignment),
+            relation = relation,
+            friend = FriendModel.from(envelopeDetail.friend)
+        )
     }
 }

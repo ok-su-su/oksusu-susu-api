@@ -4,9 +4,12 @@ import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.envelope.application.EnvelopeFacade
 import com.oksusu.susu.envelope.model.request.CreateEnvelopeRequest
 import com.oksusu.susu.extension.wrapCreated
+import com.oksusu.susu.extension.wrapOk
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -24,4 +27,11 @@ class EnvelopeResource(
         user: AuthUser,
         @RequestBody request: CreateEnvelopeRequest,
     ) = envelopeFacade.create(user, request).wrapCreated()
+
+    @Operation(summary = "상세조회")
+    @GetMapping("/{id}")
+    suspend fun get(
+        user: AuthUser,
+        @PathVariable id: Long,
+    ) = envelopeFacade.getDetail(user, id).wrapOk()
 }
