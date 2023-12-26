@@ -132,7 +132,7 @@ CREATE TABLE `community`
     `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
-) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='커뮤니티';
+) DEFAULT ENGINE=InnoDB AUTO_INCREMENT=200000 CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='커뮤니티';
 
 -- 투표 선택지
 CREATE TABLE `vote_option`

@@ -1,7 +1,8 @@
 package com.oksusu.susu.community.application
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.common.dto.SusuSliceRequest
+import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.community.domain.*
 import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
@@ -22,13 +23,13 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.user.application.UserService
-import org.springframework.data.domain.Pageable
+import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class CommunityFacade(
+class VoteFacade(
     private val txTemplates: TransactionTemplates,
     private val communityService: CommunityService,
     private val voteService: VoteService,
@@ -60,15 +61,19 @@ class CommunityFacade(
             CreateVoteResponse.of(createdCommunity, optionModels)
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_COMMUNITY_ERROR)
 
-        VoteSummary(communityId = response.id).run {
-            voteSummaryService.save(this)
-        }
-
-        response.options.map { option ->
-            VoteOptionSummary(voteOptionId = option.id!!)
-        }.run {
-            voteOptionSummaryService.saveAll(this)
-        }
+        parZip(Dispatchers.IO,
+            {
+                VoteSummary(communityId = response.id).run {
+                    voteSummaryService.save(this)
+                }
+            },
+            {
+                response.options.map { option ->
+                    VoteOptionSummary(voteOptionId = option.id!!)
+                }.run {
+                    voteOptionSummaryService.saveAll(this)
+                }
+            }, { _, _ -> })
 
         return response
     }
@@ -79,11 +84,11 @@ class CommunityFacade(
         sortType: VoteSortType,
         isMine: Boolean,
         category: CommunityCategory,
-        sliceRequest: SusuSliceRequest,
+        pageRequest: SusuPageRequest,
     ): Slice<VoteAndOptionsResponse> {
         val votes = when (sortType) {
-            VoteSortType.LATEST -> getLatestVotes(isMine, user.id, category, sliceRequest)
-            VoteSortType.POPULAR -> getPopularVotes(isMine, user.id, category, sliceRequest)
+            VoteSortType.LATEST -> getLatestVotes(isMine, user.id, category, pageRequest)
+            VoteSortType.POPULAR -> getPopularVotes(isMine, user.id, category, pageRequest)
         }
         val voteIds = votes.content.map { it.id }
         val options = voteOptionService.getOptionsByCommunityIdIn(voteIds).map {
@@ -99,13 +104,13 @@ class CommunityFacade(
         isMine: Boolean,
         uid: Long,
         category: CommunityCategory,
-        sliceRequest: SusuSliceRequest,
+        pageRequest: SusuPageRequest,
     ): Slice<Community> {
         return voteService.getAllVotes(
             isMine,
             uid,
             category,
-            sliceRequest.toDefault()
+            pageRequest.toDefault()
         )
     }
 
@@ -113,10 +118,10 @@ class CommunityFacade(
         isMine: Boolean,
         uid: Long,
         category: CommunityCategory,
-        sliceRequest: SusuSliceRequest,
+        pageRequest: SusuPageRequest,
     ): Slice<Community> {
-        val from = sliceRequest.page!! * sliceRequest.size!!
-        val to = from + sliceRequest.size
+        val from = pageRequest.page!! * pageRequest.size!!
+        val to = from + pageRequest.size
         val summaries = voteSummaryService.getSummaryBetween(from, to)
 
         return voteService.getAllVotesOrderByPopular(
@@ -124,7 +129,7 @@ class CommunityFacade(
             uid,
             category,
             summaries.map { it.communityId },
-            sliceRequest.toDefault()
+            pageRequest.toDefault()
         )
     }
 
@@ -134,10 +139,12 @@ class CommunityFacade(
         val vote = voteInfos[0].community
         val options = voteInfos.map { it.voteOption }
 
-        val creator = userService.findByIdOrThrow(vote.uid)
-
-        val voteSummary = voteSummaryService.getSummaryByCommunityId(id)
-        val optionSummaries = voteOptionSummaryService.getSummariesByOptionIdIn(options.map { it.id })
+        val (creator, voteSummary, optionSummaries) = parZip(Dispatchers.IO,
+            { userService.findByIdOrThrow(vote.uid) },
+            { voteSummaryService.getSummaryByCommunityId(id) },
+            { voteOptionSummaryService.getSummariesByOptionIdIn(options.map { it.id }) },
+            { a, b, c -> Triple(a, b, c) }
+        )
 
         val optionCountModels = options.map { option ->
             VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
@@ -167,8 +174,11 @@ class CommunityFacade(
                 .run { voteHistoryService.saveSync(this) }
         }
 
-        voteSummaryService.increaseCount(communityId)
-        voteOptionSummaryService.increaseCount(optionId)
+        parZip(Dispatchers.IO,
+            { voteSummaryService.increaseCount(communityId) },
+            { voteOptionSummaryService.increaseCount(optionId) },
+            { _, _ -> }
+        )
     }
 
     private suspend fun cancelVote(uid: Long, communityId: Long, optionId: Long) {
@@ -178,17 +188,16 @@ class CommunityFacade(
             voteHistoryService.deleteByUidAndCommunityId(uid, communityId)
         }
 
-        voteSummaryService.decreaseCount(communityId)
-        voteOptionSummaryService.decreaseCount(optionId)
+        parZip(Dispatchers.IO,
+            { voteSummaryService.decreaseCount(communityId) },
+            { voteOptionSummaryService.decreaseCount(optionId) },
+            { _, _ -> }
+        )
     }
 
     @Transactional
     suspend fun deleteVote(user: AuthUser, id: Long) {
-        val softDeletedVote = voteService.softDeleteVote(user.id, id)
-
-        txTemplates.writer.executeWithContext {
-            communityService.saveSync(softDeletedVote)
-        }
+        voteService.softDeleteVote(user.id, id)
     }
 
     @Transactional(readOnly = true)

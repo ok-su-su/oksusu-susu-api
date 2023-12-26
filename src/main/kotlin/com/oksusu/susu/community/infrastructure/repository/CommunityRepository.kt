@@ -1,6 +1,5 @@
 package com.oksusu.susu.community.infrastructure.repository
 
-import com.oksusu.susu.common.dto.SusuSliceRequest
 import com.oksusu.susu.community.domain.Community
 import com.oksusu.susu.community.domain.QCommunity
 import com.oksusu.susu.community.domain.QVoteOption
