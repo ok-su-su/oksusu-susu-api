@@ -8,11 +8,13 @@ data class SliceResponseDto<T>(
     val page: Int?,
     val size: Int?,
     val sort: Sort,
+    val hasNext: Boolean
 ) {
     constructor(slice: Slice<T>) : this(
         data = slice.content,
         page = slice.pageable.pageNumber,
         size = slice.size,
-        sort = slice.sort
+        sort = slice.sort,
+        hasNext = slice.hasNext(),
     )
 }

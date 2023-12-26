@@ -55,4 +55,10 @@ class CommunityService(
             communityRepository.findByIsActiveAndTypeAndIdIn(isActive, type, ids)
         }
     }
+
+    suspend fun countAllByIsActiveAndType(isActive: Boolean, type: CommunityType): Long{
+        return withContext(Dispatchers.IO) {
+            communityRepository.countAllByIsActiveAndType(isActive, type)
+        }
+    }
 }

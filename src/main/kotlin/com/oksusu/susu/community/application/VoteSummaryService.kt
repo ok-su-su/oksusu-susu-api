@@ -37,10 +37,21 @@ class VoteSummaryService(
         save(summary)
     }
 
-    suspend fun getPopularVotes(): List<VoteSummary> {
+    suspend fun getPopularVotes(size: Long): List<VoteSummary> {
         return withContext(Dispatchers.IO) {
-            voteSummaryRepository.findTop5ByCountOrderByCountDesc()
+            voteSummaryRepository.findTopByCountOrderByCountDesc(size)
         }.map { VoteSummary(communityId = it.value!!.toLong(), count = it.score!!.toInt()) }
             .toList().filter { it.count != 0 }.reversed()
+    }
+
+    suspend fun getSummaryBetween(from: Int, to: Int): List<VoteSummary> {
+        // zrange 맨 뒤부터 가져올려면, 마지막이 -1이 되어야 합니다.
+        val start = from.takeIf { from != 0 } ?: 1
+
+        // category sorting 조건 때문에 100개 더 가져옵니다.
+        return withContext(Dispatchers.IO) {
+            voteSummaryRepository.findAllByCountBetween(start, to + 100)
+        }.map { VoteSummary(communityId = it.value!!.toLong(), count = it.score!!.toInt()) }
+            .toList().reversed()
     }
 }

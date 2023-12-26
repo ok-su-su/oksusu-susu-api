@@ -1,18 +1,25 @@
 package com.oksusu.susu.community.infrastructure.repository
 
+import com.oksusu.susu.common.dto.SusuSliceRequest
 import com.oksusu.susu.community.domain.Community
 import com.oksusu.susu.community.domain.QCommunity
 import com.oksusu.susu.community.domain.QVoteOption
+import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.infrastructure.repository.model.CommunityAndVoteOptionModel
 import com.oksusu.susu.community.infrastructure.repository.model.QCommunityAndVoteOptionModel
+import com.oksusu.susu.community.model.vo.VoteSortType
+import com.oksusu.susu.extension.execute
+import com.oksusu.susu.extension.executeSlice
 import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.infrastructure.model.QFriendAndFriendRelationshipModel
+import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
@@ -24,14 +31,30 @@ interface CommunityRepository : JpaRepository<Community, Long>, CommunityCustomR
     fun findAllByIsActiveAndTypeOrderByCreatedAtDesc(
         isActive: Boolean,
         type: CommunityType,
-        toDefault: Pageable
+        toDefault: Pageable,
     ): Slice<Community>
+
     fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: CommunityType): Community?
     fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: CommunityType, ids: List<Long>): List<Community>
+    fun countAllByIsActiveAndType(isActive: Boolean, type: CommunityType): Long
 }
 
 interface CommunityCustomRepository {
     fun getVoteAndOptions(id: Long): List<CommunityAndVoteOptionModel>
+    fun getAllVotes(
+        isMine: Boolean,
+        uid: Long,
+        category: CommunityCategory,
+        pageable: Pageable,
+    ): Slice<Community>
+
+    fun getAllVotesOrderByPopular(
+        isMine: Boolean,
+        uid: Long,
+        category: CommunityCategory,
+        ids: List<Long>,
+        pageable: Pageable,
+    ): List<Community>
 }
 
 class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslRepositorySupport(Community::class.java) {
@@ -54,5 +77,51 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
                     .and(qCommunity.isActive.eq(true))
                     .and(qCommunity.type.eq(CommunityType.VOTE))
             ).fetch()
+    }
+
+    override fun getAllVotes(
+        isMine: Boolean,
+        uid: Long,
+        category: CommunityCategory,
+        pageable: Pageable,
+    ): Slice<Community> {
+        val uidFilter = qCommunity.uid.eq(uid).takeIf { isMine }
+        val categoryFilter = qCommunity.category.eq(category).takeIf { category != CommunityCategory.ALL }
+
+        val query = JPAQuery<QFriend>(entityManager)
+            .select(qCommunity)
+            .from(qCommunity)
+            .where(
+                qCommunity.isActive.eq(true)
+                    .and(uidFilter)
+                    .and(categoryFilter)
+            ).orderBy(
+                qCommunity.createdAt.desc()
+            )
+
+        return querydsl.executeSlice(query, pageable)
+    }
+
+    override fun getAllVotesOrderByPopular(
+        isMine: Boolean,
+        uid: Long,
+        category: CommunityCategory,
+        ids: List<Long>,
+        pageable: Pageable,
+    ): List<Community> {
+        val uidFilter = qCommunity.uid.eq(uid).takeIf { isMine }
+        val categoryFilter = qCommunity.category.eq(category).takeIf { category != CommunityCategory.ALL }
+
+        return JPAQuery<QCommunity>(entityManager)
+            .select(qCommunity)
+            .from(qCommunity)
+            .where(
+                qCommunity.isActive.eq(true)
+                    .and(qCommunity.id.`in`(ids))
+                    .and(uidFilter)
+                    .and(categoryFilter)
+            )
+            .limit(pageable.pageSize.toLong())
+            .fetch()
     }
 }

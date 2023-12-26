@@ -3,6 +3,7 @@ package com.oksusu.susu.community.application
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuSliceRequest
 import com.oksusu.susu.community.domain.*
+import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.domain.vo.VoteOptionSummary
 import com.oksusu.susu.community.domain.vo.VoteSummary
@@ -15,11 +16,13 @@ import com.oksusu.susu.community.model.response.CreateVoteResponse
 import com.oksusu.susu.community.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.community.model.response.VoteAndOptionsResponse
 import com.oksusu.susu.community.model.response.VoteWithCountResponse
+import com.oksusu.susu.community.model.vo.VoteSortType
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.user.application.UserService
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,6 +38,8 @@ class CommunityFacade(
     private val voteHistoryService: VoteHistoryService,
     private val userService: UserService,
 ) {
+    val logger = mu.KotlinLogging.logger { }
+
     @Transactional
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateVoteResponse {
         voteOptionService.validateSeq(request.options)
@@ -69,8 +74,17 @@ class CommunityFacade(
     }
 
     @Transactional(readOnly = true)
-    suspend fun getAllVotes(user: AuthUser, sliceRequest: SusuSliceRequest): Slice<VoteAndOptionsResponse> {
-        val votes = voteService.getAllVotes(sliceRequest)
+    suspend fun getAllVotes(
+        user: AuthUser,
+        sortType: VoteSortType,
+        isMine: Boolean,
+        category: CommunityCategory,
+        sliceRequest: SusuSliceRequest,
+    ): Slice<VoteAndOptionsResponse> {
+        val votes = when (sortType) {
+            VoteSortType.LATEST -> getLatestVotes(isMine, user.id, category, sliceRequest)
+            VoteSortType.POPULAR -> getPopularVotes(isMine, user.id, category, sliceRequest)
+        }
         val voteIds = votes.content.map { it.id }
         val options = voteOptionService.getOptionsByCommunityIdIn(voteIds).map {
             VoteOptionModel.from(it)
@@ -79,6 +93,39 @@ class CommunityFacade(
         return votes.map { vote ->
             VoteAndOptionsResponse.of(vote, options.filter { it.communityId == vote.id })
         }
+    }
+
+    private suspend fun getLatestVotes(
+        isMine: Boolean,
+        uid: Long,
+        category: CommunityCategory,
+        sliceRequest: SusuSliceRequest,
+    ): Slice<Community> {
+        return voteService.getAllVotes(
+            isMine,
+            uid,
+            category,
+            sliceRequest.toDefault()
+        )
+    }
+
+    private suspend fun getPopularVotes(
+        isMine: Boolean,
+        uid: Long,
+        category: CommunityCategory,
+        sliceRequest: SusuSliceRequest,
+    ): Slice<Community> {
+        val from = sliceRequest.page!! * sliceRequest.size!!
+        val to = from + sliceRequest.size
+        val summaries = voteSummaryService.getSummaryBetween(from, to)
+
+        return voteService.getAllVotesOrderByPopular(
+            isMine,
+            uid,
+            category,
+            summaries.map { it.communityId },
+            sliceRequest.toDefault()
+        )
     }
 
     @Transactional(readOnly = true)
@@ -146,7 +193,7 @@ class CommunityFacade(
 
     @Transactional(readOnly = true)
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
-        val summaries = voteSummaryService.getPopularVotes()
+        val summaries = voteSummaryService.getPopularVotes(5)
         val communityIds = summaries.map { it.communityId }
         val votes = voteService.getAllVotesByIdIn(communityIds)
 

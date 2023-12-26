@@ -1,13 +1,16 @@
 package com.oksusu.susu.community.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.common.dto.SusuSliceRequest
 import com.oksusu.susu.community.application.CommunityFacade
+import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.community.model.request.CreateVoteRequest
-import com.oksusu.susu.extension.*
-import com.oksusu.susu.friend.model.request.CreateFriendRequest
+import com.oksusu.susu.community.model.vo.VoteSortType
+import com.oksusu.susu.extension.wrapCreated
+import com.oksusu.susu.extension.wrapOk
+import com.oksusu.susu.extension.wrapSlice
+import com.oksusu.susu.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springdoc.core.annotations.ParameterObject
@@ -31,8 +34,11 @@ class CommunityResource (
     @GetMapping("/votes")
     suspend fun getAllVotes(
         user: AuthUser,
+        @RequestParam sortType: VoteSortType = VoteSortType.LATEST,
+        @RequestParam isMine: Boolean = false,
+        @RequestParam category: CommunityCategory = CommunityCategory.ALL,
         @ParameterObject sliceRequest: SusuSliceRequest,
-    ) = communityFacade.getAllVotes(user, sliceRequest).wrapSlice()
+    ) = communityFacade.getAllVotes(user, sortType, isMine, category, sliceRequest).wrapSlice()
 
     @Operation(summary = "투표 하나 검색")
     @GetMapping("/votes/{id}")

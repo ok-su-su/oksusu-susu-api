@@ -32,8 +32,15 @@ class VoteSummaryRepository(
             .score(VOTE_SUMMARY_KEY, communityId.toString()).awaitSingle()
     }
 
-    suspend fun findTop5ByCountOrderByCountDesc(): Flow<ZSetOperations.TypedTuple<String>> {
-        val range = Range.leftOpen(-5L, -1L)
+    suspend fun findTopByCountOrderByCountDesc(size: Long): Flow<ZSetOperations.TypedTuple<String>> {
+        val range = Range.leftOpen(-size, -1L)
+        return zSetOps
+            .rangeWithScores(VOTE_SUMMARY_KEY, range)
+            .asFlow()
+    }
+
+    fun findAllByCountBetween(from: Int, to: Int): Flow<ZSetOperations.TypedTuple<String>> {
+        val range = Range.leftOpen(-to.toLong(), -from.toLong())
         return zSetOps
             .rangeWithScores(VOTE_SUMMARY_KEY, range)
             .asFlow()
