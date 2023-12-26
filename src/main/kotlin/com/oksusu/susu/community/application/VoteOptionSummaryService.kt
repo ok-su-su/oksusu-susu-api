@@ -14,22 +14,17 @@ class VoteOptionSummaryService(
 ) {
     suspend fun saveAll(voteOptionSummaries: List<VoteOptionSummary>) {
         // value : voteOptionId, score : count
-        val tuples = arrayListOf<ZSetOperations.TypedTuple<String>>()
-        voteOptionSummaries.forEach { option ->
-            tuples.add(
-                DefaultTypedTuple(
-                    option.voteOptionId.toString(),
-                    option.count.toDouble()
-                )
-            )
+        val tuples = voteOptionSummaries.associate { option ->
+            option.voteOptionId.toString() to option.count.toLong()
         }
+
         withContext(Dispatchers.IO) {
-            voteOptionSummaryRepository.saveAll(voteOptionSummaries, tuples)
+            voteOptionSummaryRepository.saveAll(tuples)
         }
     }
 
     suspend fun getSummariesByOptionIdIn(ids: List<Long>): List<VoteOptionSummary> {
-        val strIds = ids.map { it.toString() }.toTypedArray()
+        val strIds = ids.map { it.toString() }
         return withContext(Dispatchers.IO) {
             voteOptionSummaryRepository.findAllByVoteOptionIdIn(strIds)
         }.mapIndexed { idx, value -> VoteOptionSummary(ids[idx], value.toInt()) }

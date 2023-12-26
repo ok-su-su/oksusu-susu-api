@@ -24,7 +24,7 @@ class VoteService(
     private val communityRepository: CommunityRepository,
     private val txTemplates: TransactionTemplates,
 ) {
-    val logger = mu.KotlinLogging.logger {  }
+    val logger = mu.KotlinLogging.logger { }
 
     suspend fun getAllVotes(
         isMine: Boolean,
@@ -79,9 +79,10 @@ class VoteService(
             { a, b -> a to b }
         )
 
-        val sortedContent = ids.flatMap { id -> votes.filter { it.id == id } }.subList(0, pageable.pageSize)
+        val sortedContent = ids.flatMap { id -> votes.filter { it.id == id } }
+        val listSize = sortedContent.size.takeIf { sortedContent.size < pageable.pageSize } ?: pageable.pageSize
         val hasNext = totalCount > (pageable.pageNumber + 1) * pageable.pageSize
-        return SliceImpl(sortedContent, pageable, hasNext)
+        return SliceImpl(sortedContent.subList(0, listSize), pageable, hasNext)
     }
 
     suspend fun getActiveVoteCount(): Long {

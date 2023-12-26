@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.math.log
 
 @Service
 class VoteFacade(
@@ -135,7 +136,6 @@ class VoteFacade(
         val voteInfos = voteService.getVoteAndOptions(id)
         val vote = voteInfos[0].community
         val options = voteInfos.map { it.voteOption }
-
         val (creator, voteSummary, optionSummaries) = parZip(Dispatchers.IO,
             { userService.findByIdOrThrow(vote.uid) },
             { voteSummaryService.getSummaryByCommunityId(id) },
@@ -200,11 +200,11 @@ class VoteFacade(
     @Transactional(readOnly = true)
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
         val summaries = voteSummaryService.getPopularVotes(5)
-        val communityIds = summaries.map { it.communityId }
-        val votes = voteService.getAllVotesByIdIn(communityIds)
+        val votes = voteService.getAllVotesByIdIn(summaries.map { it.communityId })
 
-        return summaries.map { summary ->
+        summaries.map { summary ->
             VoteWithCountResponse.of(votes.first { it.id == summary.communityId }, summary)
         }
+        return listOf()
     }
 }

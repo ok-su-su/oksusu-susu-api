@@ -1,5 +1,6 @@
 package com.oksusu.susu.community.infrastructure.redis
 
+import com.oksusu.susu.cache.CacheService
 import com.oksusu.susu.community.domain.vo.VoteSummary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
@@ -17,32 +18,24 @@ const val VOTE_SUMMARY_KEY = "vote_summary"
 
 @Repository
 class VoteSummaryRepository(
-    private val reactiveRedisTemplate: ReactiveRedisTemplate<String, String>,
+    private val cacheService: CacheService
 ) {
-    val zSetOps = reactiveRedisTemplate.opsForZSet()
-
-    suspend fun save(voteSummary: VoteSummary) {
+    suspend fun save(summary: VoteSummary) {
         // value : communityId, score : count
-        zSetOps
-            .add(VOTE_SUMMARY_KEY, voteSummary.communityId.toString(), voteSummary.count.toDouble()).awaitSingle()
+        cacheService.zSetSave(VOTE_SUMMARY_KEY, mapOf(summary.communityId.toString() to summary.count.toLong()))
     }
 
     suspend fun findByCommunityId(communityId: Long): Double {
-        return zSetOps
-            .score(VOTE_SUMMARY_KEY, communityId.toString()).awaitSingle()
+        return cacheService.zSetFindByMember(VOTE_SUMMARY_KEY, communityId.toString())
     }
 
     suspend fun findTopByCountOrderByCountDesc(size: Long): Flow<ZSetOperations.TypedTuple<String>> {
         val range = Range.leftOpen(-size, -1L)
-        return zSetOps
-            .rangeWithScores(VOTE_SUMMARY_KEY, range)
-            .asFlow()
+        return cacheService.zSetFindRangeWithScores(VOTE_SUMMARY_KEY, range)
     }
 
-    fun findAllByCountBetween(from: Int, to: Int): Flow<ZSetOperations.TypedTuple<String>> {
+    suspend fun findAllByCountBetween(from: Int, to: Int): Flow<ZSetOperations.TypedTuple<String>> {
         val range = Range.leftOpen(-to.toLong(), -from.toLong())
-        return zSetOps
-            .rangeWithScores(VOTE_SUMMARY_KEY, range)
-            .asFlow()
+        return cacheService.zSetFindRangeWithScores(VOTE_SUMMARY_KEY, range)
     }
 }
