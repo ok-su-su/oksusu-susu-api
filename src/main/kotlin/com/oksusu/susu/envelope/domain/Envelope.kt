@@ -27,6 +27,9 @@ class Envelope(
     @Column(name = "friend_id")
     val friendId: Long,
 
+    @Column(name = "ledger_id")
+    val ledgerId: Long? = null,
+
     @Column(name = "amount")
     val amount: Long,
 

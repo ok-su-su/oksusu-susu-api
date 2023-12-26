@@ -107,6 +107,7 @@ CREATE TABLE `envelope`
     `uid`            int          NOT NULL COMMENT 'user id',
     `type`           varchar(128) NOT NULL COMMENT 'type: SENT, RECEIVED',
     `friend_id`      int          NOT NULL COMMENT '친구 id',
+    `ledger_id`      int          NOT NULL COMMENT '장부 id',
     `amount`         int          NOT NULL COMMENT '금액',
     `gift`           varchar(512) NOT NULL COMMENT '선물',
     `memo`           varchar(512) NOT NULL COMMENT '메모',

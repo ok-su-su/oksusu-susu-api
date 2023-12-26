@@ -5,8 +5,10 @@ import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapPage
 import com.oksusu.susu.extension.wrapVoid
+import com.oksusu.susu.ledger.application.LedgerFacade
 import com.oksusu.susu.ledger.application.LedgerService
 import com.oksusu.susu.ledger.model.request.CreateLedgerRequest
+import com.oksusu.susu.ledger.model.request.SearchLedgerRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springdoc.core.annotations.ParameterObject
@@ -24,20 +26,26 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(value = ["/api/v1/ledgers"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class LedgerResource(
     private val ledgerService: LedgerService,
+    private val ledgerFacade: LedgerFacade,
 ) {
     @Operation(summary = "장부 생성")
     @PostMapping
     suspend fun create(
         user: AuthUser,
         @RequestBody request: CreateLedgerRequest,
-    ) = ledgerService.create(user, request).wrapCreated()
+    ) = ledgerFacade.create(user, request).wrapCreated()
 
     @Operation(summary = "장부 검색")
     @GetMapping
-    suspend fun getAll(
+    suspend fun search(
         user: AuthUser,
+        @ParameterObject request: SearchLedgerRequest,
         @ParameterObject pageRequest: SusuPageRequest,
-    ) = ledgerService.getAll(user, pageRequest).wrapPage()
+    ) = ledgerFacade.search(
+        user = user,
+        request = request,
+        pageRequest = pageRequest
+    ).wrapPage()
 
     @Operation(summary = "장부 삭제")
     @DeleteMapping
