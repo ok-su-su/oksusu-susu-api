@@ -6,21 +6,17 @@ import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.infrastructure.repository.CommunityRepository
 import com.oksusu.susu.community.infrastructure.repository.model.CommunityAndVoteOptionModel
-import com.oksusu.susu.community.model.vo.VoteSortType
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NoAuthorityException
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.executeWithContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
 import org.springframework.stereotype.Service
-import kotlin.math.E
 
 @Service
 class VoteService(
@@ -28,6 +24,8 @@ class VoteService(
     private val communityRepository: CommunityRepository,
     private val txTemplates: TransactionTemplates,
 ) {
+    val logger = mu.KotlinLogging.logger {  }
+
     suspend fun getAllVotes(
         isMine: Boolean,
         uid: Long,
@@ -74,17 +72,15 @@ class VoteService(
         ids: List<Long>,
         pageable: Pageable,
     ): Slice<Community> {
-        val customPageRequest = PageRequest.of(0, pageable.pageSize)
         val (votes, totalCount) = parZip(
             Dispatchers.IO,
-            { communityRepository.getAllVotesOrderByPopular(isMine, uid, category, ids, customPageRequest) },
+            { communityRepository.getAllVotesOrderByPopular(isMine, uid, category, ids) },
             { getActiveVoteCount() },
             { a, b -> a to b }
         )
 
-        val sortedContent = ids.flatMap { id -> votes.filter { it.id == id } }
-        val hasNext = (pageable.pageSize * pageable.pageNumber < totalCount
-                && totalCount <= (pageable.pageSize + 1) * pageable.pageNumber)
+        val sortedContent = ids.flatMap { id -> votes.filter { it.id == id } }.subList(0, pageable.pageSize)
+        val hasNext = totalCount > (pageable.pageNumber + 1) * pageable.pageSize
         return SliceImpl(sortedContent, pageable, hasNext)
     }
 

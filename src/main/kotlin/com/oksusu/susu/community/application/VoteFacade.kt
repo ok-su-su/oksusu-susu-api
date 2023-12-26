@@ -17,6 +17,7 @@ import com.oksusu.susu.community.model.response.CreateVoteResponse
 import com.oksusu.susu.community.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.community.model.response.VoteAndOptionsResponse
 import com.oksusu.susu.community.model.response.VoteWithCountResponse
+import com.oksusu.susu.community.model.vo.VoteSortRequest
 import com.oksusu.susu.community.model.vo.VoteSortType
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
@@ -81,14 +82,12 @@ class VoteFacade(
     @Transactional(readOnly = true)
     suspend fun getAllVotes(
         user: AuthUser,
-        sortType: VoteSortType,
-        isMine: Boolean,
-        category: CommunityCategory,
+        sortRequest: VoteSortRequest,
         pageRequest: SusuPageRequest,
     ): Slice<VoteAndOptionsResponse> {
-        val votes = when (sortType) {
-            VoteSortType.LATEST -> getLatestVotes(isMine, user.id, category, pageRequest)
-            VoteSortType.POPULAR -> getPopularVotes(isMine, user.id, category, pageRequest)
+        val votes = when (sortRequest.sortType) {
+            VoteSortType.LATEST -> getLatestVotes(sortRequest, user.id, pageRequest)
+            VoteSortType.POPULAR -> getPopularVotes(sortRequest, user.id, pageRequest)
         }
         val voteIds = votes.content.map { it.id }
         val options = voteOptionService.getOptionsByCommunityIdIn(voteIds).map {
@@ -101,23 +100,21 @@ class VoteFacade(
     }
 
     private suspend fun getLatestVotes(
-        isMine: Boolean,
+        sortRequest: VoteSortRequest,
         uid: Long,
-        category: CommunityCategory,
         pageRequest: SusuPageRequest,
     ): Slice<Community> {
         return voteService.getAllVotes(
-            isMine,
+            sortRequest.mine,
             uid,
-            category,
+            sortRequest.category,
             pageRequest.toDefault()
         )
     }
 
     private suspend fun getPopularVotes(
-        isMine: Boolean,
+        sortRequest: VoteSortRequest,
         uid: Long,
-        category: CommunityCategory,
         pageRequest: SusuPageRequest,
     ): Slice<Community> {
         val from = pageRequest.page!! * pageRequest.size!!
@@ -125,9 +122,9 @@ class VoteFacade(
         val summaries = voteSummaryService.getSummaryBetween(from, to)
 
         return voteService.getAllVotesOrderByPopular(
-            isMine,
+            sortRequest.mine,
             uid,
-            category,
+            sortRequest.category,
             summaries.map { it.communityId },
             pageRequest.toDefault()
         )

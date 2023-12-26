@@ -7,18 +7,12 @@ import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.infrastructure.repository.model.CommunityAndVoteOptionModel
 import com.oksusu.susu.community.infrastructure.repository.model.QCommunityAndVoteOptionModel
-import com.oksusu.susu.community.model.vo.VoteSortType
-import com.oksusu.susu.extension.execute
 import com.oksusu.susu.extension.executeSlice
-import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.friend.domain.QFriend
-import com.oksusu.susu.friend.infrastructure.model.QFriendAndFriendRelationshipModel
-import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
@@ -51,8 +45,7 @@ interface CommunityCustomRepository {
         isMine: Boolean,
         uid: Long,
         category: CommunityCategory,
-        ids: List<Long>,
-        pageable: Pageable,
+        ids: List<Long>
     ): List<Community>
 }
 
@@ -72,9 +65,9 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
             .from(qCommunity)
             .leftJoin(qVoteOption).on(qCommunity.id.eq(qVoteOption.communityId))
             .where(
-                qCommunity.id.eq(id)
-                    .and(qCommunity.isActive.eq(true))
-                    .and(qCommunity.type.eq(CommunityType.VOTE))
+                qCommunity.id.eq(id),
+                qCommunity.isActive.eq(true),
+                qCommunity.type.eq(CommunityType.VOTE),
             ).fetch()
     }
 
@@ -91,9 +84,9 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
             .select(qCommunity)
             .from(qCommunity)
             .where(
-                qCommunity.isActive.eq(true)
-                    .and(uidFilter)
-                    .and(categoryFilter)
+                qCommunity.isActive.eq(true),
+                uidFilter,
+                categoryFilter,
             ).orderBy(
                 qCommunity.createdAt.desc()
             )
@@ -106,7 +99,6 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
         uid: Long,
         category: CommunityCategory,
         ids: List<Long>,
-        pageable: Pageable,
     ): List<Community> {
         val uidFilter = qCommunity.uid.eq(uid).takeIf { isMine }
         val categoryFilter = qCommunity.category.eq(category).takeIf { category != CommunityCategory.ALL }
@@ -115,12 +107,11 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
             .select(qCommunity)
             .from(qCommunity)
             .where(
-                qCommunity.isActive.eq(true)
-                    .and(qCommunity.id.`in`(ids))
-                    .and(uidFilter)
-                    .and(categoryFilter)
+                qCommunity.isActive.eq(true),
+                qCommunity.id.`in`(ids),
+                uidFilter,
+                categoryFilter,
             )
-            .limit(pageable.pageSize.toLong())
             .fetch()
     }
 }
