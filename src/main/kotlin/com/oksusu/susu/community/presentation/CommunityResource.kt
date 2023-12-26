@@ -36,7 +36,7 @@ class CommunityResource (
 
     @Operation(summary = "투표 하나 검색")
     @GetMapping("/votes/{id}")
-    suspend fun getAllVotes(
+    suspend fun getVote(
         user: AuthUser,
         @PathVariable id: Long,
     ) = communityFacade.getVote(user, id).wrapOk()
@@ -55,4 +55,10 @@ class CommunityResource (
         user: AuthUser,
         @PathVariable id: Long,
     ) = communityFacade.deleteVote(user, id).wrapVoid()
+
+    @Operation(summary = "가장 인기 있는 투표 검색")
+    @GetMapping("/votes/popular")
+    suspend fun getPopularVotes(
+        user: AuthUser,
+    ) = communityFacade.getPopularVotes(user).wrapOk()
 }

@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CommunityService(
-    private val communityRepository: CommunityRepository
+    private val communityRepository: CommunityRepository,
 ) {
     @Transactional
     fun saveSync(community: Community): Community {
@@ -25,7 +25,7 @@ class CommunityService(
     suspend fun findAllByIsActiveAndTypeOrderByCreatedAtDes(
         isActive: Boolean,
         type: CommunityType,
-        pageable: Pageable
+        pageable: Pageable,
     ): Slice<Community> {
         return withContext(Dispatchers.IO) {
             communityRepository.findAllByIsActiveAndTypeOrderByCreatedAtDesc(
@@ -48,5 +48,11 @@ class CommunityService(
         return withContext(Dispatchers.IO) {
             communityRepository.findByIdAndIsActiveAndType(id, true, CommunityType.VOTE)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_COMMUNITY_ERROR)
+    }
+
+    suspend fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: CommunityType, ids: List<Long>): List<Community> {
+        return withContext(Dispatchers.IO) {
+            communityRepository.findByIsActiveAndTypeAndIdIn(isActive, type, ids)
+        }
     }
 }

@@ -4,7 +4,7 @@ import com.oksusu.susu.community.domain.Community
 import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.model.VoteOptionModel
 
-class VoteResponse(
+class VoteAndOptionsResponse(
     val id: Long,
     val uid: Long,
     val category: CommunityCategory,
@@ -12,8 +12,8 @@ class VoteResponse(
     val options: List<VoteOptionModel>,
 ) {
     companion object {
-        fun of(vote: Community, options: List<VoteOptionModel>): VoteResponse {
-            return VoteResponse(
+        fun of(vote: Community, options: List<VoteOptionModel>): VoteAndOptionsResponse {
+            return VoteAndOptionsResponse(
                 id = vote.id,
                 uid = vote.uid,
                 category = vote.category,

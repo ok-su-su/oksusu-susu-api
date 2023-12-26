@@ -22,13 +22,12 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CommunityCustomRepository {
     fun findAllByIsActiveAndTypeOrderByCreatedAtDesc(
-        b: Boolean,
-        vote: CommunityType,
+        isActive: Boolean,
+        type: CommunityType,
         toDefault: Pageable
     ): Slice<Community>
-
-    fun findByIdAndIsActiveAndType(id: Long, b: Boolean, vote: CommunityType): Community?
-
+    fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: CommunityType): Community?
+    fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: CommunityType, ids: List<Long>): List<Community>
 }
 
 interface CommunityCustomRepository {

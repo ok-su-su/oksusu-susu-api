@@ -49,4 +49,8 @@ class VoteService(
         return vote
     }
 
+    suspend fun getAllVotesByIdIn(communityIds: List<Long>): List<Community> {
+        return communityService.findByIsActiveAndTypeAndIdIn(true, CommunityType.VOTE, communityIds)
+    }
+
 }

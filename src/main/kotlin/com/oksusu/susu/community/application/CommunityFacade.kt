@@ -12,8 +12,9 @@ import com.oksusu.susu.community.model.VoteOptionModel
 import com.oksusu.susu.community.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.community.model.request.CreateVoteRequest
 import com.oksusu.susu.community.model.response.CreateVoteResponse
-import com.oksusu.susu.community.model.response.VoteCountResponse
-import com.oksusu.susu.community.model.response.VoteResponse
+import com.oksusu.susu.community.model.response.VoteAndOptionsWithCountResponse
+import com.oksusu.susu.community.model.response.VoteAndOptionsResponse
+import com.oksusu.susu.community.model.response.VoteWithCountResponse
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
@@ -68,7 +69,7 @@ class CommunityFacade(
     }
 
     @Transactional(readOnly = true)
-    suspend fun getAllVotes(user: AuthUser, sliceRequest: SusuSliceRequest): Slice<VoteResponse> {
+    suspend fun getAllVotes(user: AuthUser, sliceRequest: SusuSliceRequest): Slice<VoteAndOptionsResponse> {
         val votes = voteService.getAllVotes(sliceRequest)
         val voteIds = votes.content.map { it.id }
         val options = voteOptionService.getOptionsByCommunityIdIn(voteIds).map {
@@ -76,12 +77,12 @@ class CommunityFacade(
         }
 
         return votes.map { vote ->
-            VoteResponse.of(vote, options.filter { it.communityId == vote.id })
+            VoteAndOptionsResponse.of(vote, options.filter { it.communityId == vote.id })
         }
     }
 
     @Transactional(readOnly = true)
-    suspend fun getVote(user: AuthUser, id: Long): VoteCountResponse {
+    suspend fun getVote(user: AuthUser, id: Long): VoteAndOptionsWithCountResponse {
         val voteInfos = voteService.getVoteAndOptions(id)
         val vote = voteInfos[0].community
         val options = voteInfos.map { it.voteOption }
@@ -95,7 +96,7 @@ class CommunityFacade(
             VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
         }
 
-        return VoteCountResponse.of(
+        return VoteAndOptionsWithCountResponse.of(
             VoteCountModel.of(vote, voteSummary),
             optionCountModels,
             creator,
@@ -140,6 +141,17 @@ class CommunityFacade(
 
         txTemplates.writer.executeWithContext {
             communityService.saveSync(softDeletedVote)
+        }
+    }
+
+    @Transactional(readOnly = true)
+    suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
+        val summaries = voteSummaryService.getPopularVotes()
+        val communityIds = summaries.map { it.communityId }
+        val votes = voteService.getAllVotesByIdIn(communityIds)
+
+        return summaries.map { summary ->
+            VoteWithCountResponse.of(votes.first { it.id == summary.communityId }, summary)
         }
     }
 }
