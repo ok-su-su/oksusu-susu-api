@@ -19,22 +19,29 @@ import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 
 @Repository
 interface CommunityRepository : JpaRepository<Community, Long>, CommunityCustomRepository {
+    @Transactional(readOnly = true)
     fun findAllByIsActiveAndTypeOrderByCreatedAtDesc(
         isActive: Boolean,
         type: CommunityType,
         toDefault: Pageable,
     ): Slice<Community>
 
+    @Transactional(readOnly = true)
     fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: CommunityType): Community?
+    @Transactional(readOnly = true)
     fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: CommunityType, ids: List<Long>): List<Community>
+    @Transactional(readOnly = true)
     fun countAllByIsActiveAndType(isActive: Boolean, type: CommunityType): Long
 }
 
 interface CommunityCustomRepository {
+    @Transactional(readOnly = true)
     fun getVoteAndOptions(id: Long): List<CommunityAndVoteOptionModel>
+    @Transactional(readOnly = true)
     fun getAllVotes(
         isMine: Boolean,
         uid: Long,
@@ -42,6 +49,7 @@ interface CommunityCustomRepository {
         pageable: Pageable,
     ): Slice<Community>
 
+    @Transactional(readOnly = true)
     fun getAllVotesOrderByPopular(
         isMine: Boolean,
         uid: Long,

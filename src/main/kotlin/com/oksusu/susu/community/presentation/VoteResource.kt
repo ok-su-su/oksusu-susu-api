@@ -29,6 +29,7 @@ class VoteResource (
         @RequestBody request: CreateVoteRequest,
     ) = voteFacade.createVote(user, request).wrapCreated()
 
+    /** 카테고리 전체 검색 : 0 */
     @Operation(summary = "투표 검색")
     @GetMapping
     suspend fun getAllVotes(
