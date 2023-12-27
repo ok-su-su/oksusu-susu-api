@@ -171,7 +171,6 @@ CREATE TABLE `term`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보';
 
-
 -- 약관 정보 유저 매핑
 CREATE TABLE `term_agreement`
 (
@@ -182,5 +181,4 @@ CREATE TABLE `term_agreement`
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보';
-CREATE UNIQUE INDEX idx__uid ON term_agreement (uid);
 

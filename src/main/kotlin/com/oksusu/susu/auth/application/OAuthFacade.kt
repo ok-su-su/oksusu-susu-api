@@ -7,8 +7,14 @@ import com.oksusu.susu.auth.model.dto.TokenDto
 import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
+import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.term.application.TermAgreementService
+import com.oksusu.susu.term.application.TermService
+import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.domain.User
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
@@ -21,6 +27,9 @@ class OAuthFacade(
     private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
     private val oAuthService: OAuthService,
+    private val txTemplates: TransactionTemplates,
+    private val termService: TermService,
+    private val termAgreementService: TermAgreementService,
 ) {
     /** 회원가입 가능 여부 체크. */
     @Transactional(readOnly = true)
@@ -37,16 +46,22 @@ class OAuthFacade(
     suspend fun register(
         provider: OauthProvider,
         accessToken: String,
-        oauthRegisterRequest: OauthRegisterRequest,
+        request: OauthRegisterRequest,
     ): TokenDto {
         val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
 
-        if (userService.existsByOauthInfo(oauthInfo)) {
-            throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
-        }
+        userService.validateNotRegistered(oauthInfo)
+        termService.validateExistTerms(request.termAgreement)
 
-        val user = User.toEntity(oauthRegisterRequest, oauthInfo)
-            .run { userService.saveSync(this) }
+        val user = txTemplates.writer.executeWithContext {
+            val createdUser = User.toEntity(request, oauthInfo)
+                .run { userService.saveSync(this) }
+
+            request.termAgreement.map { TermAgreement(uid = createdUser.id, termId = it) }
+                .run { termAgreementService.saveAllSync(this) }
+
+            createdUser
+        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_USER_ERROR)
 
         return generateTokenDto(user.id)
     }

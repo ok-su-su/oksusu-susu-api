@@ -29,4 +29,11 @@ class TermService(
             termRepository.findAllByIsActive(true)
         }
     }
+
+
+    suspend fun validateExistTerms(ids: List<Long>){
+        withContext(Dispatchers.IO){
+            termRepository.findAllByIdIn(ids)
+        }.takeIf { it.size == ids.size } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_TERM_ERROR)
+    }
 }

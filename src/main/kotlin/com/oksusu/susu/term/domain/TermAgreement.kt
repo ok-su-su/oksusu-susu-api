@@ -4,8 +4,8 @@ import com.oksusu.susu.common.domain.BaseEntity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "term")
-class TermAssignment (
+@Table(name = "term_agreement")
+class TermAgreement (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,

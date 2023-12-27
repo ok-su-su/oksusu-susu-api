@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TermRepository: JpaRepository<Term, Long> {
     fun findAllByIsActive(isActive: Boolean): List<Term>
+    fun findAllByIdIn(ids: List<Long>): List<Term>
 }
