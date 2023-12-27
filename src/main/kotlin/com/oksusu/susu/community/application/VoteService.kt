@@ -29,11 +29,11 @@ class VoteService(
     suspend fun getAllVotes(
         isMine: Boolean,
         uid: Long,
-        category: CommunityCategory,
+        categoryId: Long,
         pageable: Pageable,
     ): Slice<Community> {
         return withContext(Dispatchers.IO) {
-            communityRepository.getAllVotes(isMine, uid, category, pageable)
+            communityRepository.getAllVotes(isMine, uid, categoryId, pageable)
         }
     }
 
@@ -68,13 +68,13 @@ class VoteService(
     suspend fun getAllVotesOrderByPopular(
         isMine: Boolean,
         uid: Long,
-        category: CommunityCategory,
+        categoryId: Long,
         ids: List<Long>,
         pageable: Pageable,
     ): Slice<Community> {
         val (votes, totalCount) = parZip(
             Dispatchers.IO,
-            { communityRepository.getAllVotesOrderByPopular(isMine, uid, category, ids) },
+            { communityRepository.getAllVotesOrderByPopular(isMine, uid, categoryId, ids) },
             { getActiveVoteCount() },
             { a, b -> a to b }
         )

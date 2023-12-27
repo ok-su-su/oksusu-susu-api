@@ -2,7 +2,13 @@ package com.oksusu.susu.community.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.category.application.CategoryAssignmentService
+import com.oksusu.susu.category.application.CategoryService
+import com.oksusu.susu.category.domain.CategoryAssignment
+import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
+import com.oksusu.susu.category.infrastructure.CategoryAssignmentRepository
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.common.util.Quad
 import com.oksusu.susu.community.domain.*
 import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
@@ -40,6 +46,8 @@ class VoteFacade(
     private val voteOptionSummaryService: VoteOptionSummaryService,
     private val voteHistoryService: VoteHistoryService,
     private val userService: UserService,
+    private val categoryAssignmentService: CategoryAssignmentService,
+    private val categoryService: CategoryService,
 ) {
     val logger = mu.KotlinLogging.logger { }
 
@@ -51,7 +59,6 @@ class VoteFacade(
             val createdCommunity = Community(
                 uid = user.id,
                 type = CommunityType.VOTE,
-                category = request.category,
                 content = request.content,
             ).run { communityService.saveSync(this) }
 
@@ -60,7 +67,13 @@ class VoteFacade(
             }.run { voteOptionService.saveAllSync(this) }
                 .map { option -> VoteOptionModel.from(option) }
 
-            CreateVoteResponse.of(createdCommunity, optionModels)
+            CategoryAssignment(
+                targetId = createdCommunity.id,
+                targetType = CategoryAssignmentType.COMMUNITY,
+                categoryId = request.categoryId,
+            ).run { categoryAssignmentService.saveSync(this) }
+
+            CreateVoteResponse.of(createdCommunity, optionModels, categoryService.getCategory(request.categoryId))
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_COMMUNITY_ERROR)
 
         parZip(Dispatchers.IO,
@@ -91,12 +104,20 @@ class VoteFacade(
             VoteSortType.POPULAR -> getPopularVotes(sortRequest, user.id, pageRequest)
         }
         val voteIds = votes.content.map { it.id }
-        val options = voteOptionService.getOptionsByCommunityIdIn(voteIds).map {
-            VoteOptionModel.from(it)
-        }
+
+        val (categoryAssignments, options) = parZip(Dispatchers.IO,
+            { categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.COMMUNITY, voteIds) },
+            { voteOptionService.getOptionsByCommunityIdIn(voteIds) },
+            { a, b -> a to b })
+
+        val optionModels = options.map { VoteOptionModel.from(it) }
 
         return votes.map { vote ->
-            VoteAndOptionsResponse.of(vote, options.filter { it.communityId == vote.id })
+            VoteAndOptionsResponse.of(
+                vote,
+                optionModels.filter { it.communityId == vote.id },
+                categoryService.getCategory(categoryAssignments.first { it.targetId == vote.id }.categoryId)
+            )
         }
     }
 
@@ -136,11 +157,12 @@ class VoteFacade(
         val voteInfos = voteService.getVoteAndOptions(id)
         val vote = voteInfos[0].community
         val options = voteInfos.map { it.voteOption }
-        val (creator, voteSummary, optionSummaries) = parZip(Dispatchers.IO,
+        val (creator, voteSummary, optionSummaries, categoryAssignment) = parZip(Dispatchers.IO,
             { userService.findByIdOrThrow(vote.uid) },
             { voteSummaryService.getSummaryByCommunityId(id) },
             { voteOptionSummaryService.getSummariesByOptionIdIn(options.map { it.id }) },
-            { a, b, c -> Triple(a, b, c) }
+            { categoryAssignmentService.findByIdAndTypeOrThrow(vote.id, CategoryAssignmentType.COMMUNITY) },
+            { a, b, c, d -> Quad(a, b, c, d) }
         )
 
         val optionCountModels = options.map { option ->
@@ -148,7 +170,7 @@ class VoteFacade(
         }
 
         return VoteAndOptionsWithCountResponse.of(
-            VoteCountModel.of(vote, voteSummary),
+            VoteCountModel.of(vote, voteSummary, categoryService.getCategory(categoryAssignment.categoryId)),
             optionCountModels,
             creator,
             user.id == creator.id
@@ -166,30 +188,30 @@ class VoteFacade(
     private suspend fun castVote(uid: Long, communityId: Long, optionId: Long) {
         voteHistoryService.validateVoteNotExist(uid, communityId)
 
-        txTemplates.writer.executeWithContext {
-            VoteHistory(uid = uid, communityId = communityId, voteOptionId = optionId)
-                .run { voteHistoryService.saveSync(this) }
-        }
-
         parZip(Dispatchers.IO,
             { voteSummaryService.increaseCount(communityId) },
             { voteOptionSummaryService.increaseCount(optionId) },
             { _, _ -> }
         )
+
+        txTemplates.writer.executeWithContext {
+            VoteHistory(uid = uid, communityId = communityId, voteOptionId = optionId)
+                .run { voteHistoryService.saveSync(this) }
+        }
     }
 
     private suspend fun cancelVote(uid: Long, communityId: Long, optionId: Long) {
         voteHistoryService.validateVoteExist(uid, communityId, optionId)
-
-        txTemplates.writer.executeWithContext {
-            voteHistoryService.deleteByUidAndCommunityId(uid, communityId)
-        }
 
         parZip(Dispatchers.IO,
             { voteSummaryService.decreaseCount(communityId) },
             { voteOptionSummaryService.decreaseCount(optionId) },
             { _, _ -> }
         )
+
+        txTemplates.writer.executeWithContext {
+            voteHistoryService.deleteByUidAndCommunityId(uid, communityId)
+        }
     }
 
     @Transactional
@@ -207,9 +229,15 @@ class VoteFacade(
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
         val summaries = voteSummaryService.getPopularVotes(5)
         val votes = voteService.getAllVotesByIdIn(summaries.map { it.communityId })
+        val categoryAssignments =
+            categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.COMMUNITY, votes.map { it.id })
 
         return summaries.map { summary ->
-            VoteWithCountResponse.of(votes.first { it.id == summary.communityId }, summary)
+            VoteWithCountResponse.of(
+                votes.first { it.id == summary.communityId },
+                summary,
+                categoryService.getCategory(categoryAssignments.first { it.targetId == summary.communityId }.categoryId)
+            )
         }
     }
 }

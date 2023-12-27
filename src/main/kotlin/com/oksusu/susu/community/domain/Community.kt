@@ -16,8 +16,6 @@ class Community(
 
     val type: CommunityType,
 
-    val category: CommunityCategory,
-
     val title: String? = null,
 
     val content: String,

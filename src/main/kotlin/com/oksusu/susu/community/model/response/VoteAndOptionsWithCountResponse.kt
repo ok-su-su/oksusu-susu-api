@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 class VoteAndOptionsWithCountResponse(
     val id: Long,
     val isMine: Boolean,
-    val category: CommunityCategory,
+    val category: String,
     val content: String,
     val count: Int,
     @DateFormat

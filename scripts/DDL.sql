@@ -93,7 +93,7 @@ CREATE TABLE `category_assignment`
     `target_id`       int          NOT NULL COMMENT '대상 id',
     `target_type`     varchar(256) NOT NULL COMMENT '대상 type (LEDGER, ENVELOPE)',
     `category_id`     int          NOT NULL COMMENT '카테고리 id',
-    `custom_category` varchar(256) NOT NULL COMMENT '기타 항목인 경우, 별도 입력을 위한 컬럼',
+    `custom_category` varchar(256) NULL COMMENT '기타 항목인 경우, 별도 입력을 위한 컬럼',
     `created_at`      datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at`     datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
@@ -127,12 +127,11 @@ CREATE TABLE `community`
     `type`        int          NOT NULL COMMENT '커뮤니티 타입, 0: 투표',
     `title`       varchar(256) DEFAULT NULL COMMENT '제목',
     `content`     varchar(512) NOT NULL COMMENT '내용',
-    `category`    int          NOT NULL COMMENT '커뮤니티 카테고리',
     `is_active`   tinyint      NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
     `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
-) DEFAULT ENGINE=InnoDB AUTO_INCREMENT=200000 CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='커뮤니티';
+) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='커뮤니티';
 
 -- 투표 선택지
 CREATE TABLE `vote_option`

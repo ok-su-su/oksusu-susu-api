@@ -29,4 +29,14 @@ class CategoryAssignmentService(
             categoryAssignmentRepository.findByTargetIdAndTargetType(targetId, targetType)
         }
     }
+
+    suspend fun findAllByTypeAndIdIn(
+        targetType: CategoryAssignmentType,
+        targetIds: List<Long>,
+    ): List<CategoryAssignment> {
+        return withContext(Dispatchers.IO){
+            categoryAssignmentRepository.findAllByTargetTypeAndTargetIdIn(targetType, targetIds)
+        }
+    }
+
 }

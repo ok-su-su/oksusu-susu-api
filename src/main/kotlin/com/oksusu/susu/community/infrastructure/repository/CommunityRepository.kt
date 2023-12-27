@@ -1,9 +1,10 @@
 package com.oksusu.susu.community.infrastructure.repository
 
+import com.oksusu.susu.category.domain.QCategoryAssignment
+import com.oksusu.susu.common.consts.DEFAULT_CATEGORY_ID
 import com.oksusu.susu.community.domain.Community
 import com.oksusu.susu.community.domain.QCommunity
 import com.oksusu.susu.community.domain.QVoteOption
-import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.infrastructure.repository.model.CommunityAndVoteOptionModel
 import com.oksusu.susu.community.infrastructure.repository.model.QCommunityAndVoteOptionModel
@@ -37,15 +38,15 @@ interface CommunityCustomRepository {
     fun getAllVotes(
         isMine: Boolean,
         uid: Long,
-        category: CommunityCategory,
+        categoryId: Long,
         pageable: Pageable,
     ): Slice<Community>
 
     fun getAllVotesOrderByPopular(
         isMine: Boolean,
         uid: Long,
-        category: CommunityCategory,
-        ids: List<Long>
+        categoryId: Long,
+        ids: List<Long>,
     ): List<Community>
 }
 
@@ -58,6 +59,7 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
 
     private val qCommunity = QCommunity.community
     private val qVoteOption = QVoteOption.voteOption
+    private val qCategoryAssignment = QCategoryAssignment.categoryAssignment
 
     override fun getVoteAndOptions(id: Long): List<CommunityAndVoteOptionModel> {
         return JPAQuery<QCommunity>(entityManager)
@@ -74,15 +76,16 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
     override fun getAllVotes(
         isMine: Boolean,
         uid: Long,
-        category: CommunityCategory,
+        categoryId: Long,
         pageable: Pageable,
     ): Slice<Community> {
         val uidFilter = qCommunity.uid.eq(uid).takeIf { isMine }
-        val categoryFilter = qCommunity.category.eq(category).takeIf { category != CommunityCategory.ALL }
+        val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
 
         val query = JPAQuery<QFriend>(entityManager)
             .select(qCommunity)
             .from(qCommunity)
+            .leftJoin(qCategoryAssignment).on(qCommunity.id.eq(qCategoryAssignment.targetId))
             .where(
                 qCommunity.isActive.eq(true),
                 uidFilter,
@@ -97,15 +100,16 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
     override fun getAllVotesOrderByPopular(
         isMine: Boolean,
         uid: Long,
-        category: CommunityCategory,
+        categoryId: Long,
         ids: List<Long>,
     ): List<Community> {
         val uidFilter = qCommunity.uid.eq(uid).takeIf { isMine }
-        val categoryFilter = qCommunity.category.eq(category).takeIf { category != CommunityCategory.ALL }
+        val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
 
         return JPAQuery<QCommunity>(entityManager)
             .select(qCommunity)
             .from(qCommunity)
+            .leftJoin(qCategoryAssignment).on(qCommunity.id.eq(qCategoryAssignment.targetId))
             .where(
                 qCommunity.isActive.eq(true),
                 qCommunity.id.`in`(ids),

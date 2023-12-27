@@ -8,7 +8,6 @@ class CommunityModel(
     val id: Long,
     val uid: Long,
     val type: CommunityType,
-    val category: CommunityCategory,
     val title: String?,
     val content: String,
     val isActive: Boolean,
