@@ -5,9 +5,7 @@ import com.oksusu.susu.exception.SusuException
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.*
 import org.springframework.data.jpa.repository.support.Querydsl
 
 fun <T> Querydsl?.execute(query: JPAQuery<T>, pageable: Pageable): Page<T> {
@@ -15,6 +13,23 @@ fun <T> Querydsl?.execute(query: JPAQuery<T>, pageable: Pageable): Page<T> {
         ?.let { queryDsl ->
             queryDsl.applyPagination(pageable, query).run {
                 PageImpl(this.fetch(), pageable, this.fetchCount())
+            }
+        } ?: throw SusuException(ErrorCode.QUERY_DSL_NOT_EXISTS_ERROR)
+}
+
+fun <T> Querydsl?.executeSlice(query: JPAQuery<T>, pageable: Pageable): Slice<T> {
+    return this.takeUnless { querydsl -> querydsl == null }
+        ?.let { queryDsl ->
+            queryDsl.applyPagination(pageable, query).run {
+                this.limit(pageable.pageSize + 1L)
+                    .fetch()
+            }.run {
+                var hasNext = false
+                if (this.size > pageable.pageSize) {
+                    hasNext = true
+                    this.removeAt(pageable.pageSize)
+                }
+                SliceImpl(this, pageable, hasNext)
             }
         } ?: throw SusuException(ErrorCode.QUERY_DSL_NOT_EXISTS_ERROR)
 }

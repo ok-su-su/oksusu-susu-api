@@ -10,4 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 interface CategoryAssignmentRepository : JpaRepository<CategoryAssignment, Long> {
     @Transactional(readOnly = true)
     fun findByTargetIdAndTargetType(targetId: Long, targetType: CategoryAssignmentType): CategoryAssignment
+
+    @Transactional(readOnly = true)
+    fun findAllByTargetTypeAndTargetIdIn(targetType: CategoryAssignmentType, targetIds: List<Long>): List<CategoryAssignment>
 }
