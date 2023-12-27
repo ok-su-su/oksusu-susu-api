@@ -1,8 +1,6 @@
 package com.oksusu.susu.community.model
 
-import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
-import jakarta.persistence.Column
 
 class CommunityModel(
     val id: Long,

@@ -34,9 +34,8 @@ class CategoryAssignmentService(
         targetType: CategoryAssignmentType,
         targetIds: List<Long>,
     ): List<CategoryAssignment> {
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             categoryAssignmentRepository.findAllByTargetTypeAndTargetIdIn(targetType, targetIds)
         }
     }
-
 }

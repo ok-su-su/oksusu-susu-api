@@ -1,7 +1,6 @@
 package com.oksusu.susu.community.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
-import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import jakarta.persistence.*
 

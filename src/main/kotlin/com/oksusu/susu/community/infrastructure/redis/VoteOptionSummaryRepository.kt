@@ -1,21 +1,17 @@
 package com.oksusu.susu.community.infrastructure.redis
 
 import com.oksusu.susu.cache.CacheService
-import com.oksusu.susu.cache.ZSetCacheService
 import com.oksusu.susu.community.domain.vo.VoteOptionSummary
-import kotlinx.coroutines.reactor.awaitSingle
-import org.springframework.data.redis.core.ReactiveRedisTemplate
-import org.springframework.data.redis.core.ZSetOperations.TypedTuple
 import org.springframework.stereotype.Repository
 
 const val VOTE_OPTION_SUMMARY_KEY = "vote_option_summary"
 
 @Repository
 class VoteOptionSummaryRepository(
-    private val cacheService: CacheService
-){
+    private val cacheService: CacheService,
+) {
     suspend fun <T> saveAll(
-        tuples: Map<T, Long>
+        tuples: Map<T, Long>,
     ) {
         // value : voteOptionId, score : count
         cacheService.zSetSaveAll(VOTE_OPTION_SUMMARY_KEY, tuples)

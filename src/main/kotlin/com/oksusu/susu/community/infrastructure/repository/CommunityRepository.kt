@@ -32,8 +32,10 @@ interface CommunityRepository : JpaRepository<Community, Long>, CommunityCustomR
 
     @Transactional(readOnly = true)
     fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: CommunityType): Community?
+
     @Transactional(readOnly = true)
     fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: CommunityType, ids: List<Long>): List<Community>
+
     @Transactional(readOnly = true)
     fun countAllByIsActiveAndType(isActive: Boolean, type: CommunityType): Long
 }
@@ -41,6 +43,7 @@ interface CommunityRepository : JpaRepository<Community, Long>, CommunityCustomR
 interface CommunityCustomRepository {
     @Transactional(readOnly = true)
     fun getVoteAndOptions(id: Long): List<CommunityAndVoteOptionModel>
+
     @Transactional(readOnly = true)
     fun getAllVotes(
         isMine: Boolean,
@@ -77,7 +80,7 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
             .where(
                 qCommunity.id.eq(id),
                 qCommunity.isActive.eq(true),
-                qCommunity.type.eq(CommunityType.VOTE),
+                qCommunity.type.eq(CommunityType.VOTE)
             ).fetch()
     }
 
@@ -97,7 +100,7 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
             .where(
                 qCommunity.isActive.eq(true),
                 uidFilter,
-                categoryFilter,
+                categoryFilter
             ).orderBy(
                 qCommunity.createdAt.desc()
             )
@@ -122,7 +125,7 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
                 qCommunity.isActive.eq(true),
                 qCommunity.id.`in`(ids),
                 uidFilter,
-                categoryFilter,
+                categoryFilter
             )
             .fetch()
     }

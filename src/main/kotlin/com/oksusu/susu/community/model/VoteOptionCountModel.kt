@@ -3,7 +3,6 @@ package com.oksusu.susu.community.model
 import com.oksusu.susu.community.domain.VoteOption
 import com.oksusu.susu.community.domain.vo.VoteOptionSummary
 
-
 class VoteOptionCountModel(
     val id: Long,
     val communityId: Long,

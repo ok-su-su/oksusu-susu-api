@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 interface VoteOptionRepository : JpaRepository<VoteOption, Long> {
     @Transactional(readOnly = true)
     fun findAllByCommunityIdInOrderBySeq(communityIds: List<Long>): List<VoteOption>
+
     @Transactional(readOnly = true)
-    fun findAllByCommunityIdOrderBySeq(communityId: Long) : List<VoteOption>
+    fun findAllByCommunityIdOrderBySeq(communityId: Long): List<VoteOption>
 }

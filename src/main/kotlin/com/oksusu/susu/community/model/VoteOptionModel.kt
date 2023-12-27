@@ -1,6 +1,5 @@
 package com.oksusu.susu.community.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.oksusu.susu.community.domain.VoteOption
 import io.swagger.v3.oas.annotations.media.Schema
 

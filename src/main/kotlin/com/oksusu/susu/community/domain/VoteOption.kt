@@ -23,7 +23,7 @@ class VoteOption(
             return VoteOption(
                 communityId = communityId,
                 content = voteOptionModel.content,
-                seq = voteOptionModel.seq,
+                seq = voteOptionModel.seq
             )
         }
     }

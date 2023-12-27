@@ -1,7 +1,6 @@
 package com.oksusu.susu.community.model.response
 
 import com.oksusu.susu.common.annotation.DateFormat
-import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.model.VoteCountModel
 import com.oksusu.susu.community.model.VoteOptionCountModel
 import com.oksusu.susu.user.domain.User
@@ -24,7 +23,7 @@ class VoteAndOptionsWithCountResponse(
             vote: VoteCountModel,
             options: List<VoteOptionCountModel>,
             creator: User,
-            isMine: Boolean
+            isMine: Boolean,
         ): VoteAndOptionsWithCountResponse {
             return VoteAndOptionsWithCountResponse(
                 id = vote.id,
@@ -34,7 +33,7 @@ class VoteAndOptionsWithCountResponse(
                 count = vote.count,
                 createdAt = vote.createdAt,
                 creatorProfile = UserProfileModel.from(creator),
-                options = options,
+                options = options
             )
         }
     }

@@ -2,7 +2,6 @@ package com.oksusu.susu.community.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.community.domain.Community
-import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.infrastructure.repository.CommunityRepository
 import com.oksusu.susu.community.infrastructure.repository.model.CommunityAndVoteOptionModel

@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "투표")
 @RestController
 @RequestMapping(value = ["/api/v1/votes"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class VoteResource (
+class VoteResource(
     private val voteFacade: VoteFacade,
-){
+) {
     @Operation(summary = "투표 생성")
     @PostMapping
     suspend fun createVote(

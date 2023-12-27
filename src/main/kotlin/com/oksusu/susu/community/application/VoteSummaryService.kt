@@ -3,7 +3,6 @@ package com.oksusu.susu.community.application
 import com.oksusu.susu.community.domain.vo.VoteSummary
 import com.oksusu.susu.community.infrastructure.redis.VoteSummaryRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
@@ -57,7 +56,7 @@ class VoteSummaryService(
     }
 
     suspend fun deleteSummaryByCommunityId(communityId: Long) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             voteSummaryRepository.deleteByCommunityId(communityId)
         }
     }

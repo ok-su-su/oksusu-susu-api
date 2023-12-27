@@ -6,11 +6,9 @@ import com.oksusu.susu.category.application.CategoryAssignmentService
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
-import com.oksusu.susu.category.infrastructure.CategoryAssignmentRepository
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.common.util.Quad
 import com.oksusu.susu.community.domain.*
-import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.domain.vo.VoteOptionSummary
 import com.oksusu.susu.community.domain.vo.VoteSummary
@@ -20,8 +18,8 @@ import com.oksusu.susu.community.model.VoteOptionModel
 import com.oksusu.susu.community.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.community.model.request.CreateVoteRequest
 import com.oksusu.susu.community.model.response.CreateVoteResponse
-import com.oksusu.susu.community.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.community.model.response.VoteAndOptionsResponse
+import com.oksusu.susu.community.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.community.model.response.VoteWithCountResponse
 import com.oksusu.susu.community.model.vo.VoteSortRequest
 import com.oksusu.susu.community.model.vo.VoteSortType
@@ -34,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.math.log
 
 @Service
 class VoteFacade(
@@ -59,7 +56,7 @@ class VoteFacade(
             val createdCommunity = Community(
                 uid = user.id,
                 type = CommunityType.VOTE,
-                content = request.content,
+                content = request.content
             ).run { communityService.saveSync(this) }
 
             val optionModels = request.options.map { option ->
@@ -70,13 +67,14 @@ class VoteFacade(
             CategoryAssignment(
                 targetId = createdCommunity.id,
                 targetType = CategoryAssignmentType.COMMUNITY,
-                categoryId = request.categoryId,
+                categoryId = request.categoryId
             ).run { categoryAssignmentService.saveSync(this) }
 
             CreateVoteResponse.of(createdCommunity, optionModels, categoryService.getCategory(request.categoryId))
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_COMMUNITY_ERROR)
 
-        parZip(Dispatchers.IO,
+        parZip(
+            Dispatchers.IO,
             {
                 VoteSummary(communityId = response.id).run {
                     voteSummaryService.save(this)
@@ -88,7 +86,9 @@ class VoteFacade(
                 }.run {
                     voteOptionSummaryService.saveAll(this)
                 }
-            }, { _, _ -> })
+            },
+            { _, _ -> }
+        )
 
         return response
     }
@@ -105,10 +105,12 @@ class VoteFacade(
         }
         val voteIds = votes.content.map { it.id }
 
-        val (categoryAssignments, options) = parZip(Dispatchers.IO,
+        val (categoryAssignments, options) = parZip(
+            Dispatchers.IO,
             { categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.COMMUNITY, voteIds) },
             { voteOptionService.getOptionsByCommunityIdIn(voteIds) },
-            { a, b -> a to b })
+            { a, b -> a to b }
+        )
 
         val optionModels = options.map { VoteOptionModel.from(it) }
 
@@ -157,7 +159,8 @@ class VoteFacade(
         val voteInfos = voteService.getVoteAndOptions(id)
         val vote = voteInfos[0].community
         val options = voteInfos.map { it.voteOption }
-        val (creator, voteSummary, optionSummaries, categoryAssignment) = parZip(Dispatchers.IO,
+        val (creator, voteSummary, optionSummaries, categoryAssignment) = parZip(
+            Dispatchers.IO,
             { userService.findByIdOrThrow(vote.uid) },
             { voteSummaryService.getSummaryByCommunityId(id) },
             { voteOptionSummaryService.getSummariesByOptionIdIn(options.map { it.id }) },
@@ -188,7 +191,8 @@ class VoteFacade(
     private suspend fun castVote(uid: Long, communityId: Long, optionId: Long) {
         voteHistoryService.validateVoteNotExist(uid, communityId)
 
-        parZip(Dispatchers.IO,
+        parZip(
+            Dispatchers.IO,
             { voteSummaryService.increaseCount(communityId) },
             { voteOptionSummaryService.increaseCount(optionId) },
             { _, _ -> }
@@ -203,7 +207,8 @@ class VoteFacade(
     private suspend fun cancelVote(uid: Long, communityId: Long, optionId: Long) {
         voteHistoryService.validateVoteExist(uid, communityId, optionId)
 
-        parZip(Dispatchers.IO,
+        parZip(
+            Dispatchers.IO,
             { voteSummaryService.decreaseCount(communityId) },
             { voteOptionSummaryService.decreaseCount(optionId) },
             { _, _ -> }
@@ -216,11 +221,13 @@ class VoteFacade(
 
     @Transactional
     suspend fun deleteVote(user: AuthUser, id: Long) {
-        val options = parZip(Dispatchers.IO,
+        val options = parZip(
+            Dispatchers.IO,
             { voteSummaryService.deleteSummaryByCommunityId(id) },
             { voteOptionService.getVoteOptions(id) },
-            { _, b -> b })
-        voteOptionSummaryService.deleteSummaryByOptionIdIn(options.map { id })
+            { _, b -> b }
+        )
+        voteOptionSummaryService.deleteSummaryByOptionIdIn(options.map { it.id })
 
         voteService.softDeleteVote(user.id, id)
     }

@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class VoteHistoryService(
-    private val voteHistoryRepository: VoteHistoryRepository
+    private val voteHistoryRepository: VoteHistoryRepository,
 ) {
     @Transactional
     fun saveSync(voteHistory: VoteHistory): VoteHistory {

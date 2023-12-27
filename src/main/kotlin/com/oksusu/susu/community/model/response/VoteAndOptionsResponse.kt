@@ -2,7 +2,6 @@ package com.oksusu.susu.community.model.response
 
 import com.oksusu.susu.category.model.CategoryModel
 import com.oksusu.susu.community.domain.Community
-import com.oksusu.susu.community.domain.vo.CommunityCategory
 import com.oksusu.susu.community.model.VoteOptionModel
 
 class VoteAndOptionsResponse(

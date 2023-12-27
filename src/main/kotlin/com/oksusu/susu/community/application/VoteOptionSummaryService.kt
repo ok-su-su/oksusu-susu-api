@@ -4,8 +4,6 @@ import com.oksusu.susu.community.domain.vo.VoteOptionSummary
 import com.oksusu.susu.community.infrastructure.redis.VoteOptionSummaryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.springframework.data.redis.core.DefaultTypedTuple
-import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Service
 
 @Service
@@ -52,7 +50,7 @@ class VoteOptionSummaryService(
     }
 
     suspend fun deleteSummaryByOptionIdIn(ids: List<Long>) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             voteOptionSummaryRepository.deleteByVoteOptionIdIn(ids)
         }
     }

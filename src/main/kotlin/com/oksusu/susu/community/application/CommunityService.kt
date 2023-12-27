@@ -29,7 +29,9 @@ class CommunityService(
     ): Slice<Community> {
         return withContext(Dispatchers.IO) {
             communityRepository.findAllByIsActiveAndTypeOrderByCreatedAtDesc(
-                isActive, type, pageable
+                isActive,
+                type,
+                pageable
             )
         }
     }
@@ -56,7 +58,7 @@ class CommunityService(
         }
     }
 
-    suspend fun countAllByIsActiveAndType(isActive: Boolean, type: CommunityType): Long{
+    suspend fun countAllByIsActiveAndType(isActive: Boolean, type: CommunityType): Long {
         return withContext(Dispatchers.IO) {
             communityRepository.countAllByIsActiveAndType(isActive, type)
         }

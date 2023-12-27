@@ -2,7 +2,6 @@ package com.oksusu.susu.community.application
 
 import com.oksusu.susu.community.domain.VoteOption
 import com.oksusu.susu.community.infrastructure.repository.VoteOptionRepository
-import com.oksusu.susu.community.model.VoteOptionCountModel
 import com.oksusu.susu.community.model.VoteOptionModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
@@ -22,14 +21,15 @@ class VoteOptionService(
 
     suspend fun validateSeq(optionModels: List<VoteOptionModel>) {
         optionModels.map { option -> option.seq }.toSet().count { seq -> seq > 0 }.run {
-            if (this != optionModels.size)
+            if (this != optionModels.size) {
                 throw InvalidRequestException(ErrorCode.INVALID_VOTE_OPTION_SEQUENCE)
+            }
         }
     }
 
     suspend fun getOptionsByCommunityIdIn(communityIds: List<Long>): List<VoteOption> {
         return withContext(Dispatchers.IO) {
-            voteOptionRepository.findAllByCommunityIdInOrderBySeq(communityIds);
+            voteOptionRepository.findAllByCommunityIdInOrderBySeq(communityIds)
         }
     }
 

@@ -1,7 +1,5 @@
 package com.oksusu.susu.community.model.vo
 
-import com.oksusu.susu.community.domain.vo.CommunityCategory
-
 data class VoteSortRequest(
     val mine: Boolean,
     val sortType: VoteSortType,

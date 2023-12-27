@@ -12,7 +12,7 @@ class UserProfileModel(
             return UserProfileModel(
                 id = user.id,
                 name = user.name,
-                profileImageUrl = user.profileImageUrl,
+                profileImageUrl = user.profileImageUrl
             )
         }
     }

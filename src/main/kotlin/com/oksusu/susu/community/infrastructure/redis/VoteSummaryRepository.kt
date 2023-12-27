@@ -3,14 +3,7 @@ package com.oksusu.susu.community.infrastructure.redis
 import com.oksusu.susu.cache.CacheService
 import com.oksusu.susu.community.domain.vo.VoteSummary
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactive.awaitLast
-import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.domain.Range
-import org.springframework.data.domain.Range.Bound
-import org.springframework.data.domain.Range.RangeBuilder
-import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Repository
 
@@ -18,7 +11,7 @@ const val VOTE_SUMMARY_KEY = "vote_summary"
 
 @Repository
 class VoteSummaryRepository(
-    private val cacheService: CacheService
+    private val cacheService: CacheService,
 ) {
     suspend fun save(summary: VoteSummary) {
         // value : communityId, score : count

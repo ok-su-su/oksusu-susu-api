@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class CacheServiceImpl(
-    private val reactiveRedisTemplate: ReactiveRedisTemplate<String, String>
-): CacheService {
+    private val reactiveRedisTemplate: ReactiveRedisTemplate<String, String>,
+) : CacheService {
     val zSetOps = reactiveRedisTemplate.opsForZSet()
 
     override suspend fun <T> zSetSaveAll(key: String, tuples: Map<T, Long>) {
