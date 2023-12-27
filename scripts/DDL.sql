@@ -162,7 +162,7 @@ CREATE UNIQUE INDEX idx__uid__community_id ON vote_history (uid, community_id);
 CREATE TABLE `term`
 (
     `id`           bigint  NOT NULL AUTO_INCREMENT COMMENT '약관 정보 id',
-    `title`        varchar(512) DEFAULT NULL COMMENT '약관명',
+    `title`        varchar(512) NOT NULL COMMENT '약관명',
     `description`  text    NOT NULL COMMENT '약관 상세',
     `is_essential` tinyint NOT NULL COMMENT '필수 여부, 필수 : 1, 선택 : 0',
     `is_active`    tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
