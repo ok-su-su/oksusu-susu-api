@@ -55,4 +55,10 @@ class VoteSummaryService(
         }.map { VoteSummary(communityId = it.value!!.toLong(), count = it.score!!.toInt()) }
             .toList().reversed()
     }
+
+    suspend fun deleteSummaryByCommunityId(communityId: Long) {
+        withContext(Dispatchers.IO){
+            voteSummaryRepository.deleteByCommunityId(communityId)
+        }
+    }
 }

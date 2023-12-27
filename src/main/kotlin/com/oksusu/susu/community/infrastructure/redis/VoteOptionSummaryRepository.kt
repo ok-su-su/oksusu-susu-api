@@ -21,8 +21,9 @@ class VoteOptionSummaryRepository(
         cacheService.zSetSaveAll(VOTE_OPTION_SUMMARY_KEY, tuples)
     }
 
-    suspend fun findAllByVoteOptionIdIn(ids: List<String>): List<Double> {
-        return cacheService.zSetFindByMemberIn(VOTE_OPTION_SUMMARY_KEY, ids)
+    suspend fun findAllByVoteOptionIdIn(ids: List<Long>): List<Double> {
+        val strIds = ids.map { it.toString() }
+        return cacheService.zSetFindByMemberIn(VOTE_OPTION_SUMMARY_KEY, strIds)
     }
 
     suspend fun save(summary: VoteOptionSummary) {
@@ -32,5 +33,10 @@ class VoteOptionSummaryRepository(
 
     suspend fun findByVoteOptionId(voteOptionId: Long): Double {
         return cacheService.zSetFindByMember(VOTE_OPTION_SUMMARY_KEY, voteOptionId.toString())
+    }
+
+    suspend fun deleteByVoteOptionIdIn(ids: List<Long>) {
+        val strIds = ids.map { it.toString() }
+        return cacheService.zSetDeleteByMemberIn(VOTE_OPTION_SUMMARY_KEY, strIds)
     }
 }

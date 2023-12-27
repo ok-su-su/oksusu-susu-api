@@ -10,4 +10,5 @@ interface ZSetCacheService {
     suspend fun zSetFindByMember(key: String, member: String): Double
     suspend fun zSetFindByMemberIn(key: String, members: List<String>): List<Double>
     suspend fun zSetFindRangeWithScores(key: String, range: Range<Long>): Flow<ZSetOperations.TypedTuple<String>>
+    suspend fun zSetDeleteByMemberIn(key: String, members: List<String>)
 }

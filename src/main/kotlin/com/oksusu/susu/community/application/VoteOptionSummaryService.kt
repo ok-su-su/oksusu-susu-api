@@ -24,9 +24,8 @@ class VoteOptionSummaryService(
     }
 
     suspend fun getSummariesByOptionIdIn(ids: List<Long>): List<VoteOptionSummary> {
-        val strIds = ids.map { it.toString() }
         return withContext(Dispatchers.IO) {
-            voteOptionSummaryRepository.findAllByVoteOptionIdIn(strIds)
+            voteOptionSummaryRepository.findAllByVoteOptionIdIn(ids)
         }.mapIndexed { idx, value -> VoteOptionSummary(ids[idx], value.toInt()) }
     }
 
@@ -50,5 +49,11 @@ class VoteOptionSummaryService(
     suspend fun decreaseCount(optionId: Long) {
         val summary = getSummaryByOptionId(optionId).apply { count-- }
         save(summary)
+    }
+
+    suspend fun deleteSummaryByOptionIdIn(ids: List<Long>) {
+        withContext(Dispatchers.IO){
+            voteOptionSummaryRepository.deleteByVoteOptionIdIn(ids)
+        }
     }
 }

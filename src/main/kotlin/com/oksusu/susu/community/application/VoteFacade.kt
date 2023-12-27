@@ -194,6 +194,12 @@ class VoteFacade(
 
     @Transactional
     suspend fun deleteVote(user: AuthUser, id: Long) {
+        val options = parZip(Dispatchers.IO,
+            { voteSummaryService.deleteSummaryByCommunityId(id) },
+            { voteOptionService.getVoteOptions(id) },
+            { _, b -> b })
+        voteOptionSummaryService.deleteSummaryByOptionIdIn(options.map { id })
+
         voteService.softDeleteVote(user.id, id)
     }
 
@@ -202,9 +208,8 @@ class VoteFacade(
         val summaries = voteSummaryService.getPopularVotes(5)
         val votes = voteService.getAllVotesByIdIn(summaries.map { it.communityId })
 
-        summaries.map { summary ->
+        return summaries.map { summary ->
             VoteWithCountResponse.of(votes.first { it.id == summary.communityId }, summary)
         }
-        return listOf()
     }
 }

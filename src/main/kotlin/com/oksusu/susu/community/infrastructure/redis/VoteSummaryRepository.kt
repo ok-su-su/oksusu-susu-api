@@ -38,4 +38,8 @@ class VoteSummaryRepository(
         val range = Range.leftOpen(-to.toLong(), -from.toLong())
         return cacheService.zSetFindRangeWithScores(VOTE_SUMMARY_KEY, range)
     }
+
+    suspend fun deleteByCommunityId(communityId: Long) {
+        cacheService.zSetDeleteByMemberIn(VOTE_SUMMARY_KEY, listOf(communityId.toString()))
+    }
 }

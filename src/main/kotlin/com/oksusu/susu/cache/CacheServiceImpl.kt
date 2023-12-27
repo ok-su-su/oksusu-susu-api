@@ -47,4 +47,8 @@ class CacheServiceImpl(
     override suspend fun zSetFindRangeWithScores(key: String, range: Range<Long>): Flow<ZSetOperations.TypedTuple<String>> {
         return zSetOps.rangeWithScores(key, range).asFlow()
     }
+
+    override suspend fun zSetDeleteByMemberIn(key: String, members: List<String>) {
+        zSetOps.remove(key, *members.toTypedArray()).awaitSingle()
+    }
 }
