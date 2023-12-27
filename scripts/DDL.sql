@@ -157,3 +157,30 @@ CREATE TABLE `vote_history`
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='투표 유저 매핑';
 CREATE UNIQUE INDEX idx__uid__community_id ON vote_history (uid, community_id);
+
+-- 약관 정보
+CREATE TABLE `term`
+(
+    `id`           bigint  NOT NULL AUTO_INCREMENT COMMENT '약관 정보 id',
+    `title`        varchar(512) DEFAULT NULL COMMENT '약관명',
+    `description`  text    NOT NULL COMMENT '약관 상세',
+    `is_essential` tinyint NOT NULL COMMENT '필수 여부, 필수 : 1, 선택 : 0',
+    `is_active`    tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
+    `created_at`   datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`  datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보';
+
+
+-- 약관 정보 유저 매핑
+CREATE TABLE `term_agreement`
+(
+    `id`          bigint NOT NULL AUTO_INCREMENT COMMENT '약관 정보 id',
+    `uid`         bigint NOT NULL COMMENT '유저 id',
+    `term_id`     bigint NOT NULL COMMENT '약관 정보 id',
+    `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보';
+CREATE UNIQUE INDEX idx__uid ON term_agreement (uid);
+
