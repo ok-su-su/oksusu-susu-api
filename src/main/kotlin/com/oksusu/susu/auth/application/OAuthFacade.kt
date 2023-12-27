@@ -10,7 +10,6 @@ import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
-import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService

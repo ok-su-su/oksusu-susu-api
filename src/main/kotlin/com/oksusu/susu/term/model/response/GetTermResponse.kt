@@ -2,7 +2,7 @@ package com.oksusu.susu.term.model.response
 
 import com.oksusu.susu.term.domain.Term
 
-class GetTermResponse (
+class GetTermResponse(
     val id: Long,
     val title: String,
     val description: String,
@@ -14,7 +14,7 @@ class GetTermResponse (
                 id = term.id,
                 title = term.title,
                 description = term.description,
-                isEssential = term.isEssential,
+                isEssential = term.isEssential
             )
         }
     }
