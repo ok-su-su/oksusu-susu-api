@@ -9,6 +9,7 @@ import com.oksusu.susu.category.model.CategoryWithCustomModel
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.application.EnvelopeService
+import com.oksusu.susu.event.model.DeleteLedgerEvent
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.exception.InvalidRequestException
@@ -20,6 +21,7 @@ import com.oksusu.susu.ledger.model.request.CreateLedgerRequest
 import com.oksusu.susu.ledger.model.request.SearchLedgerRequest
 import com.oksusu.susu.ledger.model.response.CreateLedgerResponse
 import com.oksusu.susu.ledger.model.response.SearchLedgerResponse
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
@@ -30,6 +32,7 @@ class LedgerFacade(
     private val categoryService: CategoryService,
     private val categoryAssignmentService: CategoryAssignmentService,
     private val txTemplate: TransactionTemplates,
+    private val publisher: ApplicationEventPublisher,
 ) {
     suspend fun create(user: AuthUser, request: CreateLedgerRequest): CreateLedgerResponse {
         if (request.startAt.isAfter(request.endAt)) {
@@ -98,6 +101,29 @@ class LedgerFacade(
                 totalAmounts = statistic?.totalAmounts ?: 0L,
                 totalCounts = statistic?.totalCounts ?: 0L
             )
+        }
+    }
+
+    suspend fun delete(user: AuthUser, ids: Set<Long>) {
+        val ledgers = ledgerService.findAllByUidAndIdIn(user.id, ids.toList())
+
+        ledgers.forEach { leder ->
+            txTemplate.writer.executeWithContext {
+                /** 장부 삭제 */
+                ledgerService.deleteSync(leder)
+
+                /** 카테고리 정보 삭제 */
+                categoryAssignmentService.deleteByTargetIdAndTargetTypeSync(
+                    targetId = leder.id,
+                    targetType = CategoryAssignmentType.LEDGER
+                )
+
+                /** 봉투 삭제 */
+                envelopeService.deleteAllByLedgerId(leder.id)
+
+                /** 이벤트 발행 */
+                publisher.publishEvent(DeleteLedgerEvent(leder))
+            }
         }
     }
 }

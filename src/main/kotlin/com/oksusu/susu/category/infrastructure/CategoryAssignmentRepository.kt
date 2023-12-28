@@ -19,4 +19,7 @@ interface CategoryAssignmentRepository : JpaRepository<CategoryAssignment, Long>
 
     @Transactional
     fun deleteByTargetIdAndTargetType(targetId: Long, targetType: CategoryAssignmentType)
+
+    @Transactional
+    fun deleteAllByTargetTypeAndTargetIdIn(targetType: CategoryAssignmentType, targetIds: List<Long>)
 }

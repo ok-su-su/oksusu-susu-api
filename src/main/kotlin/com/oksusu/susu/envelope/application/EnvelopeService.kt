@@ -25,6 +25,15 @@ class EnvelopeService(
         envelopeRepository.delete(envelope)
     }
 
+    @Transactional
+    fun deleteAllByLedgerId(ledgerId: Long) {
+        envelopeRepository.deleteAllByLedgerId(ledgerId)
+    }
+
+    suspend fun findAllByLedgerId(ledgerId: Long): List<Envelope> {
+        return withContext(Dispatchers.IO) { envelopeRepository.findAllByLedgerId(ledgerId) }
+    }
+
     suspend fun countTotalAmountsAndCounts(ledgerIds: List<Long>): List<CountTotalAmountsAndCountsModel> {
         return withContext(Dispatchers.IO) { envelopeRepository.countTotalAmountsAndCounts(ledgerIds) }
     }

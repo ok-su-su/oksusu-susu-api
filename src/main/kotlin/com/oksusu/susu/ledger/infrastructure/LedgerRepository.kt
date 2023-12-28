@@ -21,7 +21,10 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository
+interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository {
+    @Transactional(readOnly = true)
+    fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Ledger>
+}
 
 interface LedgerCustomRepository {
     @Transactional(readOnly = true)

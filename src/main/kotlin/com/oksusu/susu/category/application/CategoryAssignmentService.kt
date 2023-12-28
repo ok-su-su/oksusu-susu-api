@@ -24,6 +24,11 @@ class CategoryAssignmentService(
         categoryAssignmentRepository.deleteByTargetIdAndTargetType(targetId, targetType)
     }
 
+    @Transactional
+    fun deleteAllByTargetTypeAndTargetIdIn(targetType: CategoryAssignmentType, targetIds: List<Long>) {
+        categoryAssignmentRepository.deleteAllByTargetTypeAndTargetIdIn(targetType, targetIds)
+    }
+
     suspend fun findByIdAndTypeOrThrow(targetId: Long, targetType: CategoryAssignmentType): CategoryAssignment {
         return findByIdAndTypeOrNull(targetId, targetType)
             ?: throw NotFoundException(ErrorCode.NOT_FOUND_CATEGORY_ASSIGNMENT_ERROR_CODE)

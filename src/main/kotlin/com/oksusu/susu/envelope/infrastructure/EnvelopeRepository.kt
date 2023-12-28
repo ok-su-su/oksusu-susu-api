@@ -23,6 +23,12 @@ import org.springframework.transaction.annotation.Transactional
 interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepository {
     @Transactional(readOnly = true)
     fun findByIdAndUid(id: Long, uid: Long): Envelope?
+
+    @Transactional
+    fun deleteAllByLedgerId(ledgerId: Long)
+
+    @Transactional(readOnly = true)
+    fun findAllByLedgerId(ledgerId: Long): List<Envelope>
 }
 
 interface EnvelopeCustomRepository {

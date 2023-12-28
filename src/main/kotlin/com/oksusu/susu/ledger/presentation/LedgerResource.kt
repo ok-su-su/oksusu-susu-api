@@ -6,7 +6,6 @@ import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapPage
 import com.oksusu.susu.extension.wrapVoid
 import com.oksusu.susu.ledger.application.LedgerFacade
-import com.oksusu.susu.ledger.application.LedgerService
 import com.oksusu.susu.ledger.model.request.CreateLedgerRequest
 import com.oksusu.susu.ledger.model.request.SearchLedgerRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(value = ["/api/v1/ledgers"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class LedgerResource(
-    private val ledgerService: LedgerService,
     private val ledgerFacade: LedgerFacade,
 ) {
     @Operation(summary = "장부 생성")
@@ -52,5 +50,5 @@ class LedgerResource(
     suspend fun delete(
         user: AuthUser,
         @RequestParam ids: Set<Long>,
-    ) = ledgerService.delete(user, ids).wrapVoid()
+    ) = ledgerFacade.delete(user, ids).wrapVoid()
 }
