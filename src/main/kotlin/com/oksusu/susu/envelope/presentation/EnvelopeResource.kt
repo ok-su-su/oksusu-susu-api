@@ -5,9 +5,11 @@ import com.oksusu.susu.envelope.application.EnvelopeFacade
 import com.oksusu.susu.envelope.model.request.CreateEnvelopeRequest
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
+import com.oksusu.susu.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,4 +36,11 @@ class EnvelopeResource(
         user: AuthUser,
         @PathVariable id: Long,
     ) = envelopeFacade.getDetail(user, id).wrapOk()
+
+    @Operation(summary = "삭제")
+    @DeleteMapping("/{id}")
+    suspend fun delete(
+        user: AuthUser,
+        @PathVariable id: Long,
+    ) = envelopeFacade.delete(user, id).wrapVoid()
 }

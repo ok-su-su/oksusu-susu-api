@@ -76,4 +76,19 @@ class EnvelopeFacade(
             friend = FriendModel.from(envelopeDetail.friend)
         )
     }
+
+    suspend fun delete(user: AuthUser, id: Long) {
+        val envelope = envelopeService.findByIdOrThrow(id, user.id)
+
+        txTemplates.writer.executeWithContext {
+            /** 봉투 삭제 */
+            envelopeService.deleteSync(envelope)
+
+            /** 카테고리 삭제 */
+            categoryAssignmentService.deleteByTargetIdAndTargetTypeSync(
+                targetId = envelope.id,
+                targetType = CategoryAssignmentType.ENVELOPE
+            )
+        }
+    }
 }

@@ -12,5 +12,11 @@ interface CategoryAssignmentRepository : JpaRepository<CategoryAssignment, Long>
     fun findByTargetIdAndTargetType(targetId: Long, targetType: CategoryAssignmentType): CategoryAssignment
 
     @Transactional(readOnly = true)
-    fun findAllByTargetTypeAndTargetIdIn(targetType: CategoryAssignmentType, targetIds: List<Long>): List<CategoryAssignment>
+    fun findAllByTargetTypeAndTargetIdIn(
+        targetType: CategoryAssignmentType,
+        targetIds: List<Long>,
+    ): List<CategoryAssignment>
+
+    @Transactional
+    fun deleteByTargetIdAndTargetType(targetId: Long, targetType: CategoryAssignmentType)
 }

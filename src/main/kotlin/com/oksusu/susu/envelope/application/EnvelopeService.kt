@@ -20,6 +20,11 @@ class EnvelopeService(
         return envelopeRepository.save(envelope)
     }
 
+    @Transactional
+    fun deleteSync(envelope: Envelope) {
+        envelopeRepository.delete(envelope)
+    }
+
     suspend fun countTotalAmountsAndCounts(ledgerIds: List<Long>): List<CountTotalAmountsAndCountsModel> {
         return withContext(Dispatchers.IO) { envelopeRepository.countTotalAmountsAndCounts(ledgerIds) }
     }

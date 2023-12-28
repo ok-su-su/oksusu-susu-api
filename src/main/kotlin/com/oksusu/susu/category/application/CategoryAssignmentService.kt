@@ -19,6 +19,11 @@ class CategoryAssignmentService(
         return categoryAssignmentRepository.save(categoryAssignment)
     }
 
+    @Transactional
+    fun deleteByTargetIdAndTargetTypeSync(targetId: Long, targetType: CategoryAssignmentType) {
+        categoryAssignmentRepository.deleteByTargetIdAndTargetType(targetId, targetType)
+    }
+
     suspend fun findByIdAndTypeOrThrow(targetId: Long, targetType: CategoryAssignmentType): CategoryAssignment {
         return findByIdAndTypeOrNull(targetId, targetType)
             ?: throw NotFoundException(ErrorCode.NOT_FOUND_CATEGORY_ASSIGNMENT_ERROR_CODE)

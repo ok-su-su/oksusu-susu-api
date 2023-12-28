@@ -17,3 +17,5 @@ class FailToCreateException(errorCode: ErrorCode) : SusuException(errorCode)
 class AlreadyException(errorCode: ErrorCode) : SusuException(errorCode)
 
 class NoAuthorityException(errorCode: ErrorCode) : SusuException(errorCode)
+
+class FailToExecuteException(errorCode: ErrorCode) : SusuException(errorCode)
