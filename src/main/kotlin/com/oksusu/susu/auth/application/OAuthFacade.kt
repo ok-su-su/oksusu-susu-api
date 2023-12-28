@@ -18,6 +18,9 @@ import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.domain.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
@@ -53,8 +56,13 @@ class OAuthFacade(
     ): TokenDto {
         val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
 
-        userService.validateNotRegistered(oauthInfo)
-        termService.validateExistTerms(request.termAgreement)
+        coroutineScope {
+            val validateNotRegistered = async(Dispatchers.IO) { userService.validateNotRegistered(oauthInfo) }
+            val validateExistTerms = async(Dispatchers.IO) { termService.validateExistTerms(request.termAgreement) }
+
+            validateNotRegistered.await()
+            validateExistTerms.await()
+        }
 
         val user = txTemplates.writer.executeWithContext {
             val createdUser = User.toEntity(request, oauthInfo)

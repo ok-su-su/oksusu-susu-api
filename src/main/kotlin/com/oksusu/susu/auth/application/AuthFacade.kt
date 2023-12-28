@@ -1,5 +1,6 @@
 package com.oksusu.susu.auth.application
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.auth.model.AuthUser
@@ -43,25 +44,29 @@ class AuthFacade(
     suspend fun refreshToken(authUser: AuthUser, request: TokenRefreshRequest): TokenDto {
         jwtTokenService.verifyRefreshToken(request.refreshToken)
 
-        refreshTokenService.deleteByIdSync(authUser.id)
+        return parZip(
+            { refreshTokenService.deleteByIdSync(authUser.id) },
+            { tokenGenerateHelper.generateAccessAndRefreshToken(authUser.id) }
+        ) { _, tokenDto ->
+            RefreshToken(
+                id = authUser.id,
+                refreshToken = tokenDto.refreshToken,
+                ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
+            ).run { refreshTokenService.saveSync(this) }
 
-        val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(authUser.id)
-
-        RefreshToken(
-            id = authUser.id,
-            refreshToken = tokenDto.refreshToken,
-            ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
-        ).run { refreshTokenService.saveSync(this) }
-
-        return tokenDto
+            tokenDto
+        }
     }
 
     @Transactional
     suspend fun withdraw(authUser: AuthUser) {
         val user = userService.findByIdOrThrow(authUser.id)
 
-        oauthService.withdraw(user.oauthInfo)
-
-        userService.withdraw(authUser.id)
+        parZip(
+            { oauthService.withdraw(user.oauthInfo) },
+            { userService.withdraw(authUser.id) }
+        ) { _, _ ->
+            /** 현재는 추가적인 로직은 없음 */
+        }
     }
 }

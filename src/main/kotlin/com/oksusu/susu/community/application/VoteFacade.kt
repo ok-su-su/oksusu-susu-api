@@ -8,7 +8,9 @@ import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.common.util.Quad
-import com.oksusu.susu.community.domain.*
+import com.oksusu.susu.community.domain.Community
+import com.oksusu.susu.community.domain.VoteHistory
+import com.oksusu.susu.community.domain.VoteOption
 import com.oksusu.susu.community.domain.vo.CommunityType
 import com.oksusu.susu.community.domain.vo.VoteOptionSummary
 import com.oksusu.susu.community.domain.vo.VoteSummary
@@ -46,7 +48,11 @@ class VoteFacade(
     private val categoryAssignmentService: CategoryAssignmentService,
     private val categoryService: CategoryService,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    private val logger = mu.KotlinLogging.logger { }
+
+    companion object {
+        private const val DEFAULT_POPULAR_VOTE_COUNT = 5L
+    }
 
     @Transactional
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateVoteResponse {
@@ -74,7 +80,6 @@ class VoteFacade(
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_COMMUNITY_ERROR)
 
         parZip(
-            Dispatchers.IO,
             {
                 VoteSummary(communityId = response.id).run {
                     voteSummaryService.save(this)
@@ -173,10 +178,10 @@ class VoteFacade(
         }
 
         return VoteAndOptionsWithCountResponse.of(
-            VoteCountModel.of(vote, voteSummary, categoryService.getCategory(categoryAssignment.categoryId)),
-            optionCountModels,
-            creator,
-            user.id == creator.id
+            vote = VoteCountModel.of(vote, voteSummary, categoryService.getCategory(categoryAssignment.categoryId)),
+            options = optionCountModels,
+            creator = creator,
+            isMine = user.id == creator.id
         )
     }
 
@@ -192,7 +197,6 @@ class VoteFacade(
         voteHistoryService.validateVoteNotExist(uid, communityId)
 
         parZip(
-            Dispatchers.IO,
             { voteSummaryService.increaseCount(communityId) },
             { voteOptionSummaryService.increaseCount(optionId) },
             { _, _ -> }
@@ -208,7 +212,6 @@ class VoteFacade(
         voteHistoryService.validateVoteExist(uid, communityId, optionId)
 
         parZip(
-            Dispatchers.IO,
             { voteSummaryService.decreaseCount(communityId) },
             { voteOptionSummaryService.decreaseCount(optionId) },
             { _, _ -> }
@@ -222,7 +225,6 @@ class VoteFacade(
     @Transactional
     suspend fun deleteVote(user: AuthUser, id: Long) {
         val options = parZip(
-            Dispatchers.IO,
             { voteSummaryService.deleteSummaryByCommunityId(id) },
             { voteOptionService.getVoteOptions(id) },
             { _, b -> b }
@@ -234,16 +236,20 @@ class VoteFacade(
 
     @Transactional(readOnly = true)
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
-        val summaries = voteSummaryService.getPopularVotes(5)
-        val votes = voteService.getAllVotesByIdIn(summaries.map { it.communityId })
-        val categoryAssignments =
-            categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.COMMUNITY, votes.map { it.id })
+        val summaries = voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT)
+        val votes = voteService.getAllVotesByIdIn(summaries.map { summary -> summary.communityId })
+        val categoryAssignments = categoryAssignmentService.findAllByTypeAndIdIn(
+            targetType = CategoryAssignmentType.COMMUNITY,
+            targetIds = votes.map { vote -> vote.id }
+        )
 
         return summaries.map { summary ->
             VoteWithCountResponse.of(
-                votes.first { it.id == summary.communityId },
-                summary,
-                categoryService.getCategory(categoryAssignments.first { it.targetId == summary.communityId }.categoryId)
+                community = votes.first { vote -> vote.id == summary.communityId },
+                summary = summary,
+                category = categoryService.getCategory(
+                    categoryAssignments.first { it.targetId == summary.communityId }.categoryId
+                )
             )
         }
     }

@@ -11,11 +11,13 @@ class TermFacade(
 ) {
     @Transactional(readOnly = true)
     suspend fun getTerm(id: Long): GetTermResponse {
-        return termService.findByIdOrThrow(id).run { GetTermResponse.from(this) }
+        return termService.findByIdOrThrow(id)
+            .run { GetTermResponse.from(this) }
     }
 
     @Transactional(readOnly = true)
     suspend fun getTermInfos(): List<GetTermInfosResponse> {
-        return termService.getAllActiveTerms().map { GetTermInfosResponse.from(it) }
+        return termService.getAllActiveTerms()
+            .map { term -> GetTermInfosResponse.from(term) }
     }
 }
