@@ -2,7 +2,7 @@ package com.oksusu.susu.ledger.model.request
 
 import java.time.LocalDateTime
 
-data class CreateLedgerRequest(
+data class CreateAndUpdateLedgerRequest(
     val title: String,
     val description: String?,
     val categoryId: Long,

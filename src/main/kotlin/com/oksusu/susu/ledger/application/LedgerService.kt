@@ -1,7 +1,10 @@
 package com.oksusu.susu.ledger.application
 
+import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.infrastructure.LedgerRepository
+import com.oksusu.susu.ledger.infrastructure.model.LedgerDetailModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
 import kotlinx.coroutines.Dispatchers
@@ -36,5 +39,13 @@ class LedgerService(
 
     suspend fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Ledger> {
         return withContext(Dispatchers.IO) { ledgerRepository.findAllByUidAndIdIn(uid, ids) }
+    }
+
+    suspend fun findLedgerDetailOrThrow(id: Long, uid: Long): LedgerDetailModel {
+        return findLedgerDetailOrNull(id, uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_LEDGER_ERROR)
+    }
+
+    suspend fun findLedgerDetailOrNull(id: Long, uid: Long): LedgerDetailModel? {
+        return withContext(Dispatchers.IO) { ledgerRepository.findLedgerDetail(id, uid) }
     }
 }

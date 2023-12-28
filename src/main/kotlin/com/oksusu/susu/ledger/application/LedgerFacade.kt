@@ -17,9 +17,9 @@ import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
 import com.oksusu.susu.ledger.model.LedgerModel
-import com.oksusu.susu.ledger.model.request.CreateLedgerRequest
+import com.oksusu.susu.ledger.model.request.CreateAndUpdateLedgerRequest
 import com.oksusu.susu.ledger.model.request.SearchLedgerRequest
-import com.oksusu.susu.ledger.model.response.CreateLedgerResponse
+import com.oksusu.susu.ledger.model.response.CreateAndUpdateLedgerResponse
 import com.oksusu.susu.ledger.model.response.SearchLedgerResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
@@ -34,7 +34,7 @@ class LedgerFacade(
     private val txTemplate: TransactionTemplates,
     private val publisher: ApplicationEventPublisher,
 ) {
-    suspend fun create(user: AuthUser, request: CreateLedgerRequest): CreateLedgerResponse {
+    suspend fun create(user: AuthUser, request: CreateAndUpdateLedgerRequest): CreateAndUpdateLedgerResponse {
         if (request.startAt.isAfter(request.endAt)) {
             throw InvalidRequestException(ErrorCode.LEDGER_INVALID_DUE_DATE_ERROR)
         }
@@ -66,8 +66,50 @@ class LedgerFacade(
             createdLedger
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_LEDGER_ERROR)
 
-        return CreateLedgerResponse.of(
+        return CreateAndUpdateLedgerResponse.of(
             ledger = createdLedger,
+            category = category,
+            customCategory = customCategory
+        )
+    }
+
+    suspend fun update(
+        user: AuthUser,
+        id: Long,
+        request: CreateAndUpdateLedgerRequest,
+    ): CreateAndUpdateLedgerResponse? {
+        if (request.startAt.isAfter(request.endAt)) {
+            throw InvalidRequestException(ErrorCode.LEDGER_INVALID_DUE_DATE_ERROR)
+        }
+
+        val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.id)
+
+        val category = categoryService.getCategory(request.categoryId)
+
+        /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
+        val customCategory = when (category.id == 5L) {
+            true -> request.customCategory
+            else -> null
+        }
+
+        val updatedLedger = txTemplate.writer.executeWithContext {
+            val updatedLedger = ledger.apply {
+                this.title = request.title
+                this.description = request.description
+                this.startAt = request.startAt
+                this.endAt = request.endAt
+            }.run { ledgerService.saveSync(this) }
+
+            categoryAssignment.apply {
+                this.categoryId = category.id
+                this.customCategory = customCategory
+            }.run { categoryAssignmentService.saveSync(this) }
+
+            updatedLedger
+        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_LEDGER_ERROR)
+
+        return CreateAndUpdateLedgerResponse.of(
+            ledger = updatedLedger,
             category = category,
             customCategory = customCategory
         )

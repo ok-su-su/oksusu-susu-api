@@ -5,6 +5,8 @@ import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.extension.execute
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.domain.QLedger
+import com.oksusu.susu.ledger.infrastructure.model.LedgerDetailModel
+import com.oksusu.susu.ledger.infrastructure.model.QLedgerDetailModel
 import com.oksusu.susu.ledger.infrastructure.model.QSearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
@@ -29,6 +31,9 @@ interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository
 interface LedgerCustomRepository {
     @Transactional(readOnly = true)
     fun search(spec: SearchLedgerSpec, pageable: Pageable): Page<SearchLedgerModel>
+
+    @Transactional(readOnly = true)
+    fun findLedgerDetail(id: Long, uid: Long): LedgerDetailModel?
 }
 
 class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySupport(Ledger::class.java) {
@@ -57,5 +62,17 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             )
 
         return querydsl.execute(query, pageable)
+    }
+
+    override fun findLedgerDetail(id: Long, uid: Long): LedgerDetailModel? {
+        return JPAQuery<QLedger>(entityManager)
+            .select(QLedgerDetailModel(qLedger, qCategoryAssignment))
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qLedger.id.eq(id),
+                qLedger.uid.eq(uid),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            ).fetchOne()
     }
 }
