@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional
 class UserService(
     private val userRepository: UserRepository,
 ) {
+    suspend fun validateNotRegistered(oauthInfo: OauthInfo) {
+        existsByOauthInfo(oauthInfo).takeUnless { it } ?: throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
+    }
+
     suspend fun existsByOauthInfo(oauthInfo: OauthInfo): Boolean {
         return withContext(Dispatchers.IO) {
             userRepository.existsByOauthInfo(oauthInfo)

@@ -5,6 +5,7 @@ import java.time.LocalDate
 
 class OauthRegisterRequest(
     val name: String,
+    val termAgreement: List<Long>,
     val gender: Gender?,
     val birth: Int?,
 ) {
