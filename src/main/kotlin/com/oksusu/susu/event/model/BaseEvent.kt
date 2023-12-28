@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.dto
+package com.oksusu.susu.event.model
 
 import java.time.LocalDateTime
 
