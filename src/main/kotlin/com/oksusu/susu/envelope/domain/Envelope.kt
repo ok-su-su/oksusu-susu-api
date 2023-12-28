@@ -22,24 +22,24 @@ class Envelope(
     val uid: Long,
 
     @Enumerated(EnumType.STRING)
-    val type: EnvelopeType,
+    var type: EnvelopeType,
 
     @Column(name = "friend_id")
-    val friendId: Long,
+    var friendId: Long,
 
     @Column(name = "ledger_id")
     val ledgerId: Long? = null,
 
     @Column(name = "amount")
-    val amount: Long,
+    var amount: Long,
 
-    val gift: String? = null,
+    var gift: String? = null,
 
-    val memo: String? = null,
+    var memo: String? = null,
 
     @Column(name = "has_visited")
-    val hasVisited: Boolean,
+    var hasVisited: Boolean,
 
     @Column(name = "handed_over_at")
-    val handedOverAt: LocalDateTime,
+    var handedOverAt: LocalDateTime,
 ) : BaseEntity()

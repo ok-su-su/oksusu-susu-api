@@ -18,13 +18,13 @@ class Ledger(
 
     val uid: Long,
 
-    val title: String,
+    var title: String,
 
-    val description: String? = null,
+    var description: String? = null,
 
     @Column(name = "start_at")
-    val startAt: LocalDateTime,
+    var startAt: LocalDateTime,
 
     @Column(name = "end_at")
-    val endAt: LocalDateTime,
+    var endAt: LocalDateTime,
 ) : BaseEntity()

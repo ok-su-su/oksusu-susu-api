@@ -1,8 +1,10 @@
 package com.oksusu.susu.ledger.application
 
-import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.infrastructure.LedgerRepository
+import com.oksusu.susu.ledger.infrastructure.model.LedgerDetailModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +23,11 @@ class LedgerService(
         return ledgerRepository.save(ledger)
     }
 
+    @Transactional
+    fun deleteSync(ledger: Ledger) {
+        ledgerRepository.delete(ledger)
+    }
+
     suspend fun search(
         searchSpec: SearchLedgerSpec,
         pageable: Pageable,
@@ -30,11 +37,15 @@ class LedgerService(
         }
     }
 
-    @Transactional
-    suspend fun delete(user: AuthUser, ids: Set<Long>) {
-        // ids validate 추가 필요, 사이즈 체크
-        withContext(Dispatchers.IO) {
-            ledgerRepository.deleteAllByIdInBatch(ids)
-        }
+    suspend fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Ledger> {
+        return withContext(Dispatchers.IO) { ledgerRepository.findAllByUidAndIdIn(uid, ids) }
+    }
+
+    suspend fun findLedgerDetailOrThrow(id: Long, uid: Long): LedgerDetailModel {
+        return findLedgerDetailOrNull(id, uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_LEDGER_ERROR)
+    }
+
+    suspend fun findLedgerDetailOrNull(id: Long, uid: Long): LedgerDetailModel? {
+        return withContext(Dispatchers.IO) { ledgerRepository.findLedgerDetail(id, uid) }
     }
 }

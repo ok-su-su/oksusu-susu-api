@@ -23,11 +23,20 @@ import org.springframework.transaction.annotation.Transactional
 interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepository {
     @Transactional(readOnly = true)
     fun findByIdAndUid(id: Long, uid: Long): Envelope?
+
+    @Transactional
+    fun deleteAllByLedgerId(ledgerId: Long)
+
+    @Transactional(readOnly = true)
+    fun findAllByLedgerId(ledgerId: Long): List<Envelope>
 }
 
 interface EnvelopeCustomRepository {
     @Transactional(readOnly = true)
     fun countTotalAmountsAndCounts(ledgerIds: List<Long>): List<CountTotalAmountsAndCountsModel>
+
+    @Transactional(readOnly = true)
+    fun countTotalAmountAndCount(ledgerId: Long): CountTotalAmountsAndCountsModel
 
     @Transactional(readOnly = true)
     fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel?
@@ -58,6 +67,19 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 qEnvelope.ledgerId.`in`(ledgerIds)
             ).groupBy(qEnvelope.ledgerId)
             .fetch()
+    }
+
+    override fun countTotalAmountAndCount(ledgerId: Long): CountTotalAmountsAndCountsModel {
+        return JPAQuery<QEnvelope>(entityManager)
+            .select(
+                QCountTotalAmountsAndCountsModel(
+                    qEnvelope.ledgerId,
+                    qEnvelope.amount.sum(),
+                    qEnvelope.id.count()
+                )
+            ).from(qEnvelope)
+            .where(qEnvelope.ledgerId.eq(ledgerId))
+            .fetchFirst()
     }
 
     override fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel? {

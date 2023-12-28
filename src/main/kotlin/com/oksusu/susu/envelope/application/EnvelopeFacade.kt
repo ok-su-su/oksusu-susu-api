@@ -9,8 +9,8 @@ import com.oksusu.susu.category.model.CategoryWithCustomModel
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.model.EnvelopeModel
-import com.oksusu.susu.envelope.model.request.CreateEnvelopeRequest
-import com.oksusu.susu.envelope.model.response.CreateEnvelopeResponse
+import com.oksusu.susu.envelope.model.request.CreateAndUpdateEnvelopeRequest
+import com.oksusu.susu.envelope.model.response.CreateAndUpdateEnvelopeResponse
 import com.oksusu.susu.envelope.model.response.EnvelopeDetailResponse
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
@@ -29,7 +29,7 @@ class EnvelopeFacade(
     private val categoryAssignmentService: CategoryAssignmentService,
     private val txTemplates: TransactionTemplates,
 ) {
-    suspend fun create(user: AuthUser, request: CreateEnvelopeRequest): CreateEnvelopeResponse {
+    suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
         val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.id)
         val category = categoryService.getCategory(request.category.id)
 
@@ -61,7 +61,43 @@ class EnvelopeFacade(
             createdEnvelope
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_ENVELOPE_ERROR)
 
-        return CreateEnvelopeResponse.from(createdEnvelope)
+        return CreateAndUpdateEnvelopeResponse.from(createdEnvelope)
+    }
+
+    suspend fun update(
+        user: AuthUser,
+        id: Long,
+        request: CreateAndUpdateEnvelopeRequest,
+    ): CreateAndUpdateEnvelopeResponse {
+        val (envelope, friend, _, categoryAssignment) = envelopeService.getDetail(id, user.id)
+        val category = categoryService.getCategory(request.category.id)
+
+        /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
+        val customCategory = when (category.id == 5L) {
+            true -> request.category.customCategory
+            else -> null
+        }
+
+        val updatedEnvelope = txTemplates.writer.executeWithContext {
+            val updatedEnvelope = envelope.apply {
+                this.type = request.type
+                this.friendId = friend.id
+                this.amount = request.amount
+                this.gift = request.gift
+                this.memo = request.memo
+                this.hasVisited = request.hasVisited
+                this.handedOverAt = request.handedOverAt
+            }.run { envelopeService.saveSync(this) }
+
+            categoryAssignment.apply {
+                this.categoryId = category.id
+                this.customCategory = customCategory
+            }.run { categoryAssignmentService.saveSync(this) }
+
+            updatedEnvelope
+        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_ENVELOPE_ERROR)
+
+        return CreateAndUpdateEnvelopeResponse.from(updatedEnvelope)
     }
 
     suspend fun getDetail(user: AuthUser, id: Long): EnvelopeDetailResponse {
@@ -75,5 +111,20 @@ class EnvelopeFacade(
             relation = relation,
             friend = FriendModel.from(envelopeDetail.friend)
         )
+    }
+
+    suspend fun delete(user: AuthUser, id: Long) {
+        val envelope = envelopeService.findByIdOrThrow(id, user.id)
+
+        txTemplates.writer.executeWithContext {
+            /** 봉투 삭제 */
+            envelopeService.deleteSync(envelope)
+
+            /** 카테고리 삭제 */
+            categoryAssignmentService.deleteByTargetIdAndTargetTypeSync(
+                targetId = envelope.id,
+                targetType = CategoryAssignmentType.ENVELOPE
+            )
+        }
     }
 }
