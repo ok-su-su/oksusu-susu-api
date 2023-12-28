@@ -8,6 +8,7 @@ import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
 import com.oksusu.susu.config.database.TransactionTemplates
+import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.extension.executeWithContext
@@ -15,7 +16,6 @@ import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
-import com.oksusu.susu.term.model.event.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.domain.User
 import org.springframework.context.ApplicationEventPublisher
@@ -32,7 +32,7 @@ class OAuthFacade(
     private val txTemplates: TransactionTemplates,
     private val termService: TermService,
     private val termAgreementService: TermAgreementService,
-    private val eventPublisher: ApplicationEventPublisher
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     /** 회원가입 가능 여부 체크. */
     @Transactional(readOnly = true)
@@ -63,14 +63,15 @@ class OAuthFacade(
             val termAgreements = request.termAgreement.map { TermAgreement(uid = createdUser.id, termId = it) }
                 .run { termAgreementService.saveAllSync(this) }
 
-            eventPublisher.publishEvent(TermAgreementHistoryCreateEvent(
-                termAgreements = termAgreements,
-                changeType = TermAgreementChangeType.AGREEMENT
-            ))
+            eventPublisher.publishEvent(
+                TermAgreementHistoryCreateEvent(
+                    termAgreements = termAgreements,
+                    changeType = TermAgreementChangeType.AGREEMENT
+                )
+            )
 
             createdUser
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_USER_ERROR)
-
 
         return generateTokenDto(user.id)
     }

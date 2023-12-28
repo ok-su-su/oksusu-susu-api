@@ -6,7 +6,7 @@ import java.lang.reflect.Method
 
 @Component
 class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
-    val logger = mu.KotlinLogging.logger {  }
+    val logger = mu.KotlinLogging.logger { }
 
     override fun handleUncaughtException(throwable: Throwable, method: Method, vararg params: Any) {
         logger.error("Exception message - $throwable")

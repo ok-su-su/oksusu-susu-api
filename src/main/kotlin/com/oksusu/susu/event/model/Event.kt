@@ -13,4 +13,4 @@ data class DeleteLedgerEvent(
 class TermAgreementHistoryCreateEvent(
     val termAgreements: List<TermAgreement>,
     val changeType: TermAgreementChangeType,
-): BaseEvent(), Event
+) : BaseEvent(), Event
