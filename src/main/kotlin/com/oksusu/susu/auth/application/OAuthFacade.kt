@@ -14,8 +14,11 @@ import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
+import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
+import com.oksusu.susu.term.model.event.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.domain.User
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,6 +32,7 @@ class OAuthFacade(
     private val txTemplates: TransactionTemplates,
     private val termService: TermService,
     private val termAgreementService: TermAgreementService,
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     /** 회원가입 가능 여부 체크. */
     @Transactional(readOnly = true)
@@ -56,11 +60,17 @@ class OAuthFacade(
             val createdUser = User.toEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
 
-            request.termAgreement.map { TermAgreement(uid = createdUser.id, termId = it) }
+            val termAgreements = request.termAgreement.map { TermAgreement(uid = createdUser.id, termId = it) }
                 .run { termAgreementService.saveAllSync(this) }
+
+            eventPublisher.publishEvent(TermAgreementHistoryCreateEvent(
+                termAgreements = termAgreements,
+                changeType = TermAgreementChangeType.AGREEMENT
+            ))
 
             createdUser
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_USER_ERROR)
+
 
         return generateTokenDto(user.id)
     }
