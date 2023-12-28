@@ -48,6 +48,13 @@ class LedgerResource(
         request = request
     ).wrapOk()
 
+    @Operation(summary = "장부 조회")
+    @GetMapping("/{id}")
+    suspend fun get(
+        user: AuthUser,
+        @PathVariable id: Long,
+    ) = ledgerFacade.get(user, id).wrapOk()
+
     @Operation(summary = "장부 검색")
     @GetMapping
     suspend fun search(

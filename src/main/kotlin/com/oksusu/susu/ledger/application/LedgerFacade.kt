@@ -1,5 +1,6 @@
 package com.oksusu.susu.ledger.application
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.category.application.CategoryAssignmentService
 import com.oksusu.susu.category.application.CategoryService
@@ -20,6 +21,7 @@ import com.oksusu.susu.ledger.model.LedgerModel
 import com.oksusu.susu.ledger.model.request.CreateAndUpdateLedgerRequest
 import com.oksusu.susu.ledger.model.request.SearchLedgerRequest
 import com.oksusu.susu.ledger.model.response.CreateAndUpdateLedgerResponse
+import com.oksusu.susu.ledger.model.response.LedgerDetailResponse
 import com.oksusu.susu.ledger.model.response.SearchLedgerResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
@@ -113,6 +115,22 @@ class LedgerFacade(
             category = category,
             customCategory = customCategory
         )
+    }
+
+    suspend fun get(user: AuthUser, id: Long): LedgerDetailResponse {
+        val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.id)
+
+        return parZip(
+            { categoryService.getCategory(categoryAssignment.categoryId) },
+            { envelopeService.countTotalAmountAndCount(id) }
+        ) { category, (_, totalAmounts, totalCounts) ->
+            LedgerDetailResponse(
+                ledger = LedgerModel.from(ledger),
+                category = CategoryWithCustomModel.of(category, categoryAssignment.customCategory),
+                totalAmounts = totalAmounts,
+                totalCounts = totalCounts
+            )
+        }
     }
 
     suspend fun search(
