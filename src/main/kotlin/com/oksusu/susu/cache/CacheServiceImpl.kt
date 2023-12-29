@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.DefaultTypedTuple
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Service
+import java.time.Duration
 
 @Service
 class CacheServiceImpl(
@@ -54,8 +55,8 @@ class CacheServiceImpl(
         zSetOps.remove(key, *members.toTypedArray()).awaitSingle()
     }
 
-    override suspend fun save(key: String, value: String) {
-        keyValueOps.set(key, value).awaitSingle()
+    override suspend fun save(key: String, value: String, ttl: Int) {
+        keyValueOps.set(key, value, Duration.ofSeconds(ttl.toLong())).awaitSingle()
     }
 
     override suspend fun findByKey(key: String): String? {

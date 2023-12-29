@@ -11,7 +11,7 @@ class SusuSpecificStatisticRepository(
         return cacheService.findByKey(key)
     }
 
-    suspend fun save(key: String, value: String) {
-        cacheService.save(key, value)
+    suspend fun save(key: String, value: String, ttl: Int) {
+        cacheService.save(key, value, ttl)
     }
 }

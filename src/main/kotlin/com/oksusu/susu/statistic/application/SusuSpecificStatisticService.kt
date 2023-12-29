@@ -1,6 +1,7 @@
 package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
+import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel
 import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificStatisticRepository
@@ -52,13 +53,13 @@ class SusuSpecificStatisticService(
             model.relationshipId
         )
         withContext(Dispatchers.IO) {
-            susuSpecificStatisticRepository.save(key, model.averageAmount.toString())
+            susuSpecificStatisticRepository.save(key, model.averageAmount.toString(), SUSU_STATISTIC_TTL)
         }
     }
 
     suspend fun save(key: String, value: Long) {
         withContext(Dispatchers.IO) {
-            susuSpecificStatisticRepository.save(key, value.toString())
+            susuSpecificStatisticRepository.save(key, value.toString(), SUSU_STATISTIC_TTL)
         }
     }
 
