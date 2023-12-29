@@ -3,6 +3,7 @@ package com.oksusu.susu.cache
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.domain.Range
 import org.springframework.data.redis.core.DefaultTypedTuple
 import org.springframework.data.redis.core.ReactiveRedisTemplate
@@ -14,6 +15,7 @@ class CacheServiceImpl(
     private val reactiveRedisTemplate: ReactiveRedisTemplate<String, String>,
 ) : CacheService {
     val zSetOps = reactiveRedisTemplate.opsForZSet()
+    val keyValueOps = reactiveRedisTemplate.opsForValue()
 
     override suspend fun <T> zSetSaveAll(key: String, tuples: Map<T, Long>) {
         val typedTuples = arrayListOf<ZSetOperations.TypedTuple<String>>()
@@ -50,5 +52,13 @@ class CacheServiceImpl(
 
     override suspend fun zSetDeleteByMemberIn(key: String, members: List<String>) {
         zSetOps.remove(key, *members.toTypedArray()).awaitSingle()
+    }
+
+    override suspend fun save(key: String, value: String) {
+        keyValueOps.set(key, value).awaitSingle()
+    }
+
+    override suspend fun findByKey(key: String): String? {
+        return keyValueOps.get(key).awaitSingleOrNull()
     }
 }

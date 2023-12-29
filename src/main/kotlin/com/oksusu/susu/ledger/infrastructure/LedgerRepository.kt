@@ -38,7 +38,10 @@ interface LedgerCustomRepository {
     fun findLedgerDetail(id: Long, uid: Long): LedgerDetailModel?
 
     @Transactional(readOnly = true)
-    fun countPerCategoryId(uid: Long): List<CountPerCategoryIdModel>
+    fun countPerCategoryId(): List<CountPerCategoryIdModel>
+
+    @Transactional(readOnly = true)
+    fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
 }
 
 class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySupport(Ledger::class.java) {
@@ -81,7 +84,23 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             ).fetchOne()
     }
 
-    override fun countPerCategoryId(uid: Long): List<CountPerCategoryIdModel> {
+    override fun countPerCategoryId(): List<CountPerCategoryIdModel> {
+        return JPAQuery<QLedger>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qLedger.id.count()
+                )
+            )
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            ).groupBy(qCategoryAssignment.categoryId)
+            .fetch()
+    }
+
+    override fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel> {
         return JPAQuery<QLedger>(entityManager)
             .select(
                 QCountPerCategoryIdModel(

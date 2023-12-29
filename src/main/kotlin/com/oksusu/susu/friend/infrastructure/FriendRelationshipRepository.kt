@@ -20,7 +20,10 @@ interface FriendRelationshipRepository : JpaRepository<FriendRelationship, Long>
 
 interface FriendRelationshipCustomRepository {
     @Transactional(readOnly = true)
-    suspend fun countPerRelationshipId(uid: Long): List<CountPerRelationshipIdModel>
+    suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel>
+
+    @Transactional(readOnly = true)
+    suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel>
 }
 
 class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepository, QuerydslRepositorySupport(Friend::class.java) {
@@ -37,7 +40,19 @@ class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepositor
     private val qCategory = QCategory.category
     private val qRelationShip = QRelationship.relationship
 
-    override suspend fun countPerRelationshipId(uid: Long): List<CountPerRelationshipIdModel> {
+    override suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
+        return JPAQuery<FriendRelationship>(entityManager)
+            .select(
+                QCountPerRelationshipIdModel(qRelationShip, qEnvelope.id.count())
+            ).from(qFriendRelationship)
+            .join(qFriend).on(qFriendRelationship.friendId.eq(qFriend.id))
+            .join(qRelationShip).on(qFriendRelationship.relationshipId.eq(qRelationShip.id))
+            .join(qEnvelope).on(qFriendRelationship.friendId.eq(qEnvelope.friendId))
+            .groupBy(qFriendRelationship.relationshipId)
+            .fetch()
+    }
+
+    override suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel> {
         return JPAQuery<FriendRelationship>(entityManager)
             .select(
                 QCountPerRelationshipIdModel(qRelationShip, qEnvelope.id.count())

@@ -17,9 +17,15 @@ class FriendRelationshipService(
         return friendRelationshipRepository.save(friendRelationship)
     }
 
-    suspend fun countPerRelationshipId(uid: Long): List<CountPerRelationshipIdModel> {
+    suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
         return withContext(Dispatchers.IO) {
-            friendRelationshipRepository.countPerRelationshipId(uid)
+            friendRelationshipRepository.countPerRelationshipId()
+        }
+    }
+
+    suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel> {
+        return withContext(Dispatchers.IO) {
+            friendRelationshipRepository.countPerRelationshipIdByUid(uid)
         }
     }
 }

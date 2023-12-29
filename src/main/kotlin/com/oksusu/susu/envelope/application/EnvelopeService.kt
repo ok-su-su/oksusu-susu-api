@@ -59,33 +59,53 @@ class EnvelopeService(
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
     }
 
-    suspend fun getMaxAmountByUidAndType(uid: Long, type: EnvelopeType): Long? {
+    suspend fun getMaxAmountByUidAndTypeByUid(uid: Long, type: EnvelopeType): Long? {
         return withContext(Dispatchers.IO) {
-            envelopeRepository.getMaxAmount(uid, type)
+            envelopeRepository.getMaxAmountByUid(uid, type)
         }
     }
 
-    suspend fun getMaxAmountEnvelopeInfo(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel? {
-        return getMaxAmountByUidAndType(uid, type)?.let { maxAmount ->
+    suspend fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel? {
+        return getMaxAmountByUidAndTypeByUid(uid, type)?.let { maxAmount ->
             withContext(Dispatchers.IO) {
-                envelopeRepository.findEnvelopeAndFriend(maxAmount, uid, type)
+                envelopeRepository.findEnvelopeAndFriendByUid(maxAmount, uid, type)
             }
         }
     }
 
-    suspend fun countPerHandedOverAtInLast8Month(uid: Long, type: EnvelopeType): List<CountPerHandedOverAtModel> {
+    suspend fun countPerHandedOverAtInLast8Month(type: EnvelopeType): List<CountPerHandedOverAtModel> {
         val from = LocalDate.now().minusMonths(7).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
         return withContext(Dispatchers.IO) {
-            envelopeRepository.countPerHandedOverAtBetween(uid, type, from, to)
+            envelopeRepository.countPerHandedOverAtBetween(type, from, to)
         }
     }
 
-    suspend fun countPerCategoryId(
+    suspend fun countPerHandedOverAtInLast8MonthByUid(uid: Long, type: EnvelopeType): List<CountPerHandedOverAtModel> {
+        val from = LocalDate.now().minusMonths(7).atTime(0, 0)
+        val to = LocalDate.now().atTime(23, 59)
+        return withContext(Dispatchers.IO) {
+            envelopeRepository.countPerHandedOverAtBetweenByUid(uid, type, from, to)
+        }
+    }
+
+    suspend fun countPerCategoryId(): List<CountPerCategoryIdModel> {
+        return withContext(Dispatchers.IO) {
+            envelopeRepository.countPerCategoryId()
+        }
+    }
+
+    suspend fun countPerCategoryIdByUid(
         uid: Long,
     ): List<CountPerCategoryIdModel> {
         return withContext(Dispatchers.IO) {
-            envelopeRepository.countPerCategoryId(uid)
+            envelopeRepository.countPerCategoryIdByUid(uid)
+        }
+    }
+
+    suspend fun countAvgAmountPerCategoryIdAndRelationshipIdAndBirth(): List<CountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel> {
+        return withContext(Dispatchers.IO) {
+            envelopeRepository.countAvgAmountPerCategoryIdAndRelationshipIdAndBirth()
         }
     }
 }

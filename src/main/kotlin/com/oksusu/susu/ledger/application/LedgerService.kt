@@ -50,9 +50,15 @@ class LedgerService(
         return withContext(Dispatchers.IO) { ledgerRepository.findLedgerDetail(id, uid) }
     }
 
-    suspend fun countPerCategoryId(uid: Long): List<CountPerCategoryIdModel> {
+    suspend fun countPerCategoryId(): List<CountPerCategoryIdModel> {
         return withContext(Dispatchers.IO) {
-            ledgerRepository.countPerCategoryId(uid)
+            ledgerRepository.countPerCategoryId()
+        }
+    }
+
+    suspend fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel> {
+        return withContext(Dispatchers.IO) {
+            ledgerRepository.countPerCategoryIdByUid(uid)
         }
     }
 }
