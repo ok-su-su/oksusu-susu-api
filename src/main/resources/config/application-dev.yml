@@ -28,6 +28,7 @@ spring:
   jackson:
     serialization:
       indent_output: true
+      write-null-map-values: true
   data:
     redis:
       host: localhost

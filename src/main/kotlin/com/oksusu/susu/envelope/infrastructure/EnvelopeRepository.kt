@@ -4,10 +4,9 @@ import com.oksusu.susu.category.domain.QCategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.QEnvelope
-import com.oksusu.susu.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
-import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailModel
-import com.oksusu.susu.envelope.infrastructure.model.QCountTotalAmountsAndCountsModel
-import com.oksusu.susu.envelope.infrastructure.model.QEnvelopeDetailModel
+import com.oksusu.susu.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.envelope.infrastructure.model.*
+import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.querydsl.jpa.impl.JPAQuery
@@ -18,6 +17,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepository {
@@ -40,6 +40,23 @@ interface EnvelopeCustomRepository {
 
     @Transactional(readOnly = true)
     fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel?
+
+    @Transactional(readOnly = true)
+    suspend fun getMaxAmount(uid: Long, type: EnvelopeType): Long?
+
+    @Transactional(readOnly = true)
+    suspend fun findEnvelopeAndFriend(maxAmount: Long, uid: Long, type: EnvelopeType): EnvelopeAndFriendModel?
+
+    @Transactional(readOnly = true)
+    suspend fun countPerHandedOverAtBetween(
+        uid: Long,
+        type: EnvelopeType,
+        from: LocalDateTime,
+        to: LocalDateTime,
+    ): List<CountPerHandedOverAtModel>
+
+    @Transactional(readOnly = true)
+    suspend fun countPerCategoryId(uid: Long): List<CountPerCategoryIdModel>
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -100,5 +117,75 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 qEnvelope.uid.eq(uid),
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             ).fetchFirst()
+    }
+
+    override suspend fun getMaxAmount(uid: Long, type: EnvelopeType): Long? {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                qEnvelope.amount.max()
+            ).from(qEnvelope)
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.uid.eq(uid),
+                qEnvelope.type.eq(type),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            ).fetchFirst()
+    }
+
+    override suspend fun findEnvelopeAndFriend(maxAmount: Long, uid: Long, type: EnvelopeType): EnvelopeAndFriendModel? {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QEnvelopeAndFriendModel(
+                    qEnvelope,
+                    qFriend
+                )
+            ).from(qEnvelope)
+            .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.uid.eq(uid),
+                qEnvelope.type.eq(type),
+                qEnvelope.amount.eq(maxAmount),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            ).fetchFirst()
+    }
+
+    override suspend fun countPerHandedOverAtBetween(
+        uid: Long,
+        type: EnvelopeType,
+        from: LocalDateTime,
+        to: LocalDateTime,
+    ): List<CountPerHandedOverAtModel> {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QCountPerHandedOverAtModel(
+                    qEnvelope.handedOverAt.month(),
+                    qEnvelope.id.count()
+                )
+            ).from(qEnvelope)
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.uid.eq(uid),
+                qEnvelope.type.eq(type),
+                qEnvelope.handedOverAt.between(from, to),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            ).groupBy(qEnvelope.handedOverAt.month())
+            .fetch()
+    }
+
+    override suspend fun countPerCategoryId(uid: Long): List<CountPerCategoryIdModel> {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qEnvelope.id.count()
+                )
+            ).from(qEnvelope)
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.uid.eq(uid),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            ).groupBy(qCategoryAssignment.categoryId)
+            .fetch()
     }
 }

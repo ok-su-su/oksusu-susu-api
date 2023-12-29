@@ -1,5 +1,6 @@
 package com.oksusu.susu.ledger.application
 
+import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.ledger.domain.Ledger
@@ -47,5 +48,11 @@ class LedgerService(
 
     suspend fun findLedgerDetailOrNull(id: Long, uid: Long): LedgerDetailModel? {
         return withContext(Dispatchers.IO) { ledgerRepository.findLedgerDetail(id, uid) }
+    }
+
+    suspend fun countPerCategoryId(uid: Long): List<CountPerCategoryIdModel> {
+        return withContext(Dispatchers.IO) {
+            ledgerRepository.countPerCategoryId(uid)
+        }
     }
 }
