@@ -6,7 +6,6 @@ import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.QEnvelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.*
-import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.oksusu.susu.user.domain.QUser
@@ -70,7 +69,7 @@ interface EnvelopeCustomRepository {
     suspend fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
 
     @Transactional(readOnly = true)
-    suspend fun countAvgAmountPerCategoryIdAndRelationshipIdAndBirth(): List<CountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel>
+    suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel>
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -244,10 +243,10 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override suspend fun countAvgAmountPerCategoryIdAndRelationshipIdAndBirth(): List<CountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel> {
+    override suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
-                QCountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel(
+                QCountAvgAmountPerStatisticGroupModel(
                     qCategoryAssignment.categoryId,
                     qFriendRelationship.relationshipId,
                     qUser.birth.year().castToNum(Long::class.java),

@@ -103,9 +103,9 @@ class EnvelopeService(
         }
     }
 
-    suspend fun countAvgAmountPerCategoryIdAndRelationshipIdAndBirth(): List<CountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel> {
+    suspend fun countAvgAmountPerCategoryIdAndRelationshipIdAndBirth(): List<CountAvgAmountPerStatisticGroupModel> {
         return withContext(Dispatchers.IO) {
-            envelopeRepository.countAvgAmountPerCategoryIdAndRelationshipIdAndBirth()
+            envelopeRepository.countAvgAmountPerStatisticGroup()
         }
     }
 }

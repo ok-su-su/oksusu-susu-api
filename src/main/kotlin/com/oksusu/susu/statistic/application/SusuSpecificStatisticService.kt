@@ -2,7 +2,7 @@ package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
-import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel
+import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificStatisticRepository
 import com.oksusu.susu.statistic.model.SusuSpecificStatisticModel
@@ -43,7 +43,7 @@ class SusuSpecificStatisticService(
         }
     }
 
-    suspend fun save(model: CountAvgAmountPerCategoryIdAndRelationshipIdAndBirthModel) {
+    suspend fun save(model: CountAvgAmountPerStatisticGroupModel) {
         val key = generateStatisticKey(
             model.birth.toAgeGroup(),
             model.categoryId,

@@ -3,6 +3,8 @@ package com.oksusu.susu.batch.job
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
+import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.ledger.application.LedgerService
 import com.oksusu.susu.statistic.application.SusuBasicStatisticService
@@ -63,26 +65,44 @@ class RefreshSusuStatistic(
 
                 // 평균 수수 레디스 저장
                 // key: age_categoryId_relationshipId, value: avg
-                avgAmountModels.map { avgAmountModel ->
-                    async { susuSpecificStatisticService.save(avgAmountModel) }
+                parseIntoGroup(avgAmountModels).map { model ->
+                    async { susuSpecificStatisticService.save(model.key, model.value) }
                 }
 
                 // key: category_categoryId, value: avg
                 avgAmountModels.groupBy { it.categoryId }.map { modelsMap ->
                     val key = "category_" + modelsMap.key.toString()
-                    val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount }
+                    val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
                     async { susuSpecificStatisticService.save(key, avgAmount) }
                 }
 
                 // key: relationship_relationshipId, value: avg
                 avgAmountModels.groupBy { it.relationshipId }.map { modelsMap ->
                     val key = "relationship_" + modelsMap.key.toString()
-                    val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount }
+                    val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
                     async { susuSpecificStatisticService.save(key, avgAmount) }
                 }
             }
 
             logger.info { "end susu statistic refresh" }
         }
+    }
+
+    fun parseIntoGroup(avgAmountModels: List<CountAvgAmountPerStatisticGroupModel>): Map<String, Long> {
+        val ages = avgAmountModels.groupBy { it.birth.toAgeGroup() }
+
+        val ageCategorys = ages.flatMap { age ->
+            val ageCategories = age.value.groupBy { it.categoryId }
+            ageCategories.map { ageCategory ->
+                "${age.key}_${ageCategory.key}" to ageCategory.value
+            }
+        }.associate { ageCategory -> ageCategory.first to ageCategory.second }
+
+        return ageCategorys.flatMap { ageCategory ->
+            val groups = ageCategory.value.groupBy { it.relationshipId }
+            groups.map { group ->
+                "${ageCategory.key}_${group.key}" to ageCategory.value
+            }
+        }.associate { group -> group.first to group.second.sumOf { it.averageAmount } / group.second.size }
     }
 }
