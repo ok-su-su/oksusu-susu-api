@@ -46,12 +46,15 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     FAIL_TO_CREATE_ENVELOPE_ERROR(HttpStatus.BAD_REQUEST, "봉투 생성을 실패했습니다."),
     NOT_FOUND_ENVELOPE_ERROR(HttpStatus.NOT_FOUND, "봉투 정보를 찾을 수 없습니다."),
 
-    /** Community Error Code */
-    NOT_FOUND_COMMUNITY_ERROR(HttpStatus.NOT_FOUND, "커뮤니티 정보를 찾을 수 없습니다."),
+    /** Post Error Code */
+    NOT_FOUND_POST_ERROR(HttpStatus.NOT_FOUND, "게시글 정보를 찾을 수 없습니다."),
     INVALID_VOTE_OPTION_SEQUENCE(HttpStatus.BAD_REQUEST, "투표 옵션 순서가 잘못되었습니다."),
-    FAIL_TO_CREATE_COMMUNITY_ERROR(HttpStatus.BAD_REQUEST, "커뮤니티 생성을 실패했습니다."),
+    FAIL_TO_CREATE_POST_ERROR(HttpStatus.BAD_REQUEST, "게시글 생성을 실패했습니다."),
     NOT_FOUND_VOTE_ERROR(HttpStatus.NOT_FOUND, "투표 정보를 찾을 수 없습니다."),
     DUPLICATED_VOTE_ERROR(HttpStatus.NOT_FOUND, "중복 투표를 할 수 없습니다."),
+
+    /** Post Category Error Code */
+    NOT_FOUND_POST_CATEGORY_ERROR(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
 
     /** Term Error Code */
     NOT_FOUND_TERM_ERROR(HttpStatus.NOT_FOUND, "약관 정보를 찾을 수 없습니다."),
