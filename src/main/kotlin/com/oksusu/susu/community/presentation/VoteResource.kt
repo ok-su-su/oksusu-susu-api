@@ -4,7 +4,6 @@ import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.community.application.VoteFacade
 import com.oksusu.susu.community.model.request.CreateVoteHistoryRequest
-import com.oksusu.susu.community.model.request.CreateVoteRequest
 import com.oksusu.susu.community.model.vo.VoteSortRequest
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
@@ -22,12 +21,12 @@ import org.springframework.web.bind.annotation.*
 class VoteResource(
     private val voteFacade: VoteFacade,
 ) {
-    @Operation(summary = "투표 생성")
-    @PostMapping
-    suspend fun createVote(
-        user: AuthUser,
-        @RequestBody request: CreateVoteRequest,
-    ) = voteFacade.createVote(user, request).wrapCreated()
+//    @Operation(summary = "투표 생성")
+//    @PostMapping
+//    suspend fun createVote(
+//        user: AuthUser,
+//        @RequestBody request: CreateVoteRequest,
+//    ) = voteFacade.createVote(user, request).wrapCreated()
 
     /** 카테고리 전체 검색 : 0 */
     @Operation(summary = "투표 검색")
@@ -38,12 +37,12 @@ class VoteResource(
         @ParameterObject sliceRequest: SusuPageRequest,
     ) = voteFacade.getAllVotes(user, sortRequest, sliceRequest).wrapSlice()
 
-    @Operation(summary = "투표 하나 검색")
-    @GetMapping("/{id}")
-    suspend fun getVote(
-        user: AuthUser,
-        @PathVariable id: Long,
-    ) = voteFacade.getVote(user, id).wrapOk()
+//    @Operation(summary = "투표 하나 검색")
+//    @GetMapping("/{id}")
+//    suspend fun getVote(
+//        user: AuthUser,
+//        @PathVariable id: Long,
+//    ) = voteFacade.getVote(user, id).wrapOk()
 
     @Operation(summary = "투표하기")
     @PostMapping("/{id}")

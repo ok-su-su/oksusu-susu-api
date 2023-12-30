@@ -8,10 +8,10 @@ import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.common.util.Quad
-import com.oksusu.susu.community.domain.Community
+import com.oksusu.susu.community.domain.Post
 import com.oksusu.susu.community.domain.VoteHistory
 import com.oksusu.susu.community.domain.VoteOption
-import com.oksusu.susu.community.domain.vo.CommunityType
+import com.oksusu.susu.community.domain.vo.PostType
 import com.oksusu.susu.community.domain.vo.VoteOptionSummary
 import com.oksusu.susu.community.domain.vo.VoteSummary
 import com.oksusu.susu.community.model.VoteCountModel
@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class VoteFacade(
     private val txTemplates: TransactionTemplates,
-    private val communityService: CommunityService,
+    private val postService: PostService,
     private val voteService: VoteService,
     private val voteOptionService: VoteOptionService,
     private val voteSummaryService: VoteSummaryService,
@@ -59,24 +59,25 @@ class VoteFacade(
         voteOptionService.validateSeq(request.options)
 
         val response = txTemplates.writer.executeWithContext {
-            val createdCommunity = Community(
+            val createdPost = Post(
                 uid = user.id,
-                type = CommunityType.VOTE,
-                content = request.content
-            ).run { communityService.saveSync(this) }
+                type = PostType.VOTE,
+                content = request.content,
+                postCategoryId = 1
+            ).run { postService.saveSync(this) }
 
             val optionModels = request.options.map { option ->
-                VoteOption.of(option, createdCommunity.id)
+                VoteOption.of(option, createdPost.id)
             }.run { voteOptionService.saveAllSync(this) }
                 .map { option -> VoteOptionModel.from(option) }
 
             CategoryAssignment(
-                targetId = createdCommunity.id,
+                targetId = createdPost.id,
                 targetType = CategoryAssignmentType.COMMUNITY,
                 categoryId = request.categoryId
             ).run { categoryAssignmentService.saveSync(this) }
 
-            CreateVoteResponse.of(createdCommunity, optionModels, categoryService.getCategory(request.categoryId))
+            CreateVoteResponse.of(createdPost, optionModels, categoryService.getCategory(request.categoryId))
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_COMMUNITY_ERROR)
 
         parZip(
@@ -132,7 +133,7 @@ class VoteFacade(
         sortRequest: VoteSortRequest,
         uid: Long,
         pageRequest: SusuPageRequest,
-    ): Slice<Community> {
+    ): Slice<Post> {
         return voteService.getAllVotes(
             sortRequest.mine,
             uid,
@@ -145,7 +146,7 @@ class VoteFacade(
         sortRequest: VoteSortRequest,
         uid: Long,
         pageRequest: SusuPageRequest,
-    ): Slice<Community> {
+    ): Slice<Post> {
         val from = pageRequest.page!! * pageRequest.size!!
         val to = from + pageRequest.size
         val summaries = voteSummaryService.getSummaryBetween(from, to)
@@ -162,7 +163,7 @@ class VoteFacade(
     @Transactional(readOnly = true)
     suspend fun getVote(user: AuthUser, id: Long): VoteAndOptionsWithCountResponse {
         val voteInfos = voteService.getVoteAndOptions(id)
-        val vote = voteInfos[0].community
+        val vote = voteInfos[0].post
         val options = voteInfos.map { it.voteOption }
         val (creator, voteSummary, optionSummaries, categoryAssignment) = parZip(
             Dispatchers.IO,
@@ -245,7 +246,7 @@ class VoteFacade(
 
         return summaries.map { summary ->
             VoteWithCountResponse.of(
-                community = votes.first { vote -> vote.id == summary.communityId },
+                post = votes.first { vote -> vote.id == summary.communityId },
                 summary = summary,
                 category = categoryService.getCategory(
                     categoryAssignments.first { it.targetId == summary.communityId }.categoryId

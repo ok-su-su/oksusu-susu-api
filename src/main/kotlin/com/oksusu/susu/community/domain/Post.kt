@@ -1,19 +1,22 @@
 package com.oksusu.susu.community.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
-import com.oksusu.susu.community.domain.vo.CommunityType
+import com.oksusu.susu.community.domain.vo.PostType
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "community")
-class Community(
+@Table(name = "post")
+class Post(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
     val uid: Long,
 
-    val type: CommunityType,
+    @Column(name = "post_category_id")
+    val postCategoryId: Long,
+
+    val type: PostType,
 
     val title: String? = null,
 

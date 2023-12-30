@@ -1,7 +1,7 @@
 package com.oksusu.susu.community.model.response
 
 import com.oksusu.susu.category.model.CategoryModel
-import com.oksusu.susu.community.domain.Community
+import com.oksusu.susu.community.domain.Post
 import com.oksusu.susu.community.model.VoteOptionModel
 
 class VoteAndOptionsResponse(
@@ -12,7 +12,7 @@ class VoteAndOptionsResponse(
     val options: List<VoteOptionModel>,
 ) {
     companion object {
-        fun of(vote: Community, options: List<VoteOptionModel>, category: CategoryModel): VoteAndOptionsResponse {
+        fun of(vote: Post, options: List<VoteOptionModel>, category: CategoryModel): VoteAndOptionsResponse {
             return VoteAndOptionsResponse(
                 id = vote.id,
                 uid = vote.uid,

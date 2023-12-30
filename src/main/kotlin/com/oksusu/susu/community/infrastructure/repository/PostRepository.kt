@@ -2,14 +2,13 @@ package com.oksusu.susu.community.infrastructure.repository
 
 import com.oksusu.susu.category.domain.QCategoryAssignment
 import com.oksusu.susu.common.consts.DEFAULT_CATEGORY_ID
-import com.oksusu.susu.community.domain.Community
-import com.oksusu.susu.community.domain.QCommunity
+import com.oksusu.susu.community.domain.Post
+import com.oksusu.susu.community.domain.QPost
 import com.oksusu.susu.community.domain.QVoteOption
-import com.oksusu.susu.community.domain.vo.CommunityType
-import com.oksusu.susu.community.infrastructure.repository.model.CommunityAndVoteOptionModel
-import com.oksusu.susu.community.infrastructure.repository.model.QCommunityAndVoteOptionModel
+import com.oksusu.susu.community.domain.vo.PostType
+import com.oksusu.susu.community.infrastructure.repository.model.PostAndVoteOptionModel
+import com.oksusu.susu.community.infrastructure.repository.model.QPostAndVoteOptionModel
 import com.oksusu.susu.extension.executeSlice
-import com.oksusu.susu.friend.domain.QFriend
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,27 +21,27 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface CommunityRepository : JpaRepository<Community, Long>, CommunityCustomRepository {
+interface PostRepository : JpaRepository<Post, Long>, PostCustomRepository {
     @Transactional(readOnly = true)
     fun findAllByIsActiveAndTypeOrderByCreatedAtDesc(
         isActive: Boolean,
-        type: CommunityType,
+        type: PostType,
         toDefault: Pageable,
-    ): Slice<Community>
+    ): Slice<Post>
 
     @Transactional(readOnly = true)
-    fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: CommunityType): Community?
+    fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: PostType): Post?
 
     @Transactional(readOnly = true)
-    fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: CommunityType, ids: List<Long>): List<Community>
+    fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: PostType, ids: List<Long>): List<Post>
 
     @Transactional(readOnly = true)
-    fun countAllByIsActiveAndType(isActive: Boolean, type: CommunityType): Long
+    fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long
 }
 
-interface CommunityCustomRepository {
+interface PostCustomRepository {
     @Transactional(readOnly = true)
-    fun getVoteAndOptions(id: Long): List<CommunityAndVoteOptionModel>
+    fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel>
 
     @Transactional(readOnly = true)
     fun getAllVotes(
@@ -50,7 +49,7 @@ interface CommunityCustomRepository {
         uid: Long,
         categoryId: Long,
         pageable: Pageable,
-    ): Slice<Community>
+    ): Slice<Post>
 
     @Transactional(readOnly = true)
     fun getAllVotesOrderByPopular(
@@ -58,29 +57,29 @@ interface CommunityCustomRepository {
         uid: Long,
         categoryId: Long,
         ids: List<Long>,
-    ): List<Community>
+    ): List<Post>
 }
 
-class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslRepositorySupport(Community::class.java) {
+class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport(Post::class.java) {
     @Autowired
     @Qualifier("susuEntityManager")
     override fun setEntityManager(entityManager: EntityManager) {
         super.setEntityManager(entityManager)
     }
 
-    private val qCommunity = QCommunity.community
+    private val qPost = QPost.post
     private val qVoteOption = QVoteOption.voteOption
     private val qCategoryAssignment = QCategoryAssignment.categoryAssignment
 
-    override fun getVoteAndOptions(id: Long): List<CommunityAndVoteOptionModel> {
-        return JPAQuery<QCommunity>(entityManager)
-            .select(QCommunityAndVoteOptionModel(qCommunity, qVoteOption))
-            .from(qCommunity)
-            .leftJoin(qVoteOption).on(qCommunity.id.eq(qVoteOption.communityId))
+    override fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
+        return JPAQuery<QPost>(entityManager)
+            .select(QPostAndVoteOptionModel(qPost, qVoteOption))
+            .from(qPost)
+            .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.communityId))
             .where(
-                qCommunity.id.eq(id),
-                qCommunity.isActive.eq(true),
-                qCommunity.type.eq(CommunityType.VOTE)
+                qPost.id.eq(id),
+                qPost.isActive.eq(true),
+                qPost.type.eq(PostType.VOTE)
             ).fetch()
     }
 
@@ -89,20 +88,20 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
         uid: Long,
         categoryId: Long,
         pageable: Pageable,
-    ): Slice<Community> {
-        val uidFilter = qCommunity.uid.eq(uid).takeIf { isMine }
+    ): Slice<Post> {
+        val uidFilter = qPost.uid.eq(uid).takeIf { isMine }
         val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
 
-        val query = JPAQuery<QFriend>(entityManager)
-            .select(qCommunity)
-            .from(qCommunity)
-            .leftJoin(qCategoryAssignment).on(qCommunity.id.eq(qCategoryAssignment.targetId))
+        val query = JPAQuery<QPost>(entityManager)
+            .select(qPost)
+            .from(qPost)
+            .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
             .where(
-                qCommunity.isActive.eq(true),
+                qPost.isActive.eq(true),
                 uidFilter,
                 categoryFilter
             ).orderBy(
-                qCommunity.createdAt.desc()
+                qPost.createdAt.desc()
             )
 
         return querydsl.executeSlice(query, pageable)
@@ -113,17 +112,17 @@ class CommunityCustomRepositoryImpl : CommunityCustomRepository, QuerydslReposit
         uid: Long,
         categoryId: Long,
         ids: List<Long>,
-    ): List<Community> {
-        val uidFilter = qCommunity.uid.eq(uid).takeIf { isMine }
+    ): List<Post> {
+        val uidFilter = qPost.uid.eq(uid).takeIf { isMine }
         val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
 
-        return JPAQuery<QCommunity>(entityManager)
-            .select(qCommunity)
-            .from(qCommunity)
-            .leftJoin(qCategoryAssignment).on(qCommunity.id.eq(qCategoryAssignment.targetId))
+        return JPAQuery<QPost>(entityManager)
+            .select(qPost)
+            .from(qPost)
+            .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
             .where(
-                qCommunity.isActive.eq(true),
-                qCommunity.id.`in`(ids),
+                qPost.isActive.eq(true),
+                qPost.id.`in`(ids),
                 uidFilter,
                 categoryFilter
             )

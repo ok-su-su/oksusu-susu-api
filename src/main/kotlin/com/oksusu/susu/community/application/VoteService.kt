@@ -1,10 +1,10 @@
 package com.oksusu.susu.community.application
 
 import arrow.fx.coroutines.parZip
-import com.oksusu.susu.community.domain.Community
-import com.oksusu.susu.community.domain.vo.CommunityType
-import com.oksusu.susu.community.infrastructure.repository.CommunityRepository
-import com.oksusu.susu.community.infrastructure.repository.model.CommunityAndVoteOptionModel
+import com.oksusu.susu.community.domain.Post
+import com.oksusu.susu.community.domain.vo.PostType
+import com.oksusu.susu.community.infrastructure.repository.PostRepository
+import com.oksusu.susu.community.infrastructure.repository.model.PostAndVoteOptionModel
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NoAuthorityException
@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class VoteService(
-    private val communityService: CommunityService,
-    private val communityRepository: CommunityRepository,
+    private val postService: PostService,
+    private val postRepository: PostRepository,
     private val txTemplates: TransactionTemplates,
 ) {
     val logger = mu.KotlinLogging.logger { }
@@ -30,20 +30,20 @@ class VoteService(
         uid: Long,
         categoryId: Long,
         pageable: Pageable,
-    ): Slice<Community> {
+    ): Slice<Post> {
         return withContext(Dispatchers.IO) {
-            communityRepository.getAllVotes(isMine, uid, categoryId, pageable)
+            postRepository.getAllVotes(isMine, uid, categoryId, pageable)
         }
     }
 
-    suspend fun getVote(id: Long): Community {
-        return communityService.findByIdAndIsActiveAndTypeOrThrow(id, true, CommunityType.VOTE)
+    suspend fun getVote(id: Long): Post {
+        return postService.findByIdAndIsActiveAndTypeOrThrow(id, true, PostType.VOTE)
     }
 
-    suspend fun getVoteAndOptions(id: Long): List<CommunityAndVoteOptionModel> {
+    suspend fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
         return withContext(Dispatchers.IO) {
-            communityRepository.getVoteAndOptions(id)
-        }.takeUnless { it.isNullOrEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
+            postRepository.getVoteAndOptions(id)
+        }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
     }
 
     suspend fun softDeleteVote(uid: Long, id: Long) {
@@ -56,12 +56,12 @@ class VoteService(
         vote.apply { isActive = false }
 
         txTemplates.writer.executeWithContext {
-            communityService.saveSync(vote)
+            postService.saveSync(vote)
         }
     }
 
-    suspend fun getAllVotesByIdIn(communityIds: List<Long>): List<Community> {
-        return communityService.findByIsActiveAndTypeAndIdIn(true, CommunityType.VOTE, communityIds)
+    suspend fun getAllVotesByIdIn(communityIds: List<Long>): List<Post> {
+        return postService.findByIsActiveAndTypeAndIdIn(true, PostType.VOTE, communityIds)
     }
 
     suspend fun getAllVotesOrderByPopular(
@@ -70,10 +70,10 @@ class VoteService(
         categoryId: Long,
         ids: List<Long>,
         pageable: Pageable,
-    ): Slice<Community> {
+    ): Slice<Post> {
         val (votes, totalCount) = parZip(
             Dispatchers.IO,
-            { communityRepository.getAllVotesOrderByPopular(isMine, uid, categoryId, ids) },
+            { postRepository.getAllVotesOrderByPopular(isMine, uid, categoryId, ids) },
             { getActiveVoteCount() },
             { a, b -> a to b }
         )
@@ -85,6 +85,6 @@ class VoteService(
     }
 
     suspend fun getActiveVoteCount(): Long {
-        return communityService.countAllByIsActiveAndType(true, CommunityType.VOTE)
+        return postService.countAllByIsActiveAndType(true, PostType.VOTE)
     }
 }

@@ -1,7 +1,7 @@
 package com.oksusu.susu.community.model.response
 
 import com.oksusu.susu.category.model.CategoryModel
-import com.oksusu.susu.community.domain.Community
+import com.oksusu.susu.community.domain.Post
 import com.oksusu.susu.community.domain.vo.VoteSummary
 
 class VoteWithCountResponse(
@@ -11,11 +11,11 @@ class VoteWithCountResponse(
     val count: Int,
 ) {
     companion object {
-        fun of(community: Community, summary: VoteSummary, category: CategoryModel): VoteWithCountResponse {
+        fun of(post: Post, summary: VoteSummary, category: CategoryModel): VoteWithCountResponse {
             return VoteWithCountResponse(
-                id = community.id,
+                id = post.id,
                 category = category.name,
-                content = community.content,
+                content = post.content,
                 count = summary.count
             )
         }
