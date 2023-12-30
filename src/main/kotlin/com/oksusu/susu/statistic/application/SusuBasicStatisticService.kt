@@ -1,8 +1,14 @@
 package com.oksusu.susu.statistic.application
 
+import com.oksusu.susu.category.application.CategoryService
+import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
+import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
 import com.oksusu.susu.extension.toClockEpochMilli
+import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicStatisticRepository
+import com.oksusu.susu.statistic.model.SusuBasicStatisticModel
+import com.oksusu.susu.statistic.model.TitleValueModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
@@ -12,8 +18,65 @@ import java.time.LocalDateTime
 @Service
 class SusuBasicStatisticService(
     private val susuBasicStatisticRepository: SusuBasicStatisticRepository,
+    private val categoryService: CategoryService,
 ) {
     val logger = mu.KotlinLogging.logger { }
+
+    suspend fun constructBasicStatistic(
+        envelopHandOverAtMonthCount: List<CountPerHandedOverAtModel>,
+        relationShipConuts: List<CountPerRelationshipIdModel>,
+        envelopeCategoryCounts: List<CountPerCategoryIdModel>,
+        ledgerCategoryCounts: List<CountPerCategoryIdModel>,
+    ): SusuBasicStatistic {
+        // 최근 사용 금액
+        val envelopHandOverAtMonthCountModel = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
+            ?.map { count -> TitleValueModel(count.handedOverAtMonth.toString(), count.totalCounts) }
+
+        // 경조사비를 가장 많이 쓴 달
+        val mostSpentMonth = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
+            ?.maxBy { it.totalCounts }
+            ?.handedOverAtMonth!!.toLong()
+
+        // 최다 수수 관계
+        val relationShipIdConutModel = relationShipConuts.takeIf { it.isNotEmpty() }
+            ?.maxBy { it.totalCounts }
+            ?.run {
+                TitleValueModel(
+                    title = this.relationship.relation,
+                    value = this.totalCounts
+                )
+            }
+
+        // 최다 수수 경조사
+        val categoryIdSet = envelopeCategoryCounts.map { count -> count.categoryId }.toSet()
+            .union(ledgerCategoryCounts.map { count -> count.categoryId })
+        val categoryCounts = categoryIdSet.map { id ->
+            val envelopeCount = envelopeCategoryCounts.firstOrNull { it.categoryId == id }
+                ?.totalCounts ?: 0L
+            val ledgerCount = ledgerCategoryCounts.firstOrNull { it.categoryId == id }
+                ?.totalCounts ?: 0L
+            CountPerCategoryIdModel(
+                categoryId = id,
+                totalCounts = envelopeCount + ledgerCount
+            )
+        }
+        val categotyMaxCountModel = categoryCounts.takeIf { it.isNotEmpty() }
+            ?.maxBy { it.totalCounts }
+            ?.let {
+                val category = categoryService.getCategory(it.categoryId)
+                TitleValueModel(title = category.name, value = it.totalCounts)
+            }
+
+        return SusuBasicStatistic.from(
+            id = LocalDateTime.now().toClockEpochMilli(),
+            statistic = SusuBasicStatisticModel(
+                recentSpent = envelopHandOverAtMonthCountModel,
+                mostSpentMonth = mostSpentMonth,
+                relationship = relationShipIdConutModel,
+                category = categotyMaxCountModel
+            )
+        )
+    }
 
     suspend fun getLatestSusuBasicStatistic(): SusuBasicStatistic {
         val id = LocalDateTime.now().toClockEpochMilli()

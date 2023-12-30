@@ -1,5 +1,6 @@
 package com.oksusu.susu.config
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,8 +17,7 @@ class JacksonConfig {
         return Jackson2ObjectMapperBuilderCustomizer { builder: Jackson2ObjectMapperBuilder ->
             builder
                 .failOnUnknownProperties(false)
-            // 이거 설정해두면 널 값이 response에 표기되지 않아서 주석처리 했습니다
-//                .serializationInclusion(JsonInclude.Include.NON_ABSENT)
+                .serializationInclusion(JsonInclude.Include.NON_ABSENT)
         }
     }
 }
