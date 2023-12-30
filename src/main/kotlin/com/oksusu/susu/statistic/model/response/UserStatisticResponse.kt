@@ -1,6 +1,7 @@
 package com.oksusu.susu.statistic.model.response
 
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
+import com.oksusu.susu.statistic.domain.UserStatistic
 import com.oksusu.susu.statistic.model.TitleValueModel
 
 class UserStatisticResponse(
@@ -24,12 +25,23 @@ class UserStatisticResponse(
             sentMaxAmountModel: TitleValueModel?,
         ): UserStatisticResponse {
             return UserStatisticResponse(
-                recentSpent = basicStatistic.statistic.recentSpent,
-                mostSpentMonth = basicStatistic.statistic.mostSpentMonth,
-                mostRelationship = basicStatistic.statistic.relationship,
-                mostCategory = basicStatistic.statistic.category,
+                recentSpent = basicStatistic.recentSpent,
+                mostSpentMonth = basicStatistic.mostSpentMonth,
+                mostRelationship = basicStatistic.relationship,
+                mostCategory = basicStatistic.category,
                 highestAmountReceived = receivedMaxAmountModel,
                 highestAmountSent = sentMaxAmountModel
+            )
+        }
+
+        fun from(userStatistic: UserStatistic): UserStatisticResponse {
+            return UserStatisticResponse(
+                recentSpent = userStatistic.recentSpent,
+                mostSpentMonth = userStatistic.mostSpentMonth,
+                mostRelationship = userStatistic.mostRelationship,
+                mostCategory = userStatistic.mostCategory,
+                highestAmountReceived = userStatistic.highestAmountReceived,
+                highestAmountSent = userStatistic.highestAmountSent
             )
         }
     }

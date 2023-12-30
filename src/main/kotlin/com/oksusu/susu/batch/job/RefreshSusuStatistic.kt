@@ -12,7 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
 
+@Component
 class RefreshSusuStatistic(
     private val envelopeService: EnvelopeService,
     private val friendRelationshipService: FriendRelationshipService,
@@ -23,7 +25,7 @@ class RefreshSusuStatistic(
     val logger = mu.KotlinLogging.logger { }
 
     @Scheduled(
-        cron = "0 0 * * * *",
+        fixedRate = 1000 * 60 * 60,
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-susu-statistic.initial-delay:100}"
     )
     fun refreshSusuStatistic() {

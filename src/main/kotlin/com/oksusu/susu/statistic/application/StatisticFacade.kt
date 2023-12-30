@@ -1,12 +1,10 @@
 package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
-import com.oksusu.susu.extension.toJson
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.ledger.application.LedgerService
@@ -32,9 +30,9 @@ class StatisticFacade(
 
     suspend fun getUserStatistic(user: AuthUser): UserStatisticResponse {
         // caching 된거 확인
-        userStatisticService.findByIdOrNull(user.id)?.run {
+        userStatisticService.getStatisticOrNull(user.id)?.run {
             logger.debug { "${user.id} user statistic cache hit" }
-            return this.userStatisticResponse
+            return UserStatisticResponse.from(this)
         }
 
         val userStatisticResponse = parZip(
@@ -61,10 +59,10 @@ class StatisticFacade(
 
             // 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사
             val basicStatistic = susuBasicStatisticService.constructBasicStatistic(
-                envelopHandOverAtMonthCount,
-                relationShipConuts,
-                envelopeCategoryCounts,
-                ledgerCategoryCounts
+                envelopHandOverAtMonthCount = envelopHandOverAtMonthCount,
+                relationShipConuts = relationShipConuts,
+                envelopeCategoryCounts = envelopeCategoryCounts,
+                ledgerCategoryCounts = ledgerCategoryCounts
             )
 
             // 가장 많이 받은 금액
@@ -76,31 +74,32 @@ class StatisticFacade(
                 sentMaxAmount?.run { TitleValueModel(title = this.friend.name, value = this.envelope.amount) }
 
             UserStatisticResponse.of(
-                basicStatistic,
-                receivedMaxAmountModel,
-                sentMaxAmountModel
+                basicStatistic = basicStatistic,
+                receivedMaxAmountModel = receivedMaxAmountModel,
+                sentMaxAmountModel = sentMaxAmountModel
             )
         }
 
-        UserStatistic.from(user.id, userStatisticResponse).run { userStatisticService.save(this) }
+        UserStatistic.from(userStatisticResponse).run {
+            userStatisticService.save(uid = user.id, userStatistic = this)
+        }
 
-        logger.info { jacksonObjectMapper().readValue(userStatisticResponse.toJson(), UserStatisticResponse::class.java) }
         return userStatisticResponse
     }
 
     suspend fun getSusuStatistic(requestParam: SusuStatisticRequest): SusuStatisticResponse {
         return parZip(
-            { susuSpecificStatisticService.getLatestSusuSpecificStatistic(requestParam) },
-            { susuBasicStatisticService.getLatestSusuBasicStatistic() }
+            { susuSpecificStatisticService.getSusuSpecificStatistic(requestParam) },
+            { susuBasicStatisticService.getStatisticOrThrow() }
         ) { tempSpecific, basic ->
             val specific = tempSpecific.apply {
-                this.averageCategory?.apply { title = categoryService.getCategory(requestParam.category).name }
+                this.averageCategory?.apply { title = categoryService.getCategory(requestParam.postCategoryId).name }
                 this.averageRelationship?.apply {
                     title =
-                        relationshipService.getRelationship(requestParam.relationship).relation
+                        relationshipService.getRelationship(requestParam.relationshipId).relation
                 }
             }
-            SusuStatisticResponse.of(specific, basic.statistic)
+            SusuStatisticResponse.of(specific, basic)
         }
     }
 }

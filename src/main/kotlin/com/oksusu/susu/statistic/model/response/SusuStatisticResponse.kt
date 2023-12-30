@@ -1,6 +1,6 @@
 package com.oksusu.susu.statistic.model.response
 
-import com.oksusu.susu.statistic.model.SusuBasicStatisticModel
+import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.model.SusuSpecificStatisticModel
 import com.oksusu.susu.statistic.model.TitleStringModel
 import com.oksusu.susu.statistic.model.TitleValueModel
@@ -22,7 +22,7 @@ class SusuStatisticResponse(
     val mostCategory: TitleValueModel?,
 ) {
     companion object {
-        fun of(specific: SusuSpecificStatisticModel, basic: SusuBasicStatisticModel): SusuStatisticResponse {
+        fun of(specific: SusuSpecificStatisticModel, basic: SusuBasicStatistic): SusuStatisticResponse {
             return SusuStatisticResponse(
                 averageSent = specific.averageSent,
                 averageRelationship = specific.averageRelationship,

@@ -18,20 +18,19 @@ class SusuSpecificStatisticService(
 ) {
     val logger = mu.KotlinLogging.logger { }
 
-    suspend fun getLatestSusuSpecificStatistic(request: SusuStatisticRequest): SusuSpecificStatisticModel {
+    suspend fun getSusuSpecificStatistic(request: SusuStatisticRequest): SusuSpecificStatisticModel {
         val ageCategoryRelationshipKey = generateStatisticKey(
-            request.age.number,
-            request.category,
-            request.relationship
+            age = request.age.number,
+            postCategoryId = request.postCategoryId,
+            relationshipId = request.relationshipId
         )
 
         return parZip(
             { findByKey(ageCategoryRelationshipKey) },
-            { findByKey("category_" + request.category.toString()) },
-            { findByKey("relationship_" + request.relationship.toString()) }
+            { findByKey("category_" + request.postCategoryId.toString()) },
+            { findByKey("relationship_" + request.relationshipId.toString()) }
         ) { averageSent, categoryAmount, relationShipAmount ->
-            logger.info { "$averageSent $categoryAmount $relationShipAmount" }
-            val a = SusuSpecificStatisticModel(
+            SusuSpecificStatisticModel(
                 averageSent = averageSent,
                 averageRelationship = relationShipAmount?.let {
                     TitleStringModel(
@@ -41,8 +40,6 @@ class SusuSpecificStatisticService(
                 },
                 averageCategory = categoryAmount?.let { TitleStringModel(title = "temp", value = categoryAmount) }
             )
-            logger.info { a.averageCategory.toString() }
-            a
         }
     }
 
@@ -69,7 +66,7 @@ class SusuSpecificStatisticService(
         }
     }
 
-    suspend fun generateStatisticKey(age: Long, category: Long, relationship: Long): String {
-        return age.toString() + "_" + category.toString() + "_" + relationship.toString()
+    suspend fun generateStatisticKey(age: Long, postCategoryId: Long, relationshipId: Long): String {
+        return age.toString() + "_" + postCategoryId.toString() + "_" + relationshipId.toString()
     }
 }

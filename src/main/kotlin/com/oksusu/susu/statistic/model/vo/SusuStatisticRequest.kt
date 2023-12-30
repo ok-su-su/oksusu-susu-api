@@ -2,8 +2,8 @@ package com.oksusu.susu.statistic.model.vo
 
 class SusuStatisticRequest(
     val age: AgeType,
-    val relationship: Long,
-    val category: Long,
+    val relationshipId: Long,
+    val postCategoryId: Long,
 )
 
 enum class AgeType(

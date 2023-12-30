@@ -3,17 +3,13 @@ package com.oksusu.susu.statistic.application
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
-import com.oksusu.susu.extension.toClockEpochMilli
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicStatisticRepository
-import com.oksusu.susu.statistic.model.SusuBasicStatisticModel
 import com.oksusu.susu.statistic.model.TitleValueModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class SusuBasicStatisticService(
@@ -67,30 +63,22 @@ class SusuBasicStatisticService(
                 TitleValueModel(title = category.name, value = it.totalCounts)
             }
 
-        return SusuBasicStatistic.from(
-            id = LocalDateTime.now().toClockEpochMilli(),
-            statistic = SusuBasicStatisticModel(
-                recentSpent = envelopHandOverAtMonthCountModel,
-                mostSpentMonth = mostSpentMonth,
-                relationship = relationShipIdConutModel,
-                category = categotyMaxCountModel
-            )
+        return SusuBasicStatistic(
+            recentSpent = envelopHandOverAtMonthCountModel,
+            mostSpentMonth = mostSpentMonth,
+            relationship = relationShipIdConutModel,
+            category = categotyMaxCountModel
         )
     }
 
-    suspend fun getLatestSusuBasicStatistic(): SusuBasicStatistic {
-        val id = LocalDateTime.now().toClockEpochMilli()
-        return findByIdOrThrow(id)
-    }
-
-    suspend fun findByIdOrThrow(id: Long): SusuBasicStatistic {
+    suspend fun getStatisticOrThrow(): SusuBasicStatistic {
         // 통계 없으면 에러 띄우기
-        return findByIdOrNull(id)!!
+        return getStatisticOrNull()!!
     }
 
-    suspend fun findByIdOrNull(id: Long): SusuBasicStatistic? {
+    suspend fun getStatisticOrNull(): SusuBasicStatistic? {
         return withContext(Dispatchers.IO) {
-            susuBasicStatisticRepository.findByIdOrNull(id)
+            susuBasicStatisticRepository.getStatistic()
         }
     }
 
