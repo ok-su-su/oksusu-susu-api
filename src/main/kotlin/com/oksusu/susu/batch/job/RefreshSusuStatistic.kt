@@ -1,6 +1,9 @@
 package com.oksusu.susu.batch.job
 
 import arrow.fx.coroutines.parZip
+import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
+import com.oksusu.susu.common.consts.SUSU_CATEGORY_STATISTIC_KEY_PREFIX
+import com.oksusu.susu.common.consts.SUSU_RELATIONSHIP_STATISTIC_KEY_PREFIX
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
@@ -23,6 +26,7 @@ class RefreshSusuStatistic(
     private val ledgerService: LedgerService,
     private val susuBasicStatisticService: SusuBasicStatisticService,
     private val susuSpecificStatisticService: SusuSpecificStatisticService,
+    private val cacheKeyGenerateHelper: CacheKeyGenerateHelper,
 ) {
     val logger = mu.KotlinLogging.logger { }
 
@@ -64,21 +68,26 @@ class RefreshSusuStatistic(
                 )
 
                 // 평균 수수 레디스 저장
-                // key: age_categoryId_relationshipId, value: avg
+                // key: age:categoryId:relationshipId, value: avg
                 parseIntoGroup(avgAmountModels).map { model ->
-                    async { susuSpecificStatisticService.save(model.key, model.value) }
+                    async {
+                        susuSpecificStatisticService.save(
+                            cacheKeyGenerateHelper.getSusuSpecificStatisticKey(model.key),
+                            model.value
+                        )
+                    }
                 }
 
-                // key: category_categoryId, value: avg
+                // key: susu_category_statistic:categoryId, value: avg
                 avgAmountModels.groupBy { it.categoryId }.map { modelsMap ->
-                    val key = "category_" + modelsMap.key.toString()
+                    val key = SUSU_CATEGORY_STATISTIC_KEY_PREFIX + modelsMap.key.toString()
                     val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
                     async { susuSpecificStatisticService.save(key, avgAmount) }
                 }
 
-                // key: relationship_relationshipId, value: avg
+                // key: susu_relationship_statistic:relationshipId, value: avg
                 avgAmountModels.groupBy { it.relationshipId }.map { modelsMap ->
-                    val key = "relationship_" + modelsMap.key.toString()
+                    val key = SUSU_RELATIONSHIP_STATISTIC_KEY_PREFIX + modelsMap.key.toString()
                     val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
                     async { susuSpecificStatisticService.save(key, avgAmount) }
                 }
@@ -94,14 +103,14 @@ class RefreshSusuStatistic(
         val ageCategorys = ages.flatMap { age ->
             val ageCategories = age.value.groupBy { it.categoryId }
             ageCategories.map { ageCategory ->
-                "${age.key}_${ageCategory.key}" to ageCategory.value
+                "${age.key}:${ageCategory.key}" to ageCategory.value
             }
         }.associate { ageCategory -> ageCategory.first to ageCategory.second }
 
         return ageCategorys.flatMap { ageCategory ->
             val groups = ageCategory.value.groupBy { it.relationshipId }
             groups.map { group ->
-                "${ageCategory.key}_${group.key}" to ageCategory.value
+                "${ageCategory.key}:${group.key}" to ageCategory.value
             }
         }.associate { group -> group.first to group.second.sumOf { it.averageAmount } / group.second.size }
     }
