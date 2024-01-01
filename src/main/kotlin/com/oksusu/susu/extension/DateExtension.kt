@@ -22,3 +22,7 @@ fun LocalDateTime.equalsFromYearToSec(otherTime: LocalDateTime): Boolean {
         this.minute == otherTime.minute &&
         this.second == otherTime.second
 }
+
+fun LocalDateTime.toClockEpochMilli(): Long {
+    return this.withMinute(0).withSecond(0).withNano(0).toInstant().toEpochMilli()
+}
