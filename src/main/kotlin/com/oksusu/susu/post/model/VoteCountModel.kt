@@ -10,6 +10,7 @@ class VoteCountModel(
     val category: String,
     val content: String,
     val createdAt: LocalDateTime,
+    val modifiedAt: LocalDateTime,
     val count: Int,
 ) {
     companion object {
@@ -20,6 +21,7 @@ class VoteCountModel(
                 category = postCategoryModel.name,
                 content = post.content,
                 createdAt = post.createdAt,
+                modifiedAt = post.modifiedAt,
                 count = voteSummary.count
             )
         }

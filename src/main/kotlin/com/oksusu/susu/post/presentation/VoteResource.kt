@@ -8,6 +8,7 @@ import com.oksusu.susu.extension.wrapSlice
 import com.oksusu.susu.extension.wrapVoid
 import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.post.model.request.CreateVoteRequest
+import com.oksusu.susu.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.post.model.vo.VoteSortRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -29,7 +30,7 @@ class VoteResource(
     ) = voteFacade.createVote(user, request).wrapCreated()
 
     /** 카테고리 전체 검색 : 0 */
-    @Operation(summary = "투표 검색")
+    @Operation(summary = "투표 조회")
     @GetMapping
     suspend fun getAllVotes(
         user: AuthUser,
@@ -37,7 +38,7 @@ class VoteResource(
         @ParameterObject sliceRequest: SusuPageRequest,
     ) = voteFacade.getAllVotes(user, sortRequest, sliceRequest).wrapSlice()
 
-    @Operation(summary = "투표 하나 검색")
+    @Operation(summary = "투표 하나 조회")
     @GetMapping("/{id}")
     suspend fun getVote(
         user: AuthUser,
@@ -59,6 +60,15 @@ class VoteResource(
         @PathVariable id: Long,
     ) = voteFacade.deleteVote(user, id).wrapVoid()
 
+    @Operation(summary = "투표 업데이트")
+    @PatchMapping("/{id}")
+    suspend fun update(
+        user: AuthUser,
+        @PathVariable id: Long,
+        @RequestBody request: UpdateVoteRequest,
+    ) = voteFacade.update(user, id, request).wrapOk()
+
+    /** 총 투표 수가 0 일 경우 제외됩니다  */
     @Operation(summary = "가장 인기 있는 투표 검색")
     @GetMapping("/popular")
     suspend fun getPopularVotes(

@@ -14,13 +14,13 @@ class Post(
     val uid: Long,
 
     @Column(name = "post_category_id")
-    val postCategoryId: Long,
+    var postCategoryId: Long,
 
     val type: PostType,
 
     val title: String? = null,
 
-    val content: String,
+    var content: String,
 
     @Column(name = "is_active")
     var isActive: Boolean = true,

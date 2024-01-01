@@ -1,6 +1,7 @@
 package com.oksusu.susu.post.model.response
 
 import com.oksusu.susu.common.annotation.DateFormat
+import com.oksusu.susu.extension.equalsFromYearToSec
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
 import com.oksusu.susu.user.domain.User
@@ -16,6 +17,7 @@ class VoteAndOptionsWithCountResponse(
     @DateFormat
     val createdAt: LocalDateTime,
     val creatorProfile: UserProfileModel,
+    val isModified: Boolean,
     val options: List<VoteOptionCountModel>,
 ) {
     companion object {
@@ -33,6 +35,7 @@ class VoteAndOptionsWithCountResponse(
                 count = vote.count,
                 createdAt = vote.createdAt,
                 creatorProfile = UserProfileModel.from(creator),
+                isModified = !vote.createdAt.equalsFromYearToSec(vote.modifiedAt),
                 options = options
             )
         }

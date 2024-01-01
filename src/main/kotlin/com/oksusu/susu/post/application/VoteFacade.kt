@@ -18,14 +18,14 @@ import com.oksusu.susu.post.model.VoteOptionCountModel
 import com.oksusu.susu.post.model.VoteOptionModel
 import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.post.model.request.CreateVoteRequest
-import com.oksusu.susu.post.model.response.CreateVoteResponse
+import com.oksusu.susu.post.model.request.UpdateVoteRequest
+import com.oksusu.susu.post.model.response.CreateAndUpdateVoteResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.VoteSortRequest
 import com.oksusu.susu.post.model.vo.VoteSortType
 import com.oksusu.susu.user.application.UserService
-import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -49,7 +49,7 @@ class VoteFacade(
     }
 
     @Transactional
-    suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateVoteResponse {
+    suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
         voteOptionService.validateSeq(request.options)
         postCategoryService.validateExistCategory(request.postCategoryId)
 
@@ -66,7 +66,7 @@ class VoteFacade(
             }.run { voteOptionService.saveAllSync(this) }
                 .map { option -> VoteOptionModel.from(option) }
 
-            CreateVoteResponse.of(
+            CreateAndUpdateVoteResponse.of(
                 createdPost,
                 optionModels,
                 postCategoryService.getCategory(request.postCategoryId)
@@ -157,28 +157,26 @@ class VoteFacade(
         val options = voteInfos.map { voteInfo -> voteInfo.voteOption }
 
         return parZip(
-            Dispatchers.IO,
             { userService.findByIdOrThrow(vote.uid) },
             { voteSummaryService.getSummaryByPostId(id) },
             { voteOptionSummaryService.getSummariesByOptionIdIn(options.map { option -> option.id }) },
-            { postCategoryService.getCategory(vote.postCategoryId) },
-            { creator, voteSummary, optionSummaries, postCategoryModel ->
-                val optionCountModels = options.map { option ->
-                    VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
-                }
-
-                VoteAndOptionsWithCountResponse.of(
-                    vote = VoteCountModel.of(
-                        vote,
-                        voteSummary,
-                        postCategoryModel
-                    ),
-                    options = optionCountModels,
-                    creator = creator,
-                    isMine = user.id == creator.id
-                )
+            { postCategoryService.getCategory(vote.postCategoryId) }
+        ) { creator, voteSummary, optionSummaries, postCategoryModel ->
+            val optionCountModels = options.map { option ->
+                VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
             }
-        )
+
+            VoteAndOptionsWithCountResponse.of(
+                vote = VoteCountModel.of(
+                    vote,
+                    voteSummary,
+                    postCategoryModel
+                ),
+                options = optionCountModels,
+                creator = creator,
+                isMine = user.id == creator.id
+            )
+        }
     }
 
     @Transactional
@@ -243,5 +241,34 @@ class VoteFacade(
                 postCategoryModel = postCategoryModels.first { it.id == vote.postCategoryId }
             )
         }
+    }
+
+    @Transactional
+    suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
+        val updatedPostCategory = parZip(
+            // 투표 된게 있는지 검사
+            { voteHistoryService.validateHistoryNotExist(id) },
+            { postCategoryService.getCategory(request.postCategoryId) }
+        ) { _, updatedPostCategory ->
+            updatedPostCategory
+        }
+
+        val voteInfos = voteService.getVoteAndOptions(id)
+
+        val vote = voteInfos[0].post
+        val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
+
+        val updatedVote = txTemplates.writer.executeWithContext {
+            vote.apply {
+                content = request.content
+                postCategoryId = request.postCategoryId
+            }.run { postService.saveSync(this) }
+        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_POST_ERROR)
+
+        return CreateAndUpdateVoteResponse.of(
+            updatedVote,
+            options,
+            updatedPostCategory
+        )
     }
 }

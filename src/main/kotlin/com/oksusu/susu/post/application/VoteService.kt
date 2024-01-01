@@ -53,10 +53,10 @@ class VoteService(
             throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
         }
 
-        vote.apply { isActive = false }
-
         txTemplates.writer.executeWithContext {
-            postService.saveSync(vote)
+            vote.apply { isActive = false }.run {
+                postService.saveSync(vote)
+            }
         }
     }
 
