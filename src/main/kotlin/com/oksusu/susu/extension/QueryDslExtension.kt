@@ -3,6 +3,7 @@ package com.oksusu.susu.extension
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.SusuException
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
 import org.springframework.data.domain.*
@@ -35,5 +36,9 @@ fun <T> Querydsl?.executeSlice(query: JPAQuery<T>, pageable: Pageable): Slice<T>
 }
 
 fun StringPath.isEquals(parameter: String?): BooleanExpression? {
+    return parameter?.let { this.eq(parameter) }
+}
+
+fun NumberPath<Long>.isEquals(parameter: Long?): BooleanExpression? {
     return parameter?.let { this.eq(parameter) }
 }

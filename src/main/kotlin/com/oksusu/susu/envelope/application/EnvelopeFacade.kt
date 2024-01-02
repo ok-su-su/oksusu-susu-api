@@ -6,18 +6,23 @@ import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.category.model.CategoryWithCustomModel
+import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
+import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.envelope.model.EnvelopeModel
 import com.oksusu.susu.envelope.model.request.CreateAndUpdateEnvelopeRequest
+import com.oksusu.susu.envelope.model.request.SearchEnvelopeRequest
 import com.oksusu.susu.envelope.model.response.CreateAndUpdateEnvelopeResponse
 import com.oksusu.susu.envelope.model.response.EnvelopeDetailResponse
+import com.oksusu.susu.envelope.model.response.SearchEnvelopeResponse
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
 @Service
@@ -124,6 +129,38 @@ class EnvelopeFacade(
             categoryAssignmentService.deleteByTargetIdAndTargetTypeSync(
                 targetId = envelope.id,
                 targetType = CategoryAssignmentType.ENVELOPE
+            )
+        }
+    }
+
+    suspend fun search(
+        user: AuthUser,
+        request: SearchEnvelopeRequest,
+        pageRequest: SusuPageRequest,
+    ): Page<SearchEnvelopeResponse> {
+        val searchSpec = SearchEnvelopeSpec(
+            uid = user.id,
+            ledgerId = request.ledgerId,
+            include = request.include ?: emptySet()
+        )
+        val pageable = pageRequest.toDefault()
+
+        val response = envelopeService.search(searchSpec, pageable)
+
+        return response.map { searchModel ->
+            val category = searchModel.categoryAssignment?.categoryId?.let { categoryId ->
+                categoryService.getCategory(categoryId)
+            }?.run { CategoryWithCustomModel.of(this, searchModel.categoryAssignment) }
+            val relation = searchModel.friendRelationship?.relationshipId?.let { relationshipId ->
+                relationshipService.getRelationship(relationshipId)
+            }
+            val friend = searchModel.friend?.let { friend -> FriendModel.from(friend) }
+
+            SearchEnvelopeResponse(
+                envelope = EnvelopeModel.from(searchModel.envelope),
+                category = category,
+                relation = relation,
+                friend = friend
             )
         }
     }

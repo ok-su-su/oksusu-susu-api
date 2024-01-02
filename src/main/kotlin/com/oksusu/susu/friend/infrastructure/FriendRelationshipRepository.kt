@@ -26,7 +26,9 @@ interface FriendRelationshipCustomRepository {
     suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel>
 }
 
-class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepository, QuerydslRepositorySupport(Friend::class.java) {
+class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepository, QuerydslRepositorySupport(
+    Friend::class.java
+) {
     @Autowired
     @Qualifier("susuEntityManager")
     override fun setEntityManager(entityManager: EntityManager) {
