@@ -73,19 +73,14 @@ class VoteFacade(
             )
         } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_POST_ERROR)
 
+        val voteSummary = VoteSummary(postId = response.id)
+        val voteOptionSummaries = response.options.map { option ->
+            VoteOptionSummary(voteOptionId = option.id!!)
+        }
+
         parZip(
-            {
-                VoteSummary(postId = response.id).run {
-                    voteSummaryService.save(this)
-                }
-            },
-            {
-                response.options.map { option ->
-                    VoteOptionSummary(voteOptionId = option.id!!)
-                }.run {
-                    voteOptionSummaryService.saveAll(this)
-                }
-            }
+            { voteSummaryService.save(voteSummary) },
+            { voteOptionSummaryService.saveAll(voteOptionSummaries) }
         ) { _, _ -> }
 
         return response

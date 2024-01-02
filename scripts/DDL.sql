@@ -137,7 +137,7 @@ CREATE TABLE `post`
 -- 게시글
 CREATE TABLE `post_category`
 (
-    `id`          bigint  NOT NULL AUTO_INCREMENT COMMENT '커뮤니티 id',
+    `id`          bigint  NOT NULL AUTO_INCREMENT COMMENT '게시글 id',
     `name`        varchar(256) DEFAULT NULL COMMENT '카테고리 명',
     `seq`         int     NOT NULL COMMENT '노출 순서',
     `is_active`   tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',

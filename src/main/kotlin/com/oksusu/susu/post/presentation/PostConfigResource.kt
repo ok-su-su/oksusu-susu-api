@@ -17,8 +17,8 @@ class PostConfigResource(
     private val postCategoryService: PostCategoryService,
 ) {
     @Operation(summary = "게시글 카테고리 데이터 제공")
-    @GetMapping
-    suspend fun getCreateEnvelopesConfig(
+    @GetMapping("/create-post")
+    suspend fun getCreatePostsConfig(
         user: AuthUser,
     ) = postCategoryService.getAll().wrapOk()
 }
