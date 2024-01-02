@@ -34,6 +34,21 @@ VALUES ('term4', 'des4', 1, 1);
 INSERT INTO susu.term (title, description, is_essential, is_active)
 VALUES ('term5', 'des5', 1, 1);
 
+
+-- post_category
+INSERT INTO susu.post_category (seq, name, is_active)
+VALUES (1, '결혼식', 1);
+INSERT INTO susu.post_category (seq, name, is_active)
+VALUES (2, '장례식', 1);
+INSERT INTO susu.post_category (seq, name, is_active)
+VALUES (3, '돌잔치', 1);
+INSERT INTO susu.post_category (seq, name, is_active)
+VALUES (4, '생일 기념일', 1);
+INSERT INTO susu.post_category (seq, name, is_active)
+VALUES (5, '자유', 1);
+INSERT INTO susu.post_category (seq, name, is_active)
+VALUES (6, '명예의 전당', 1);
+
 -- friend
 INSERT INTO suus.friend (uid, name)
 VALUES ('200000', 'user1'),
