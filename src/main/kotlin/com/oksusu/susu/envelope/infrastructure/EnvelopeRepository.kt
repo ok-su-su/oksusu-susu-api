@@ -6,6 +6,8 @@ import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.QEnvelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.*
+import com.oksusu.susu.extension.execute
+import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.oksusu.susu.user.domain.QUser
@@ -13,6 +15,8 @@ import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
@@ -70,6 +74,9 @@ interface EnvelopeCustomRepository {
 
     @Transactional(readOnly = true)
     suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel>
+
+    @Transactional(readOnly = true)
+    fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel>
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -265,5 +272,37 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 qUser.birth.year().castToNum(Long::class.java)
             )
             .fetch()
+    }
+
+    override fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel> {
+        /** select */
+        val query = JPAQuery<Envelope>(entityManager)
+            .select(
+                QSearchEnvelopeModel(
+                    qEnvelope,
+                    if (spec.include.contains(IncludeSpec.FRIEND)) qFriend else null,
+                    if (spec.include.contains(IncludeSpec.RELATION)) qFriendRelationship else null,
+                    if (spec.include.contains(IncludeSpec.CATEGORY)) qCategoryAssignment else null
+                )
+            ).from(qEnvelope)
+
+        /** join */
+        if (spec.include.contains(IncludeSpec.FRIEND)) {
+            query.join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
+        }
+        if (spec.include.contains(IncludeSpec.RELATION)) {
+            query.join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
+        }
+        if (spec.include.contains(IncludeSpec.CATEGORY)) {
+            query.join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+        }
+
+        /** where */
+        query.where(
+            qEnvelope.uid.eq(spec.uid),
+            qEnvelope.ledgerId.isEquals(spec.ledgerId)
+        )
+
+        return querydsl.execute(query, pageable)
     }
 }
