@@ -11,6 +11,7 @@ import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.oksusu.susu.user.domain.QUser
+import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -77,6 +78,9 @@ interface EnvelopeCustomRepository {
 
     @Transactional(readOnly = true)
     fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel>
+
+    @Transactional(readOnly = true)
+    fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel>
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -302,6 +306,32 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             qEnvelope.uid.eq(spec.uid),
             qEnvelope.ledgerId.isEquals(spec.ledgerId)
         )
+
+        return querydsl.execute(query, pageable)
+    }
+
+    override fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel> {
+        val sentAmount = CaseBuilder()
+            .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
+            .then(QEnvelope.envelope.amount)
+            .otherwise(0)
+
+        val receivedAmount = CaseBuilder()
+            .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
+            .then(QEnvelope.envelope.amount)
+            .otherwise(0)
+
+        val query = JPAQuery<Envelope>(entityManager)
+            .select(
+                QFriendStatisticsModel(
+                    qEnvelope.friendId,
+                    sentAmount.sum(),
+                    receivedAmount.sum()
+                )
+            )
+            .from(QEnvelope.envelope)
+            .where(qEnvelope.uid.eq(uid))
+            .groupBy(qEnvelope.friendId)
 
         return querydsl.execute(query, pageable)
     }

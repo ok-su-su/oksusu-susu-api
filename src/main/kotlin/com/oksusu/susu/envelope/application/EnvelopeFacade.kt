@@ -15,9 +15,11 @@ import com.oksusu.susu.envelope.model.request.CreateAndUpdateEnvelopeRequest
 import com.oksusu.susu.envelope.model.request.SearchEnvelopeRequest
 import com.oksusu.susu.envelope.model.response.CreateAndUpdateEnvelopeResponse
 import com.oksusu.susu.envelope.model.response.EnvelopeDetailResponse
+import com.oksusu.susu.envelope.model.response.GetFriendStatisticsResponse
 import com.oksusu.susu.envelope.model.response.SearchEnvelopeResponse
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToCreateException
+import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.executeWithContext
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
@@ -161,6 +163,26 @@ class EnvelopeFacade(
                 category = category,
                 relation = relation,
                 friend = friend
+            )
+        }
+    }
+
+    suspend fun findFriendStatistics(user: AuthUser, pageRequest: SusuPageRequest): Page<GetFriendStatisticsResponse> {
+        val pageable = pageRequest.toDefault()
+
+        val friendStatistics = envelopeService.findFriendStatistics(user.id, pageable)
+
+        val friendIds = friendStatistics.map { statistics -> statistics.friendId }.toList()
+        val friends = friendService.findAllByIdIn(friendIds).associateBy { friend -> friend.id }
+
+        return friendStatistics.map { statistics ->
+            val friend = friends[statistics.friendId] ?: throw NotFoundException(ErrorCode.NOT_FOUND_FRIEND_ERROR)
+
+            GetFriendStatisticsResponse(
+                friend = friend,
+                totalAmounts = statistics.sentAmounts + statistics.receivedAmounts,
+                sentAmounts = statistics.sentAmounts,
+                receivedAmounts = statistics.receivedAmounts
             )
         }
     }

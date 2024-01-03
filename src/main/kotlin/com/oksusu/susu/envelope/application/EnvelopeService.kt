@@ -9,6 +9,7 @@ import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
 import com.oksusu.susu.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
 import com.oksusu.susu.envelope.infrastructure.model.EnvelopeAndFriendModel
 import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailModel
+import com.oksusu.susu.envelope.infrastructure.model.FriendStatisticsModel
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeModel
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.exception.ErrorCode
@@ -120,5 +121,9 @@ class EnvelopeService(
 
     suspend fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel> {
         return withContext(Dispatchers.IO) { envelopeRepository.search(spec, pageable) }
+    }
+
+    suspend fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel> {
+        return withContext(Dispatchers.IO) { envelopeRepository.findFriendStatistics(uid, pageable) }
     }
 }

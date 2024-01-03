@@ -26,6 +26,9 @@ interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository
 
     @Transactional(readOnly = true)
     fun existsByUidAndPhoneNumber(uid: Long, phoneNumber: String): Boolean
+
+    @Transactional(readOnly = true)
+    fun findAllByIdIn(ids: List<Long>): List<Friend>
 }
 
 interface FriendCustomRepository {

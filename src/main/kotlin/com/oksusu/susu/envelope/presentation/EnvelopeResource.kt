@@ -72,4 +72,14 @@ class EnvelopeResource(
         request = request,
         pageRequest = pageRequest
     ).wrapPage()
+
+    @Operation(summary = "친구 봉투 통계 조회")
+    @GetMapping("/friend-statistics")
+    suspend fun findFriendStatistics(
+        user: AuthUser,
+        @ParameterObject pageRequest: SusuPageRequest,
+    ) = envelopeFacade.findFriendStatistics(
+        user = user,
+        pageRequest = pageRequest
+    ).wrapPage()
 }

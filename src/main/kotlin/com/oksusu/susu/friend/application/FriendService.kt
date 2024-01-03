@@ -50,4 +50,8 @@ class FriendService(
     suspend fun findByIdOrNull(id: Long): Friend? {
         return withContext(Dispatchers.IO) { friendRepository.findByIdOrNull(id) }
     }
+
+    suspend fun findAllByIdIn(ids: List<Long>): List<Friend> {
+        return withContext(Dispatchers.IO) { friendRepository.findAllByIdIn(ids) }
+    }
 }
