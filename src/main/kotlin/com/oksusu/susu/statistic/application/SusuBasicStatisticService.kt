@@ -31,7 +31,8 @@ class SusuBasicStatisticService(
         // 경조사비를 가장 많이 쓴 달
         val mostSpentMonth = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
             ?.maxBy { it.totalCounts }
-            ?.handedOverAtMonth!!.toLong()
+            ?.handedOverAtMonth
+            ?.toLong()
 
         // 최다 수수 관계
         val relationShipIdConutModel = relationShipConuts.takeIf { it.isNotEmpty() }
