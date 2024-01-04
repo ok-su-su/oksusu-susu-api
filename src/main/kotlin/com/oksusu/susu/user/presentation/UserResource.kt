@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "유저")
@@ -21,21 +22,16 @@ class UserResource(
 ) {
 
     @Operation(summary = "유저 정보 조회")
-    @GetMapping
+    @GetMapping("/my-info")
     suspend fun getUserInfo(
         user: AuthUser,
     ) = userFacade.getUserInfo(user).wrapOk()
 
     @Operation(summary = "유저 정보 수정")
-    @PatchMapping
+    @PatchMapping("/{uid}")
     suspend fun updateUserInfo(
         user: AuthUser,
+        @RequestParam uid: Long,
         @RequestBody request: UpdateUserInfoRequest,
-    ) = userFacade.updateUserInfo(user, request).wrapOk()
-
-    @Operation(summary = "연동된 소셜 로그인 정보 조회")
-    @GetMapping("/oauth")
-    suspend fun getOAuthInfo(
-        user: AuthUser,
-    ) = userFacade.getOAuthInfo(user).wrapOk()
+    ) = userFacade.updateUserInfo(uid, user, request).wrapOk()
 }

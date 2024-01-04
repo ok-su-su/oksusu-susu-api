@@ -1,4 +1,4 @@
-package com.oksusu.susu.user.model.response
+package com.oksusu.susu.auth.model.dto.response
 
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.user.domain.User

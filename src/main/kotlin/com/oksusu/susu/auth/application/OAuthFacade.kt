@@ -2,11 +2,13 @@ package com.oksusu.susu.auth.application
 
 import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.helper.TokenGenerateHelper
+import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.TokenDto
 import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
+import com.oksusu.susu.auth.model.dto.response.UserOAuthInfoResponse
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.exception.ErrorCode
@@ -118,5 +120,9 @@ class OAuthFacade(
         val oauthToken = oAuthService.getOauthToken(provider, code, request)
 
         return this.login(OauthProvider.KAKAO, OAuthLoginRequest(oauthToken.accessToken)).accessToken
+    }
+
+    suspend fun getOAuthInfo(user: AuthUser): UserOAuthInfoResponse {
+        return userService.findByIdOrThrow(user.id).run { UserOAuthInfoResponse.from(this) }
     }
 }
