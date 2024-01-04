@@ -12,9 +12,9 @@ import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.event.model.DeleteLedgerEvent
 import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.exception.InvalidRequestException
-import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.extension.coExecute
+import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
 import com.oksusu.susu.ledger.model.LedgerModel
@@ -49,7 +49,7 @@ class LedgerFacade(
             else -> null
         }
 
-        val createdLedger = txTemplate.writer.executeWithContext {
+        val createdLedger = txTemplate.writer.coExecute {
             val createdLedger = Ledger(
                 uid = user.id,
                 title = request.title,
@@ -66,7 +66,7 @@ class LedgerFacade(
             ).run { categoryAssignmentService.saveSync(this) }
 
             createdLedger
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_LEDGER_ERROR)
+        }
 
         return CreateAndUpdateLedgerResponse.of(
             ledger = createdLedger,
@@ -94,7 +94,7 @@ class LedgerFacade(
             else -> null
         }
 
-        val updatedLedger = txTemplate.writer.executeWithContext {
+        val updatedLedger = txTemplate.writer.coExecute {
             val updatedLedger = ledger.apply {
                 this.title = request.title
                 this.description = request.description
@@ -108,7 +108,7 @@ class LedgerFacade(
             }.run { categoryAssignmentService.saveSync(this) }
 
             updatedLedger
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_LEDGER_ERROR)
+        }
 
         return CreateAndUpdateLedgerResponse.of(
             ledger = updatedLedger,
@@ -168,7 +168,7 @@ class LedgerFacade(
         val ledgers = ledgerService.findAllByUidAndIdIn(user.id, ids.toList())
 
         ledgers.forEach { leder ->
-            txTemplate.writer.executeWithContext {
+            txTemplate.writer.coExecuteOrNull {
                 /** 장부 삭제 */
                 ledgerService.deleteSync(leder)
 

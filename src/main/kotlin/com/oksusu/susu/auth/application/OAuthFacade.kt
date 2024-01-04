@@ -11,9 +11,7 @@ import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
 import com.oksusu.susu.auth.model.dto.response.UserOAuthInfoResponse
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
-import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.FailToCreateException
-import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
@@ -66,7 +64,7 @@ class OAuthFacade(
             validateExistTerms.await()
         }
 
-        val user = txTemplates.writer.executeWithContext {
+        val user = txTemplates.writer.coExecute {
             val createdUser = User.toEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
 
@@ -81,7 +79,7 @@ class OAuthFacade(
             )
 
             createdUser
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_USER_ERROR)
+        }
 
         return generateTokenDto(user.id)
     }

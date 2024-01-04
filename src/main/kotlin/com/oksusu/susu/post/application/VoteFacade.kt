@@ -4,9 +4,8 @@ import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
-import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.FailToCreateException
-import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.extension.coExecute
+import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.VoteHistory
 import com.oksusu.susu.post.domain.VoteOption
@@ -53,7 +52,7 @@ class VoteFacade(
         voteOptionService.validateSeq(request.options)
         postCategoryService.validateExistCategory(request.postCategoryId)
 
-        val response = txTemplates.writer.executeWithContext {
+        val response = txTemplates.writer.coExecute {
             val createdPost = Post(
                 uid = user.id,
                 type = PostType.VOTE,
@@ -71,7 +70,7 @@ class VoteFacade(
                 optionModels,
                 postCategoryService.getCategory(request.postCategoryId)
             )
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_POST_ERROR)
+        }
 
         val voteSummary = VoteSummary(postId = response.id)
         val voteOptionSummaries = response.options.map { option ->
@@ -190,7 +189,7 @@ class VoteFacade(
             { voteOptionSummaryService.increaseCount(optionId) }
         ) { _, _ -> }
 
-        txTemplates.writer.executeWithContext {
+        txTemplates.writer.coExecute {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
                 .run { voteHistoryService.saveSync(this) }
         }
@@ -204,7 +203,7 @@ class VoteFacade(
             { voteOptionSummaryService.decreaseCount(optionId) }
         ) { _, _ -> }
 
-        txTemplates.writer.executeWithContext {
+        txTemplates.writer.coExecuteOrNull {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
         }
     }
@@ -253,12 +252,12 @@ class VoteFacade(
         val vote = voteInfos[0].post
         val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
 
-        val updatedVote = txTemplates.writer.executeWithContext {
+        val updatedVote = txTemplates.writer.coExecute {
             vote.apply {
                 content = request.content
                 postCategoryId = request.postCategoryId
             }.run { postService.saveSync(this) }
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_POST_ERROR)
+        }
 
         return CreateAndUpdateVoteResponse.of(
             updatedVote,
