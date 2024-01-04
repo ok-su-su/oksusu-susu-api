@@ -99,9 +99,7 @@ dependencies {
 
     /** swagger */
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC_VERSION}")
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-api:${DependencyVersion.SPRINGDOC_VERSION}")
-    implementation("org.springdoc:springdoc-openapi-starter-common:${DependencyVersion.SPRINGDOC_VERSION}")
-    implementation("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE_VERSION}")
+    runtimeOnly("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE_VERSION}")
     kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE_VERSION}")
 
     /** database */

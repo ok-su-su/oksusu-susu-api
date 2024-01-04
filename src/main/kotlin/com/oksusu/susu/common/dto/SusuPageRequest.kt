@@ -19,7 +19,7 @@ data class SusuPageRequest(
     }
 
     fun String?.parsingSort(): Sort {
-        val sortSpec = (this ?: "createdAt, desc").trim().split(",")
+        val sortSpec = (this ?: "createdAt,desc").trim().split(",")
 
         if (sortSpec.size != 2) {
             return Sort.by("createdAt").descending()

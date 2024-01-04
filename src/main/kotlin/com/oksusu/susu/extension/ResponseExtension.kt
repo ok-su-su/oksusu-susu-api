@@ -1,9 +1,14 @@
 package com.oksusu.susu.extension
 
 import com.oksusu.susu.common.dto.PageResponseDto
+import com.oksusu.susu.common.dto.SliceResponseDto
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Slice
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+
+/** Wrap Response Slice */
+fun <T> Slice<T>.wrapSlice() = SliceResponseDto(this)
 
 /** Wrap Response Page */
 fun <T> Page<T>.wrapPage() = PageResponseDto(this)

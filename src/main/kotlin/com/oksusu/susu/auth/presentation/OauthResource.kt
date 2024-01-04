@@ -1,6 +1,7 @@
 package com.oksusu.susu.auth.presentation
 
 import com.oksusu.susu.auth.application.OAuthFacade
+import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
@@ -41,4 +42,10 @@ class OauthResource(
         @PathVariable provider: OauthProvider,
         @RequestBody request: OAuthLoginRequest,
     ) = oAuthFacade.login(provider, request).wrapOk()
+
+    @Operation(summary = "연동된 소셜 로그인 정보 조회")
+    @GetMapping("/oauth")
+    suspend fun getOAuthInfo(
+        user: AuthUser,
+    ) = oAuthFacade.getOAuthInfo(user).wrapOk()
 }

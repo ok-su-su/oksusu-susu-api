@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,5 +41,17 @@ class FriendService(
 
     suspend fun existsByPhoneNumber(uid: Long, phoneNumber: String): Boolean {
         return withContext(Dispatchers.IO) { friendRepository.existsByUidAndPhoneNumber(uid, phoneNumber) }
+    }
+
+    suspend fun findByIdOrThrow(id: Long): Friend {
+        return findByIdOrNull(id) ?: throw NotFoundException(ErrorCode.NOT_FOUND_FRIEND_ERROR)
+    }
+
+    suspend fun findByIdOrNull(id: Long): Friend? {
+        return withContext(Dispatchers.IO) { friendRepository.findByIdOrNull(id) }
+    }
+
+    suspend fun findAllByIdIn(ids: List<Long>): List<Friend> {
+        return withContext(Dispatchers.IO) { friendRepository.findAllByIdIn(ids) }
     }
 }

@@ -2,9 +2,13 @@ package com.oksusu.susu.ledger.infrastructure
 
 import com.oksusu.susu.category.domain.QCategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
+import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
+import com.oksusu.susu.envelope.infrastructure.model.QCountPerCategoryIdModel
 import com.oksusu.susu.extension.execute
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.domain.QLedger
+import com.oksusu.susu.ledger.infrastructure.model.LedgerDetailModel
+import com.oksusu.susu.ledger.infrastructure.model.QLedgerDetailModel
 import com.oksusu.susu.ledger.infrastructure.model.QSearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
@@ -21,11 +25,23 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository
+interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository {
+    @Transactional(readOnly = true)
+    fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Ledger>
+}
 
 interface LedgerCustomRepository {
     @Transactional(readOnly = true)
     fun search(spec: SearchLedgerSpec, pageable: Pageable): Page<SearchLedgerModel>
+
+    @Transactional(readOnly = true)
+    fun findLedgerDetail(id: Long, uid: Long): LedgerDetailModel?
+
+    @Transactional(readOnly = true)
+    fun countPerCategoryId(): List<CountPerCategoryIdModel>
+
+    @Transactional(readOnly = true)
+    fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
 }
 
 class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySupport(Ledger::class.java) {
@@ -54,5 +70,50 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             )
 
         return querydsl.execute(query, pageable)
+    }
+
+    override fun findLedgerDetail(id: Long, uid: Long): LedgerDetailModel? {
+        return JPAQuery<QLedger>(entityManager)
+            .select(QLedgerDetailModel(qLedger, qCategoryAssignment))
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qLedger.id.eq(id),
+                qLedger.uid.eq(uid),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            ).fetchOne()
+    }
+
+    override fun countPerCategoryId(): List<CountPerCategoryIdModel> {
+        return JPAQuery<QLedger>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qLedger.id.count()
+                )
+            )
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            ).groupBy(qCategoryAssignment.categoryId)
+            .fetch()
+    }
+
+    override fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel> {
+        return JPAQuery<QLedger>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qLedger.id.count()
+                )
+            )
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qLedger.uid.eq(uid),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            ).groupBy(qCategoryAssignment.categoryId)
+            .fetch()
     }
 }

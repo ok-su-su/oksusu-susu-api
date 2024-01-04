@@ -5,7 +5,7 @@ import com.oksusu.susu.friend.domain.Relationship
 data class RelationshipModel(
     val id: Long,
     val relation: String,
-    val description: String,
+    val description: String?,
 ) {
     companion object {
         fun from(relationship: Relationship): RelationshipModel {

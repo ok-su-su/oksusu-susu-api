@@ -1,14 +1,13 @@
-package com.oksusu.susu.envelope.model.response
+package com.oksusu.susu.envelope.model
 
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import java.time.LocalDateTime
 
-data class CreateEnvelopeResponse(
-    val id: Long = -1,
+data class EnvelopeModel(
+    val id: Long,
     val uid: Long,
     val type: EnvelopeType,
-    val friendId: Long,
     val amount: Long,
     val gift: String?,
     val memo: String?,
@@ -16,12 +15,11 @@ data class CreateEnvelopeResponse(
     val handedOverAt: LocalDateTime,
 ) {
     companion object {
-        fun from(envelope: Envelope): CreateEnvelopeResponse {
-            return CreateEnvelopeResponse(
+        fun from(envelope: Envelope): EnvelopeModel {
+            return EnvelopeModel(
                 id = envelope.id,
                 uid = envelope.uid,
                 type = envelope.type,
-                friendId = envelope.friendId,
                 amount = envelope.amount,
                 gift = envelope.gift,
                 memo = envelope.memo,

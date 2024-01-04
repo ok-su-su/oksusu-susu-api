@@ -2,15 +2,28 @@ package com.oksusu.susu.auth.application
 
 import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.helper.TokenGenerateHelper
+import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.TokenDto
 import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
 import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
+import com.oksusu.susu.auth.model.dto.response.UserOAuthInfoResponse
+import com.oksusu.susu.config.database.TransactionTemplates
+import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.exception.FailToCreateException
+import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.term.application.TermAgreementService
+import com.oksusu.susu.term.application.TermService
+import com.oksusu.susu.term.domain.TermAgreement
+import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.domain.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,6 +34,10 @@ class OAuthFacade(
     private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
     private val oAuthService: OAuthService,
+    private val txTemplates: TransactionTemplates,
+    private val termService: TermService,
+    private val termAgreementService: TermAgreementService,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     /** 회원가입 가능 여부 체크. */
     @Transactional(readOnly = true)
@@ -37,16 +54,34 @@ class OAuthFacade(
     suspend fun register(
         provider: OauthProvider,
         accessToken: String,
-        oauthRegisterRequest: OauthRegisterRequest,
+        request: OauthRegisterRequest,
     ): TokenDto {
         val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
 
-        if (userService.existsByOauthInfo(oauthInfo)) {
-            throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
+        coroutineScope {
+            val validateNotRegistered = async(Dispatchers.IO) { userService.validateNotRegistered(oauthInfo) }
+            val validateExistTerms = async(Dispatchers.IO) { termService.validateExistTerms(request.termAgreement) }
+
+            validateNotRegistered.await()
+            validateExistTerms.await()
         }
 
-        val user = User.toEntity(oauthRegisterRequest, oauthInfo)
-            .run { userService.saveSync(this) }
+        val user = txTemplates.writer.executeWithContext {
+            val createdUser = User.toEntity(request, oauthInfo)
+                .run { userService.saveSync(this) }
+
+            val termAgreements = request.termAgreement.map { TermAgreement(uid = createdUser.id, termId = it) }
+                .run { termAgreementService.saveAllSync(this) }
+
+            eventPublisher.publishEvent(
+                TermAgreementHistoryCreateEvent(
+                    termAgreements = termAgreements,
+                    changeType = TermAgreementChangeType.AGREEMENT
+                )
+            )
+
+            createdUser
+        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_USER_ERROR)
 
         return generateTokenDto(user.id)
     }
@@ -85,5 +120,9 @@ class OAuthFacade(
         val oauthToken = oAuthService.getOauthToken(provider, code, request)
 
         return this.login(OauthProvider.KAKAO, OAuthLoginRequest(oauthToken.accessToken)).accessToken
+    }
+
+    suspend fun getOAuthInfo(user: AuthUser): UserOAuthInfoResponse {
+        return userService.findByIdOrThrow(user.id).run { UserOAuthInfoResponse.from(this) }
     }
 }

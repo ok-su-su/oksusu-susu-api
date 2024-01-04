@@ -4,7 +4,7 @@ import com.oksusu.susu.category.model.request.CreateCategoryAssignmentRequest
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import java.time.LocalDateTime
 
-data class CreateEnvelopeRequest(
+data class CreateAndUpdateEnvelopeRequest(
     val type: EnvelopeType,
     val friendId: Long,
     val amount: Long,

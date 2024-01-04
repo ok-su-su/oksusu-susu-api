@@ -5,7 +5,7 @@ import com.oksusu.susu.category.model.CategoryWithCustomModel
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.model.LedgerModel
 
-data class CreateLedgerResponse(
+data class CreateAndUpdateLedgerResponse(
     val ledger: LedgerModel,
     val category: CategoryWithCustomModel,
 ) {
@@ -14,8 +14,8 @@ data class CreateLedgerResponse(
             ledger: Ledger,
             category: CategoryModel,
             customCategory: String?,
-        ): CreateLedgerResponse {
-            return CreateLedgerResponse(
+        ): CreateAndUpdateLedgerResponse {
+            return CreateAndUpdateLedgerResponse(
                 ledger = LedgerModel.from(ledger),
                 category = CategoryWithCustomModel.of(category, customCategory)
             )
