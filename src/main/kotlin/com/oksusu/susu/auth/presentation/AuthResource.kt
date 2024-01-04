@@ -30,9 +30,8 @@ class AuthResource(
     @Operation(summary = "token refresh")
     @PostMapping("/token/refresh")
     suspend fun tokenRefresh(
-        authUser: AuthUser,
         @RequestBody request: TokenRefreshRequest,
-    ) = authFacade.refreshToken(authUser, request).wrapOk()
+    ) = authFacade.refreshToken(request).wrapOk()
 
     /** 회원 탈퇴 */
     @Operation(summary = "withdraw")
