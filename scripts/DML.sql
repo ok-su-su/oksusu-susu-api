@@ -50,7 +50,7 @@ INSERT INTO susu.post_category (seq, name, is_active)
 VALUES (6, '명예의 전당', 1);
 
 -- friend
-INSERT INTO suus.friend (uid, name)
+INSERT INTO susu.friend (uid, name)
 VALUES ('200000', 'user1'),
        ('200000', 'user2'),
        ('200000', 'user3');
