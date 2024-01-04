@@ -14,9 +14,9 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     NO_AUTHORITY_ERROR(HttpStatus.FORBIDDEN, "수정 권한이 없습니다."),
 
     /** Auth Error Code */
-    FAIL_TO_VERIFY_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "fail to verify token"),
-    NOT_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "엑세스 토큰이 아닙니다."),
-    NOT_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰이 아닙니다."),
+    FAIL_TO_VERIFY_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, "fail to verify token"),
+    NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "엑세스 토큰이 아닙니다."),
+    NOT_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 아닙니다."),
 
     /** User Error Code */
     USER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
