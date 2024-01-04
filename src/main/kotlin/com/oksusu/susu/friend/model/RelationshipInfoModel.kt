@@ -6,7 +6,7 @@ data class RelationshipInfoModel(
     val id: Long,
     val relation: String,
     val customRelation: String?,
-    val description: String,
+    val description: String?,
 ) {
     companion object {
         fun of(relationship: RelationshipModel, friendRelationship: FriendRelationship): RelationshipInfoModel {
