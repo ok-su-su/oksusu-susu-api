@@ -15,8 +15,6 @@ class UserStatisticService(
     }
 
     suspend fun getStatisticOrNull(uid: Long): UserStatistic? {
-        return withContext(Dispatchers.IO) {
-            userStatisticRepository.getStatistic(uid)
-        }
+        return withContext(Dispatchers.IO) { userStatisticRepository.getStatistic(uid) }
     }
 }

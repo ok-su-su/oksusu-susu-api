@@ -66,9 +66,9 @@ class VoteFacade(
                 .map { option -> VoteOptionModel.from(option) }
 
             CreateAndUpdateVoteResponse.of(
-                createdPost,
-                optionModels,
-                postCategoryService.getCategory(request.postCategoryId)
+                post = createdPost,
+                optionModels = optionModels,
+                postCategoryModel = postCategoryService.getCategory(request.postCategoryId)
             )
         }
 
@@ -104,9 +104,9 @@ class VoteFacade(
 
             votes.map { vote ->
                 VoteAndOptionsResponse.of(
-                    vote,
-                    optionModels.filter { it.postId == vote.id },
-                    postCategoryModels.first { model -> vote.postCategoryId == model.id }
+                    vote = vote,
+                    options = optionModels.filter { it.postId == vote.id },
+                    postCategoryModel = postCategoryModels.first { model -> vote.postCategoryId == model.id }
                 )
             }
         }
@@ -118,10 +118,10 @@ class VoteFacade(
         pageRequest: SusuPageRequest,
     ): Slice<Post> {
         return voteService.getAllVotes(
-            sortRequest.mine,
-            uid,
-            sortRequest.categoryId,
-            pageRequest.toDefault()
+            isMine = sortRequest.mine,
+            uid = uid,
+            categoryId = sortRequest.categoryId,
+            pageable = pageRequest.toDefault()
         )
     }
 
@@ -135,11 +135,11 @@ class VoteFacade(
         val summaries = voteSummaryService.getSummaryBetween(from, to)
 
         return voteService.getAllVotesOrderByPopular(
-            sortRequest.mine,
-            uid,
-            sortRequest.categoryId,
-            summaries.map { it.postId },
-            pageRequest.toDefault()
+            isMine = sortRequest.mine,
+            uid = uid,
+            categoryId = sortRequest.categoryId,
+            ids = summaries.map { it.postId },
+            pageable = pageRequest.toDefault()
         )
     }
 
@@ -198,6 +198,7 @@ class VoteFacade(
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
         voteHistoryService.validateVoteExist(uid, postId, optionId)
 
+        // TODO : 이런 구조에서는 parZip보다는 coroutine scope를 직접 여는게 좋을 듯 합니다
         parZip(
             { voteSummaryService.decreaseCount(postId) },
             { voteOptionSummaryService.decreaseCount(optionId) }
@@ -239,30 +240,27 @@ class VoteFacade(
 
     @Transactional
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
-        val updatedPostCategory = parZip(
+        return parZip(
             // 투표 된게 있는지 검사
             { voteHistoryService.validateHistoryNotExist(id) },
-            { postCategoryService.getCategory(request.postCategoryId) }
-        ) { _, updatedPostCategory ->
-            updatedPostCategory
+            { postCategoryService.getCategory(request.postCategoryId) },
+            { voteService.getVoteAndOptions(id) }
+        ) { _, updatedPostCategory, voteInfos ->
+            val vote = voteInfos[0].post
+            val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
+
+            val updatedVote = txTemplates.writer.coExecute {
+                vote.apply {
+                    content = request.content
+                    postCategoryId = request.postCategoryId
+                }.run { postService.saveSync(this) }
+            }
+
+            CreateAndUpdateVoteResponse.of(
+                post = updatedVote,
+                optionModels = options,
+                postCategoryModel = updatedPostCategory
+            )
         }
-
-        val voteInfos = voteService.getVoteAndOptions(id)
-
-        val vote = voteInfos[0].post
-        val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
-
-        val updatedVote = txTemplates.writer.coExecute {
-            vote.apply {
-                content = request.content
-                postCategoryId = request.postCategoryId
-            }.run { postService.saveSync(this) }
-        }
-
-        return CreateAndUpdateVoteResponse.of(
-            updatedVote,
-            options,
-            updatedPostCategory
-        )
     }
 }

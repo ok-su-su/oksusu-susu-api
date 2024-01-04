@@ -60,8 +60,9 @@ class UserService(
         user.apply {
             userState = UserState.DELETED
             oauthInfo = oauthInfo.withdrawOauthInfo()
-        }
+        }.run { }
 
+        // TODO : 이러면 트랜잭션 불가아닌가요?
         saveSync(user)
     }
 }
