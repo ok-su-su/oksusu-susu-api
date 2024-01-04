@@ -15,8 +15,9 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Auth Error Code */
     FAIL_TO_VERIFY_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, "fail to verify token"),
-    NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "엑세스 토큰이 아닙니다."),
-    NOT_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 아닙니다."),
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효한 엑세스 토큰이 아닙니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효한 리프레시 토큰이 아닙니다."),
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효한 토큰이 아닙니다."),
 
     /** User Error Code */
     USER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),

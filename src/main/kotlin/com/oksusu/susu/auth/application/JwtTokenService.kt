@@ -32,6 +32,14 @@ class JwtTokenService(
         .withClaim("type", ACCESS_TOKEN)
         .build()
 
+    private val accessJwtVerifierWithExtendedExpiredAt = JWT
+        .require(Algorithm.HMAC256(jwtConfig.secretKey))
+        .withIssuer(jwtConfig.issuer)
+        .withAudience(jwtConfig.audience)
+        .withClaim("type", ACCESS_TOKEN)
+        .acceptExpiresAt(jwtConfig.refreshExp.toLong())
+        .build()
+
     private val refreshJwtVerifier = JWT
         .require(Algorithm.HMAC256(jwtConfig.secretKey))
         .withIssuer(jwtConfig.issuer)
@@ -57,6 +65,13 @@ class JwtTokenService(
         return mapper.readValue(payload)
     }
 
+    fun verifyTokenWithExtendedExpiredAt(token: String): AuthUserTokenPayload {
+        val payload = runCatching { accessJwtVerifierWithExtendedExpiredAt.verify(token).payload.decodeBase64() }
+            .getOrNull() ?: throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
+
+        return mapper.readValue(payload)
+    }
+
     fun verifyTokenMono(authUserToken: Mono<AuthUserToken>): Mono<AuthUserTokenPayload> {
         return authUserToken.flatMap { jwtToken ->
             Mono.fromCallable { verifyToken(jwtToken) }
@@ -77,8 +92,10 @@ class JwtTokenService(
         }.sign(Algorithm.HMAC256(jwtConfig.secretKey))
     }
 
-    suspend fun verifyRefreshToken(refreshToken: String) {
-        runCatching { refreshJwtVerifier.verify(refreshToken) }
-            .onFailure { throw InvalidTokenException(ErrorCode.NOT_REFRESH_TOKEN) }
+    suspend fun verifyRefreshToken(refreshToken: String): AuthUserTokenPayload {
+        val payload = runCatching { refreshJwtVerifier.verify(refreshToken).payload.decodeBase64() }
+            .getOrNull() ?: throw InvalidTokenException(ErrorCode.INVALID_REFRESH_TOKEN)
+
+        return mapper.readValue(payload)
     }
 }
