@@ -1,6 +1,7 @@
 package com.oksusu.susu.user.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.user.application.UserFacade
 import com.oksusu.susu.user.model.request.UpdateUserInfoRequest
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "유저")
+@Tag(name = SwaggerTag.USER_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/users"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserResource(

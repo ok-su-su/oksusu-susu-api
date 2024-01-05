@@ -23,13 +23,13 @@ class UserFacade(
             throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
         }
 
-        val user = userService.findByIdOrThrow(user.id)
+        val beforeChangedUser = userService.findByIdOrThrow(user.id)
 
         val updatedUser = txTemplate.writer.coExecute {
-            user.apply {
-                name = request.name
-                gender = request.gender
-                birth = request.getBirth()
+            beforeChangedUser.apply {
+                this.name = request.name
+                this.gender = request.gender
+                this.birth = request.getBirth()
             }.run { userService.saveSync(this) }
         }
 
