@@ -29,7 +29,6 @@ class User(
     @Column(name = "profile_image_url")
     var profileImageUrl: String? = null,
 ) : BaseEntity() {
-
     companion object {
         fun toEntity(oauthRegisterRequest: OauthRegisterRequest, oauthInfo: OauthInfo): User {
             return User(

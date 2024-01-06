@@ -12,6 +12,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     QUERY_DSL_NOT_EXISTS_ERROR(HttpStatus.NOT_FOUND, "not found query dsl"),
     COROUTINE_CANCELLATION_ERROR(HttpStatus.BAD_REQUEST, "coroutine cancellation error"),
     NO_AUTHORITY_ERROR(HttpStatus.FORBIDDEN, "수정 권한이 없습니다."),
+    FAIL_TO_TRANSACTION_TEMPLATE_EXECUTE_ERROR(HttpStatus.BAD_REQUEST, "fail to tx-templates execute error"),
 
     /** Auth Error Code */
     FAIL_TO_VERIFY_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, "fail to verify token"),
@@ -22,11 +23,9 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** User Error Code */
     USER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
     ALREADY_REGISTERED_USER(HttpStatus.NOT_FOUND, "이미 가입된 유저입니다."),
-    FAIL_TO_CREATE_USER_ERROR(HttpStatus.BAD_REQUEST, "유저 생성을 실패했습니다."),
 
     /** Ledger Error Code */
     LEDGER_INVALID_DUE_DATE_ERROR(HttpStatus.BAD_REQUEST, "잘못된 일정 등록 요청입니다."),
-    FAIL_TO_CREATE_LEDGER_ERROR(HttpStatus.BAD_REQUEST, "장부 생성을 실패했습니다."),
     NOT_FOUND_LEDGER_ERROR(HttpStatus.NOT_FOUND, "장부 정보가 없습니다."),
 
     /** Category Error Code */
@@ -41,16 +40,13 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** Friend Error Code */
     NOT_FOUND_FRIEND_ERROR(HttpStatus.NOT_FOUND, "친구 정보를 찾을 수 없습니다."),
     ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR(HttpStatus.BAD_REQUEST, "이미 등록된 전화번호 입니다."),
-    FAIL_TO_CREATE_FRIEND_ERROR(HttpStatus.BAD_REQUEST, "친구 생성을 실패했습니다."),
 
     /** Envelope Error Code */
-    FAIL_TO_CREATE_ENVELOPE_ERROR(HttpStatus.BAD_REQUEST, "봉투 생성을 실패했습니다."),
     NOT_FOUND_ENVELOPE_ERROR(HttpStatus.NOT_FOUND, "봉투 정보를 찾을 수 없습니다."),
 
     /** Post Error Code */
     NOT_FOUND_POST_ERROR(HttpStatus.NOT_FOUND, "게시글 정보를 찾을 수 없습니다."),
     INVALID_VOTE_OPTION_SEQUENCE(HttpStatus.BAD_REQUEST, "투표 옵션 순서가 잘못되었습니다."),
-    FAIL_TO_CREATE_POST_ERROR(HttpStatus.BAD_REQUEST, "게시글 생성을 실패했습니다."),
     NOT_FOUND_VOTE_ERROR(HttpStatus.NOT_FOUND, "투표 정보를 찾을 수 없습니다."),
     DUPLICATED_VOTE_ERROR(HttpStatus.NOT_FOUND, "중복 투표를 할 수 없습니다."),
 

@@ -73,19 +73,16 @@ class SusuBasicStatisticService(
     }
 
     suspend fun getStatisticOrThrow(): SusuBasicStatistic {
-        // 통계 없으면 에러 띄우기
+        // TODO : !!보다는 throw하는 로직이 더 좋을 듯 합니다.
+        /** 통계 없으면 에러 띄우기 */
         return getStatisticOrNull()!!
     }
 
     suspend fun getStatisticOrNull(): SusuBasicStatistic? {
-        return withContext(Dispatchers.IO) {
-            susuBasicStatisticRepository.getStatistic()
-        }
+        return withContext(Dispatchers.IO) { susuBasicStatisticRepository.getStatistic() }
     }
 
     suspend fun save(susuBasicStatistic: SusuBasicStatistic) {
-        withContext(Dispatchers.IO) {
-            susuBasicStatisticRepository.save(susuBasicStatistic)
-        }
+        withContext(Dispatchers.IO) { susuBasicStatisticRepository.save(susuBasicStatistic) }
     }
 }

@@ -48,14 +48,12 @@ class StatisticFacade(
             { envelopeService.getMaxAmountEnvelopeInfoByUid(user.id, EnvelopeType.RECEIVED) },
             // 가장 많이 보낸 금액
             { envelopeService.getMaxAmountEnvelopeInfoByUid(user.id, EnvelopeType.SENT) }
-        ) {
-                envelopHandOverAtMonthCount,
-                relationShipConuts,
-                envelopeCategoryCounts,
-                ledgerCategoryCounts,
-                receivedMaxAmount,
-                sentMaxAmount,
-            ->
+        ) { envelopHandOverAtMonthCount,
+            relationShipConuts,
+            envelopeCategoryCounts,
+            ledgerCategoryCounts,
+            receivedMaxAmount,
+            sentMaxAmount, ->
 
             // 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사
             val basicStatistic = susuBasicStatisticService.constructBasicStatistic(
@@ -66,12 +64,14 @@ class StatisticFacade(
             )
 
             // 가장 많이 받은 금액
-            val receivedMaxAmountModel =
-                receivedMaxAmount?.run { TitleValueModel(title = this.friend.name, value = this.envelope.amount) }
+            val receivedMaxAmountModel = receivedMaxAmount?.run {
+                TitleValueModel(title = this.friend.name, value = this.envelope.amount)
+            }
 
             // 가장 많이 보낸 금액
-            val sentMaxAmountModel =
-                sentMaxAmount?.run { TitleValueModel(title = this.friend.name, value = this.envelope.amount) }
+            val sentMaxAmountModel = sentMaxAmount?.run {
+                TitleValueModel(title = this.friend.name, value = this.envelope.amount)
+            }
 
             UserStatisticResponse.of(
                 basicStatistic = basicStatistic,
@@ -95,8 +95,7 @@ class StatisticFacade(
             val specific = tempSpecific.apply {
                 this.averageCategory?.apply { title = categoryService.getCategory(requestParam.postCategoryId).name }
                 this.averageRelationship?.apply {
-                    title =
-                        relationshipService.getRelationship(requestParam.relationshipId).relation
+                    title = relationshipService.getRelationship(requestParam.relationshipId).relation
                 }
             }
             SusuStatisticResponse.of(specific, basic)

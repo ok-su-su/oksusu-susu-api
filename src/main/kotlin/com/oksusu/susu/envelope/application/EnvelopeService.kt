@@ -12,6 +12,7 @@ import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailModel
 import com.oksusu.susu.envelope.infrastructure.model.FriendStatisticsModel
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeModel
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
+import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import kotlinx.coroutines.Dispatchers
@@ -123,7 +124,10 @@ class EnvelopeService(
         return withContext(Dispatchers.IO) { envelopeRepository.search(spec, pageable) }
     }
 
-    suspend fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel> {
-        return withContext(Dispatchers.IO) { envelopeRepository.findFriendStatistics(uid, pageable) }
+    suspend fun findFriendStatistics(
+        searchSpec: SearchFriendStatisticsSpec,
+        pageable: Pageable,
+    ): Page<FriendStatisticsModel> {
+        return withContext(Dispatchers.IO) { envelopeRepository.findFriendStatistics(searchSpec, pageable) }
     }
 }

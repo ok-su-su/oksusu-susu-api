@@ -5,7 +5,7 @@ import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.event.model.DeleteLedgerEvent
-import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.extension.coExecuteOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class LedgerEventListener(
             val envelopes = envelopeService.findAllByLedgerId(event.ledger.id)
             val envelopeIds = envelopes.map { envelope -> envelope.id }
 
-            txTemplates.writer.executeWithContext {
+            txTemplates.writer.coExecuteOrNull {
                 /** 봉투 삭제 */
                 envelopeService.deleteAllByLedgerId(event.ledger.id)
 

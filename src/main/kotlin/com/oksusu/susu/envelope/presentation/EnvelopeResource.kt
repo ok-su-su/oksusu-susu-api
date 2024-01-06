@@ -5,6 +5,7 @@ import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.envelope.application.EnvelopeFacade
 import com.oksusu.susu.envelope.model.request.CreateAndUpdateEnvelopeRequest
 import com.oksusu.susu.envelope.model.request.SearchEnvelopeRequest
+import com.oksusu.susu.envelope.model.request.SearchFriendStatisticsRequest
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.extension.wrapPage
@@ -75,11 +76,13 @@ class EnvelopeResource(
 
     @Operation(summary = "친구 봉투 통계 조회")
     @GetMapping("/friend-statistics")
-    suspend fun findFriendStatistics(
+    suspend fun searchFriendStatistics(
         user: AuthUser,
+        @ParameterObject request: SearchFriendStatisticsRequest,
         @ParameterObject pageRequest: SusuPageRequest,
-    ) = envelopeFacade.findFriendStatistics(
+    ) = envelopeFacade.searchFriendStatistics(
         user = user,
+        request = request,
         pageRequest = pageRequest
     ).wrapPage()
 }
