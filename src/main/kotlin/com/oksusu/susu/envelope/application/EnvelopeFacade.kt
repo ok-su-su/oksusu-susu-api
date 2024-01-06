@@ -10,9 +10,11 @@ import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
+import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.envelope.model.EnvelopeModel
 import com.oksusu.susu.envelope.model.request.CreateAndUpdateEnvelopeRequest
 import com.oksusu.susu.envelope.model.request.SearchEnvelopeRequest
+import com.oksusu.susu.envelope.model.request.SearchFriendStatisticsRequest
 import com.oksusu.susu.envelope.model.response.CreateAndUpdateEnvelopeResponse
 import com.oksusu.susu.envelope.model.response.EnvelopeDetailResponse
 import com.oksusu.susu.envelope.model.response.GetFriendStatisticsResponse
@@ -167,10 +169,20 @@ class EnvelopeFacade(
         }
     }
 
-    suspend fun findFriendStatistics(user: AuthUser, pageRequest: SusuPageRequest): Page<GetFriendStatisticsResponse> {
+    suspend fun searchFriendStatistics(
+        user: AuthUser,
+        request: SearchFriendStatisticsRequest,
+        pageRequest: SusuPageRequest,
+    ): Page<GetFriendStatisticsResponse> {
         val pageable = pageRequest.toDefault()
+        val searchSpec = SearchFriendStatisticsSpec(
+            uid = user.id,
+            friendIds = request.friendIds?.toList(),
+            fromTotalAmounts = request.fromTotalAmounts,
+            toTotalAmounts = request.toTotalAmounts
+        )
 
-        val friendStatistics = envelopeService.findFriendStatistics(user.id, pageable)
+        val friendStatistics = envelopeService.findFriendStatistics(searchSpec, pageable)
 
         val friendIds = friendStatistics.map { statistics -> statistics.friendId }.toList()
         val friends = friendService.findAllByIdIn(friendIds).associateBy { friend -> friend.id }
