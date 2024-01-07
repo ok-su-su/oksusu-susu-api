@@ -121,6 +121,9 @@ dependencies {
     /** thymeleaf */
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
+    /** fastexcel */
+    implementation("org.dhatim:fastexcel:0.16.5")
+
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

@@ -7,9 +7,11 @@ import com.oksusu.susu.envelope.domain.QEnvelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.*
 import com.oksusu.susu.extension.execute
+import com.oksusu.susu.extension.executeSlice
 import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
+import com.oksusu.susu.ledger.domain.QLedger
 import com.oksusu.susu.user.domain.QUser
 import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.jpa.impl.JPAQuery
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
@@ -81,6 +84,13 @@ interface EnvelopeCustomRepository {
 
     @Transactional(readOnly = true)
     fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel>
+
+    @Transactional(readOnly = true)
+    fun findAllDetailEnvelopeAndLedgerByEnvelopeType(
+        uid: Long,
+        envelopeType: EnvelopeType,
+        pageable: Pageable,
+    ): Slice<EnvelopeDetailAndLedgerModel>
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -95,6 +105,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
     private val qFriendRelationship = QFriendRelationship.friendRelationship
     private val qCategoryAssignment = QCategoryAssignment.categoryAssignment
     private val qUser = QUser.user
+    private val qLedger = QLedger.ledger
 
     override fun countTotalAmountsAndCounts(ledgerIds: List<Long>): List<CountTotalAmountsAndCountsModel> {
         return JPAQuery<QEnvelope>(entityManager)
@@ -334,5 +345,33 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .groupBy(qEnvelope.friendId)
 
         return querydsl.execute(query, pageable)
+    }
+
+    override fun findAllDetailEnvelopeAndLedgerByEnvelopeType(
+        uid: Long,
+        envelopeType: EnvelopeType,
+        pageable: Pageable,
+    ): Slice<EnvelopeDetailAndLedgerModel> {
+        val query = JPAQuery<Envelope>(entityManager)
+            .select(
+                QEnvelopeDetailAndLedgerModel(
+                    qLedger,
+                    qEnvelope,
+                    qFriend,
+                    qFriendRelationship,
+                    qCategoryAssignment
+                )
+            ).from(qEnvelope)
+            .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
+            .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .leftJoin(qLedger).on(qEnvelope.ledgerId.eq(qLedger.id))
+            .where(
+                qEnvelope.uid.eq(uid),
+                qEnvelope.type.eq(envelopeType),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
+
+        return querydsl.executeSlice(query, pageable)
     }
 }
