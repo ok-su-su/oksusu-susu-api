@@ -29,9 +29,9 @@ class PostService(
     ): Slice<Post> {
         return withContext(Dispatchers.IO) {
             postRepository.findAllByIsActiveAndTypeOrderByCreatedAtDesc(
-                isActive,
-                type,
-                pageable
+                isActive = isActive,
+                type = type,
+                toDefault = pageable
             )
         }
     }
@@ -41,9 +41,7 @@ class PostService(
     }
 
     suspend fun findByIdOrNull(id: Long): Post? {
-        return withContext(Dispatchers.IO) {
-            postRepository.findByIdOrNull(id)
-        }
+        return withContext(Dispatchers.IO) { postRepository.findByIdOrNull(id) }
     }
 
     suspend fun findByIdAndIsActiveAndTypeOrThrow(id: Long, isActive: Boolean, type: PostType): Post {
@@ -53,14 +51,10 @@ class PostService(
     }
 
     suspend fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: PostType, ids: List<Long>): List<Post> {
-        return withContext(Dispatchers.IO) {
-            postRepository.findByIsActiveAndTypeAndIdIn(isActive, type, ids)
-        }
+        return withContext(Dispatchers.IO) { postRepository.findByIsActiveAndTypeAndIdIn(isActive, type, ids) }
     }
 
     suspend fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long {
-        return withContext(Dispatchers.IO) {
-            postRepository.countAllByIsActiveAndType(isActive, type)
-        }
+        return withContext(Dispatchers.IO) { postRepository.countAllByIsActiveAndType(isActive, type) }
     }
 }

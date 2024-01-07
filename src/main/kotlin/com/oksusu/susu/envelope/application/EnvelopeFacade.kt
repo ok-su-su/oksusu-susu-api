@@ -10,17 +10,19 @@ import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
+import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.envelope.model.EnvelopeModel
 import com.oksusu.susu.envelope.model.request.CreateAndUpdateEnvelopeRequest
 import com.oksusu.susu.envelope.model.request.SearchEnvelopeRequest
+import com.oksusu.susu.envelope.model.request.SearchFriendStatisticsRequest
 import com.oksusu.susu.envelope.model.response.CreateAndUpdateEnvelopeResponse
 import com.oksusu.susu.envelope.model.response.EnvelopeDetailResponse
 import com.oksusu.susu.envelope.model.response.GetFriendStatisticsResponse
 import com.oksusu.susu.envelope.model.response.SearchEnvelopeResponse
 import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.FailToCreateException
 import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.extension.coExecute
+import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
@@ -46,7 +48,7 @@ class EnvelopeFacade(
             else -> null
         }
 
-        val createdEnvelope = txTemplates.writer.executeWithContext {
+        val createdEnvelope = txTemplates.writer.coExecute {
             val createdEnvelope = Envelope(
                 uid = user.id,
                 type = request.type,
@@ -66,7 +68,7 @@ class EnvelopeFacade(
             ).run { categoryAssignmentService.saveSync(this) }
 
             createdEnvelope
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_ENVELOPE_ERROR)
+        }
 
         return CreateAndUpdateEnvelopeResponse.from(createdEnvelope)
     }
@@ -85,7 +87,7 @@ class EnvelopeFacade(
             else -> null
         }
 
-        val updatedEnvelope = txTemplates.writer.executeWithContext {
+        val updatedEnvelope = txTemplates.writer.coExecute {
             val updatedEnvelope = envelope.apply {
                 this.type = request.type
                 this.friendId = friend.id
@@ -102,7 +104,7 @@ class EnvelopeFacade(
             }.run { categoryAssignmentService.saveSync(this) }
 
             updatedEnvelope
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_ENVELOPE_ERROR)
+        }
 
         return CreateAndUpdateEnvelopeResponse.from(updatedEnvelope)
     }
@@ -123,7 +125,7 @@ class EnvelopeFacade(
     suspend fun delete(user: AuthUser, id: Long) {
         val envelope = envelopeService.findByIdOrThrow(id, user.id)
 
-        txTemplates.writer.executeWithContext {
+        txTemplates.writer.coExecuteOrNull {
             /** 봉투 삭제 */
             envelopeService.deleteSync(envelope)
 
@@ -167,10 +169,20 @@ class EnvelopeFacade(
         }
     }
 
-    suspend fun findFriendStatistics(user: AuthUser, pageRequest: SusuPageRequest): Page<GetFriendStatisticsResponse> {
+    suspend fun searchFriendStatistics(
+        user: AuthUser,
+        request: SearchFriendStatisticsRequest,
+        pageRequest: SusuPageRequest,
+    ): Page<GetFriendStatisticsResponse> {
         val pageable = pageRequest.toDefault()
+        val searchSpec = SearchFriendStatisticsSpec(
+            uid = user.id,
+            friendIds = request.friendIds?.toList(),
+            fromTotalAmounts = request.fromTotalAmounts,
+            toTotalAmounts = request.toTotalAmounts
+        )
 
-        val friendStatistics = envelopeService.findFriendStatistics(user.id, pageable)
+        val friendStatistics = envelopeService.findFriendStatistics(searchSpec, pageable)
 
         val friendIds = friendStatistics.map { statistics -> statistics.friendId }.toList()
         val friends = friendService.findAllByIdIn(friendIds).associateBy { friend -> friend.id }

@@ -5,8 +5,7 @@ import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.AlreadyException
 import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.FailToCreateException
-import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.domain.FriendRelationship
 import com.oksusu.susu.friend.infrastructure.model.SearchFriendRequestModel
@@ -62,7 +61,7 @@ class FriendFacade(
             false -> null
         }
 
-        val createdFriend = txTemplates.writer.executeWithContext {
+        val createdFriend = txTemplates.writer.coExecute {
             val createdFriend = Friend(
                 uid = user.id,
                 name = request.name,
@@ -76,7 +75,7 @@ class FriendFacade(
             ).run { friendRelationshipService.saveSync(this) }
 
             createdFriend
-        } ?: throw FailToCreateException(ErrorCode.FAIL_TO_CREATE_FRIEND_ERROR)
+        }
 
         return CreateFriendResponse(createdFriend.id)
     }

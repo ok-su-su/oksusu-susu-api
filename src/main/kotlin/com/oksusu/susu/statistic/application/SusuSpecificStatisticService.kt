@@ -47,12 +47,17 @@ class SusuSpecificStatisticService(
 
     suspend fun save(model: CountAvgAmountPerStatisticGroupModel) {
         val key = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(
-            model.birth.toAgeGroup(),
-            model.categoryId,
-            model.relationshipId
+            age = model.birth.toAgeGroup(),
+            postCategoryId = model.categoryId,
+            relationshipId = model.relationshipId
         )
+
         withContext(Dispatchers.IO) {
-            susuSpecificStatisticRepository.save(key, model.averageAmount.toString(), SUSU_STATISTIC_TTL)
+            susuSpecificStatisticRepository.save(
+                key = key,
+                value = model.averageAmount.toString(),
+                ttl = SUSU_STATISTIC_TTL
+            )
         }
     }
 
@@ -63,8 +68,6 @@ class SusuSpecificStatisticService(
     }
 
     suspend fun findByKey(key: String): String? {
-        return withContext(Dispatchers.IO) {
-            susuSpecificStatisticRepository.findByKey(key)
-        }
+        return withContext(Dispatchers.IO) { susuSpecificStatisticRepository.findByKey(key) }
     }
 }

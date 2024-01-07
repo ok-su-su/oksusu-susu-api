@@ -10,6 +10,7 @@ import com.oksusu.susu.auth.model.dto.TokenDto
 import com.oksusu.susu.auth.model.dto.response.TokenRefreshRequest
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidTokenException
+import com.oksusu.susu.exception.NoAuthorityException
 import com.oksusu.susu.user.application.UserService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,7 +28,7 @@ class AuthFacade(
         return jwtTokenService.verifyTokenMono(token)
             .map { payload ->
                 if (payload.type != "accessToken") {
-                    throw InvalidTokenException(ErrorCode.NOT_ACCESS_TOKEN)
+                    throw InvalidTokenException(ErrorCode.INVALID_ACCESS_TOKEN)
                 }
                 val user = userService.findByIdOrThrowSync(payload.id)
 
@@ -41,15 +42,20 @@ class AuthFacade(
     }
 
     @Transactional
-    suspend fun refreshToken(authUser: AuthUser, request: TokenRefreshRequest): TokenDto {
-        jwtTokenService.verifyRefreshToken(request.refreshToken)
+    suspend fun refreshToken(request: TokenRefreshRequest): TokenDto {
+        val accessPayload = jwtTokenService.verifyTokenWithExtendedExpiredAt(request.accessToken)
+        val refreshPayload = jwtTokenService.verifyRefreshToken(request.refreshToken)
+
+        if (accessPayload.id != refreshPayload.id) {
+            throw NoAuthorityException(ErrorCode.INVALID_TOKEN)
+        }
 
         return parZip(
-            { refreshTokenService.deleteByIdSync(authUser.id) },
-            { tokenGenerateHelper.generateAccessAndRefreshToken(authUser.id) }
+            { refreshTokenService.deleteByIdSync(refreshPayload.id) },
+            { tokenGenerateHelper.generateAccessAndRefreshToken(refreshPayload.id) }
         ) { _, tokenDto ->
             RefreshToken(
-                id = authUser.id,
+                id = refreshPayload.id,
                 refreshToken = tokenDto.refreshToken,
                 ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
             ).run { refreshTokenService.saveSync(this) }

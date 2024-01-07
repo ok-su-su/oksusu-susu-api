@@ -5,6 +5,8 @@ import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.envelope.infrastructure.model.QCountPerCategoryIdModel
 import com.oksusu.susu.extension.execute
+import com.oksusu.susu.extension.isContains
+import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.domain.QLedger
 import com.oksusu.susu.ledger.infrastructure.model.LedgerDetailModel
@@ -61,7 +63,8 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
             .where(
                 qLedger.uid.eq(spec.uid),
-                qCategoryAssignment.categoryId.eq(spec.categoryId),
+                qLedger.title.isContains(spec.title),
+                qCategoryAssignment.categoryId.isEquals(spec.categoryId),
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER),
                 allOf(
                     qLedger.startAt.after(spec.fromStartAt),

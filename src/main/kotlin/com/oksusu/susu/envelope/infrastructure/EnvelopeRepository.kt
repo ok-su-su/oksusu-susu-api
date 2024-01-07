@@ -83,7 +83,7 @@ interface EnvelopeCustomRepository {
     fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel>
 
     @Transactional(readOnly = true)
-    fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel>
+    fun findFriendStatistics(sepc: SearchFriendStatisticsSpec, pageable: Pageable): Page<FriendStatisticsModel>
 
     @Transactional(readOnly = true)
     fun findAllDetailEnvelopeAndLedgerByEnvelopeType(
@@ -321,7 +321,10 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
         return querydsl.execute(query, pageable)
     }
 
-    override fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel> {
+    override fun findFriendStatistics(
+        spec: SearchFriendStatisticsSpec,
+        pageable: Pageable,
+    ): Page<FriendStatisticsModel> {
         val sentAmount = CaseBuilder()
             .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
             .then(QEnvelope.envelope.amount)
@@ -341,8 +344,22 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 )
             )
             .from(QEnvelope.envelope)
-            .where(qEnvelope.uid.eq(uid))
-            .groupBy(qEnvelope.friendId)
+            .where(qEnvelope.uid.eq(spec.uid))
+
+        if (!spec.friendIds.isNullOrEmpty()) {
+            query
+                .where(qEnvelope.friendId.`in`(spec.friendIds))
+        }
+
+        val totalAmount = sentAmount.sum().add(receivedAmount.sum())
+        if (spec.fromTotalAmounts != null) {
+            query.where(totalAmount.goe(totalAmount))
+        }
+        if (spec.toTotalAmounts != null) {
+            query.where(totalAmount.loe(totalAmount))
+        }
+
+        query.groupBy(qEnvelope.friendId)
 
         return querydsl.execute(query, pageable)
     }

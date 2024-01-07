@@ -5,7 +5,7 @@ import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NoAuthorityException
 import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.extension.executeWithContext
+import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
@@ -53,7 +53,7 @@ class VoteService(
             throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
         }
 
-        txTemplates.writer.executeWithContext {
+        txTemplates.writer.coExecute {
             vote.apply { isActive = false }.run {
                 postService.saveSync(vote)
             }

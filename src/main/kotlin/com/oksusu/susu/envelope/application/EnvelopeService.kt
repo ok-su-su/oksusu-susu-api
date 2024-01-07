@@ -126,7 +126,10 @@ class EnvelopeService(
         return withContext(Dispatchers.IO) { envelopeRepository.search(spec, pageable) }
     }
 
-    suspend fun findFriendStatistics(uid: Long, pageable: Pageable): Page<FriendStatisticsModel> {
-        return withContext(Dispatchers.IO) { envelopeRepository.findFriendStatistics(uid, pageable) }
+    suspend fun findFriendStatistics(
+        searchSpec: SearchFriendStatisticsSpec,
+        pageable: Pageable,
+    ): Page<FriendStatisticsModel> {
+        return withContext(Dispatchers.IO) { envelopeRepository.findFriendStatistics(searchSpec, pageable) }
     }
 }
