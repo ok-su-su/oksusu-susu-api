@@ -1,6 +1,6 @@
 package com.oksusu.susu.statistic.model
 
-class TitleStringModel(
+data class TitleStringModel(
     var title: String,
     val value: String,
 )
