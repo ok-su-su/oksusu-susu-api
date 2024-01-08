@@ -13,10 +13,10 @@ import java.time.Duration
 
 @Service
 class CacheServiceImpl(
-    private val reactiveRedisTemplate: ReactiveRedisTemplate<String, String>,
+    reactiveRedisTemplate: ReactiveRedisTemplate<String, String>,
 ) : CacheService {
-    val zSetOps = reactiveRedisTemplate.opsForZSet()
-    val keyValueOps = reactiveRedisTemplate.opsForValue()
+    private val zSetOps = reactiveRedisTemplate.opsForZSet()
+    private val keyValueOps = reactiveRedisTemplate.opsForValue()
 
     override suspend fun <T> zSetSaveAll(key: String, tuples: Map<T, Long>) {
         val typedTuples = arrayListOf<ZSetOperations.TypedTuple<String>>()
@@ -47,7 +47,10 @@ class CacheServiceImpl(
         return zSetOps.score(key, *members.toTypedArray()).awaitSingle()
     }
 
-    override suspend fun zSetFindRangeWithScores(key: String, range: Range<Long>): Flow<ZSetOperations.TypedTuple<String>> {
+    override suspend fun zSetFindRangeWithScores(
+        key: String,
+        range: Range<Long>,
+    ): Flow<ZSetOperations.TypedTuple<String>> {
         return zSetOps.rangeWithScores(key, range).asFlow()
     }
 
