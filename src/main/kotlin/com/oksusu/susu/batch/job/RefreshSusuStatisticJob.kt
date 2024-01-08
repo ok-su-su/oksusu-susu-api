@@ -43,7 +43,7 @@ class RefreshSusuStatisticJob(
             relationShipConuts,
             envelopeCategoryCounts,
             ledgerCategoryCounts,
-            avgAmountModels ->
+            avgAmountModels, ->
 
             /** 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사 레디스 저장 */
             susuBasicStatisticService.save(

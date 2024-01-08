@@ -8,7 +8,7 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.domain.FriendRelationship
-import com.oksusu.susu.friend.infrastructure.model.SearchFriendRequestModel
+import com.oksusu.susu.friend.infrastructure.model.SearchFriendSpec
 import com.oksusu.susu.friend.model.request.CreateFriendRequest
 import com.oksusu.susu.friend.model.request.SearchFriendRequest
 import com.oksusu.susu.friend.model.response.CreateFriendResponse
@@ -29,7 +29,7 @@ class FriendFacade(
         pageRequest: SusuPageRequest,
     ): Page<SearchFriendResponse> {
         val searchResponse = friendService.search(
-            searchRequest = SearchFriendRequestModel(
+            spec = SearchFriendSpec(
                 uid = user.id,
                 name = searchRequest.name,
                 phoneNumber = searchRequest.phoneNumber

@@ -5,7 +5,7 @@ import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.model.PostCategoryModel
 import com.oksusu.susu.post.model.VoteOptionModel
 
-class CreateAndUpdateVoteResponse(
+data class CreateAndUpdateVoteResponse(
     val id: Long,
     val category: String,
     val content: String,
@@ -13,7 +13,11 @@ class CreateAndUpdateVoteResponse(
     val options: List<VoteOptionModel>,
 ) {
     companion object {
-        fun of(post: Post, optionModels: List<VoteOptionModel>, postCategoryModel: PostCategoryModel): CreateAndUpdateVoteResponse {
+        fun of(
+            post: Post,
+            optionModels: List<VoteOptionModel>,
+            postCategoryModel: PostCategoryModel,
+        ): CreateAndUpdateVoteResponse {
             return CreateAndUpdateVoteResponse(
                 id = post.id,
                 category = postCategoryModel.name,

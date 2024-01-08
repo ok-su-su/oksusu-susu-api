@@ -1,5 +1,6 @@
 package com.oksusu.susu.health.presentation
 
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.health.dto.HealthResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
-@Tag(name = "Health")
+@Tag(name = SwaggerTag.HEALTH_SWAGGER_TAG)
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class HealthResource(

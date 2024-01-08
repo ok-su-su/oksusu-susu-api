@@ -1,6 +1,7 @@
 package com.oksusu.susu.envelope.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.envelope.application.EnvelopeConfigService
 import com.oksusu.susu.extension.wrapOk
 import io.swagger.v3.oas.annotations.Operation
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "봉투 Config")
+@Tag(name = SwaggerTag.ENVELOPE_CONFIG_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/envelopes/configs"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class EnvelopeConfigResource(

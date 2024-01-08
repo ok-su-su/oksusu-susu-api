@@ -8,7 +8,7 @@ import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.model.UserProfileModel
 import java.time.LocalDateTime
 
-class VoteAndOptionsWithCountResponse(
+data class VoteAndOptionsWithCountResponse(
     val id: Long,
     val isMine: Boolean,
     val category: String,

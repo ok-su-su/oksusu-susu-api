@@ -5,6 +5,7 @@ import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
 import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
 import io.swagger.v3.oas.annotations.Operation
@@ -12,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = "Oauth")
+@Tag(name = SwaggerTag.OAUTH_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/oauth"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class OauthResource(

@@ -14,7 +14,11 @@ class VoteAndOptionsResponse(
     val options: List<VoteOptionModel>,
 ) {
     companion object {
-        fun of(vote: Post, options: List<VoteOptionModel>, postCategoryModel: PostCategoryModel): VoteAndOptionsResponse {
+        fun of(
+            vote: Post,
+            options: List<VoteOptionModel>,
+            postCategoryModel: PostCategoryModel,
+        ): VoteAndOptionsResponse {
             return VoteAndOptionsResponse(
                 id = vote.id,
                 uid = vote.uid,

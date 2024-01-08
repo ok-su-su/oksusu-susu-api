@@ -2,6 +2,7 @@ package com.oksusu.susu.friend.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapPage
 import com.oksusu.susu.friend.application.FriendFacade
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "지인")
+@Tag(name = SwaggerTag.FRIEND_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/friends"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class FriendResource(
