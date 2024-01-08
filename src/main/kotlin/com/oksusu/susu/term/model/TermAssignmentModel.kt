@@ -1,6 +1,6 @@
 package com.oksusu.susu.term.model
 
-class TermAssignmentModel(
+data class TermAssignmentModel(
     val id: Long,
     val uid: Long,
     val termId: Long,

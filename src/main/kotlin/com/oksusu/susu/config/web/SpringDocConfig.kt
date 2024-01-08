@@ -66,4 +66,5 @@ class SpringDocConfig(
 
 object SwaggerTag {
     const val USER_SWAGGER_TAG = "User API"
+    const val TERM_SWAGGER_TAG = "Term API"
 }

@@ -11,5 +11,5 @@ interface TermRepository : JpaRepository<Term, Long> {
     fun findAllByIsActiveOrderByIsEssentialDesc(isActive: Boolean): List<Term>
 
     @Transactional(readOnly = true)
-    fun findAllByIdIn(ids: List<Long>): List<Term>
+    fun countAllByIdIn(ids: List<Long>): Long
 }
