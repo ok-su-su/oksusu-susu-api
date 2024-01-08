@@ -1,4 +1,4 @@
-package com.oksusu.susu.user.domain
+package com.oksusu.susu.user.domain.vo
 
 enum class Gender {
     /** 남성 */

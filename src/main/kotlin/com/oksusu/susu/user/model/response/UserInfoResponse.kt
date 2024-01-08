@@ -1,8 +1,8 @@
 package com.oksusu.susu.user.model.response
 
 import com.oksusu.susu.common.annotation.DateFormat
-import com.oksusu.susu.user.domain.Gender
 import com.oksusu.susu.user.domain.User
+import com.oksusu.susu.user.domain.vo.Gender
 import java.time.LocalDate
 
 class UserInfoResponse(

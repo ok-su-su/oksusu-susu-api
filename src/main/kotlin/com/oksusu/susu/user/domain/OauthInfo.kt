@@ -17,7 +17,10 @@ data class OauthInfo(
     val oauthId: String,
 ) {
     fun withdrawOauthInfo(): OauthInfo {
-        val withDrawOid = "withdraw ${LocalDateTime.now()}:$oauthId"
-        return OauthInfo(oauthProvider, withDrawOid)
+        return OauthInfo(this.oauthProvider, withDrawOid())
+    }
+
+    private fun withDrawOid(now: LocalDateTime = LocalDateTime.now()): String {
+        return "withdraw:$now:${this.oauthId}"
     }
 }
