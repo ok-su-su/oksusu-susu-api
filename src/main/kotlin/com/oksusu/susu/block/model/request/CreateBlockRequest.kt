@@ -1,11 +1,8 @@
-package com.oksusu.susu.block.model
+package com.oksusu.susu.block.model.request
 
 import com.oksusu.susu.block.domain.vo.BlockTargetType
-import jakarta.persistence.*
 
-class BlockModel(
-    val id: Long,
-    val uid: Long,
+class CreateBlockRequest(
     val targetId: Long,
     val targetType: BlockTargetType,
     val reason: String?,

@@ -2,6 +2,7 @@ package com.oksusu.susu.user.application
 
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.user.domain.OauthInfo
@@ -66,5 +67,11 @@ class UserService(
                 this.oauthInfo = oauthInfo.withdrawOauthInfo()
             }.run { saveSync(this) }
         }
+    }
+
+    suspend fun validateExist(id: Long) {
+        withContext(Dispatchers.IO) {
+            userRepository.existsById(id)
+        }.takeIf { it } ?: throw InvalidRequestException(ErrorCode.USER_NOT_FOUND_ERROR)
     }
 }

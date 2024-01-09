@@ -1,7 +1,6 @@
 package com.oksusu.susu.block.domain
 
 import com.oksusu.susu.block.domain.vo.BlockTargetType
-import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.common.domain.BaseEntity
 import jakarta.persistence.*
 

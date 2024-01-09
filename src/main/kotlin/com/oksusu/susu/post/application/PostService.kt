@@ -1,6 +1,7 @@
 package com.oksusu.susu.post.application
 
 import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
@@ -56,5 +57,11 @@ class PostService(
 
     suspend fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long {
         return withContext(Dispatchers.IO) { postRepository.countAllByIsActiveAndType(isActive, type) }
+    }
+
+    suspend fun validateExist(id: Long) {
+        withContext(Dispatchers.IO) {
+            postRepository.existsById(id)
+        }.takeIf { it } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
 }
