@@ -30,9 +30,6 @@ interface PostRepository : JpaRepository<Post, Long>, PostCustomRepository {
     fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: PostType): Post?
 
     @Transactional(readOnly = true)
-    fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: PostType, ids: List<Long>): List<Post>
-
-    @Transactional(readOnly = true)
     fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long
 }
 
@@ -41,10 +38,12 @@ interface PostCustomRepository {
     fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel>
 
     @Transactional(readOnly = true)
-    fun getAllVotes(
+    fun getAllVotesExceptBlock(
         isMine: Boolean,
         uid: Long,
         categoryId: Long,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
         pageable: Pageable,
     ): Slice<Post>
 
@@ -54,6 +53,17 @@ interface PostCustomRepository {
         uid: Long,
         categoryId: Long,
         ids: List<Long>,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
+    ): List<Post>
+
+    @Transactional(readOnly = true)
+    fun findByIsActiveAndTypeAndIdInExceptBlock(
+        isActive: Boolean,
+        type: PostType,
+        ids: List<Long>,
+        userBlockId: List<Long>,
+        postBlockIds: List<Long>,
     ): List<Post>
 }
 
@@ -80,14 +90,17 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             ).fetch()
     }
 
-    override fun getAllVotes(
+    override fun getAllVotesExceptBlock(
         isMine: Boolean,
         uid: Long,
         categoryId: Long,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
         pageable: Pageable,
     ): Slice<Post> {
-        val uidFilter = qPost.uid.eq(uid).takeIf { isMine }
+        val uidFilter = qPost.uid.eq(uid).takeIf { isMine } ?: qPost.uid.notIn(userBlockIds)
         val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
+        val postIdFilter = qPost.id.notIn(postBlockIds)
 
         val query = JPAQuery<com.oksusu.susu.post.domain.QPost>(entityManager)
             .select(qPost)
@@ -96,7 +109,8 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             .where(
                 qPost.isActive.eq(true),
                 uidFilter,
-                categoryFilter
+                categoryFilter,
+                postIdFilter
             ).orderBy(
                 qPost.createdAt.desc()
             )
@@ -109,9 +123,12 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         uid: Long,
         categoryId: Long,
         ids: List<Long>,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
     ): List<Post> {
-        val uidFilter = qPost.uid.eq(uid).takeIf { isMine }
+        val uidFilter = qPost.uid.eq(uid).takeIf { isMine } ?: qPost.uid.notIn(userBlockIds)
         val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
+        val postIdFilter = qPost.id.notIn(postBlockIds).and(qPost.id.`in`(ids))
 
         return JPAQuery<com.oksusu.susu.post.domain.QPost>(entityManager)
             .select(qPost)
@@ -119,9 +136,32 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
             .where(
                 qPost.isActive.eq(true),
-                qPost.id.`in`(ids),
                 uidFilter,
-                categoryFilter
+                categoryFilter,
+                postIdFilter
+            )
+            .fetch()
+    }
+
+    override fun findByIsActiveAndTypeAndIdInExceptBlock(
+        isActive: Boolean,
+        type: PostType,
+        ids: List<Long>,
+        userBlockId: List<Long>,
+        postBlockIds: List<Long>,
+    ): List<Post> {
+        val uidFilter = qPost.uid.notIn(userBlockId)
+        val postIdFilter = qPost.id.`in`(ids).and(qPost.id.notIn(postBlockIds))
+
+        return JPAQuery<com.oksusu.susu.post.domain.QPost>(entityManager)
+            .select(qPost)
+            .from(qPost)
+            .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qPost.isActive.eq(isActive),
+                qPost.type.eq(type),
+                uidFilter,
+                postIdFilter
             )
             .fetch()
     }

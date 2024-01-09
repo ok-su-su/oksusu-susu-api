@@ -10,4 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 interface BlockRepository : JpaRepository<Block, Long> {
     @Transactional(readOnly = true)
     fun existsByUidAndTargetIdAndTargetType(uid: Long, targetId: Long, targetType: BlockTargetType): Boolean
+
+    @Transactional(readOnly = true)
+    fun findAllByUid(uid: Long): List<Block>
 }

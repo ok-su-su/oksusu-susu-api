@@ -22,4 +22,21 @@ class BlockService(
     fun saveSync(block: Block): Block {
         return blockRepository.save(block)
     }
+
+    suspend fun findAllByUid(uid: Long): List<Block> {
+        return withContext(Dispatchers.IO) {
+            blockRepository.findAllByUid(uid)
+        }
+    }
+
+    suspend fun getUserAndPostBlockTargetIds(uid: Long): Pair<List<Long>, List<Long>> {
+        val blocks = findAllByUid(uid)
+
+        val userBlockIds = blocks.filter { it.targetType == BlockTargetType.USER }
+            .map { block -> block.targetId }
+        val postBlockIds = blocks.filter { it.targetType == BlockTargetType.POST }
+            .map { block -> block.targetId }
+
+        return userBlockIds to postBlockIds
+    }
 }

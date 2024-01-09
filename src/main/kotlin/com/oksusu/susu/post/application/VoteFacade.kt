@@ -2,6 +2,8 @@ package com.oksusu.susu.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.block.application.BlockService
+import com.oksusu.susu.block.domain.vo.BlockTargetType
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.extension.coExecute
@@ -25,9 +27,9 @@ import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.VoteSortRequest
 import com.oksusu.susu.post.model.vo.VoteSortType
 import com.oksusu.susu.user.application.UserService
+import kotlinx.coroutines.*
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class VoteFacade(
@@ -40,6 +42,7 @@ class VoteFacade(
     private val voteHistoryService: VoteHistoryService,
     private val userService: UserService,
     private val postCategoryService: PostCategoryService,
+    private val blockService: BlockService,
 ) {
     private val logger = mu.KotlinLogging.logger { }
 
@@ -47,7 +50,6 @@ class VoteFacade(
         private const val DEFAULT_POPULAR_VOTE_COUNT = 5L
     }
 
-    @Transactional
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
         voteOptionService.validateSeq(request.options)
         postCategoryService.validateExistCategory(request.postCategoryId)
@@ -90,9 +92,23 @@ class VoteFacade(
         sortRequest: VoteSortRequest,
         pageRequest: SusuPageRequest,
     ): Slice<VoteAndOptionsResponse> {
+        val (userBlockIds, postBlockIds) = blockService.getUserAndPostBlockTargetIds(user.id)
+
         val votes = when (sortRequest.sortType) {
-            VoteSortType.LATEST -> getLatestVotes(sortRequest, user.id, pageRequest)
-            VoteSortType.POPULAR -> getPopularVotes(sortRequest, user.id, pageRequest)
+            VoteSortType.LATEST -> getLatestVotes(
+                sortRequest = sortRequest,
+                uid = user.id,
+                userBlockIds = userBlockIds,
+                postBlockIds = postBlockIds,
+                pageRequest = pageRequest
+            )
+            VoteSortType.POPULAR -> getPopularVotes(
+                sortRequest = sortRequest,
+                uid = user.id,
+                userBlockIds = userBlockIds,
+                postBlockIds = postBlockIds,
+                pageRequest = pageRequest
+            )
         }
 
         return parZip(
@@ -114,12 +130,16 @@ class VoteFacade(
     private suspend fun getLatestVotes(
         sortRequest: VoteSortRequest,
         uid: Long,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
         pageRequest: SusuPageRequest,
     ): Slice<Post> {
-        return voteService.getAllVotes(
+        return voteService.getAllVotesExceptBlock(
             isMine = sortRequest.mine,
             uid = uid,
             categoryId = sortRequest.categoryId,
+            userBlockIds = userBlockIds,
+            postBlockIds = postBlockIds,
             pageable = pageRequest.toDefault()
         )
     }
@@ -127,6 +147,8 @@ class VoteFacade(
     private suspend fun getPopularVotes(
         sortRequest: VoteSortRequest,
         uid: Long,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
         pageRequest: SusuPageRequest,
     ): Slice<Post> {
         val from = pageRequest.page!! * pageRequest.size!!
@@ -138,6 +160,8 @@ class VoteFacade(
             uid = uid,
             categoryId = sortRequest.categoryId,
             ids = summaries.map { it.postId },
+            userBlockIds = userBlockIds,
+            postBlockIds = postBlockIds,
             pageable = pageRequest.toDefault()
         )
     }
@@ -171,7 +195,6 @@ class VoteFacade(
         }
     }
 
-    @Transactional
     suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
         when (request.isCancel) {
             true -> cancelVote(user.id, id, request.optionId)
@@ -182,10 +205,12 @@ class VoteFacade(
     private suspend fun castVote(uid: Long, postId: Long, optionId: Long) {
         voteHistoryService.validateVoteNotExist(uid, postId)
 
-        parZip(
-            { voteSummaryService.increaseCount(postId) },
-            { voteOptionSummaryService.increaseCount(optionId) }
-        ) { _, _ -> }
+        CoroutineScope(Dispatchers.IO).launch {
+            val increaseSummary = async { voteSummaryService.increaseCount(postId) }
+            val increaseOptionSummary = async { voteOptionSummaryService.increaseCount(optionId) }
+
+            awaitAll(increaseSummary, increaseOptionSummary)
+        }
 
         txTemplates.writer.coExecute {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
@@ -196,19 +221,21 @@ class VoteFacade(
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
         voteHistoryService.validateVoteExist(uid, postId, optionId)
 
-        // TODO : 이런 구조에서는 parZip보다는 coroutine scope를 직접 여는게 좋을 듯 합니다
-        parZip(
-            { voteSummaryService.decreaseCount(postId) },
-            { voteOptionSummaryService.decreaseCount(optionId) }
-        ) { _, _ -> }
+        CoroutineScope(Dispatchers.IO).launch {
+            val decreaseSummary = async { voteSummaryService.decreaseCount(postId) }
+            val decreaseOptionSummary = async { voteOptionSummaryService.decreaseCount(optionId) }
+
+            awaitAll(decreaseSummary, decreaseOptionSummary)
+        }
 
         txTemplates.writer.coExecuteOrNull {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
         }
     }
 
-    @Transactional
     suspend fun deleteVote(user: AuthUser, id: Long) {
+        postService.validateAuthority(id, user.id)
+
         parZip(
             { voteSummaryService.deleteSummaryByPostId(id) },
             { voteOptionService.getVoteOptions(id) }
@@ -220,8 +247,19 @@ class VoteFacade(
     }
 
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
-        val summaries = voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT)
-        val votes = voteService.getAllVotesByIdIn(summaries.map { summary -> summary.postId })
+        val (summaries, votes) = parZip(
+            { voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT) },
+            { blockService.findAllByUid(user.id) }
+        ) { summaries, blocks ->
+            val userBlockIds = blocks.filter { it.targetType == BlockTargetType.USER }
+                .map { block -> block.targetId }
+            val postBlockIds = blocks.filter { it.targetType == BlockTargetType.POST }
+                .map { block -> block.targetId }
+            val ids = summaries.map { summary -> summary.postId }
+
+            summaries to voteService.getAllVotesByIdInExceptBlock(ids, userBlockIds, postBlockIds)
+        }
+
         val postCategoryModels = postCategoryService.getCategoryByIdIn(votes.map { vote -> vote.postCategoryId })
 
         return summaries.map { summary ->
@@ -235,14 +273,13 @@ class VoteFacade(
         }
     }
 
-    @Transactional
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
         return parZip(
-            // 투표 된게 있는지 검사
+            { postService.validateAuthority(id, user.id) },
             { voteHistoryService.validateHistoryNotExist(id) },
             { postCategoryService.getCategory(request.postCategoryId) },
             { voteService.getVoteAndOptions(id) }
-        ) { _, updatedPostCategory, voteInfos ->
+        ) { _, _, updatedPostCategory, voteInfos ->
             val vote = voteInfos[0].post
             val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
 

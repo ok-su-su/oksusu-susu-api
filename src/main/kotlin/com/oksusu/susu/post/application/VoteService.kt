@@ -25,14 +25,23 @@ class VoteService(
 ) {
     val logger = mu.KotlinLogging.logger { }
 
-    suspend fun getAllVotes(
+    suspend fun getAllVotesExceptBlock(
         isMine: Boolean,
         uid: Long,
         categoryId: Long,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
         pageable: Pageable,
     ): Slice<Post> {
         return withContext(Dispatchers.IO) {
-            postRepository.getAllVotes(isMine, uid, categoryId, pageable)
+            postRepository.getAllVotesExceptBlock(
+                isMine = isMine,
+                uid = uid,
+                categoryId = categoryId,
+                userBlockIds = userBlockIds,
+                postBlockIds = postBlockIds,
+                pageable = pageable
+            )
         }
     }
 
@@ -60,8 +69,18 @@ class VoteService(
         }
     }
 
-    suspend fun getAllVotesByIdIn(postIds: List<Long>): List<Post> {
-        return postService.findByIsActiveAndTypeAndIdIn(true, PostType.VOTE, postIds)
+    suspend fun getAllVotesByIdInExceptBlock(
+        postIds: List<Long>,
+        userBlockId: List<Long>,
+        postBlockIds: List<Long>,
+    ): List<Post> {
+        return postService.findByIsActiveAndTypeAndIdInExceptBlock(
+            isActive = true,
+            type = PostType.VOTE,
+            ids = postIds,
+            userBlockId = userBlockId,
+            postBlockIds = postBlockIds
+        )
     }
 
     suspend fun getAllVotesOrderByPopular(
@@ -69,11 +88,22 @@ class VoteService(
         uid: Long,
         categoryId: Long,
         ids: List<Long>,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
         pageable: Pageable,
     ): Slice<Post> {
         val (votes, totalCount) = parZip(
             Dispatchers.IO,
-            { postRepository.getAllVotesOrderByPopular(isMine, uid, categoryId, ids) },
+            {
+                postRepository.getAllVotesOrderByPopular(
+                    isMine = isMine,
+                    uid = uid,
+                    categoryId = categoryId,
+                    ids = ids,
+                    userBlockIds = userBlockIds,
+                    postBlockIds = postBlockIds
+                )
+            },
             { getActiveVoteCount() },
             { a, b -> a to b }
         )
