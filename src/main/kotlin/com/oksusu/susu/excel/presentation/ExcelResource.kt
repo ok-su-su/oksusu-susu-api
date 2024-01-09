@@ -25,7 +25,7 @@ class ExcelResource(
     }
 
     @Operation(summary = "excel 파일로 가져오기")
-    @GetMapping
+    @GetMapping("/all-envelopes")
     suspend fun getAllEnvelopsExcel(
         user: AuthUser,
         @RequestParam(defaultValue = DEFAULT_EXCEL_TITLE) fileName: String,
