@@ -3,22 +3,14 @@ package com.oksusu.susu.envelope.application
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.EnvelopeRepository
-import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
-import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
-import com.oksusu.susu.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
-import com.oksusu.susu.envelope.infrastructure.model.EnvelopeAndFriendModel
-import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailModel
-import com.oksusu.susu.envelope.infrastructure.model.FriendStatisticsModel
-import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeModel
-import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
-import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
+import com.oksusu.susu.envelope.infrastructure.model.*
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -68,6 +60,16 @@ class EnvelopeService(
         return withContext(Dispatchers.IO) {
             envelopeRepository.findDetailEnvelope(id, uid)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
+    }
+
+    suspend fun getDetailAndLedgersByEnvelopeType(
+        uid: Long,
+        envelopeType: EnvelopeType,
+        pageable: Pageable,
+    ): Slice<EnvelopeDetailAndLedgerModel> {
+        return withContext(Dispatchers.IO) {
+            envelopeRepository.findAllDetailEnvelopeAndLedgerByEnvelopeType(uid, envelopeType, pageable)
+        }
     }
 
     suspend fun getMaxAmountByUidAndTypeByUid(uid: Long, type: EnvelopeType): Long? {
