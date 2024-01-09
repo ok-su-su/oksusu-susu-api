@@ -2,7 +2,7 @@ package com.oksusu.susu.post.model
 
 import com.oksusu.susu.post.domain.PostCategory
 
-class PostCategoryModel(
+data class PostCategoryModel(
     val id: Long,
     val name: String,
     val seq: Int,

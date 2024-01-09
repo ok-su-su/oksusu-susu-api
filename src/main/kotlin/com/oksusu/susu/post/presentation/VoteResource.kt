@@ -2,25 +2,27 @@ package com.oksusu.susu.post.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.extension.wrapSlice
 import com.oksusu.susu.extension.wrapVoid
+import com.oksusu.susu.post.application.VoteFacade
 import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.post.model.request.CreateVoteRequest
 import com.oksusu.susu.post.model.request.UpdateVoteRequest
-import com.oksusu.susu.post.model.vo.VoteSortRequest
+import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = "투표")
+@Tag(name = SwaggerTag.VOTE_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/votes"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class VoteResource(
-    private val voteFacade: com.oksusu.susu.post.application.VoteFacade,
+    private val voteFacade: VoteFacade,
 ) {
     @Operation(summary = "투표 생성")
     @PostMapping
@@ -29,14 +31,14 @@ class VoteResource(
         @RequestBody request: CreateVoteRequest,
     ) = voteFacade.createVote(user, request).wrapCreated()
 
-    /** 카테고리 전체 검색 : 0 */
+    /** 인기순 정렬은 다른 조건이 무시됩니다. */
     @Operation(summary = "투표 조회")
     @GetMapping
-    suspend fun getAllVotes(
+    suspend fun searchVotes(
         user: AuthUser,
-        @ParameterObject sortRequest: VoteSortRequest,
+        @ParameterObject searchRequest: SearchVoteRequest,
         @ParameterObject sliceRequest: SusuPageRequest,
-    ) = voteFacade.getAllVotes(user, sortRequest, sliceRequest).wrapSlice()
+    ) = voteFacade.getAllVotes(user, searchRequest, sliceRequest).wrapSlice()
 
     @Operation(summary = "투표 하나 조회")
     @GetMapping("/{id}")
@@ -47,7 +49,7 @@ class VoteResource(
 
     @Operation(summary = "투표하기")
     @PostMapping("/{id}")
-    suspend fun getAllVotes(
+    suspend fun castVote(
         user: AuthUser,
         @PathVariable id: Long,
         @RequestBody request: CreateVoteHistoryRequest,

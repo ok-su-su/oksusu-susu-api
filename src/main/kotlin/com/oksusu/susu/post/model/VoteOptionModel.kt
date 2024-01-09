@@ -3,7 +3,7 @@ package com.oksusu.susu.post.model
 import com.oksusu.susu.post.domain.VoteOption
 import io.swagger.v3.oas.annotations.media.Schema
 
-class VoteOptionModel(
+data class VoteOptionModel(
     @Schema(hidden = true)
     val id: Long?,
     @Schema(hidden = true)

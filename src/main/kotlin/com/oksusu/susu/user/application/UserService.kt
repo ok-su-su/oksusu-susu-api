@@ -1,10 +1,12 @@
 package com.oksusu.susu.user.application
 
+import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.User
-import com.oksusu.susu.user.domain.UserState
+import com.oksusu.susu.user.domain.vo.UserState
 import com.oksusu.susu.user.infrastructure.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val txTemplates: TransactionTemplates,
 ) {
     suspend fun validateNotRegistered(oauthInfo: OauthInfo) {
         existsByOauthInfo(oauthInfo).takeUnless { isExists -> isExists }
@@ -56,12 +59,12 @@ class UserService(
 
     suspend fun withdraw(uid: Long) {
         val user = findByIdOrThrow(uid)
-        user.apply {
-            userState = UserState.DELETED
-            oauthInfo = oauthInfo.withdrawOauthInfo()
-        }.run { }
 
-        // TODO : 이러면 트랜잭션 불가아닌가요?
-        saveSync(user)
+        txTemplates.writer.coExecute {
+            user.apply {
+                this.userState = UserState.DELETED
+                this.oauthInfo = oauthInfo.withdrawOauthInfo()
+            }.run { saveSync(this) }
+        }
     }
 }

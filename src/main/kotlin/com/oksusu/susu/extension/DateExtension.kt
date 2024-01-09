@@ -4,6 +4,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 object Zone {
     val KST: ZoneId = ZoneId.of("Asia/Seoul")
@@ -25,4 +26,9 @@ fun LocalDateTime.equalsFromYearToSec(otherTime: LocalDateTime): Boolean {
 
 fun LocalDateTime.toClockEpochMilli(): Long {
     return this.withMinute(0).withSecond(0).withNano(0).toInstant().toEpochMilli()
+}
+
+fun LocalDateTime.format(format: String): String {
+    val formatter = DateTimeFormatter.ofPattern(format)
+    return this.format(formatter)
 }

@@ -1,22 +1,31 @@
 package com.oksusu.susu.cache
 
+import com.oksusu.susu.extension.mapper
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.domain.Range
 import org.springframework.data.redis.core.DefaultTypedTuple
 import org.springframework.data.redis.core.ReactiveRedisTemplate
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Service
 import java.time.Duration
 
 @Service
-class CacheServiceImpl(
+class SuspendableCacheService(
     private val reactiveRedisTemplate: ReactiveRedisTemplate<String, String>,
+    private val reactiveStringRedisTemplate: ReactiveStringRedisTemplate,
 ) : CacheService {
-    val zSetOps = reactiveRedisTemplate.opsForZSet()
-    val keyValueOps = reactiveRedisTemplate.opsForValue()
+    private val logger = mu.KotlinLogging.logger { }
+    private val zSetOps = reactiveRedisTemplate.opsForZSet()
+    private val keyValueOps = reactiveRedisTemplate.opsForValue()
 
     override suspend fun <T> zSetSaveAll(key: String, tuples: Map<T, Long>) {
         val typedTuples = arrayListOf<ZSetOperations.TypedTuple<String>>()
@@ -47,7 +56,10 @@ class CacheServiceImpl(
         return zSetOps.score(key, *members.toTypedArray()).awaitSingle()
     }
 
-    override suspend fun zSetFindRangeWithScores(key: String, range: Range<Long>): Flow<ZSetOperations.TypedTuple<String>> {
+    override suspend fun zSetFindRangeWithScores(
+        key: String,
+        range: Range<Long>,
+    ): Flow<ZSetOperations.TypedTuple<String>> {
         return zSetOps.rangeWithScores(key, range).asFlow()
     }
 
@@ -65,5 +77,43 @@ class CacheServiceImpl(
 
     override suspend fun findByKey(key: String): String? {
         return keyValueOps.get(key).awaitSingleOrNull()
+    }
+
+    override suspend fun <VALUE_TYPE : Any> set(cache: Cache<VALUE_TYPE>, value: VALUE_TYPE) {
+        coroutineScope {
+            launch(Dispatchers.IO + Job()) {
+                runCatching {
+                    reactiveStringRedisTemplate.opsForValue().set(
+                        cache.key,
+                        mapper.writeValueAsString(value),
+                        cache.duration
+                    ).cache().awaitSingleOrNull()
+                }.onFailure { e ->
+                    when (e) {
+                        is CancellationException -> logger.debug { "Redis Set job cancelled." }
+                        else -> logger.error(e) { "fail to set data from redis. key : ${cache.key}" }
+                    }
+                }.getOrNull()
+            }
+        }
+    }
+
+    override suspend fun <VALUE_TYPE : Any> getOrNull(cache: Cache<VALUE_TYPE>): VALUE_TYPE? {
+        return runCatching {
+            val jsonValue = reactiveStringRedisTemplate.opsForValue()
+                .get(cache.key)
+                .cache()
+                .awaitSingleOrNull()
+
+            when (jsonValue.isNullOrBlank()) {
+                true -> null
+                false -> mapper.readValue(jsonValue, cache.type)
+            }
+        }.onFailure { e ->
+            when (e) {
+                is CancellationException -> logger.debug { "Redis Read job cancelled." }
+                else -> logger.error(e) { "fail to read data from redis. key : ${cache.key}" }
+            }
+        }.getOrNull()
     }
 }

@@ -1,11 +1,15 @@
 package com.oksusu.susu.post.infrastructure.repository
 
 import com.oksusu.susu.category.domain.QCategoryAssignment
-import com.oksusu.susu.common.consts.DEFAULT_CATEGORY_ID
 import com.oksusu.susu.extension.executeSlice
+import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.post.domain.Post
+import com.oksusu.susu.post.domain.QPost
+import com.oksusu.susu.post.domain.QVoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
+import com.oksusu.susu.post.infrastructure.repository.model.QPostAndVoteOptionModel
+import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,17 +46,15 @@ interface PostCustomRepository {
 
     @Transactional(readOnly = true)
     fun getAllVotes(
-        isMine: Boolean,
         uid: Long,
-        categoryId: Long,
+        searchSpec: SearchVoteSpec,
         pageable: Pageable,
     ): Slice<Post>
 
     @Transactional(readOnly = true)
     fun getAllVotesOrderByPopular(
-        isMine: Boolean,
         uid: Long,
-        categoryId: Long,
+        searchSpec: SearchVoteSpec,
         ids: List<Long>,
     ): List<Post>
 }
@@ -64,13 +66,13 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         super.setEntityManager(entityManager)
     }
 
-    private val qPost = com.oksusu.susu.post.domain.QPost.post
-    private val qVoteOption = com.oksusu.susu.post.domain.QVoteOption.voteOption
+    private val qPost = QPost.post
+    private val qVoteOption = QVoteOption.voteOption
     private val qCategoryAssignment = QCategoryAssignment.categoryAssignment
 
     override fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
-        return JPAQuery<com.oksusu.susu.post.domain.QPost>(entityManager)
-            .select(com.oksusu.susu.post.infrastructure.repository.model.QPostAndVoteOptionModel(qPost, qVoteOption))
+        return JPAQuery<QPost>(entityManager)
+            .select(QPostAndVoteOptionModel(qPost, qVoteOption))
             .from(qPost)
             .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
             .where(
@@ -81,22 +83,23 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
     }
 
     override fun getAllVotes(
-        isMine: Boolean,
         uid: Long,
-        categoryId: Long,
+        searchSpec: SearchVoteSpec,
         pageable: Pageable,
     ): Slice<Post> {
-        val uidFilter = qPost.uid.eq(uid).takeIf { isMine }
-        val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
+        val uidFilter = searchSpec.mine?.let { qPost.uid.eq(uid) }
+        val categoryFilter = qCategoryAssignment.categoryId.isEquals(searchSpec.categoryId)
+        val contentFilter = searchSpec.content?.let { qPost.content.contains(it) }
 
-        val query = JPAQuery<com.oksusu.susu.post.domain.QPost>(entityManager)
+        val query = JPAQuery<QPost>(entityManager)
             .select(qPost)
             .from(qPost)
             .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
             .where(
                 qPost.isActive.eq(true),
                 uidFilter,
-                categoryFilter
+                categoryFilter,
+                contentFilter
             ).orderBy(
                 qPost.createdAt.desc()
             )
@@ -105,23 +108,24 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
     }
 
     override fun getAllVotesOrderByPopular(
-        isMine: Boolean,
         uid: Long,
-        categoryId: Long,
+        searchSpec: SearchVoteSpec,
         ids: List<Long>,
     ): List<Post> {
-        val uidFilter = qPost.uid.eq(uid).takeIf { isMine }
-        val categoryFilter = qCategoryAssignment.categoryId.eq(categoryId).takeIf { categoryId != DEFAULT_CATEGORY_ID }
+//        val uidFilter = searchSpec.mine?.let { qPost.uid.eq(uid) }
+//        val categoryFilter = qCategoryAssignment.categoryId.isEquals(searchSpec.categoryId)
+//        val contentFilter = searchSpec.content?.let { qPost.content.contains(it) }
 
-        return JPAQuery<com.oksusu.susu.post.domain.QPost>(entityManager)
+        return JPAQuery<QPost>(entityManager)
             .select(qPost)
             .from(qPost)
-            .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
             .where(
                 qPost.isActive.eq(true),
-                qPost.id.`in`(ids),
-                uidFilter,
-                categoryFilter
+                qPost.id.`in`(ids)
+//                uidFilter,
+//                categoryFilter,
+//                contentFilter
             )
             .fetch()
     }

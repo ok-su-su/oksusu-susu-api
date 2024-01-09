@@ -12,6 +12,7 @@ import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.domain.vo.VoteOptionSummary
 import com.oksusu.susu.post.domain.vo.VoteSummary
+import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
 import com.oksusu.susu.post.model.VoteOptionModel
@@ -22,9 +23,11 @@ import com.oksusu.susu.post.model.response.CreateAndUpdateVoteResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
-import com.oksusu.susu.post.model.vo.VoteSortRequest
+import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.post.model.vo.VoteSortType
 import com.oksusu.susu.user.application.UserService
+import kotlinx.coroutines.*
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -77,23 +80,26 @@ class VoteFacade(
             VoteOptionSummary(voteOptionId = option.id!!)
         }
 
-        parZip(
-            { voteSummaryService.save(voteSummary) },
-            { voteOptionSummaryService.saveAll(voteOptionSummaries) }
-        ) { _, _ -> }
+        CoroutineScope(Dispatchers.IO).launch {
+            val saveSummary = async { voteSummaryService.save(voteSummary) }
+            val saveOptionSummary = async { voteOptionSummaryService.saveAll(voteOptionSummaries) }
+
+            awaitAll(saveSummary, saveOptionSummary)
+        }
 
         return response
     }
 
-    @Transactional(readOnly = true)
     suspend fun getAllVotes(
         user: AuthUser,
-        sortRequest: VoteSortRequest,
+        searchRequest: SearchVoteRequest,
         pageRequest: SusuPageRequest,
     ): Slice<VoteAndOptionsResponse> {
-        val votes = when (sortRequest.sortType) {
-            VoteSortType.LATEST -> getLatestVotes(sortRequest, user.id, pageRequest)
-            VoteSortType.POPULAR -> getPopularVotes(sortRequest, user.id, pageRequest)
+        val searchSpec = SearchVoteSpec.from(searchRequest)
+
+        val votes = when (searchSpec.sortType) {
+            VoteSortType.LATEST -> getLatestVotes(user.id, searchSpec, pageRequest.toDefault())
+            VoteSortType.POPULAR -> getPopularVotes(user.id, searchSpec, pageRequest.toDefault())
         }
 
         return parZip(
@@ -113,37 +119,34 @@ class VoteFacade(
     }
 
     private suspend fun getLatestVotes(
-        sortRequest: VoteSortRequest,
         uid: Long,
-        pageRequest: SusuPageRequest,
+        searchSpec: SearchVoteSpec,
+        pageRequest: Pageable,
     ): Slice<Post> {
         return voteService.getAllVotes(
-            isMine = sortRequest.mine,
             uid = uid,
-            categoryId = sortRequest.categoryId,
-            pageable = pageRequest.toDefault()
+            searchSpec = searchSpec,
+            pageable = pageRequest
         )
     }
 
     private suspend fun getPopularVotes(
-        sortRequest: VoteSortRequest,
         uid: Long,
-        pageRequest: SusuPageRequest,
+        searchSpec: SearchVoteSpec,
+        pageRequest: Pageable,
     ): Slice<Post> {
-        val from = pageRequest.page!! * pageRequest.size!!
-        val to = from + pageRequest.size
+        val from = pageRequest.pageNumber * pageRequest.pageSize
+        val to = from + pageRequest.pageSize
         val summaries = voteSummaryService.getSummaryBetween(from, to)
 
         return voteService.getAllVotesOrderByPopular(
-            isMine = sortRequest.mine,
             uid = uid,
-            categoryId = sortRequest.categoryId,
+            searchSpec = searchSpec,
             ids = summaries.map { it.postId },
-            pageable = pageRequest.toDefault()
+            pageable = pageRequest
         )
     }
 
-    @Transactional(readOnly = true)
     suspend fun getVote(user: AuthUser, id: Long): VoteAndOptionsWithCountResponse {
         val voteInfos = voteService.getVoteAndOptions(id)
 
@@ -184,10 +187,12 @@ class VoteFacade(
     private suspend fun castVote(uid: Long, postId: Long, optionId: Long) {
         voteHistoryService.validateVoteNotExist(uid, postId)
 
-        parZip(
-            { voteSummaryService.increaseCount(postId) },
-            { voteOptionSummaryService.increaseCount(optionId) }
-        ) { _, _ -> }
+        CoroutineScope(Dispatchers.IO).launch {
+            val increaseSummary = async { voteSummaryService.increaseCount(postId) }
+            val increaseOptionSummary = async { voteOptionSummaryService.increaseCount(optionId) }
+
+            awaitAll(increaseSummary, increaseOptionSummary)
+        }
 
         txTemplates.writer.coExecute {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
@@ -198,11 +203,12 @@ class VoteFacade(
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
         voteHistoryService.validateVoteExist(uid, postId, optionId)
 
-        // TODO : 이런 구조에서는 parZip보다는 coroutine scope를 직접 여는게 좋을 듯 합니다
-        parZip(
-            { voteSummaryService.decreaseCount(postId) },
-            { voteOptionSummaryService.decreaseCount(optionId) }
-        ) { _, _ -> }
+        CoroutineScope(Dispatchers.IO).launch {
+            val decreaseSummary = async { voteSummaryService.decreaseCount(postId) }
+            val decreaseOptionSummary = async { voteOptionSummaryService.decreaseCount(optionId) }
+
+            awaitAll(decreaseSummary, decreaseOptionSummary)
+        }
 
         txTemplates.writer.coExecuteOrNull {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
@@ -221,7 +227,6 @@ class VoteFacade(
         voteService.softDeleteVote(user.id, id)
     }
 
-    @Transactional(readOnly = true)
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
         val summaries = voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT)
         val votes = voteService.getAllVotesByIdIn(summaries.map { summary -> summary.postId })

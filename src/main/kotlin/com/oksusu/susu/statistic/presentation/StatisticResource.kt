@@ -1,6 +1,7 @@
 package com.oksusu.susu.statistic.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.statistic.application.StatisticFacade
 import com.oksusu.susu.statistic.model.vo.SusuStatisticRequest
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "통계")
+@Tag(name = SwaggerTag.STATISTIC_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/statistics"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class StatisticResource(

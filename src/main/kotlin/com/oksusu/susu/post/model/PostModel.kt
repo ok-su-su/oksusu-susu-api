@@ -2,7 +2,7 @@ package com.oksusu.susu.post.model
 
 import com.oksusu.susu.post.domain.vo.PostType
 
-class PostModel(
+data class PostModel(
     val id: Long,
     val uid: Long,
     val type: PostType,

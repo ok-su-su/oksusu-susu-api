@@ -5,7 +5,7 @@ import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.VoteSummary
 import com.oksusu.susu.post.model.PostCategoryModel
 
-class VoteWithCountResponse(
+data class VoteWithCountResponse(
     val id: Long,
     val category: String,
     val content: String,
