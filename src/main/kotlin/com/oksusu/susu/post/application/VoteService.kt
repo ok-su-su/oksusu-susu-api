@@ -10,6 +10,7 @@ import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
 import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
+import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.Pageable
@@ -26,18 +27,16 @@ class VoteService(
     val logger = mu.KotlinLogging.logger { }
 
     suspend fun getAllVotesExceptBlock(
-        isMine: Boolean,
         uid: Long,
-        categoryId: Long,
+        searchSpec: SearchVoteSpec,
         userBlockIds: List<Long>,
         postBlockIds: List<Long>,
         pageable: Pageable,
     ): Slice<Post> {
         return withContext(Dispatchers.IO) {
             postRepository.getAllVotesExceptBlock(
-                isMine = isMine,
                 uid = uid,
-                categoryId = categoryId,
+                searchSpec = searchSpec,
                 userBlockIds = userBlockIds,
                 postBlockIds = postBlockIds,
                 pageable = pageable
@@ -62,10 +61,10 @@ class VoteService(
             throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
         }
 
+        val softDeletedVote = vote.apply { isActive = false }
+
         txTemplates.writer.coExecute {
-            vote.apply { isActive = false }.run {
-                postService.saveSync(vote)
-            }
+            postService.saveSync(softDeletedVote)
         }
     }
 
@@ -84,34 +83,31 @@ class VoteService(
     }
 
     suspend fun getAllVotesOrderByPopular(
-        isMine: Boolean,
         uid: Long,
-        categoryId: Long,
+        searchSpec: SearchVoteSpec,
         ids: List<Long>,
         userBlockIds: List<Long>,
         postBlockIds: List<Long>,
         pageable: Pageable,
     ): Slice<Post> {
-        val (votes, totalCount) = parZip(
-            Dispatchers.IO,
+        return parZip(
             {
                 postRepository.getAllVotesOrderByPopular(
-                    isMine = isMine,
                     uid = uid,
-                    categoryId = categoryId,
+                    searchSpec = searchSpec,
                     ids = ids,
                     userBlockIds = userBlockIds,
                     postBlockIds = postBlockIds
                 )
             },
-            { getActiveVoteCount() },
-            { a, b -> a to b }
-        )
+            { getActiveVoteCount() }
+        ) { votes, totalCount ->
+            val sortedContent = ids.flatMap { id -> votes.filter { it.id == id } }
+            val listSize = sortedContent.size.takeIf { sortedContent.size < pageable.pageSize } ?: pageable.pageSize
+            val hasNext = totalCount > (pageable.pageNumber + 1) * pageable.pageSize
 
-        val sortedContent = ids.flatMap { id -> votes.filter { it.id == id } }
-        val listSize = sortedContent.size.takeIf { sortedContent.size < pageable.pageSize } ?: pageable.pageSize
-        val hasNext = totalCount > (pageable.pageNumber + 1) * pageable.pageSize
-        return SliceImpl(sortedContent.subList(0, listSize), pageable, hasNext)
+            SliceImpl(sortedContent.subList(0, listSize), pageable, hasNext)
+        }
     }
 
     suspend fun getActiveVoteCount(): Long {

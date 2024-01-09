@@ -14,6 +14,7 @@ import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.domain.vo.VoteOptionSummary
 import com.oksusu.susu.post.domain.vo.VoteSummary
+import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
 import com.oksusu.susu.post.model.VoteOptionModel
@@ -24,10 +25,11 @@ import com.oksusu.susu.post.model.response.CreateAndUpdateVoteResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
-import com.oksusu.susu.post.model.vo.VoteSortRequest
+import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.post.model.vo.VoteSortType
 import com.oksusu.susu.user.application.UserService
 import kotlinx.coroutines.*
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 
@@ -79,35 +81,39 @@ class VoteFacade(
             VoteOptionSummary(voteOptionId = option.id!!)
         }
 
-        parZip(
-            { voteSummaryService.save(voteSummary) },
-            { voteOptionSummaryService.saveAll(voteOptionSummaries) }
-        ) { _, _ -> }
+        CoroutineScope(Dispatchers.IO).launch {
+            val saveSummary = async { voteSummaryService.save(voteSummary) }
+            val saveOptionSummary = async { voteOptionSummaryService.saveAll(voteOptionSummaries) }
+
+            awaitAll(saveSummary, saveOptionSummary)
+        }
 
         return response
     }
 
     suspend fun getAllVotes(
         user: AuthUser,
-        sortRequest: VoteSortRequest,
+        searchRequest: SearchVoteRequest,
         pageRequest: SusuPageRequest,
     ): Slice<VoteAndOptionsResponse> {
+        val searchSpec = SearchVoteSpec.from(searchRequest)
+
         val (userBlockIds, postBlockIds) = blockService.getUserAndPostBlockTargetIds(user.id)
 
-        val votes = when (sortRequest.sortType) {
+        val votes = when (searchSpec.sortType) {
             VoteSortType.LATEST -> getLatestVotes(
-                sortRequest = sortRequest,
                 uid = user.id,
+                searchSpec = searchSpec,
                 userBlockIds = userBlockIds,
                 postBlockIds = postBlockIds,
-                pageRequest = pageRequest
+                pageRequest = pageRequest.toDefault()
             )
             VoteSortType.POPULAR -> getPopularVotes(
-                sortRequest = sortRequest,
                 uid = user.id,
+                searchSpec = searchSpec,
                 userBlockIds = userBlockIds,
                 postBlockIds = postBlockIds,
-                pageRequest = pageRequest
+                pageRequest = pageRequest.toDefault()
             )
         }
 
@@ -128,41 +134,39 @@ class VoteFacade(
     }
 
     private suspend fun getLatestVotes(
-        sortRequest: VoteSortRequest,
         uid: Long,
+        searchSpec: SearchVoteSpec,
         userBlockIds: List<Long>,
         postBlockIds: List<Long>,
-        pageRequest: SusuPageRequest,
+        pageRequest: Pageable,
     ): Slice<Post> {
         return voteService.getAllVotesExceptBlock(
-            isMine = sortRequest.mine,
             uid = uid,
-            categoryId = sortRequest.categoryId,
+            searchSpec = searchSpec,
             userBlockIds = userBlockIds,
             postBlockIds = postBlockIds,
-            pageable = pageRequest.toDefault()
+            pageable = pageRequest
         )
     }
 
     private suspend fun getPopularVotes(
-        sortRequest: VoteSortRequest,
         uid: Long,
+        searchSpec: SearchVoteSpec,
         userBlockIds: List<Long>,
         postBlockIds: List<Long>,
-        pageRequest: SusuPageRequest,
+        pageRequest: Pageable,
     ): Slice<Post> {
-        val from = pageRequest.page!! * pageRequest.size!!
-        val to = from + pageRequest.size
+        val from = pageRequest.pageNumber * pageRequest.pageSize
+        val to = from + pageRequest.pageSize
         val summaries = voteSummaryService.getSummaryBetween(from, to)
 
         return voteService.getAllVotesOrderByPopular(
-            isMine = sortRequest.mine,
             uid = uid,
-            categoryId = sortRequest.categoryId,
+            searchSpec = searchSpec,
             ids = summaries.map { it.postId },
             userBlockIds = userBlockIds,
             postBlockIds = postBlockIds,
-            pageable = pageRequest.toDefault()
+            pageable = pageRequest
         )
     }
 
