@@ -90,7 +90,6 @@ class VoteFacade(
         return response
     }
 
-    @Transactional(readOnly = true)
     suspend fun getAllVotes(
         user: AuthUser,
         searchRequest: SearchVoteRequest,
@@ -148,7 +147,6 @@ class VoteFacade(
         )
     }
 
-    @Transactional(readOnly = true)
     suspend fun getVote(user: AuthUser, id: Long): VoteAndOptionsWithCountResponse {
         val voteInfos = voteService.getVoteAndOptions(id)
 
@@ -229,7 +227,6 @@ class VoteFacade(
         voteService.softDeleteVote(user.id, id)
     }
 
-    @Transactional(readOnly = true)
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
         val summaries = voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT)
         val votes = voteService.getAllVotesByIdIn(summaries.map { summary -> summary.postId })

@@ -2,7 +2,7 @@ package com.oksusu.susu.term.model.response
 
 import com.oksusu.susu.term.domain.Term
 
-class GetTermResponse(
+data class GetTermResponse(
     val id: Long,
     val title: String,
     val description: String,

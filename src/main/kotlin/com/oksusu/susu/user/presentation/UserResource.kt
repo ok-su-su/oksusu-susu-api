@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 class UserResource(
     private val userFacade: UserFacade,
 ) {
+    /** token 기반으로 유저 정보를 조회 */
     @Operation(summary = "유저 정보 조회")
     @GetMapping("/my-info")
     suspend fun getUserInfo(

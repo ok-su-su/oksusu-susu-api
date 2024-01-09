@@ -1,4 +1,4 @@
-package com.oksusu.susu.user.domain
+package com.oksusu.susu.user.domain.vo
 
 enum class UserState {
     /** 활동 유저 */

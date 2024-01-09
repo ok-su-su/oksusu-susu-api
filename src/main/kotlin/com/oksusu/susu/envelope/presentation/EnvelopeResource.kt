@@ -2,6 +2,7 @@ package com.oksusu.susu.envelope.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.envelope.application.EnvelopeFacade
 import com.oksusu.susu.envelope.model.request.CreateAndUpdateEnvelopeRequest
 import com.oksusu.susu.envelope.model.request.SearchEnvelopeRequest
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "봉투")
+@Tag(name = SwaggerTag.ENVELOPE_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/envelopes"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class EnvelopeResource(

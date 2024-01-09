@@ -1,5 +1,6 @@
 package com.oksusu.susu.term.presentation
 
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.term.application.TermFacade
 import io.swagger.v3.oas.annotations.Operation
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "약관")
+@Tag(name = SwaggerTag.TERM_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/terms"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class TermResource(

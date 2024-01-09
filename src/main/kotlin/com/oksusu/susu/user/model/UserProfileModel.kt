@@ -2,7 +2,7 @@ package com.oksusu.susu.user.model
 
 import com.oksusu.susu.user.domain.User
 
-class UserProfileModel(
+data class UserProfileModel(
     val id: Long,
     val name: String,
     val profileImageUrl: String?,

@@ -64,6 +64,7 @@ object DependencyVersion {
     const val KOTEST_VERSION = "5.7.2"
     const val KOTEST_EXTENSION_VERSION = "1.1.2"
     const val MOCKK_VERSION = "1.4.1"
+    const val FASTEXCEL_VERSION = "0.16.5"
 }
 
 dependencies {
@@ -120,6 +121,9 @@ dependencies {
 
     /** thymeleaf */
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+    /** fastexcel */
+    implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL_VERSION}")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")

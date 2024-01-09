@@ -1,6 +1,6 @@
 package com.oksusu.susu.term.model
 
-class TermModel(
+data class TermModel(
     val id: Long,
     val title: String,
     val description: String,

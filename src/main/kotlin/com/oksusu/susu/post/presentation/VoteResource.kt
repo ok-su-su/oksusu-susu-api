@@ -2,10 +2,12 @@ package com.oksusu.susu.post.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.extension.wrapSlice
 import com.oksusu.susu.extension.wrapVoid
+import com.oksusu.susu.post.application.VoteFacade
 import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.post.model.request.CreateVoteRequest
 import com.oksusu.susu.post.model.request.UpdateVoteRequest
@@ -16,11 +18,11 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = "투표")
+@Tag(name = SwaggerTag.VOTE_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/votes"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class VoteResource(
-    private val voteFacade: com.oksusu.susu.post.application.VoteFacade,
+    private val voteFacade: VoteFacade,
 ) {
     @Operation(summary = "투표 생성")
     @PostMapping

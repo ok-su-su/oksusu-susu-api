@@ -24,7 +24,6 @@ import kotlinx.coroutines.coroutineScope
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OAuthFacade(
@@ -38,7 +37,6 @@ class OAuthFacade(
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     /** 회원가입 가능 여부 체크. */
-    @Transactional(readOnly = true)
     suspend fun checkRegisterValid(provider: OauthProvider, accessToken: String): AbleRegisterResponse {
         val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
 
@@ -48,7 +46,6 @@ class OAuthFacade(
     }
 
     /** 회원가입 */
-    @Transactional
     suspend fun register(
         provider: OauthProvider,
         accessToken: String,
@@ -68,7 +65,8 @@ class OAuthFacade(
             val createdUser = User.toEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
 
-            val termAgreements = request.termAgreement.map { TermAgreement(uid = createdUser.id, termId = it) }
+            val termAgreements = request.termAgreement
+                .map { TermAgreement(uid = createdUser.id, termId = it) }
                 .run { termAgreementService.saveAllSync(this) }
 
             eventPublisher.publishEvent(
@@ -85,10 +83,8 @@ class OAuthFacade(
     }
 
     /** 로그인 */
-    @Transactional
     suspend fun login(provider: OauthProvider, request: OAuthLoginRequest): TokenDto {
         val oauthInfo = oAuthService.getOauthUserInfo(provider, request.accessToken)
-
         val user = userService.findByOauthInfoOrThrow(oauthInfo)
 
         return generateTokenDto(user.id)
@@ -109,7 +105,6 @@ class OAuthFacade(
     }
 
     /** 회원탈퇴 callback 페이지용 oauth 토큰 받아오기 + susu token 발급해주기 */
-    @Transactional
     suspend fun loginWithCode(
         provider: OauthProvider,
         code: String,
