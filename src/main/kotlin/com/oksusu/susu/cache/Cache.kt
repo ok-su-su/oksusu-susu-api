@@ -7,4 +7,7 @@ sealed class Cache<VALUE_TYPE>(
     open val key: String,
     open val type: TypeReference<VALUE_TYPE>,
     open val duration: Duration,
-)
+) {
+    companion object Factory {
+    }
+}

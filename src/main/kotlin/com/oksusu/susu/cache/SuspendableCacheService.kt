@@ -98,7 +98,7 @@ class SuspendableCacheService(
         }
     }
 
-    override suspend fun <VALUE_TYPE : Any> getOrNull(cache: Cache<VALUE_TYPE>, valueType: VALUE_TYPE): VALUE_TYPE? {
+    override suspend fun <VALUE_TYPE : Any> getOrNull(cache: Cache<VALUE_TYPE>): VALUE_TYPE? {
         return runCatching {
             val jsonValue = reactiveStringRedisTemplate.opsForValue()
                 .get(cache.key)

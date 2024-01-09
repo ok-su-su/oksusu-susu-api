@@ -24,7 +24,6 @@ import kotlinx.coroutines.coroutineScope
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OAuthFacade(
