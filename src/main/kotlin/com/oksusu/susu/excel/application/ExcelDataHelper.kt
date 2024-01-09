@@ -7,7 +7,9 @@ import com.oksusu.susu.excel.model.AllEnvelopeSheetDataDto
 import com.oksusu.susu.friend.application.RelationshipService
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
+import org.springframework.stereotype.Component
 
+@Component
 class ExcelDataHelper(
     private val envelopeService: EnvelopeService,
     private val categoryService: CategoryService,
