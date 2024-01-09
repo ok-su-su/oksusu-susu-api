@@ -31,7 +31,8 @@ class TermService(
 
     suspend fun validateExistTerms(ids: List<Long>) {
         withContext(Dispatchers.IO) {
-            termRepository.findAllByIdIn(ids)
-        }.takeIf { it.size == ids.size } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_TERM_ERROR)
+            termRepository.countAllByIdIn(ids)
+        }.takeIf { count -> count == ids.size.toLong() }
+            ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_TERM_ERROR)
     }
 }

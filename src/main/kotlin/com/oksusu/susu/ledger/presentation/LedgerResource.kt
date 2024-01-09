@@ -2,6 +2,7 @@ package com.oksusu.susu.ledger.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.extension.wrapPage
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "장부")
+@Tag(name = SwaggerTag.LEDGER_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/ledgers"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class LedgerResource(

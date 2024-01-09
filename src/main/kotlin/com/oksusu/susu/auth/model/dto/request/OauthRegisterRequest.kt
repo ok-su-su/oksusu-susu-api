@@ -1,6 +1,6 @@
 package com.oksusu.susu.auth.model.dto.request
 
-import com.oksusu.susu.user.domain.Gender
+import com.oksusu.susu.user.domain.vo.Gender
 import java.time.LocalDate
 
 class OauthRegisterRequest(

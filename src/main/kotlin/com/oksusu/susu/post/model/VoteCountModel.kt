@@ -4,7 +4,7 @@ import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.VoteSummary
 import java.time.LocalDateTime
 
-class VoteCountModel(
+data class VoteCountModel(
     val id: Long,
     val uid: Long,
     val category: String,

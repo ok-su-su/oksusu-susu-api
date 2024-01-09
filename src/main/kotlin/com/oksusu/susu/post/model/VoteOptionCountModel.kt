@@ -3,7 +3,7 @@ package com.oksusu.susu.post.model
 import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.VoteOptionSummary
 
-class VoteOptionCountModel(
+data class VoteOptionCountModel(
     val id: Long,
     val postId: Long,
     val content: String,

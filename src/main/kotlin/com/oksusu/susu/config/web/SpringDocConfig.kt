@@ -66,4 +66,18 @@ class SpringDocConfig(
 
 object SwaggerTag {
     const val USER_SWAGGER_TAG = "User API"
+    const val TERM_SWAGGER_TAG = "Term API"
+    const val STATISTIC_SWAGGER_TAG = "Statistic API"
+    const val AUTH_SWAGGER_TAG = "Auth API"
+    const val OAUTH_SWAGGER_TAG = "OAuth API"
+    const val CATEGORY_SWAGGER_TAG = "Category API"
+    const val DEV_SWAGGER_TAG = "DEV API"
+    const val DEV_OAUTH_SWAGGER_TAG = "DEV OAuth API"
+    const val ENVELOPE_CONFIG_SWAGGER_TAG = "Envelope Config API"
+    const val ENVELOPE_SWAGGER_TAG = "Envelope API"
+    const val FRIEND_SWAGGER_TAG = "Friend API"
+    const val HEALTH_SWAGGER_TAG = "Health API"
+    const val LEDGER_SWAGGER_TAG = "Ledger API"
+    const val POST_CONFIG_SWAGGER_TAG = "Post Config API"
+    const val VOTE_SWAGGER_TAG = "Vote API"
 }

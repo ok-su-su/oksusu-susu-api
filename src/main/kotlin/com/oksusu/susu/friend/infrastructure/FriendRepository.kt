@@ -7,7 +7,7 @@ import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.oksusu.susu.friend.infrastructure.model.FriendAndFriendRelationshipModel
 import com.oksusu.susu.friend.infrastructure.model.QFriendAndFriendRelationshipModel
-import com.oksusu.susu.friend.infrastructure.model.SearchFriendRequestModel
+import com.oksusu.susu.friend.infrastructure.model.SearchFriendSpec
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,7 +33,7 @@ interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository
 
 interface FriendCustomRepository {
     @Transactional(readOnly = true)
-    fun search(searchRequest: SearchFriendRequestModel, pageable: Pageable): Page<FriendAndFriendRelationshipModel>
+    fun search(spec: SearchFriendSpec, pageable: Pageable): Page<FriendAndFriendRelationshipModel>
 }
 
 class FriendCustomRepositoryImpl : FriendCustomRepository, QuerydslRepositorySupport(Friend::class.java) {
@@ -47,7 +47,7 @@ class FriendCustomRepositoryImpl : FriendCustomRepository, QuerydslRepositorySup
     private val qFriendRelationship = QFriendRelationship.friendRelationship
 
     override fun search(
-        searchRequest: SearchFriendRequestModel,
+        spec: SearchFriendSpec,
         pageable: Pageable,
     ): Page<FriendAndFriendRelationshipModel> {
         val query = JPAQuery<QFriend>(entityManager)
@@ -55,9 +55,9 @@ class FriendCustomRepositoryImpl : FriendCustomRepository, QuerydslRepositorySup
             .from(qFriend)
             .join(qFriend).on(qFriendRelationship.friendId.eq(qFriend.id))
             .where(
-                qFriend.uid.eq(searchRequest.uid),
-                qFriend.name.isEquals(searchRequest.name),
-                qFriend.phoneNumber.isEquals(searchRequest.phoneNumber)
+                qFriend.uid.eq(spec.uid),
+                qFriend.name.isEquals(spec.name),
+                qFriend.phoneNumber.isEquals(spec.phoneNumber)
             )
 
         return querydsl.execute(query, pageable)

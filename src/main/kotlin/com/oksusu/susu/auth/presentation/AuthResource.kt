@@ -3,6 +3,7 @@ package com.oksusu.susu.auth.presentation
 import com.oksusu.susu.auth.application.AuthFacade
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.dto.response.TokenRefreshRequest
+import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "Auth")
+@Tag(name = SwaggerTag.AUTH_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/auth"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AuthResource(

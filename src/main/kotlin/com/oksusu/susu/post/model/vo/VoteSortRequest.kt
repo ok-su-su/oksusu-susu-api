@@ -7,10 +7,10 @@ data class VoteSortRequest(
 )
 
 enum class VoteSortType {
-    // 최신 작성 순
+    /** 최신 작성 순 */
     LATEST,
 
-    // 투표 많은 순
+    /** 투표 많은 순 */
     POPULAR,
     ;
 }

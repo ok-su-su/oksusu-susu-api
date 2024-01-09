@@ -1,9 +1,8 @@
-package com.oksusu.susu.auth.helper
+package com.oksusu.susu.client.oauth.kakao
 
 import com.oksusu.susu.auth.model.dto.OauthUserInfoDto
 import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
-import com.oksusu.susu.client.oauth.kakao.KakaoClient
 import com.oksusu.susu.common.properties.KakaoOauthProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-class KakaoOauthHelper(
+class KakaoOauthService(
     val kakaoOauthProperties: KakaoOauthProperties,
     val kakaoClient: KakaoClient,
     @Value("\${server.domain-name}")

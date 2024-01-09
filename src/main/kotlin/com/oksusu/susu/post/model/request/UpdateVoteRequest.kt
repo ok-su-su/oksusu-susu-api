@@ -1,6 +1,6 @@
 package com.oksusu.susu.post.model.request
 
-class UpdateVoteRequest(
+data class UpdateVoteRequest(
     val postCategoryId: Long,
     val content: String,
 )

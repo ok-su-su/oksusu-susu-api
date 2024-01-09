@@ -1,6 +1,6 @@
 package com.oksusu.susu.post.model.request
 
-class CreateVoteHistoryRequest(
+data class CreateVoteHistoryRequest(
     val isCancel: Boolean,
     val optionId: Long,
 )
