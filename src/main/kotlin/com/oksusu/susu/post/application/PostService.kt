@@ -84,4 +84,8 @@ class PostService(
             findByIdOrThrow(id)
         }.takeIf { post -> post.uid == uid } ?: throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
     }
+
+    suspend fun existsById(id: Long): Boolean {
+        return withContext(Dispatchers.IO) { postRepository.existsById(id) }
+    }
 }

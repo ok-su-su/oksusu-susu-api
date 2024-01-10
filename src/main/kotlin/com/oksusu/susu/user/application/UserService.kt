@@ -35,7 +35,7 @@ class UserService(
     }
 
     suspend fun findByOauthInfoOrThrow(oauthInfo: OauthInfo): User {
-        return findByOauthInfoOrNull(oauthInfo) ?: throw NotFoundException(ErrorCode.USER_NOT_FOUND_ERROR)
+        return findByOauthInfoOrNull(oauthInfo) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 
     suspend fun findByOauthInfoOrNull(oauthInfo: OauthInfo): User? {
@@ -43,7 +43,7 @@ class UserService(
     }
 
     suspend fun findByIdOrThrow(uid: Long): User {
-        return findByIdOrNull(uid) ?: throw NotFoundException(ErrorCode.USER_NOT_FOUND_ERROR)
+        return findByIdOrNull(uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 
     suspend fun findByIdOrNull(uid: Long): User? {
@@ -51,7 +51,7 @@ class UserService(
     }
 
     fun findByIdOrThrowSync(uid: Long): User {
-        return findByIdOrNullSync(uid) ?: throw NotFoundException(ErrorCode.USER_NOT_FOUND_ERROR)
+        return findByIdOrNullSync(uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 
     fun findByIdOrNullSync(uid: Long): User? {
@@ -72,6 +72,10 @@ class UserService(
     suspend fun validateExist(id: Long) {
         withContext(Dispatchers.IO) {
             userRepository.existsById(id)
-        }.takeIf { it } ?: throw InvalidRequestException(ErrorCode.USER_NOT_FOUND_ERROR)
+        }.takeIf { it } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_USER_ERROR)
+    }
+
+    suspend fun existsById(id: Long): Boolean {
+        return withContext(Dispatchers.IO) { userRepository.existsById(id) }
     }
 }
