@@ -76,12 +76,12 @@ class PostService(
     suspend fun validateExist(id: Long) {
         withContext(Dispatchers.IO) {
             postRepository.existsById(id)
-        }.takeIf { it } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_POST_ERROR)
+        }.takeIf { isExist -> isExist } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
 
     suspend fun validateAuthority(id: Long, uid: Long) {
         withContext(Dispatchers.IO) {
             findByIdOrThrow(id)
-        }.takeIf { it.uid == uid } ?: throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
+        }.takeIf { post -> post.uid == uid } ?: throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
     }
 }

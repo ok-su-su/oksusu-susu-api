@@ -3,11 +3,13 @@ package com.oksusu.susu.block.application
 import com.oksusu.susu.block.domain.Block
 import com.oksusu.susu.block.domain.vo.BlockTargetType
 import com.oksusu.susu.block.infrastructure.BlockRepository
+import com.oksusu.susu.block.model.UserAndPostBlockIdModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BlockService(
@@ -16,9 +18,10 @@ class BlockService(
     suspend fun validateNotAlreadyBlock(uid: Long, targetId: Long, targetType: BlockTargetType) {
         withContext(Dispatchers.IO) {
             blockRepository.existsByUidAndTargetIdAndTargetType(uid, targetId, targetType)
-        }.takeUnless { it } ?: throw InvalidRequestException(ErrorCode.ALREADY_BLOCKED_TARGET)
+        }.takeUnless { isExist -> isExist } ?: throw InvalidRequestException(ErrorCode.ALREADY_BLOCKED_TARGET)
     }
 
+    @Transactional
     fun saveSync(block: Block): Block {
         return blockRepository.save(block)
     }
@@ -29,7 +32,7 @@ class BlockService(
         }
     }
 
-    suspend fun getUserAndPostBlockTargetIds(uid: Long): Pair<List<Long>, List<Long>> {
+    suspend fun getUserAndPostBlockTargetIds(uid: Long): UserAndPostBlockIdModel {
         val blocks = findAllByUid(uid)
 
         val userBlockIds = blocks.filter { it.targetType == BlockTargetType.USER }
@@ -37,6 +40,9 @@ class BlockService(
         val postBlockIds = blocks.filter { it.targetType == BlockTargetType.POST }
             .map { block -> block.targetId }
 
-        return userBlockIds to postBlockIds
+        return UserAndPostBlockIdModel(
+            userBlockIds = userBlockIds,
+            postBlockIds = postBlockIds
+        )
     }
 }
