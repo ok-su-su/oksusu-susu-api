@@ -32,7 +32,8 @@ import javax.sql.DataSource
         "com.oksusu.susu.friend.infrastructure",
         "com.oksusu.susu.category.infrastructure",
         "com.oksusu.susu.post.infrastructure",
-        "com.oksusu.susu.term.infrastructure"
+        "com.oksusu.susu.term.infrastructure",
+        "com.oksusu.susu.block.infrastructure"
     ],
     entityManagerFactoryRef = "susuEntityManager",
     transactionManagerRef = "susuTransactionManager"
@@ -87,7 +88,8 @@ class SusuDatabaseConfig {
                 "com.oksusu.susu.friend.domain",
                 "com.oksusu.susu.category.domain",
                 "com.oksusu.susu.post.domain",
-                "com.oksusu.susu.term.domain"
+                "com.oksusu.susu.term.domain",
+                "com.oksusu.susu.block.domain"
             )
             .properties(
                 mapOf(AvailableSettings.BEAN_CONTAINER to SpringBeanContainer(configurableListableBeanFactory))
