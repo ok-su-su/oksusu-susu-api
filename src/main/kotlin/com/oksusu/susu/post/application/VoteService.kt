@@ -70,14 +70,14 @@ class VoteService(
 
     suspend fun getAllVotesByIdInExceptBlock(
         postIds: List<Long>,
-        userBlockId: List<Long>,
+        userBlockIds: List<Long>,
         postBlockIds: List<Long>,
     ): List<Post> {
         return postService.findByIsActiveAndTypeAndIdInExceptBlock(
             isActive = true,
             type = PostType.VOTE,
             ids = postIds,
-            userBlockId = userBlockId,
+            userBlockIds = userBlockIds,
             postBlockIds = postBlockIds
         )
     }

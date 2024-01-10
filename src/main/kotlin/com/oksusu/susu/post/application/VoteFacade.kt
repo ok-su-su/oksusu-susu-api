@@ -3,7 +3,6 @@ package com.oksusu.susu.post.application
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.block.application.BlockService
-import com.oksusu.susu.block.domain.vo.BlockTargetType
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.extension.coExecute
@@ -253,12 +252,8 @@ class VoteFacade(
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
         val (summaries, votes) = parZip(
             { voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT) },
-            { blockService.findAllByUid(user.id) }
-        ) { summaries, blocks ->
-            val userBlockIds = blocks.filter { it.targetType == BlockTargetType.USER }
-                .map { block -> block.targetId }
-            val postBlockIds = blocks.filter { it.targetType == BlockTargetType.POST }
-                .map { block -> block.targetId }
+            { blockService.getUserAndPostBlockTargetIds(user.id) }
+        ) { summaries, (userBlockIds, postBlockIds) ->
             val ids = summaries.map { summary -> summary.postId }
 
             summaries to voteService.getAllVotesByIdInExceptBlock(ids, userBlockIds, postBlockIds)

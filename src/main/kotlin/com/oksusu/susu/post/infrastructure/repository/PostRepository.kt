@@ -1,10 +1,10 @@
 package com.oksusu.susu.post.infrastructure.repository
 
-import com.oksusu.susu.category.domain.QCategoryAssignment
 import com.oksusu.susu.extension.executeSlice
 import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.QPost
+import com.oksusu.susu.post.domain.QPostCategory
 import com.oksusu.susu.post.domain.QVoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
@@ -64,7 +64,7 @@ interface PostCustomRepository {
         isActive: Boolean,
         type: PostType,
         ids: List<Long>,
-        userBlockId: List<Long>,
+        userBlockIds: List<Long>,
         postBlockIds: List<Long>,
     ): List<Post>
 }
@@ -78,7 +78,7 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
 
     private val qPost = QPost.post
     private val qVoteOption = QVoteOption.voteOption
-    private val qCategoryAssignment = QCategoryAssignment.categoryAssignment
+    private val qPostCategory = QPostCategory.postCategory
 
     override fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
         return JPAQuery<QPost>(entityManager)
@@ -99,22 +99,21 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         postBlockIds: List<Long>,
         pageable: Pageable,
     ): Slice<Post> {
-//        val uidFilter = searchSpec.mine?.let { qPost.uid.eq(uid) } ?: qPost.uid.notIn(userBlockIds)
-//        val categoryFilter = qCategoryAssignment.categoryId.isEquals(searchSpec.categoryId)
-//        val contentFilter = searchSpec.content?.let { qPost.content.contains(it) }
+        val uidFilter = searchSpec.mine?.let { qPost.uid.eq(uid) } ?: qPost.uid.notIn(userBlockIds)
+        val categoryFilter = qPostCategory.id.isEquals(searchSpec.categoryId)
+        val contentFilter = searchSpec.content?.let { qPost.content.contains(it) }
         val postIdFilter = qPost.id.notIn(postBlockIds)
-        val uidFilter = qPost.uid.notIn(userBlockIds)
 
         val query = JPAQuery<QPost>(entityManager)
             .select(qPost)
             .from(qPost)
-            .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
+            .join(qPostCategory).on(qPost.postCategoryId.eq(qPostCategory.id))
             .where(
                 qPost.isActive.eq(true),
                 uidFilter,
-//                categoryFilter,
-                postIdFilter
-//                contentFilter
+                categoryFilter,
+                postIdFilter,
+                contentFilter
             ).orderBy(
                 qPost.createdAt.desc()
             )
@@ -130,20 +129,21 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         postBlockIds: List<Long>,
     ): List<Post> {
         val postIdFilter = qPost.id.notIn(postBlockIds).and(qPost.id.`in`(ids))
-        val uidFilter = searchSpec.mine?.let { qPost.uid.eq(uid) }
-        val categoryFilter = qCategoryAssignment.categoryId.isEquals(searchSpec.categoryId)
-        val contentFilter = searchSpec.content?.let { qPost.content.contains(it) }
+//        val uidFilter = searchSpec.mine?.let { qPost.uid.eq(uid) }
+//        val categoryFilter = qCategoryAssignment.categoryId.isEquals(searchSpec.categoryId)
+//        val contentFilter = searchSpec.content?.let { qPost.content.contains(it) }
+        val uidFilter = qPost.uid.notIn(userBlockIds)
 
         return JPAQuery<QPost>(entityManager)
             .select(qPost)
             .from(qPost)
-            .join(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
+            .join(qPostCategory).on(qPost.postCategoryId.eq(qPostCategory.id))
             .where(
                 qPost.isActive.eq(true),
                 uidFilter,
-                categoryFilter,
-                postIdFilter,
-                contentFilter
+//                categoryFilter,
+                postIdFilter
+//                contentFilter
             )
             .fetch()
     }
@@ -152,16 +152,16 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         isActive: Boolean,
         type: PostType,
         ids: List<Long>,
-        userBlockId: List<Long>,
+        userBlockIds: List<Long>,
         postBlockIds: List<Long>,
     ): List<Post> {
-        val uidFilter = qPost.uid.notIn(userBlockId)
+        val uidFilter = qPost.uid.notIn(userBlockIds)
         val postIdFilter = qPost.id.`in`(ids).and(qPost.id.notIn(postBlockIds))
 
-        return JPAQuery<com.oksusu.susu.post.domain.QPost>(entityManager)
+        return JPAQuery<QPost>(entityManager)
             .select(qPost)
             .from(qPost)
-            .leftJoin(qCategoryAssignment).on(qPost.id.eq(qCategoryAssignment.targetId))
+            .join(qPostCategory).on(qPost.postCategoryId.eq(qPostCategory.id))
             .where(
                 qPost.isActive.eq(isActive),
                 qPost.type.eq(type),

@@ -55,7 +55,7 @@ class PostService(
         isActive: Boolean,
         type: PostType,
         ids: List<Long>,
-        userBlockId: List<Long>,
+        userBlockIds: List<Long>,
         postBlockIds: List<Long>,
     ): List<Post> {
         return withContext(Dispatchers.IO) {
@@ -63,7 +63,7 @@ class PostService(
                 isActive = isActive,
                 type = type,
                 ids = ids,
-                userBlockId = userBlockId,
+                userBlockIds = userBlockIds,
                 postBlockIds = postBlockIds
             )
         }
