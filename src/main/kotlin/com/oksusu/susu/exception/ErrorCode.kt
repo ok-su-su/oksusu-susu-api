@@ -61,5 +61,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Block Error Code */
     ALREADY_BLOCKED_TARGET(HttpStatus.BAD_REQUEST, "이미 차단한 대상입니다."),
+    NOT_BLOCKED_TARGET(HttpStatus.BAD_REQUEST, "차단하지 않은 대상입니다."),
+    NOT_FOUND_BLOCK_ERROR(HttpStatus.NOT_FOUND, "차단 정보를 찾을 수 없습니다."),
     ;
 }

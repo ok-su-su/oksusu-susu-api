@@ -6,8 +6,10 @@ import com.oksusu.susu.block.infrastructure.BlockRepository
 import com.oksusu.susu.block.model.UserAndPostBlockIdModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
+import com.oksusu.susu.exception.NotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -44,5 +46,25 @@ class BlockService(
             userBlockIds = userBlockIds,
             postBlockIds = postBlockIds
         )
+    }
+
+    suspend fun findByIdOrNull(id: Long): Block? {
+        return withContext(Dispatchers.IO) {
+            blockRepository.findByIdOrNull(id)
+        }
+    }
+
+    suspend fun findByIdOrThrow(id: Long): Block {
+        return findByIdOrNull(id) ?: throw NotFoundException(ErrorCode.NOT_FOUND_BLOCK_ERROR)
+    }
+
+    suspend fun validateAuthority(uid: Long, id: Long) {
+        findByIdOrThrow(id).takeIf { block -> block.uid == uid }
+            ?: throw InvalidRequestException(ErrorCode.NOT_BLOCKED_TARGET)
+    }
+
+    @Transactional
+    fun deleteById(id: Long) {
+        blockRepository.deleteById(id)
     }
 }

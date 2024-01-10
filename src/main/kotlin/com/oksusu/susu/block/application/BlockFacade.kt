@@ -40,4 +40,12 @@ class BlockFacade(
             ).run { blockService.saveSync(this) }
         }
     }
+
+    suspend fun deleteBlock(user: AuthUser, id: Long) {
+        blockService.validateAuthority(user.id, id)
+
+        txTemplates.writer.coExecute {
+            blockService.deleteById(id)
+        }
+    }
 }
