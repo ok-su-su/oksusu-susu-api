@@ -1,11 +1,16 @@
 package com.oksusu.susu.cache
 
+import com.oksusu.susu.cache.model.ZSetModel
+import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.FailToExecuteException
 import com.oksusu.susu.extension.mapper
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
@@ -16,7 +21,8 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Service
-import java.time.Duration
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.zip
 
 @Service
 class SuspendableCacheService(
@@ -64,7 +70,8 @@ class SuspendableCacheService(
     }
 
     override suspend fun zSetDeleteByMemberIn(key: String, members: List<String>) {
-        zSetOps.remove(key, *members.toTypedArray()).awaitSingle()
+        zSetOps.remove(key, *members.toTypedArray())
+            .awaitSingle()
     }
 
     override suspend fun <VALUE_TYPE : Any> set(cache: Cache<VALUE_TYPE>, value: VALUE_TYPE) {
@@ -101,6 +108,93 @@ class SuspendableCacheService(
             when (e) {
                 is CancellationException -> logger.debug { "Redis Read job cancelled." }
                 else -> logger.error(e) { "fail to read data from redis. key : ${cache.key}" }
+            }
+        }.getOrNull()
+    }
+
+    override suspend fun <VALUE_TYPE : Any> zSetAll(cache: ZSetCache<VALUE_TYPE>, tuples: Map<VALUE_TYPE, Double>) {
+        coroutineScope {
+            launch(Dispatchers.IO + Job()) {
+                runCatching {
+                    val typedTuples = arrayListOf<ZSetOperations.TypedTuple<String>>()
+                    tuples.forEach { tuple ->
+                        typedTuples.add(
+                            DefaultTypedTuple(
+                                tuple.key.toString(),
+                                tuple.value
+                            )
+                        )
+                    }
+
+                    reactiveStringRedisTemplate.opsForZSet().addAll(
+                        cache.key,
+                        typedTuples
+                    ).cache().awaitSingleOrNull()
+                }.onFailure { e ->
+                    when (e) {
+                        is CancellationException -> logger.debug { "Redis Set job cancelled." }
+                        else -> logger.error(e) { "fail to set data from redis. key : ${cache.key}" }
+                    }
+                }.getOrNull()
+            }
+        }
+    }
+
+    override suspend fun <VALUE_TYPE : Any> zGetByMembers(
+        cache: ZSetCache<VALUE_TYPE>,
+        members: List<VALUE_TYPE>,
+    ): List<Double> {
+        return runCatching {
+            val jsonMembers = members.map { member -> mapper.writeValueAsString(member) }.toTypedArray()
+
+            reactiveStringRedisTemplate.opsForZSet()
+                .score(cache.key, *jsonMembers)
+                .cache()
+                .awaitSingleOrNull()
+        }.onFailure { e ->
+            when (e) {
+                is CancellationException -> logger.debug { "Redis Read job cancelled." }
+                else -> logger.error(e) { "fail to read data from redis. key : ${cache.key}" }
+            }
+        }.getOrNull() ?: throw FailToExecuteException(ErrorCode.FAIL_TO_REDIS_EXECUTE_ERROR)
+    }
+
+    override suspend fun <VALUE_TYPE : Any> zGetByRange(
+        cache: ZSetCache<VALUE_TYPE>,
+        range: Range<Long>,
+    ): List<ZSetModel<String>> {
+        return runCatching {
+            reactiveStringRedisTemplate.opsForZSet()
+                .rangeWithScores(cache.key, range)
+                .cache()
+                .asFlow().map { zSet ->
+                    ZSetModel(
+                        key = zSet.value,
+                        value = zSet.value,
+                        score = zSet.score
+                    )
+                }.toList()
+
+        }.onFailure { e ->
+            when (e) {
+                is CancellationException -> logger.debug { "Redis Read job cancelled." }
+                else -> logger.error(e) { "fail to read data from redis. key : ${cache.key}" }
+            }
+        }.getOrNull() ?: throw FailToExecuteException(ErrorCode.FAIL_TO_REDIS_EXECUTE_ERROR)
+    }
+
+    override suspend fun <VALUE_TYPE : Any> zDeleteByMembers(cache: ZSetCache<VALUE_TYPE>, members: List<VALUE_TYPE>) {
+        runCatching {
+            val jsonValues = members.map { member -> mapper.writeValueAsString(member) }.toTypedArray()
+
+            reactiveStringRedisTemplate.opsForZSet()
+                .remove(cache.key, *jsonValues)
+                .cache()
+                .awaitSingleOrNull()
+        }.onFailure { e ->
+            when (e) {
+                is CancellationException -> logger.debug { "Redis Delete job cancelled." }
+                else -> logger.error(e) { "fail to delete data from redis. key : ${cache.key}" }
             }
         }.getOrNull()
     }
