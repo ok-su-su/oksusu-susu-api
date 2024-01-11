@@ -54,6 +54,8 @@ class AuthFacade(
             { refreshTokenService.deleteByIdSync(refreshPayload.id) },
             { tokenGenerateHelper.generateAccessAndRefreshToken(refreshPayload.id) }
         ) { _, tokenDto ->
+
+            // TODO : 여기서 tx 열어서 진행, 위에 어노테이션 제거
             RefreshToken(
                 id = refreshPayload.id,
                 refreshToken = tokenDto.refreshToken,
@@ -64,6 +66,7 @@ class AuthFacade(
         }
     }
 
+    // TODO : parzip은 반환값을 이용하는 경우에 사용
     @Transactional
     suspend fun withdraw(authUser: AuthUser) {
         val user = userService.findByIdOrThrow(authUser.id)
