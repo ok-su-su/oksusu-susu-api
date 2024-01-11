@@ -56,14 +56,13 @@ class SusuSpecificStatisticService(
             susuSpecificStatisticRepository.save(
                 key = key,
                 value = model.averageAmount.toString(),
-                ttl = SUSU_STATISTIC_TTL
             )
         }
     }
 
     suspend fun save(key: String, value: Long) {
         withContext(Dispatchers.IO) {
-            susuSpecificStatisticRepository.save(key, value.toString(), SUSU_STATISTIC_TTL)
+            susuSpecificStatisticRepository.save(key, value.toString())
         }
     }
 

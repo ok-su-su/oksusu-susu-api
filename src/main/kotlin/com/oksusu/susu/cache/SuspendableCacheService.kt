@@ -67,18 +67,6 @@ class SuspendableCacheService(
         zSetOps.remove(key, *members.toTypedArray()).awaitSingle()
     }
 
-    override suspend fun save(key: String, value: String, ttl: Int) {
-        keyValueOps.set(key, value, Duration.ofSeconds(ttl.toLong())).awaitSingle()
-    }
-
-    override suspend fun save(key: String, value: String) {
-        keyValueOps.set(key, value).awaitSingle()
-    }
-
-    override suspend fun findByKey(key: String): String? {
-        return keyValueOps.get(key).awaitSingleOrNull()
-    }
-
     override suspend fun <VALUE_TYPE : Any> set(cache: Cache<VALUE_TYPE>, value: VALUE_TYPE) {
         coroutineScope {
             launch(Dispatchers.IO + Job()) {
