@@ -168,6 +168,8 @@ CREATE TABLE `vote_history`
     `modified_at`    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='투표 유저 매핑';
+
+-- TODO : prefix uidx로
 CREATE UNIQUE INDEX idx__uid__post_id ON vote_history (uid, post_id);
 
 -- 약관 정보
@@ -194,6 +196,8 @@ CREATE TABLE `term_agreement`
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보 동의';
+
+-- TODO : prefix uidx로
 CREATE UNIQUE INDEX idx__uid__term_id ON term_agreement (uid, term_id);
 
 -- 약관 정보 동의 기록
@@ -220,6 +224,8 @@ CREATE TABLE `block`
     `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '차단';
+
+-- TODO : prefix uidx로
 CREATE UNIQUE INDEX idx__uid__target_id ON block (uid, target_id);
 
 CREATE TABLE `report_history`
