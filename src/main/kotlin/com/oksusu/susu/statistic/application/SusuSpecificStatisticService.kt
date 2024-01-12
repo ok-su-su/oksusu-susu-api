@@ -2,7 +2,6 @@ package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificStatisticRepository
@@ -55,7 +54,7 @@ class SusuSpecificStatisticService(
         withContext(Dispatchers.IO) {
             susuSpecificStatisticRepository.save(
                 key = key,
-                value = model.averageAmount.toString(),
+                value = model.averageAmount.toString()
             )
         }
     }

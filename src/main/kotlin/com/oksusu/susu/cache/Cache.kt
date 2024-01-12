@@ -27,7 +27,7 @@ class SusuBasicStatisticCache(
             return SusuBasicStatisticCache(
                 key = SUSU_BASIC_STATISTIC_KEY,
                 type = object : TypeReference<SusuBasicStatistic>() {},
-                duration = Duration.ofSeconds(SUSU_STATISTIC_TTL),
+                duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
     }
@@ -43,7 +43,7 @@ class SusuSpecificStatisticCache(
             return SusuSpecificStatisticCache(
                 key = key,
                 type = object : TypeReference<String>() {},
-                duration = Duration.ofSeconds(SUSU_STATISTIC_TTL),
+                duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
     }
@@ -59,7 +59,7 @@ class UserStatisticCache(
             return UserStatisticCache(
                 key = key,
                 type = object : TypeReference<UserStatistic>() {},
-                duration = Duration.ofSeconds(USER_STATISTIC_TTL),
+                duration = Duration.ofSeconds(USER_STATISTIC_TTL)
             )
         }
     }

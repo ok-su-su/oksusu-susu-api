@@ -1,38 +1,53 @@
 package com.oksusu.susu.post.infrastructure.redis
 
 import com.oksusu.susu.cache.CacheService
+import com.oksusu.susu.cache.CacheService.Companion.zDeleteByMembers
+import com.oksusu.susu.cache.CacheService.Companion.zGetByMemberOrNull
+import com.oksusu.susu.cache.CacheService.Companion.zGetByMembers
+import com.oksusu.susu.cache.CacheService.Companion.zSet
+import com.oksusu.susu.cache.CacheService.Companion.zSetAll
+import com.oksusu.susu.cache.ZSetCache
+import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.post.domain.vo.VoteOptionSummary
 import org.springframework.stereotype.Repository
-
-const val VOTE_OPTION_SUMMARY_KEY = "vote_option_summary"
 
 @Repository
 class VoteOptionSummaryRepository(
     private val cacheService: CacheService,
 ) {
-    suspend fun <T> saveAll(
-        tuples: Map<T, Long>,
-    ) {
+    suspend fun save(summary: VoteOptionSummary) {
         // value : voteOptionId, score : count
-        cacheService.zSetSaveAll(VOTE_OPTION_SUMMARY_KEY, tuples)
+        cacheService.zSet(
+            cache = ZSetCache.createVoteOptionSummaryCache,
+            member = summary.voteOptionId,
+            score = summary.count.toDouble()
+        )
+    }
+
+    suspend fun saveAll(tuples: Map<Long, Double>) {
+        // value : voteOptionId, score : count
+        cacheService.zSetAll(cache = ZSetCache.createVoteOptionSummaryCache, tuples = tuples)
     }
 
     suspend fun findAllByVoteOptionIdIn(ids: List<Long>): List<Double> {
-        val strIds = ids.map { it.toString() }
-        return cacheService.zSetFindByMemberIn(VOTE_OPTION_SUMMARY_KEY, strIds)
-    }
-
-    suspend fun save(summary: VoteOptionSummary) {
-        // value : voteOptionId, score : count
-        cacheService.zSetSave(VOTE_OPTION_SUMMARY_KEY, mapOf(summary.voteOptionId to summary.count.toLong()))
+        return cacheService.zGetByMembers(
+            cache = ZSetCache.createVoteOptionSummaryCache,
+            members = ids
+        )
     }
 
     suspend fun findByVoteOptionId(voteOptionId: Long): Double {
-        return cacheService.zSetFindByMember(VOTE_OPTION_SUMMARY_KEY, voteOptionId.toString())
+        return cacheService.zGetByMemberOrNull(
+            cache = ZSetCache.createVoteOptionSummaryCache,
+            member = voteOptionId
+        ) ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_OPTION_SUMMARY_ERROR)
     }
 
     suspend fun deleteByVoteOptionIdIn(ids: List<Long>) {
-        val strIds = ids.map { it.toString() }
-        return cacheService.zSetDeleteByMemberIn(VOTE_OPTION_SUMMARY_KEY, strIds)
+        return cacheService.zDeleteByMembers(
+            cache = ZSetCache.createVoteOptionSummaryCache,
+            members = ids
+        )
     }
 }

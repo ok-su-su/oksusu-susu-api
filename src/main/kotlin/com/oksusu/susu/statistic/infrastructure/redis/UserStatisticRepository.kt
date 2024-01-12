@@ -1,11 +1,8 @@
 package com.oksusu.susu.statistic.infrastructure.redis
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.oksusu.susu.cache.CacheService
 import com.oksusu.susu.cache.UserStatisticCache
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
-import com.oksusu.susu.extension.toJson
 import com.oksusu.susu.statistic.domain.UserStatistic
 import org.springframework.stereotype.Repository
 

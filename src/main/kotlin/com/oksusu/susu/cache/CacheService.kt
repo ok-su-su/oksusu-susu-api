@@ -9,7 +9,7 @@ import org.springframework.data.domain.Range
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-interface CacheService : ZSetCacheService {
+interface CacheService {
     /** key-value */
     suspend fun <VALUE_TYPE : Any> set(cache: Cache<VALUE_TYPE>, value: VALUE_TYPE)
     suspend fun <VALUE_TYPE : Any> getOrNull(cache: Cache<VALUE_TYPE>): VALUE_TYPE?
@@ -22,7 +22,7 @@ interface CacheService : ZSetCacheService {
     suspend fun <VALUE_TYPE : Any> zGetByRange(
         cache: ZSetCache<VALUE_TYPE>,
         range: Range<Long>,
-    ): List<ZSetModel<String>>
+    ): List<ZSetModel<VALUE_TYPE>>
     suspend fun <VALUE_TYPE : Any> zSetAll(cache: ZSetCache<VALUE_TYPE>, tuples: Map<VALUE_TYPE, Double>)
     suspend fun <VALUE_TYPE : Any> zDeleteByMembers(cache: ZSetCache<VALUE_TYPE>, members: List<VALUE_TYPE>)
 
@@ -52,14 +52,34 @@ interface CacheService : ZSetCacheService {
             score: Double,
         ) = zSetAll(cache(ZSetCache.Factory), mapOf(member to score))
 
+        suspend fun <VALUE_TYPE : Any> CacheService.zSetAll(
+            cache: ZSetCache.Factory.() -> ZSetCache<VALUE_TYPE>,
+            tuples: Map<VALUE_TYPE, Double>,
+        ) = zSetAll(cache(ZSetCache.Factory), tuples)
+
         suspend fun <VALUE_TYPE : Any> CacheService.zGetByMemberOrNull(
             cache: ZSetCache.Factory.() -> ZSetCache<VALUE_TYPE>,
             member: VALUE_TYPE,
         ) = zGetByMembers(cache(ZSetCache.Factory), listOf(member)).firstOrNull()
 
+        suspend fun <VALUE_TYPE : Any> CacheService.zGetByMembers(
+            cache: ZSetCache.Factory.() -> ZSetCache<VALUE_TYPE>,
+            members: List<VALUE_TYPE>,
+        ) = zGetByMembers(cache(ZSetCache.Factory), members)
+
+        suspend fun <VALUE_TYPE : Any> CacheService.zGetByRange(
+            cache: ZSetCache.Factory.() -> ZSetCache<VALUE_TYPE>,
+            range: Range<Long>,
+        ) = zGetByRange(cache(ZSetCache.Factory), range)
+
         suspend fun <VALUE_TYPE : Any> CacheService.zDeleteByMember(
             cache: ZSetCache.Factory.() -> ZSetCache<VALUE_TYPE>,
             member: VALUE_TYPE,
         ) = zDeleteByMembers(cache(ZSetCache.Factory), listOf(member))
+
+        suspend fun <VALUE_TYPE : Any> CacheService.zDeleteByMembers(
+            cache: ZSetCache.Factory.() -> ZSetCache<VALUE_TYPE>,
+            members: List<VALUE_TYPE>,
+        ) = zDeleteByMembers(cache(ZSetCache.Factory), members)
     }
 }

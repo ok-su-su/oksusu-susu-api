@@ -21,64 +21,20 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Service
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.zip
 
 @Service
 class SuspendableCacheService(
-    private val reactiveRedisTemplate: ReactiveRedisTemplate<String, String>,
     private val reactiveStringRedisTemplate: ReactiveStringRedisTemplate,
 ) : CacheService {
     private val logger = mu.KotlinLogging.logger { }
-    private val zSetOps = reactiveRedisTemplate.opsForZSet()
-    private val keyValueOps = reactiveRedisTemplate.opsForValue()
-
-    override suspend fun <T> zSetSaveAll(key: String, tuples: Map<T, Long>) {
-        val typedTuples = arrayListOf<ZSetOperations.TypedTuple<String>>()
-        tuples.forEach { tuple ->
-            typedTuples.add(
-                DefaultTypedTuple(
-                    tuple.key.toString(),
-                    tuple.value.toDouble()
-                )
-            )
-        }
-
-        zSetOps.addAll(key, typedTuples).awaitSingle()
-    }
-
-    override suspend fun <T> zSetSave(key: String, tuple: Map<T, Long>) {
-        val member = tuple.firstNotNullOf { it.key.toString() }
-        val score = tuple.firstNotNullOf { it.value.toDouble() }
-
-        zSetOps.add(key, member, score).awaitSingle()
-    }
-
-    override suspend fun zSetFindByMember(key: String, member: String): Double {
-        return zSetOps.score(key, member).awaitSingle()
-    }
-
-    override suspend fun zSetFindByMemberIn(key: String, members: List<String>): List<Double> {
-        return zSetOps.score(key, *members.toTypedArray()).awaitSingle()
-    }
-
-    override suspend fun zSetFindRangeWithScores(
-        key: String,
-        range: Range<Long>,
-    ): Flow<ZSetOperations.TypedTuple<String>> {
-        return zSetOps.rangeWithScores(key, range).asFlow()
-    }
-
-    override suspend fun zSetDeleteByMemberIn(key: String, members: List<String>) {
-        zSetOps.remove(key, *members.toTypedArray())
-            .awaitSingle()
-    }
+    private val zSetOps = reactiveStringRedisTemplate.opsForZSet()
+    private val keyValueOps = reactiveStringRedisTemplate.opsForValue()
 
     override suspend fun <VALUE_TYPE : Any> set(cache: Cache<VALUE_TYPE>, value: VALUE_TYPE) {
         coroutineScope {
             launch(Dispatchers.IO + Job()) {
                 runCatching {
-                    reactiveStringRedisTemplate.opsForValue().set(
+                    keyValueOps.set(
                         cache.key,
                         mapper.writeValueAsString(value),
                         cache.duration
@@ -95,7 +51,7 @@ class SuspendableCacheService(
 
     override suspend fun <VALUE_TYPE : Any> getOrNull(cache: Cache<VALUE_TYPE>): VALUE_TYPE? {
         return runCatching {
-            val jsonValue = reactiveStringRedisTemplate.opsForValue()
+            val jsonValue = keyValueOps
                 .get(cache.key)
                 .cache()
                 .awaitSingleOrNull()
@@ -116,17 +72,14 @@ class SuspendableCacheService(
         coroutineScope {
             launch(Dispatchers.IO + Job()) {
                 runCatching {
-                    val typedTuples = arrayListOf<ZSetOperations.TypedTuple<String>>()
-                    tuples.forEach { tuple ->
-                        typedTuples.add(
-                            DefaultTypedTuple(
-                                tuple.key.toString(),
-                                tuple.value
-                            )
+                    val typedTuples = tuples.map { tuple ->
+                        DefaultTypedTuple(
+                            mapper.writeValueAsString(tuple.key),
+                            tuple.value
                         )
                     }
 
-                    reactiveStringRedisTemplate.opsForZSet().addAll(
+                    zSetOps.addAll(
                         cache.key,
                         typedTuples
                     ).cache().awaitSingleOrNull()
@@ -147,8 +100,7 @@ class SuspendableCacheService(
         return runCatching {
             val jsonMembers = members.map { member -> mapper.writeValueAsString(member) }.toTypedArray()
 
-            reactiveStringRedisTemplate.opsForZSet()
-                .score(cache.key, *jsonMembers)
+            zSetOps.score(cache.key, *jsonMembers)
                 .cache()
                 .awaitSingleOrNull()
         }.onFailure { e ->
@@ -162,19 +114,17 @@ class SuspendableCacheService(
     override suspend fun <VALUE_TYPE : Any> zGetByRange(
         cache: ZSetCache<VALUE_TYPE>,
         range: Range<Long>,
-    ): List<ZSetModel<String>> {
+    ): List<ZSetModel<VALUE_TYPE>> {
         return runCatching {
-            reactiveStringRedisTemplate.opsForZSet()
-                .rangeWithScores(cache.key, range)
+            zSetOps.rangeWithScores(cache.key, range)
                 .cache()
                 .asFlow().map { zSet ->
                     ZSetModel(
-                        key = zSet.value,
-                        value = zSet.value,
+                        key = cache.key,
+                        value = mapper.readValue(zSet.value, cache.type),
                         score = zSet.score
                     )
                 }.toList()
-
         }.onFailure { e ->
             when (e) {
                 is CancellationException -> logger.debug { "Redis Read job cancelled." }
@@ -187,8 +137,7 @@ class SuspendableCacheService(
         runCatching {
             val jsonValues = members.map { member -> mapper.writeValueAsString(member) }.toTypedArray()
 
-            reactiveStringRedisTemplate.opsForZSet()
-                .remove(cache.key, *jsonValues)
+            zSetOps.remove(cache.key, *jsonValues)
                 .cache()
                 .awaitSingleOrNull()
         }.onFailure { e ->
