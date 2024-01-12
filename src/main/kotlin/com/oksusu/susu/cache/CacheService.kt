@@ -19,15 +19,22 @@ interface CacheService {
         cache: ZSetCache<VALUE_TYPE>,
         members: List<VALUE_TYPE>,
     ): List<Double>
+
     suspend fun <VALUE_TYPE : Any> zGetByRange(
         cache: ZSetCache<VALUE_TYPE>,
         range: Range<Long>,
     ): List<ZSetModel<VALUE_TYPE>>
+
     suspend fun <VALUE_TYPE : Any> zSetAll(cache: ZSetCache<VALUE_TYPE>, tuples: Map<VALUE_TYPE, Double>)
     suspend fun <VALUE_TYPE : Any> zDeleteByMembers(cache: ZSetCache<VALUE_TYPE>, members: List<VALUE_TYPE>)
 
     companion object {
         /** key-value */
+        suspend fun <VALUE_TYPE : Any> CacheService.set(
+            cache: Cache.Factory.() -> Cache<VALUE_TYPE>,
+            value: VALUE_TYPE,
+        ) = set(cache(Cache.Factory), value)
+
         suspend fun <VALUE_TYPE : Any> CacheService.getOrNull(
             cache: Cache.Factory.() -> Cache<VALUE_TYPE>,
         ) = getOrNull(cache(Cache.Factory))

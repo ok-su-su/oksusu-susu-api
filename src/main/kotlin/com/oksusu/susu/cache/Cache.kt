@@ -14,6 +14,14 @@ sealed class Cache<VALUE_TYPE>(
     open val duration: Duration,
 ) {
     companion object Factory {
+        val createSusuBasicStatisticCache: Factory.() -> Cache<SusuBasicStatistic> =
+            { SusuBasicStatisticCache.getCache() }
+
+        val createSusuSpecificStatisticCache: Factory.(key: String) -> Cache<String> =
+            { key -> SusuSpecificStatisticCache.getCache(key) }
+
+        val createUserStatisticCache: Factory.(key: String) -> Cache<UserStatistic> =
+            { key -> UserStatisticCache.getCache(key) }
     }
 }
 
