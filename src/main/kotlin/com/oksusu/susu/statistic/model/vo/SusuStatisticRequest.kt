@@ -1,8 +1,11 @@
 package com.oksusu.susu.statistic.model.vo
 
 data class SusuStatisticRequest(
+    /** required */
     val age: AgeType,
+    /** required */
     val relationshipId: Long,
+    /** required */
     val postCategoryId: Long,
 )
 

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.STATISTIC_SWAGGER_TAG)
+@Tag(name = SwaggerTag.REPORT_SWAGGER_TAG)
 @RestController
 @RequestMapping(value = ["/api/v1/reports"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class ReportResource(
