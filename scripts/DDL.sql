@@ -51,6 +51,7 @@ CREATE TABLE `category`
     `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '관계 정보 id',
     `seq`         int          NOT NULL COMMENT '노출 순서',
     `name`        varchar(256) NOT NULL COMMENT '카테고리 명',
+    `style`       varchar(128) NOT NULL COMMENT '스타일',
     `is_active`   tinyint      NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
     `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',

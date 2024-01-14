@@ -19,6 +19,8 @@ class Category(
 
     val name: String,
 
+    val style: String,
+
     @Column(name = "is_active")
     val isActive: Boolean,
 ) : BaseEntity()
