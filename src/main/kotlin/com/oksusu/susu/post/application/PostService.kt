@@ -1,6 +1,7 @@
 package com.oksusu.susu.post.application
 
 import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
@@ -50,11 +51,41 @@ class PostService(
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
 
-    suspend fun findByIsActiveAndTypeAndIdIn(isActive: Boolean, type: PostType, ids: List<Long>): List<Post> {
-        return withContext(Dispatchers.IO) { postRepository.findByIsActiveAndTypeAndIdIn(isActive, type, ids) }
+    suspend fun findByIsActiveAndTypeAndIdInExceptBlock(
+        isActive: Boolean,
+        type: PostType,
+        ids: List<Long>,
+        userBlockIds: List<Long>,
+        postBlockIds: List<Long>,
+    ): List<Post> {
+        return withContext(Dispatchers.IO) {
+            postRepository.findByIsActiveAndTypeAndIdInExceptBlock(
+                isActive = isActive,
+                type = type,
+                ids = ids,
+                userBlockIds = userBlockIds,
+                postBlockIds = postBlockIds
+            )
+        }
     }
 
     suspend fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long {
         return withContext(Dispatchers.IO) { postRepository.countAllByIsActiveAndType(isActive, type) }
+    }
+
+    suspend fun validateExist(id: Long) {
+        withContext(Dispatchers.IO) {
+            postRepository.existsById(id)
+        }.takeIf { isExist -> isExist } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_POST_ERROR)
+    }
+
+    suspend fun validateAuthority(id: Long, uid: Long) {
+        withContext(Dispatchers.IO) {
+            findByIdOrThrow(id)
+        }.takeIf { post -> post.uid == uid } ?: throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
+    }
+
+    suspend fun existsById(id: Long): Boolean {
+        return withContext(Dispatchers.IO) { postRepository.existsById(id) }
     }
 }

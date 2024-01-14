@@ -21,7 +21,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효한 토큰이 아닙니다."),
 
     /** User Error Code */
-    USER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
+    NOT_FOUND_USER_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
     ALREADY_REGISTERED_USER(HttpStatus.NOT_FOUND, "이미 가입된 유저입니다."),
 
     /** Ledger Error Code */
@@ -58,5 +58,14 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Vote History Error Code */
     ALREADY_VOTED_POST(HttpStatus.BAD_REQUEST, "이미 진행된 투표입니다."),
+
+    /** Block Error Code */
+    ALREADY_BLOCKED_TARGET(HttpStatus.BAD_REQUEST, "이미 차단한 대상입니다."),
+    NOT_BLOCKED_TARGET(HttpStatus.BAD_REQUEST, "차단하지 않은 대상입니다."),
+    NOT_FOUND_BLOCK_ERROR(HttpStatus.NOT_FOUND, "차단 정보를 찾을 수 없습니다."),
+
+    /** Report Error Code */
+    NOT_FOUND_REPORT_METADATA_ERROR(HttpStatus.NOT_FOUND, "신고 메타데이터 정보를 찾을 수 없습니다."),
+    ALREADY_EXISTS_REPORT_HISTORY_ERROR(HttpStatus.BAD_REQUEST, "이미 신고한 상태입니다."),
     ;
 }

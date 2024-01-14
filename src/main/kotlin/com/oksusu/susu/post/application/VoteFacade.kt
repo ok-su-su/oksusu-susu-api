@@ -2,6 +2,7 @@ package com.oksusu.susu.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.block.application.BlockService
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.extension.coExecute
@@ -12,6 +13,7 @@ import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.domain.vo.VoteOptionSummary
 import com.oksusu.susu.post.domain.vo.VoteSummary
+import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
 import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
@@ -27,10 +29,8 @@ import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.post.model.vo.VoteSortType
 import com.oksusu.susu.user.application.UserService
 import kotlinx.coroutines.*
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class VoteFacade(
@@ -43,6 +43,7 @@ class VoteFacade(
     private val voteHistoryService: VoteHistoryService,
     private val userService: UserService,
     private val postCategoryService: PostCategoryService,
+    private val blockService: BlockService,
 ) {
     private val logger = mu.KotlinLogging.logger { }
 
@@ -50,7 +51,6 @@ class VoteFacade(
         private const val DEFAULT_POPULAR_VOTE_COUNT = 5L
     }
 
-    @Transactional
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
         voteOptionService.validateSeq(request.options)
         postCategoryService.validateExistCategory(request.postCategoryId)
@@ -97,9 +97,19 @@ class VoteFacade(
     ): Slice<VoteAndOptionsResponse> {
         val searchSpec = SearchVoteSpec.from(searchRequest)
 
+        val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.id)
+
+        val getAllVoteSpec = GetAllVoteSpec(
+            uid = user.id,
+            searchSpec = searchSpec,
+            userBlockIds = userAndPostBlockIdModel.userBlockIds,
+            postBlockIds = userAndPostBlockIdModel.postBlockIds,
+            pageable = pageRequest.toDefault()
+        )
+
         val votes = when (searchSpec.sortType) {
-            VoteSortType.LATEST -> getLatestVotes(user.id, searchSpec, pageRequest.toDefault())
-            VoteSortType.POPULAR -> getPopularVotes(user.id, searchSpec, pageRequest.toDefault())
+            VoteSortType.LATEST -> getLatestVotes(getAllVoteSpec)
+            VoteSortType.POPULAR -> getPopularVotes(getAllVoteSpec)
         }
 
         return parZip(
@@ -118,32 +128,18 @@ class VoteFacade(
         }
     }
 
-    private suspend fun getLatestVotes(
-        uid: Long,
-        searchSpec: SearchVoteSpec,
-        pageRequest: Pageable,
-    ): Slice<Post> {
-        return voteService.getAllVotes(
-            uid = uid,
-            searchSpec = searchSpec,
-            pageable = pageRequest
-        )
+    private suspend fun getLatestVotes(spec: GetAllVoteSpec): Slice<Post> {
+        return voteService.getAllVotesExceptBlock(spec)
     }
 
-    private suspend fun getPopularVotes(
-        uid: Long,
-        searchSpec: SearchVoteSpec,
-        pageRequest: Pageable,
-    ): Slice<Post> {
-        val from = pageRequest.pageNumber * pageRequest.pageSize
-        val to = from + pageRequest.pageSize
+    private suspend fun getPopularVotes(spec: GetAllVoteSpec): Slice<Post> {
+        val from = spec.pageable.pageNumber * spec.pageable.pageSize
+        val to = from + spec.pageable.pageSize
         val summaries = voteSummaryService.getSummaryBetween(from, to)
 
         return voteService.getAllVotesOrderByPopular(
-            uid = uid,
-            searchSpec = searchSpec,
-            ids = summaries.map { it.postId },
-            pageable = pageRequest
+            spec = spec,
+            ids = summaries.map { it.postId }
         )
     }
 
@@ -176,7 +172,6 @@ class VoteFacade(
         }
     }
 
-    @Transactional
     suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
         when (request.isCancel) {
             true -> cancelVote(user.id, id, request.optionId)
@@ -215,8 +210,9 @@ class VoteFacade(
         }
     }
 
-    @Transactional
     suspend fun deleteVote(user: AuthUser, id: Long) {
+        postService.validateAuthority(id, user.id)
+
         parZip(
             { voteSummaryService.deleteSummaryByPostId(id) },
             { voteOptionService.getVoteOptions(id) }
@@ -228,8 +224,21 @@ class VoteFacade(
     }
 
     suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
-        val summaries = voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT)
-        val votes = voteService.getAllVotesByIdIn(summaries.map { summary -> summary.postId })
+        val (summaries, votes) = parZip(
+            { voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT) },
+            { blockService.getUserAndPostBlockTargetIds(user.id) }
+        ) { summaries, userAndPostBlockIdModel ->
+            val ids = summaries.map { summary -> summary.postId }
+
+            val votes = voteService.getAllVotesByIdInExceptBlock(
+                postIds = ids,
+                userBlockIds = userAndPostBlockIdModel.userBlockIds,
+                postBlockIds = userAndPostBlockIdModel.postBlockIds
+            )
+
+            summaries to votes
+        }
+
         val postCategoryModels = postCategoryService.getCategoryByIdIn(votes.map { vote -> vote.postCategoryId })
 
         return summaries.map { summary ->
@@ -243,14 +252,13 @@ class VoteFacade(
         }
     }
 
-    @Transactional
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
         return parZip(
-            // 투표 된게 있는지 검사
+            { postService.validateAuthority(id, user.id) },
             { voteHistoryService.validateHistoryNotExist(id) },
             { postCategoryService.getCategory(request.postCategoryId) },
             { voteService.getVoteAndOptions(id) }
-        ) { _, updatedPostCategory, voteInfos ->
+        ) { _, _, updatedPostCategory, voteInfos ->
             val vote = voteInfos[0].post
             val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
 
