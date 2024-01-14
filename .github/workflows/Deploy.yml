@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['main']
+    branches: ['main', 'feature/MZ-183']
 
 env:
   ACTIVE_PROFILE: "prod"
@@ -34,7 +34,6 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-
 
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
@@ -88,6 +87,8 @@ jobs:
             sudo docker-compose -f ~/susu/docker-compose.yml --env-file ~/susu/.env up --build -d
 
             sudo docker system prune --all -f
+            
+            rm -rf .env
 
       - name: Remove IP FROM security group
         run: |
