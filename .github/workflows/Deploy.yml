@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['main', 'feature/MZ-183']
+    branches: ['main']
 
 env:
   ACTIVE_PROFILE: "prod"
@@ -76,14 +76,13 @@ jobs:
             cd susu
             
             sudo touch .env
-            echo "${{ secrets.ENV_VARS }}" | sudo tee .env > /dev/null
             echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
             
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker rm $(sudo docker ps -a -q)
             sudo docker rmi $(sudo docker images -q)
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGE_NAME }}:${{env.IMAGE_TAG}}
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/susu-nginx:0.0.1
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/susu-nginx:0.0.2
             sudo docker-compose -f ~/susu/docker-compose.yml --env-file ~/susu/.env up --build -d
 
             sudo docker system prune --all -f
