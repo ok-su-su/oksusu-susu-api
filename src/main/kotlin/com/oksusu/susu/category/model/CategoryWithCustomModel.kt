@@ -7,6 +7,7 @@ data class CategoryWithCustomModel(
     val seq: Long,
     val category: String,
     val customCategory: String? = null,
+    val style: String,
 ) {
     companion object {
         fun of(category: CategoryModel, categoryAssignment: CategoryAssignment): CategoryWithCustomModel {
@@ -14,7 +15,8 @@ data class CategoryWithCustomModel(
                 id = category.id,
                 seq = category.seq,
                 category = category.name,
-                customCategory = categoryAssignment.customCategory
+                customCategory = categoryAssignment.customCategory,
+                style = category.style
             )
         }
 
@@ -23,7 +25,8 @@ data class CategoryWithCustomModel(
                 id = category.id,
                 seq = category.seq,
                 category = category.name,
-                customCategory = customCategory
+                customCategory = customCategory,
+                style = category.style
             )
         }
     }
