@@ -1,0 +1,9 @@
+aws:
+  secretsmanager:
+    name: susu/api-server
+    fail-fast: false
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2

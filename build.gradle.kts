@@ -65,6 +65,9 @@ object DependencyVersion {
     const val KOTEST_EXTENSION_VERSION = "1.1.2"
     const val MOCKK_VERSION = "1.4.1"
     const val FASTEXCEL_VERSION = "0.16.5"
+    const val SPRING_CLOUD_VERSION = "2022.0.4"
+    const val SPRING_CLOUD_BOOTSTRAP_VERSION = "4.1.0"
+    const val AWS_SECRET_MANAGER_CONFIG_VERSION = "2.4.4"
 }
 
 dependencies {
@@ -125,8 +128,18 @@ dependencies {
     /** fastexcel */
     implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL_VERSION}")
 
+    /** aws */
+    implementation("io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:${DependencyVersion.AWS_SECRET_MANAGER_CONFIG_VERSION}")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:${DependencyVersion.SPRING_CLOUD_BOOTSTRAP_VERSION}")
+
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${DependencyVersion.SPRING_CLOUD_VERSION}")
+    }
 }
 
 defaultTasks("bootRun")
