@@ -56,7 +56,7 @@ class PostCategoryService(
         return ids.map { id -> getCategory(id) }.toSet()
     }
 
-    suspend fun validateExistCategory(postCategoryId: Long) {
+    fun validateExistCategory(postCategoryId: Long) {
         getCategory(postCategoryId)
     }
 }

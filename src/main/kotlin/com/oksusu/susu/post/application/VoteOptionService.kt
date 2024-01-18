@@ -19,7 +19,7 @@ class VoteOptionService(
         return voteOptionRepository.saveAll(voteOptions)
     }
 
-    suspend fun validateSeq(optionModels: List<VoteOptionModel>) {
+    fun validateSeq(optionModels: List<VoteOptionModel>) {
         optionModels.map { option -> option.seq }.toSet().count { seq -> seq > 0 }.run {
             if (this != optionModels.size) {
                 throw InvalidRequestException(ErrorCode.INVALID_VOTE_OPTION_SEQUENCE)

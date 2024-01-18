@@ -121,7 +121,7 @@ class VoteFacade(
             votes.map { vote ->
                 VoteAndOptionsResponse.of(
                     vote = vote,
-                    options = optionModels.filter { it.postId == vote.id },
+                    options = optionModels.filter { option -> option.postId == vote.id },
                     postCategoryModel = postCategoryModels.first { model -> vote.postCategoryId == model.id }
                 )
             }
