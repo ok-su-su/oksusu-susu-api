@@ -14,7 +14,6 @@ import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
@@ -23,13 +22,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Repository
 interface PostRepository : JpaRepository<Post, Long>, PostCustomRepository {
-    @Transactional(readOnly = true)
-    fun findAllByIsActiveAndTypeOrderByCreatedAtDesc(
-        isActive: Boolean,
-        type: PostType,
-        toDefault: Pageable,
-    ): Slice<Post>
-
     @Transactional(readOnly = true)
     fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: PostType): Post?
 

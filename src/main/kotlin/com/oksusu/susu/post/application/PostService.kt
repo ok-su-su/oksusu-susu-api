@@ -8,8 +8,6 @@ import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Slice
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,20 +19,6 @@ class PostService(
     @Transactional
     fun saveSync(post: Post): Post {
         return postRepository.save(post)
-    }
-
-    suspend fun findAllByIsActiveAndTypeOrderByCreatedAtDes(
-        isActive: Boolean,
-        type: PostType,
-        pageable: Pageable,
-    ): Slice<Post> {
-        return withContext(Dispatchers.IO) {
-            postRepository.findAllByIsActiveAndTypeOrderByCreatedAtDesc(
-                isActive = isActive,
-                type = type,
-                toDefault = pageable
-            )
-        }
     }
 
     suspend fun findByIdOrThrow(id: Long): Post {
