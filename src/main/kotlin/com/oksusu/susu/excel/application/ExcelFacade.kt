@@ -53,7 +53,7 @@ class ExcelFacade(
         do {
             val pageable = PageRequest.of(pageNum, PAGE_SIZE)
 
-            val data = func(uid, pageable)
+            val data = withContext(Dispatchers.IO) { func(uid, pageable) }
 
             excelService.insertData(
                 ws = ws,
