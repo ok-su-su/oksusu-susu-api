@@ -4,11 +4,15 @@ import com.oksusu.susu.post.domain.VoteOption
 import io.swagger.v3.oas.annotations.media.Schema
 
 data class VoteOptionModel(
+    /** 투표 옵션 id */
     @Schema(hidden = true)
     val id: Long?,
+    /** 투표 id */
     @Schema(hidden = true)
     val postId: Long?,
+    /** 옵션 내용 */
     val content: String,
+    /** 순서 */
     val seq: Int,
 ) {
     companion object {

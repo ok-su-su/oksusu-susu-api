@@ -6,11 +6,17 @@ import com.oksusu.susu.post.model.PostCategoryModel
 import com.oksusu.susu.post.model.VoteOptionModel
 
 class VoteAndOptionsResponse(
+    /** 투표 id */
     val id: Long,
+    /** 투표 생성자 id */
     val uid: Long,
+    /** 카테고리 명 */
     val category: String,
+    /** 내용 */
     val content: String,
+    /** 수정 여부 */
     val isModified: Boolean,
+    /** 투표 옵션 */
     val options: List<VoteOptionModel>,
 ) {
     companion object {
