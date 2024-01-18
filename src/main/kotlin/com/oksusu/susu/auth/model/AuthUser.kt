@@ -9,6 +9,8 @@ interface AuthUser {
     fun isAuthor(uid: Long): Boolean
 
     fun isAuthorThrow(uid: Long)
+
+    fun isNotAuthorThrow(uid: Long)
 }
 
 class AuthUserImpl(
@@ -20,6 +22,12 @@ class AuthUserImpl(
 
     override fun isAuthorThrow(uid: Long) {
         if (isAuthor(uid)) {
+            throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
+        }
+    }
+
+    override fun isNotAuthorThrow(uid: Long) {
+        if (!isAuthor(uid)) {
             throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
         }
     }
