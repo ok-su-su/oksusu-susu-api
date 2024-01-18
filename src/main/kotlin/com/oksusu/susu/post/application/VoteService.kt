@@ -1,6 +1,7 @@
 package com.oksusu.susu.post.application
 
 import arrow.fx.coroutines.parZip
+import com.oksusu.susu.common.consts.POPULAR_VOTE_SIZE
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NoAuthorityException
@@ -77,11 +78,11 @@ class VoteService(
             { postRepository.getAllVotesOrderByPopular(spec = spec, ids = ids) },
             { getActiveVoteCount() }
         ) { votes, totalCount ->
-            val sortedContent = ids.flatMap { id -> votes.filter { it.id == id } }
-            val listSize = sortedContent.size.takeIf { sortedContent.size < spec.pageable.pageSize } ?: spec.pageable.pageSize
-            val hasNext = totalCount > (spec.pageable.pageNumber + 1) * spec.pageable.pageSize
+            val sortedContent = ids.flatMap { id -> votes.filter { vote -> vote.id == id } }
 
-            SliceImpl(sortedContent.subList(0, listSize), spec.pageable, hasNext)
+            val hasNext = totalCount > (spec.pageable.pageNumber + 1) * POPULAR_VOTE_SIZE
+
+            SliceImpl(sortedContent, spec.pageable, hasNext)
         }
     }
 

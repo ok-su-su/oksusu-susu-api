@@ -3,6 +3,7 @@ package com.oksusu.susu.post.application
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.block.application.BlockService
+import com.oksusu.susu.common.consts.POPULAR_VOTE_SIZE
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.extension.coExecute
@@ -133,8 +134,8 @@ class VoteFacade(
     }
 
     private suspend fun getPopularVotes(spec: GetAllVoteSpec): Slice<Post> {
-        val from = spec.pageable.pageNumber * spec.pageable.pageSize
-        val to = from + spec.pageable.pageSize
+        val from = spec.pageable.pageNumber * POPULAR_VOTE_SIZE
+        val to = from + POPULAR_VOTE_SIZE
         val summaries = voteSummaryService.getSummaryBetween(from, to)
 
         return voteService.getAllVotesOrderByPopular(

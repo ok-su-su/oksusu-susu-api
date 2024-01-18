@@ -44,13 +44,10 @@ class VoteSummaryService(
     }
 
     suspend fun getSummaryBetween(from: Int, to: Int): List<VoteSummary> {
-        // zrange 맨 뒤부터 가져올려면, 마지막이 -1이 되어야 합니다.
         val start = from.takeIf { from != 0 } ?: 1
 
-        // category sorting 조건 때문에 50개 더 가져옵니다.
-        // score 역순으로 결과값이 나와서 내림차순으로 정렬합니다.
         return withContext(Dispatchers.IO) {
-            voteSummaryRepository.findAllByCountBetween(start, to + 50)
+            voteSummaryRepository.findAllByCountBetween(start, to)
         }.map { VoteSummary(postId = it.value!!.toLong(), count = it.score!!.toInt()) }
             .toList().reversed()
     }
