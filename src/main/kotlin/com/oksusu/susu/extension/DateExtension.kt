@@ -24,10 +24,6 @@ fun LocalDateTime.equalsFromYearToSec(otherTime: LocalDateTime): Boolean {
         this.second == otherTime.second
 }
 
-fun LocalDateTime.toClockEpochMilli(): Long {
-    return this.withMinute(0).withSecond(0).withNano(0).toInstant().toEpochMilli()
-}
-
 fun LocalDateTime.format(format: String): String {
     val formatter = DateTimeFormatter.ofPattern(format)
     return this.format(formatter)
