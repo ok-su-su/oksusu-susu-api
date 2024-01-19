@@ -30,7 +30,7 @@ class ExcelService {
     }
 
     /** 데이터 입력 */
-    fun <T> insertData(ws: Worksheet, datas: List<T>, startIndex: Int, sheet: Sheet) {
+    fun <T : Any> insertData(ws: Worksheet, datas: List<T>, startIndex: Int, sheet: Sheet) {
         datas.forEachIndexed { dataIdx, data ->
             val r = startIndex + dataIdx + 2
 
