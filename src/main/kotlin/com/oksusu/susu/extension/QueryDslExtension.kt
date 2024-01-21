@@ -50,3 +50,7 @@ fun NumberPath<Long>.isEquals(parameter: Long?): BooleanExpression? {
 fun StringPath.isContains(parameter: String?): BooleanExpression? {
     return parameter?.let { this.like(parameter) }
 }
+
+fun NumberPath<Long>.isIn(parameters: Set<Long>?): BooleanExpression? {
+    return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.`in`(params) }
+}

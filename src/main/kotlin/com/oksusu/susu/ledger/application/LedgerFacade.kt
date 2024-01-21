@@ -141,7 +141,7 @@ class LedgerFacade(
         val searchSpec = SearchLedgerSpec(
             uid = user.id,
             title = request.title,
-            categoryId = request.categoryId,
+            categoryIds = request.categoryIds,
             fromStartAt = request.fromStartAt,
             toStartAt = request.toEndAt
         )

@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 data class SearchLedgerRequest(
     val title: String?,
-    val categoryId: Long?,
+    val categoryIds: Set<Long>?,
     val fromStartAt: LocalDateTime?,
     val toEndAt: LocalDateTime?,
 )
