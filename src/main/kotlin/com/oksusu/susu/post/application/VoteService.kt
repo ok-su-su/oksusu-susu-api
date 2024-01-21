@@ -43,20 +43,6 @@ class VoteService(
         }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
     }
 
-    suspend fun softDeleteVote(uid: Long, id: Long) {
-        val vote = getVote(id)
-
-        if (vote.uid != uid) {
-            throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
-        }
-
-        val softDeletedVote = vote.apply { isActive = false }
-
-        txTemplates.writer.coExecute {
-            postService.saveSync(softDeletedVote)
-        }
-    }
-
     suspend fun getPopularVotesExceptBlock(
         uid: Long,
         userBlockIds: List<Long>,

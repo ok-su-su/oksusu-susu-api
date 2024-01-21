@@ -120,7 +120,7 @@ class VoteFacade(
         return parZip(
             { userService.findByIdOrThrow(vote.uid) },
             { countService.findByTargetIdAndTargetType(vote.id, CountTargetType.POST) },
-            { countService.findAllByTargetIdAndTargetType(optionIds, CountTargetType.VOTE_OPTION) },
+            { countService.findAllByTargetTypeAndTargetIdIn(optionIds, CountTargetType.VOTE_OPTION) },
             { postCategoryService.getCategory(vote.postCategoryId) }
         ) { creator, voteCount, optionCount, postCategoryModel ->
             val optionCountModels = options.map { option ->
@@ -187,7 +187,23 @@ class VoteFacade(
     suspend fun deleteVote(user: AuthUser, id: Long) {
         postService.validateAuthority(id, user.id)
 
-        voteService.softDeleteVote(user.id, id)
+        val (vote, options) = parZip(
+            {voteService.getVote(id)},
+            {voteOptionService.getVoteOptions(id)},
+        ){ vote, options -> vote to options }
+
+        val optionIds = options.map { option -> option.id }
+
+
+        txTemplates.writer.coExecute {
+            vote.apply { isActive = false }.run{
+                postService.saveSync(this)
+            }
+
+            countService.deleteByTargetIdAndTargetType(vote.id, CountTargetType.POST)
+
+            countService.deleteAllByTargetTypeAndTargetIdIn(CountTargetType.VOTE_OPTION, optionIds)
+        }
     }
 
     suspend fun getPopularVotes(user: AuthUser, size: Int): List<VoteWithCountResponse> {

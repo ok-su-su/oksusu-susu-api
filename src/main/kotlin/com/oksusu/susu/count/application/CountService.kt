@@ -28,9 +28,19 @@ class CountService(
         }
     }
 
-    suspend fun findAllByTargetIdAndTargetType(targetIds: List<Long>, targetType: CountTargetType): List<Count> {
+    suspend fun findAllByTargetTypeAndTargetIdIn(targetIds: List<Long>, targetType: CountTargetType): List<Count> {
         return withContext(Dispatchers.IO) {
             countRepository.findByTargetTypeAndTargetIdIn(targetType, targetIds)
         }
+    }
+
+    @Transactional
+    fun deleteByTargetIdAndTargetType(id: Long, type: CountTargetType) {
+        countRepository.deleteByTargetIdAndTargetType(id, type)
+    }
+
+    @Transactional
+    fun deleteAllByTargetTypeAndTargetIdIn(type: CountTargetType, optionIds: List<Long>) {
+        countRepository.deleteAllByTargetTypeAndTargetIdIn(type, optionIds)
     }
 }

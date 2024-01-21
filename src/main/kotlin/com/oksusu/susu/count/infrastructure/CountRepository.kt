@@ -10,6 +10,11 @@ import org.springframework.transaction.annotation.Transactional
 interface CountRepository : JpaRepository<Count, Long> {
     @Transactional
     fun findByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType): Count
-
+    @Transactional
     fun findByTargetTypeAndTargetIdIn(targetType: CountTargetType, targetIds: List<Long>): List<Count>
+    @Transactional
+    fun deleteByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType)
+    @Transactional
+    fun deleteAllByTargetTypeAndTargetIdIn(voteOption: CountTargetType, optionIds: List<Long>)
+
 }
