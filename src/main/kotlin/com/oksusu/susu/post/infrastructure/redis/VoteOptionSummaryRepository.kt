@@ -19,7 +19,7 @@ class VoteOptionSummaryRepository(
     suspend fun save(summary: VoteOptionSummary) {
         // value : voteOptionId, score : count
         cacheService.zSet(
-            cache = ZSetCache.createVoteOptionSummaryCache,
+            cache = ZSetCache.getVoteOptionSummaryCache,
             member = summary.voteOptionId,
             score = summary.count.toDouble()
         )
@@ -27,26 +27,26 @@ class VoteOptionSummaryRepository(
 
     suspend fun saveAll(tuples: Map<Long, Double>) {
         // value : voteOptionId, score : count
-        cacheService.zSetAll(cache = ZSetCache.createVoteOptionSummaryCache, tuples = tuples)
+        cacheService.zSetAll(cache = ZSetCache.getVoteOptionSummaryCache, tuples = tuples)
     }
 
     suspend fun findAllByVoteOptionIdIn(ids: List<Long>): List<Double> {
         return cacheService.zGetByMembers(
-            cache = ZSetCache.createVoteOptionSummaryCache,
+            cache = ZSetCache.getVoteOptionSummaryCache,
             members = ids
         )
     }
 
     suspend fun findByVoteOptionId(voteOptionId: Long): Double {
         return cacheService.zGetByMemberOrNull(
-            cache = ZSetCache.createVoteOptionSummaryCache,
+            cache = ZSetCache.getVoteOptionSummaryCache,
             member = voteOptionId
         ) ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_OPTION_SUMMARY_ERROR)
     }
 
     suspend fun deleteByVoteOptionIdIn(ids: List<Long>) {
         return cacheService.zDeleteByMembers(
-            cache = ZSetCache.createVoteOptionSummaryCache,
+            cache = ZSetCache.getVoteOptionSummaryCache,
             members = ids
         )
     }

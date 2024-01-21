@@ -20,7 +20,7 @@ class VoteSummaryRepository(
     suspend fun save(summary: VoteSummary) {
         // value : postId, score : count
         cacheService.zSet(
-            cache = ZSetCache.createVoteSummaryCache,
+            cache = ZSetCache.getVoteSummaryCache,
             member = summary.postId,
             score = summary.count.toDouble()
         )
@@ -28,7 +28,7 @@ class VoteSummaryRepository(
 
     suspend fun findByPostId(postId: Long): Double {
         return cacheService.zGetByMemberOrNull(
-            cache = ZSetCache.createVoteSummaryCache,
+            cache = ZSetCache.getVoteSummaryCache,
             member = postId
         ) ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_SUMMARY_ERROR)
     }
@@ -36,7 +36,7 @@ class VoteSummaryRepository(
     suspend fun findTopByCountOrderByCountDesc(size: Long): List<ZSetModel<Long>> {
         val range = Range.leftOpen(-size, -1L)
         return cacheService.zGetByRange(
-            cache = ZSetCache.createVoteSummaryCache,
+            cache = ZSetCache.getVoteSummaryCache,
             range = range
         )
     }
@@ -44,14 +44,14 @@ class VoteSummaryRepository(
     suspend fun findAllByCountBetween(from: Int, to: Int): List<ZSetModel<Long>> {
         val range = Range.leftOpen(-to.toLong(), -from.toLong())
         return cacheService.zGetByRange(
-            cache = ZSetCache.createVoteSummaryCache,
+            cache = ZSetCache.getVoteSummaryCache,
             range = range
         )
     }
 
     suspend fun deleteByPostId(postId: Long) {
         cacheService.zDeleteByMember(
-            cache = ZSetCache.createVoteSummaryCache,
+            cache = ZSetCache.getVoteSummaryCache,
             member = postId
         )
     }

@@ -14,12 +14,12 @@ class SusuBasicStatisticRepository(
 ) {
     suspend fun save(value: SusuBasicStatistic) {
         cacheService.set(
-            cache = Cache.createSusuBasicStatisticCache,
+            cache = Cache.getSusuBasicStatisticCache,
             value = value
         )
     }
 
     suspend fun getStatistic(): SusuBasicStatistic? {
-        return cacheService.getOrNull(cache = Cache.createSusuBasicStatisticCache)
+        return cacheService.getOrNull(cache = Cache.getSusuBasicStatisticCache)
     }
 }

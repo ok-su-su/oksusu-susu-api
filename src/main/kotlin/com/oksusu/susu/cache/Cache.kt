@@ -4,69 +4,40 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.oksusu.susu.common.consts.SUSU_BASIC_STATISTIC_KEY
 import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
+import com.oksusu.susu.extension.toTypeReference
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.domain.UserStatistic
 import java.time.Duration
 
-sealed class Cache<VALUE_TYPE>(
-    open val key: String,
-    open val type: TypeReference<VALUE_TYPE>,
-    open val duration: Duration,
+class Cache<VALUE_TYPE>(
+    val key: String,
+    val type: TypeReference<VALUE_TYPE>,
+    val duration: Duration,
 ) {
     companion object Factory {
-        val createSusuBasicStatisticCache: Factory.() -> Cache<SusuBasicStatistic> =
-            { SusuBasicStatisticCache.getCache() }
-
-        val createSusuSpecificStatisticCache: Factory.(key: String) -> Cache<String> =
-            { key -> SusuSpecificStatisticCache.getCache(key) }
-
-        val createUserStatisticCache: Factory.(key: String) -> Cache<UserStatistic> =
-            { key -> UserStatisticCache.getCache(key) }
-    }
-}
-
-class SusuBasicStatisticCache(
-    override val key: String,
-    override val type: TypeReference<SusuBasicStatistic>,
-    override val duration: Duration,
-) : Cache<SusuBasicStatistic>(key, type, duration) {
-    companion object Factory {
-        fun getCache(): Cache<SusuBasicStatistic> {
-            return SusuBasicStatisticCache(
+        fun getSusuBasicStatisticCache(): Cache<SusuBasicStatistic> {
+            return Cache(
                 key = SUSU_BASIC_STATISTIC_KEY,
-                type = object : TypeReference<SusuBasicStatistic>() {},
+                type = SusuBasicStatistic::class.java.toTypeReference(),
                 duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
-    }
-}
 
-class SusuSpecificStatisticCache(
-    override val key: String,
-    override val type: TypeReference<String>,
-    override val duration: Duration,
-) : Cache<String>(key, type, duration) {
-    companion object Factory {
-        fun getCache(key: String): Cache<String> {
-            return SusuSpecificStatisticCache(
+        val getSusuBasicStatisticCache: Factory.() -> Cache<SusuBasicStatistic> =
+            { getSusuBasicStatisticCache() }
+
+        fun getSusuSpecificStatisticCache(key: String): Cache<String> {
+            return Cache(
                 key = key,
-                type = object : TypeReference<String>() {},
+                type = String::class.java.toTypeReference(),
                 duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
-    }
-}
 
-class UserStatisticCache(
-    override val key: String,
-    override val type: TypeReference<UserStatistic>,
-    override val duration: Duration,
-) : Cache<UserStatistic>(key, type, duration) {
-    companion object Factory {
-        fun getCache(key: String): Cache<UserStatistic> {
-            return UserStatisticCache(
+        fun getUserStatisticCache(key: String): Cache<UserStatistic> {
+            return Cache(
                 key = key,
-                type = object : TypeReference<UserStatistic>() {},
+                type = UserStatistic::class.java.toTypeReference(),
                 duration = Duration.ofSeconds(USER_STATISTIC_TTL)
             )
         }

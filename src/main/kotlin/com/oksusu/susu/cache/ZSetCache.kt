@@ -3,44 +3,31 @@ package com.oksusu.susu.cache
 import com.fasterxml.jackson.core.type.TypeReference
 import com.oksusu.susu.common.consts.VOTE_OPTION_SUMMARY_KEY
 import com.oksusu.susu.common.consts.VOTE_SUMMARY_KEY
+import com.oksusu.susu.extension.toTypeReference
 
-sealed class ZSetCache<VALUE_TYPE>(
-    open val key: String,
-    open val type: TypeReference<VALUE_TYPE>,
+class ZSetCache<VALUE_TYPE>(
+    val key: String,
+    val type: TypeReference<VALUE_TYPE>,
 ) {
     companion object Factory {
-        val createVoteOptionSummaryCache: Factory.() -> ZSetCache<Long> =
-            { VoteOptionSummaryCache.getCache() }
-
-        val createVoteSummaryCache: Factory.() -> ZSetCache<Long> =
-            { VoteSummaryCache.getCache() }
-    }
-}
-
-class VoteOptionSummaryCache(
-    override val key: String,
-    override val type: TypeReference<Long>,
-) : ZSetCache<Long>(key, type) {
-    companion object Factory {
-        fun getCache(): ZSetCache<Long> {
-            return VoteOptionSummaryCache(
+        fun getVoteOptionSummaryCache(): ZSetCache<Long> {
+            return ZSetCache(
                 key = VOTE_OPTION_SUMMARY_KEY,
-                type = object : TypeReference<Long>() {}
+                type = Long::class.java.toTypeReference()
             )
         }
-    }
-}
 
-class VoteSummaryCache(
-    override val key: String,
-    override val type: TypeReference<Long>,
-) : ZSetCache<Long>(key, type) {
-    companion object Factory {
-        fun getCache(): ZSetCache<Long> {
-            return VoteSummaryCache(
+        val getVoteOptionSummaryCache: Factory.() -> ZSetCache<Long> =
+            { getVoteOptionSummaryCache() }
+
+        fun getVoteSummaryCache(): ZSetCache<Long> {
+            return ZSetCache(
                 key = VOTE_SUMMARY_KEY,
-                type = object : TypeReference<Long>() {}
+                type = Long::class.java.toTypeReference()
             )
         }
+
+        val getVoteSummaryCache: Factory.() -> ZSetCache<Long> =
+            { getVoteSummaryCache() }
     }
 }
