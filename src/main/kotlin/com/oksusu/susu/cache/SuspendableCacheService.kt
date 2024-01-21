@@ -18,7 +18,6 @@ import org.springframework.data.domain.Range
 import org.springframework.data.redis.core.DefaultTypedTuple
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.stereotype.Service
-import kotlin.math.log
 
 @Service
 class SuspendableCacheService(

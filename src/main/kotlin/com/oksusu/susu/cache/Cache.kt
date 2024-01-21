@@ -1,7 +1,6 @@
 package com.oksusu.susu.cache
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.common.consts.SUSU_BASIC_STATISTIC_KEY
 import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
