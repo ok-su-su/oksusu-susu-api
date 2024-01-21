@@ -1,6 +1,7 @@
 package com.oksusu.susu.cache
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.common.consts.SUSU_BASIC_STATISTIC_KEY
 import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
@@ -39,6 +40,14 @@ class Cache<VALUE_TYPE>(
                 key = key,
                 type = UserStatistic::class.java.toTypeReference(),
                 duration = Duration.ofSeconds(USER_STATISTIC_TTL)
+            )
+        }
+
+        fun getRefreshTokenCache(key: String, ttl: Long): Cache<String> {
+            return Cache(
+                key = key,
+                type = String::class.java.toTypeReference(),
+                duration = Duration.ofSeconds(ttl)
             )
         }
     }

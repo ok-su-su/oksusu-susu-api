@@ -4,11 +4,11 @@ import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.OauthProvider
-import com.oksusu.susu.auth.model.dto.TokenDto
-import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
-import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
-import com.oksusu.susu.auth.model.dto.response.AbleRegisterResponse
-import com.oksusu.susu.auth.model.dto.response.UserOAuthInfoResponse
+import com.oksusu.susu.auth.model.TokenDto
+import com.oksusu.susu.auth.model.request.OAuthLoginRequest
+import com.oksusu.susu.auth.model.request.OauthRegisterRequest
+import com.oksusu.susu.auth.model.response.AbleRegisterResponse
+import com.oksusu.susu.auth.model.response.UserOAuthInfoResponse
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.extension.coExecute
@@ -94,12 +94,11 @@ class OAuthFacade(
         val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(uid)
 
         val refreshToken = RefreshToken(
-            id = uid,
-            refreshToken = tokenDto.refreshToken,
-            ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
+            uid = uid,
+            refreshToken = tokenDto.refreshToken
         )
 
-        refreshTokenService.saveSync(refreshToken)
+        refreshTokenService.save(refreshToken)
 
         return tokenDto
     }

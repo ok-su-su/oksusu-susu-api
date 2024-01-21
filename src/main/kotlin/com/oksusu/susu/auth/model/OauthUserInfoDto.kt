@@ -1,6 +1,5 @@
-package com.oksusu.susu.auth.model.dto
+package com.oksusu.susu.auth.model
 
-import com.oksusu.susu.auth.model.OauthProvider
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthUserInfoResponse
 import com.oksusu.susu.user.domain.OauthInfo
 

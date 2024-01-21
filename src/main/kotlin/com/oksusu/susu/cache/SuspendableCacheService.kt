@@ -64,6 +64,17 @@ class SuspendableCacheService(
         }.getOrNull()
     }
 
+    override suspend fun <VALUE_TYPE : Any> delete(cache: Cache<VALUE_TYPE>) {
+        runCatching {
+            keyValueOps.delete(cache.key)
+        }.onFailure { e ->
+            when (e) {
+                is CancellationException -> logger.debug { "Redis Delete job cancelled." }
+                else -> logger.error(e) { "fail to delete data from redis. key : ${cache.key}" }
+            }
+        }.getOrNull()
+    }
+
     override suspend fun <VALUE_TYPE : Any> zSetAll(cache: ZSetCache<VALUE_TYPE>, tuples: Map<VALUE_TYPE, Double>) {
         coroutineScope {
             launch(Dispatchers.IO + Job()) {

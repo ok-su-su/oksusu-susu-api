@@ -1,6 +1,6 @@
 package com.oksusu.susu.user.domain
 
-import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
+import com.oksusu.susu.auth.model.request.OauthRegisterRequest
 import com.oksusu.susu.common.domain.BaseEntity
 import com.oksusu.susu.user.domain.vo.Gender
 import com.oksusu.susu.user.domain.vo.UserState

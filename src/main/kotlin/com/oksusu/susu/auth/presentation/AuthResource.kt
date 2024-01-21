@@ -2,7 +2,7 @@ package com.oksusu.susu.auth.presentation
 
 import com.oksusu.susu.auth.application.AuthFacade
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.auth.model.dto.response.TokenRefreshRequest
+import com.oksusu.susu.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.extension.wrapVoid
@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = SwaggerTag.AUTH_SWAGGER_TAG)
@@ -24,7 +25,7 @@ class AuthResource(
     @Operation(summary = "logout")
     @PostMapping("/logout")
     suspend fun logout(
-        authUser: AuthUser,
+        authUser: AuthUser
     ) = authFacade.logout(authUser).wrapVoid()
 
     /** 토큰 재발급 */

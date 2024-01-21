@@ -6,8 +6,8 @@ import com.oksusu.susu.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.AuthUserImpl
 import com.oksusu.susu.auth.model.AuthUserToken
-import com.oksusu.susu.auth.model.dto.TokenDto
-import com.oksusu.susu.auth.model.dto.response.TokenRefreshRequest
+import com.oksusu.susu.auth.model.TokenDto
+import com.oksusu.susu.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.exception.NoAuthorityException
@@ -37,8 +37,8 @@ class AuthFacade(
     }
 
     @Transactional
-    suspend fun logout(authUser: AuthUser) {
-        refreshTokenService.deleteByIdSync(authUser.id)
+    suspend fun logout(user: AuthUser) {
+        refreshTokenService.deleteByKey(user.id.toString())
     }
 
     @Transactional
@@ -51,14 +51,13 @@ class AuthFacade(
         }
 
         return parZip(
-            { refreshTokenService.deleteByIdSync(refreshPayload.id) },
+            { refreshTokenService.deleteByKey(refreshPayload.id.toString()) },
             { tokenGenerateHelper.generateAccessAndRefreshToken(refreshPayload.id) }
         ) { _, tokenDto ->
             RefreshToken(
-                id = refreshPayload.id,
-                refreshToken = tokenDto.refreshToken,
-                ttl = tokenGenerateHelper.getRefreshTokenTtlSecond()
-            ).run { refreshTokenService.saveSync(this) }
+                uid = refreshPayload.id,
+                refreshToken = tokenDto.refreshToken
+            ).run { refreshTokenService.save(this) }
 
             tokenDto
         }
