@@ -1,6 +1,5 @@
 package com.oksusu.susu.post.application
 
-import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.post.domain.Post
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service
 class VoteService(
     private val postService: PostService,
     private val postRepository: PostRepository,
-    private val txTemplates: TransactionTemplates,
 ) {
     val logger = mu.KotlinLogging.logger { }
 

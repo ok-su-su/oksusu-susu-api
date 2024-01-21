@@ -27,9 +27,6 @@ import org.springframework.transaction.annotation.Transactional
 interface PostRepository : JpaRepository<Post, Long>, PostCustomRepository {
     @Transactional(readOnly = true)
     fun findByIdAndIsActiveAndType(id: Long, isActive: Boolean, type: PostType): Post?
-
-    @Transactional(readOnly = true)
-    fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long
 }
 
 interface PostCustomRepository {

@@ -52,10 +52,6 @@ class PostCategoryService(
         return postCategories[id] ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_CATEGORY_ERROR)
     }
 
-    fun getCategoryByIdIn(ids: List<Long>): Set<PostCategoryModel> {
-        return ids.map { id -> getCategory(id) }.toSet()
-    }
-
     fun validateExistCategory(postCategoryId: Long) {
         getCategory(postCategoryId)
     }

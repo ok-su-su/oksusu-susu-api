@@ -35,10 +35,6 @@ class PostService(
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
 
-    suspend fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long {
-        return withContext(Dispatchers.IO) { postRepository.countAllByIsActiveAndType(isActive, type) }
-    }
-
     suspend fun validateExist(id: Long) {
         withContext(Dispatchers.IO) {
             postRepository.existsById(id)
