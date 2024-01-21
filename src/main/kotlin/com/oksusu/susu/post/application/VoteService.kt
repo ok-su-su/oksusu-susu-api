@@ -1,11 +1,8 @@
 package com.oksusu.susu.post.application
 
-import com.oksusu.susu.common.consts.POPULAR_VOTE_SIZE
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.NoAuthorityException
 import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository

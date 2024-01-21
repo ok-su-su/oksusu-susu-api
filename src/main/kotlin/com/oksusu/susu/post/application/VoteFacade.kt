@@ -188,15 +188,14 @@ class VoteFacade(
         postService.validateAuthority(id, user.id)
 
         val (vote, options) = parZip(
-            {voteService.getVote(id)},
-            {voteOptionService.getVoteOptions(id)},
-        ){ vote, options -> vote to options }
+            { voteService.getVote(id) },
+            { voteOptionService.getVoteOptions(id) }
+        ) { vote, options -> vote to options }
 
         val optionIds = options.map { option -> option.id }
 
-
         txTemplates.writer.coExecute {
-            vote.apply { isActive = false }.run{
+            vote.apply { isActive = false }.run {
                 postService.saveSync(this)
             }
 
@@ -213,7 +212,7 @@ class VoteFacade(
             uid = user.id,
             userBlockIds = userAndPostBlockIdModel.userBlockIds,
             postBlockIds = userAndPostBlockIdModel.postBlockIds,
-            size = size,
+            size = size
         )
 
         return voteAndCountModels.map { model ->
