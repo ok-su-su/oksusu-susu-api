@@ -9,6 +9,7 @@ import com.oksusu.susu.category.model.CategoryWithCustomModel
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
+import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.envelope.model.EnvelopeModel
@@ -26,6 +27,7 @@ import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
+import com.oksusu.susu.ledger.application.LedgerService
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
@@ -36,11 +38,16 @@ class EnvelopeFacade(
     private val relationshipService: RelationshipService,
     private val categoryService: CategoryService,
     private val categoryAssignmentService: CategoryAssignmentService,
+    private val ledgerService: LedgerService,
     private val txTemplates: TransactionTemplates,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
         val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.id)
         val category = categoryService.getCategory(request.category.id)
+        val ledger = when (request.ledgerId != null) {
+            true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.id)
+            false -> null
+        }
 
         /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
         val customCategory = when (category.id == 5L) {
@@ -53,6 +60,7 @@ class EnvelopeFacade(
                 uid = user.id,
                 type = request.type,
                 friendId = friend.id,
+                ledgerId = request.ledgerId,
                 amount = request.amount,
                 gift = request.gift,
                 memo = request.memo,
@@ -66,6 +74,19 @@ class EnvelopeFacade(
                 categoryId = category.id,
                 customCategory = customCategory
             ).run { categoryAssignmentService.saveSync(this) }
+
+            // TODO 바꿔야함..
+            ledger?.let {
+                if (createdEnvelope.type == EnvelopeType.RECEIVED) {
+                    it.totalReceivedAmounts = it.totalReceivedAmounts + createdEnvelope.amount
+                }
+
+                if (createdEnvelope.type == EnvelopeType.SENT) {
+                    it.totalSentAmounts = it.totalSentAmounts + createdEnvelope.amount
+                }
+
+                ledgerService.saveSync(it)
+            }
 
             createdEnvelope
         }

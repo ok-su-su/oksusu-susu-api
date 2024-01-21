@@ -21,14 +21,16 @@ CREATE UNIQUE INDEX uidx__oauth_id__oauth_provider ON user (oauth_id, oauth_prov
 -- 장부
 CREATE TABLE `ledger`
 (
-    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '장부 id',
-    `uid`         int          NOT NULL COMMENT 'user id',
-    `title`       varchar(512) NOT NULL COMMENT '제목',
-    `description` varchar(512) DEFAULT NULL COMMENT '상세 설명',
-    `start_at`    datetime     NOT NULL COMMENT '시작일',
-    `end_at`      datetime     NOT NULL COMMENT '종료일',
-    `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `id`                     bigint                 NOT NULL AUTO_INCREMENT COMMENT '장부 id',
+    `uid`                    int                    NOT NULL COMMENT 'user id',
+    `title`                  varchar(512)           NOT NULL COMMENT '제목',
+    `description`            varchar(512) DEFAULT NULL COMMENT '상세 설명',
+    `total_sent_amounts`     int          DEFAULT 0 NOT NULL COMMENT '보낸 봉투 총합',
+    `total_received_amounts` int          DEFAULT 0 NOT NULL COMMENT '받은 봉투 총합',
+    `start_at`               datetime               NOT NULL COMMENT '시작일',
+    `end_at`                 datetime               NOT NULL COMMENT '종료일',
+    `created_at`             datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`            datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 200000 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='장부';
 CREATE INDEX idx__uid ON ledger (uid);
