@@ -1,5 +1,6 @@
 package com.oksusu.susu.statistic.infrastructure.redis
 
+import com.oksusu.susu.cache.Cache
 import com.oksusu.susu.cache.CacheService
 import org.springframework.stereotype.Repository
 
@@ -8,10 +9,10 @@ class SusuSpecificStatisticRepository(
     private val cacheService: CacheService,
 ) {
     suspend fun findByKey(key: String): String? {
-        return cacheService.findByKey(key)
+        return cacheService.getOrNull(Cache.getSusuSpecificStatisticCache(key))
     }
 
-    suspend fun save(key: String, value: String, ttl: Int) {
-        cacheService.save(key, value, ttl)
+    suspend fun save(key: String, value: String) {
+        cacheService.set(Cache.getSusuSpecificStatisticCache(key), value)
     }
 }
