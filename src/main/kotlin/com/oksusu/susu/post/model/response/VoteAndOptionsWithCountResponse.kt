@@ -18,7 +18,7 @@ data class VoteAndOptionsWithCountResponse(
     /** 내용 */
     val content: String,
     /** 총 투표 수 */
-    val count: Int,
+    val count: Long,
     /** 생성일 */
     @DateFormat
     val createdAt: LocalDateTime,

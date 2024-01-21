@@ -35,24 +35,6 @@ class PostService(
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
 
-    suspend fun findByIsActiveAndTypeAndIdInExceptBlock(
-        isActive: Boolean,
-        type: PostType,
-        ids: List<Long>,
-        userBlockIds: List<Long>,
-        postBlockIds: List<Long>,
-    ): List<Post> {
-        return withContext(Dispatchers.IO) {
-            postRepository.findByIsActiveAndTypeAndIdInExceptBlock(
-                isActive = isActive,
-                type = type,
-                ids = ids,
-                userBlockIds = userBlockIds,
-                postBlockIds = postBlockIds
-            )
-        }
-    }
-
     suspend fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long {
         return withContext(Dispatchers.IO) { postRepository.countAllByIsActiveAndType(isActive, type) }
     }

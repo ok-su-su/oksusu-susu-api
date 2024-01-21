@@ -26,21 +26,21 @@ class Count(
     val countType: CountType,
 
     var count: Long = 0,
-) : BaseEntity(){
-    companion object{
+) : BaseEntity() {
+    companion object {
         fun toVoteLike(post: Post): Count {
             return Count(
                 targetId = post.id,
                 targetType = CountTargetType.POST,
-                countType = CountType.LIKE,
+                countType = CountType.VOTE
             )
         }
 
-        fun toVoteOptionLike(voteOption: VoteOption): Count{
+        fun toVoteOptionLike(voteOption: VoteOption): Count {
             return Count(
                 targetId = voteOption.id,
                 targetType = CountTargetType.VOTE_OPTION,
-                countType = CountType.LIKE
+                countType = CountType.VOTE
             )
         }
     }

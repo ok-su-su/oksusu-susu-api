@@ -3,17 +3,17 @@ package com.oksusu.susu.post.application
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.block.application.BlockService
-import com.oksusu.susu.common.consts.POPULAR_VOTE_SIZE
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
+import com.oksusu.susu.count.application.CountService
+import com.oksusu.susu.count.domain.Count
+import com.oksusu.susu.count.domain.vo.CountTargetType
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.VoteHistory
 import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.PostType
-import com.oksusu.susu.post.domain.vo.VoteOptionSummary
-import com.oksusu.susu.post.domain.vo.VoteSummary
 import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
 import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import com.oksusu.susu.post.model.VoteCountModel
@@ -39,24 +39,19 @@ class VoteFacade(
     private val postService: PostService,
     private val voteService: VoteService,
     private val voteOptionService: VoteOptionService,
-    private val voteSummaryService: VoteSummaryService,
-    private val voteOptionSummaryService: VoteOptionSummaryService,
     private val voteHistoryService: VoteHistoryService,
     private val userService: UserService,
     private val postCategoryService: PostCategoryService,
     private val blockService: BlockService,
+    private val countService: CountService,
 ) {
     private val logger = mu.KotlinLogging.logger { }
-
-    companion object {
-        private const val DEFAULT_POPULAR_VOTE_COUNT = 5L
-    }
 
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
         voteOptionService.validateSeq(request.options)
         postCategoryService.validateExistCategory(request.postCategoryId)
 
-        val response = txTemplates.writer.coExecute {
+        return txTemplates.writer.coExecute {
             val createdPost = Post(
                 uid = user.id,
                 type = PostType.VOTE,
@@ -64,31 +59,21 @@ class VoteFacade(
                 postCategoryId = request.postCategoryId
             ).run { postService.saveSync(this) }
 
-            val optionModels = request.options.map { option ->
+            val options = request.options.map { option ->
                 VoteOption.of(option, createdPost.id)
             }.run { voteOptionService.saveAllSync(this) }
-                .map { option -> VoteOptionModel.from(option) }
+
+            val voteCount = Count.toVoteLike(createdPost)
+            val voteOptionCounts = options.map { option -> Count.toVoteOptionLike(option) }
+
+            countService.saveAllSync(voteOptionCounts.plus(voteCount))
 
             CreateAndUpdateVoteResponse.of(
                 post = createdPost,
-                optionModels = optionModels,
+                optionModels = options.map { option -> VoteOptionModel.from(option) },
                 postCategoryModel = postCategoryService.getCategory(request.postCategoryId)
             )
         }
-
-        val voteSummary = VoteSummary(postId = response.id)
-        val voteOptionSummaries = response.options.map { option ->
-            VoteOptionSummary(voteOptionId = option.id!!)
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val saveSummary = async { voteSummaryService.save(voteSummary) }
-            val saveOptionSummary = async { voteOptionSummaryService.saveAll(voteOptionSummaries) }
-
-            awaitAll(saveSummary, saveOptionSummary)
-        }
-
-        return response
     }
 
     suspend fun getAllVotes(
@@ -109,39 +94,20 @@ class VoteFacade(
         )
 
         val votes = when (searchSpec.sortType) {
-            VoteSortType.LATEST -> getLatestVotes(getAllVoteSpec)
-            VoteSortType.POPULAR -> getPopularVotes(getAllVoteSpec)
+            VoteSortType.LATEST -> voteService.getAllVotesExceptBlock(getAllVoteSpec)
+            VoteSortType.POPULAR -> voteService.getAllVotesOrderByPopular(getAllVoteSpec)
         }
 
-        return parZip(
-            { postCategoryService.getCategoryByIdIn(votes.content.map { vote -> vote.postCategoryId }) },
-            { voteOptionService.getOptionsByPostIdIn(votes.content.map { vote -> vote.id }) }
-        ) { postCategoryModels, options ->
-            val optionModels = options.map { VoteOptionModel.from(it) }
+        val optionModels = voteOptionService.getOptionsByPostIdIn(votes.content.map { vote -> vote.id })
+            .map { VoteOptionModel.from(it) }
 
-            votes.map { vote ->
-                VoteAndOptionsResponse.of(
-                    vote = vote,
-                    options = optionModels.filter { option -> option.postId == vote.id },
-                    postCategoryModel = postCategoryModels.first { model -> vote.postCategoryId == model.id }
-                )
-            }
+        return votes.map { vote ->
+            VoteAndOptionsResponse.of(
+                vote = vote,
+                options = optionModels.filter { option -> option.postId == vote.id },
+                postCategoryModel = postCategoryService.getCategory(vote.postCategoryId)
+            )
         }
-    }
-
-    private suspend fun getLatestVotes(spec: GetAllVoteSpec): Slice<Post> {
-        return voteService.getAllVotesExceptBlock(spec)
-    }
-
-    private suspend fun getPopularVotes(spec: GetAllVoteSpec): Slice<Post> {
-        val from = spec.pageable.pageNumber * POPULAR_VOTE_SIZE
-        val to = from + POPULAR_VOTE_SIZE
-        val summaries = voteSummaryService.getSummaryBetween(from, to)
-
-        return voteService.getAllVotesOrderByPopular(
-            spec = spec,
-            ids = summaries.map { it.postId }
-        )
     }
 
     suspend fun getVote(user: AuthUser, id: Long): VoteAndOptionsWithCountResponse {
@@ -149,21 +115,22 @@ class VoteFacade(
 
         val vote = voteInfos[0].post
         val options = voteInfos.map { voteInfo -> voteInfo.voteOption }
+        val optionIds = options.map { option -> option.id }
 
         return parZip(
             { userService.findByIdOrThrow(vote.uid) },
-            { voteSummaryService.getSummaryByPostId(id) },
-            { voteOptionSummaryService.getSummariesByOptionIdIn(options.map { option -> option.id }) },
+            { countService.findByTargetIdAndTargetType(vote.id, CountTargetType.POST) },
+            { countService.findAllByTargetIdAndTargetType(optionIds, CountTargetType.VOTE_OPTION) },
             { postCategoryService.getCategory(vote.postCategoryId) }
-        ) { creator, voteSummary, optionSummaries, postCategoryModel ->
+        ) { creator, voteCount, optionCount, postCategoryModel ->
             val optionCountModels = options.map { option ->
-                VoteOptionCountModel.of(option, optionSummaries.first { it.voteOptionId == option.id })
+                VoteOptionCountModel.of(option, optionCount.first { it.targetId == option.id })
             }
 
             VoteAndOptionsWithCountResponse.of(
                 vote = VoteCountModel.of(
                     vote,
-                    voteSummary,
+                    voteCount,
                     postCategoryModel
                 ),
                 options = optionCountModels,
@@ -183,72 +150,60 @@ class VoteFacade(
     private suspend fun castVote(uid: Long, postId: Long, optionId: Long) {
         voteHistoryService.validateVoteNotExist(uid, postId)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val increaseSummary = async { voteSummaryService.increaseCount(postId) }
-            val increaseOptionSummary = async { voteOptionSummaryService.increaseCount(optionId) }
-
-            awaitAll(increaseSummary, increaseOptionSummary)
-        }
+        val (voteCount, voteOptionCount) = parZip(
+            { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
+            { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
+        ) { voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecute {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
                 .run { voteHistoryService.saveSync(this) }
+
+            val updatedVoteCount = voteCount.apply { count++ }
+            val updatedVoteOptionCount = voteOptionCount.apply { count++ }
+
+            countService.saveAllSync(listOf(updatedVoteCount, updatedVoteOptionCount))
         }
     }
 
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
         voteHistoryService.validateVoteExist(uid, postId, optionId)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val decreaseSummary = async { voteSummaryService.decreaseCount(postId) }
-            val decreaseOptionSummary = async { voteOptionSummaryService.decreaseCount(optionId) }
-
-            awaitAll(decreaseSummary, decreaseOptionSummary)
-        }
+        val (voteCount, voteOptionCount) = parZip(
+            { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
+            { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
+        ) { voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecuteOrNull {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
+
+            val updatedVoteCount = voteCount.apply { count-- }
+            val updatedVoteOptionCount = voteOptionCount.apply { count-- }
+
+            countService.saveAllSync(listOf(updatedVoteCount, updatedVoteOptionCount))
         }
     }
 
     suspend fun deleteVote(user: AuthUser, id: Long) {
         postService.validateAuthority(id, user.id)
 
-        parZip(
-            { voteSummaryService.deleteSummaryByPostId(id) },
-            { voteOptionService.getVoteOptions(id) }
-        ) { _, options ->
-            voteOptionSummaryService.deleteSummaryByOptionIdIn(options.map { it.id })
-        }
-
         voteService.softDeleteVote(user.id, id)
     }
 
-    suspend fun getPopularVotes(user: AuthUser): List<VoteWithCountResponse> {
-        val (summaries, votes) = parZip(
-            { voteSummaryService.getPopularVotes(DEFAULT_POPULAR_VOTE_COUNT) },
-            { blockService.getUserAndPostBlockTargetIds(user.id) }
-        ) { summaries, userAndPostBlockIdModel ->
-            val ids = summaries.map { summary -> summary.postId }
+    suspend fun getPopularVotes(user: AuthUser, size: Int): List<VoteWithCountResponse> {
+        val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.id)
 
-            val votes = voteService.getAllVotesByIdInExceptBlock(
-                postIds = ids,
-                userBlockIds = userAndPostBlockIdModel.userBlockIds,
-                postBlockIds = userAndPostBlockIdModel.postBlockIds
-            )
+        val voteAndCountModels = voteService.getPopularVotesExceptBlock(
+            uid = user.id,
+            userBlockIds = userAndPostBlockIdModel.userBlockIds,
+            postBlockIds = userAndPostBlockIdModel.postBlockIds,
+            size = size,
+        )
 
-            summaries to votes
-        }
-
-        val postCategoryModels = postCategoryService.getCategoryByIdIn(votes.map { vote -> vote.postCategoryId })
-
-        return summaries.map { summary ->
-            val vote = votes.first { vote -> vote.id == summary.postId }
-
+        return voteAndCountModels.map { model ->
             VoteWithCountResponse.of(
-                post = vote,
-                summary = summary,
-                postCategoryModel = postCategoryModels.first { it.id == vote.postCategoryId }
+                model = model,
+                postCategoryModel = postCategoryService.getCategory(model.post.postCategoryId)
             )
         }
     }

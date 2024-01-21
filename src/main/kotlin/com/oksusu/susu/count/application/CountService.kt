@@ -1,7 +1,10 @@
 package com.oksusu.susu.count.application
 
 import com.oksusu.susu.count.domain.Count
+import com.oksusu.susu.count.domain.vo.CountTargetType
 import com.oksusu.susu.count.infrastructure.CountRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,5 +20,17 @@ class CountService(
     @Transactional
     fun saveAllSync(counts: List<Count>): List<Count> {
         return countRepository.saveAll(counts)
+    }
+
+    suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType): Count {
+        return withContext(Dispatchers.IO) {
+            countRepository.findByTargetIdAndTargetType(targetId, targetType)
+        }
+    }
+
+    suspend fun findAllByTargetIdAndTargetType(targetIds: List<Long>, targetType: CountTargetType): List<Count> {
+        return withContext(Dispatchers.IO) {
+            countRepository.findByTargetTypeAndTargetIdIn(targetType, targetIds)
+        }
     }
 }

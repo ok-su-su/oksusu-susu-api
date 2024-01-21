@@ -31,7 +31,6 @@ class VoteResource(
         @RequestBody request: CreateVoteRequest,
     ) = voteFacade.createVote(user, request).wrapCreated()
 
-    /** 인기순 정렬은 다른 조건이 무시됩니다. */
     @Operation(summary = "투표 조회")
     @GetMapping
     suspend fun searchVotes(
@@ -70,10 +69,10 @@ class VoteResource(
         @RequestBody request: UpdateVoteRequest,
     ) = voteFacade.update(user, id, request).wrapOk()
 
-    /** 총 투표 수가 0 일 경우 제외됩니다  */
     @Operation(summary = "가장 인기 있는 투표 검색")
     @GetMapping("/popular")
     suspend fun getPopularVotes(
         user: AuthUser,
-    ) = voteFacade.getPopularVotes(user).wrapOk()
+        @RequestParam(defaultValue = "5") size: Int,
+    ) = voteFacade.getPopularVotes(user, size).wrapOk()
 }

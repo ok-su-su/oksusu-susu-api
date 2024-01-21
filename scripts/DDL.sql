@@ -269,8 +269,8 @@ CREATE TABLE `count`
 (
     `id`          bigint NOT NULL AUTO_INCREMENT COMMENT '카운트 id',
     `target_id`   bigint NOT NULL COMMENT '대상 id',
-    `target_type` int    NOT NULL COMMENT '대상 type (LEDGER, ENVELOPE)',
-    `count_type`  int    NOT NULL COMMENT '카운트 type (LEDGER, ENVELOPE)',
+    `target_type` int    NOT NULL COMMENT '대상 type / 0:POST, 1:VOTE_OPTION',
+    `count_type`  int    NOT NULL COMMENT '카운트 type / 0:VOTE',
     `count`       int    NOT NULL COMMENT '카운트',
     `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',

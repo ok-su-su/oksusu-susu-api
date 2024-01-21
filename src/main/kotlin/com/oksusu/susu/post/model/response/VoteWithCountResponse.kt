@@ -1,8 +1,7 @@
 package com.oksusu.susu.post.model.response
 
 import com.oksusu.susu.extension.equalsFromYearToSec
-import com.oksusu.susu.post.domain.Post
-import com.oksusu.susu.post.domain.vo.VoteSummary
+import com.oksusu.susu.post.infrastructure.repository.model.PostAndCountModel
 import com.oksusu.susu.post.model.PostCategoryModel
 
 data class VoteWithCountResponse(
@@ -13,18 +12,18 @@ data class VoteWithCountResponse(
     /** 내용 */
     val content: String,
     /** 총 투표 수 */
-    val count: Int,
+    val count: Long,
     /** 수정 여부 */
     val isModified: Boolean,
 ) {
     companion object {
-        fun of(post: Post, summary: VoteSummary, postCategoryModel: PostCategoryModel): VoteWithCountResponse {
+        fun of(model: PostAndCountModel, postCategoryModel: PostCategoryModel): VoteWithCountResponse {
             return VoteWithCountResponse(
-                id = post.id,
+                id = model.post.id,
                 category = postCategoryModel.name,
-                content = post.content,
-                count = summary.count,
-                isModified = !post.createdAt.equalsFromYearToSec(post.modifiedAt)
+                content = model.post.content,
+                count = model.count.count,
+                isModified = model.post.createdAt.equalsFromYearToSec(model.post.modifiedAt)
             )
         }
     }
