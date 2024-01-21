@@ -12,11 +12,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.domain.Range
 import org.springframework.data.redis.core.DefaultTypedTuple
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.stereotype.Service
+import kotlin.math.log
 
 @Service
 class SuspendableCacheService(
@@ -67,6 +69,7 @@ class SuspendableCacheService(
     override suspend fun <VALUE_TYPE : Any> delete(cache: Cache<VALUE_TYPE>) {
         runCatching {
             keyValueOps.delete(cache.key)
+                .awaitSingle()
         }.onFailure { e ->
             when (e) {
                 is CancellationException -> logger.debug { "Redis Delete job cancelled." }
