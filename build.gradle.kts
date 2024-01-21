@@ -188,6 +188,17 @@ when {
 
 val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
 
+/** build시 ktlint 미적용 */
+gradle.taskGraph.whenReady {
+    if (hasTask(":build")) {
+        allTasks.forEach { task ->
+            if (task.name.contains("ktlint") || task.name.contains("Ktlint")) {
+                task.enabled = false
+            }
+        }
+    }
+}
+
 /** jacoco **/
 tasks.withType<Test> {
     useJUnitPlatform()

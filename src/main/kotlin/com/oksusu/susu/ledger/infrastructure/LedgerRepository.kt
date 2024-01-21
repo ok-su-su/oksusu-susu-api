@@ -6,7 +6,7 @@ import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.envelope.infrastructure.model.QCountPerCategoryIdModel
 import com.oksusu.susu.extension.execute
 import com.oksusu.susu.extension.isContains
-import com.oksusu.susu.extension.isEquals
+import com.oksusu.susu.extension.isIn
 import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.domain.QLedger
 import com.oksusu.susu.ledger.infrastructure.model.LedgerDetailModel
@@ -30,6 +30,9 @@ import org.springframework.transaction.annotation.Transactional
 interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository {
     @Transactional(readOnly = true)
     fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Ledger>
+
+    @Transactional(readOnly = true)
+    fun findByIdAndUid(id: Long, uid: Long): Ledger?
 }
 
 interface LedgerCustomRepository {
@@ -64,7 +67,7 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             .where(
                 qLedger.uid.eq(spec.uid),
                 qLedger.title.isContains(spec.title),
-                qCategoryAssignment.categoryId.isEquals(spec.categoryId),
+                qCategoryAssignment.categoryId.isIn(spec.categoryIds),
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER),
                 allOf(
                     qLedger.startAt.after(spec.fromStartAt),

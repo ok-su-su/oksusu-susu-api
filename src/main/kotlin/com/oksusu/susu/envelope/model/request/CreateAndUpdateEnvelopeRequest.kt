@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 data class CreateAndUpdateEnvelopeRequest(
     val type: EnvelopeType,
     val friendId: Long,
+    val ledgerId: Long? = null,
     val amount: Long,
     val gift: String? = null,
     val memo: String? = null,

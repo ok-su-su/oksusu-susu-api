@@ -4,7 +4,6 @@ import com.oksusu.susu.post.domain.vo.VoteSummary
 import com.oksusu.susu.post.infrastructure.redis.VoteSummaryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
@@ -40,7 +39,7 @@ class VoteSummaryService(
         return withContext(Dispatchers.IO) {
             voteSummaryRepository.findTopByCountOrderByCountDesc(size)
         }.map { VoteSummary(postId = it.value!!.toLong(), count = it.score!!.toInt()) }
-            .toList().filter { it.count != 0 }.reversed()
+            .filter { it.count != 0 }.reversed()
     }
 
     suspend fun getSummaryBetween(from: Int, to: Int): List<VoteSummary> {
@@ -52,7 +51,7 @@ class VoteSummaryService(
         return withContext(Dispatchers.IO) {
             voteSummaryRepository.findAllByCountBetween(start, to + 50)
         }.map { VoteSummary(postId = it.value!!.toLong(), count = it.score!!.toInt()) }
-            .toList().reversed()
+            .reversed()
     }
 
     suspend fun deleteSummaryByPostId(postId: Long) {

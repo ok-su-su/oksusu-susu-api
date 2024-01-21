@@ -38,6 +38,14 @@ class LedgerService(
         }
     }
 
+    suspend fun findByIdAndUidOrThrow(id: Long, uid: Long): Ledger {
+        return findByIdAndUidOrNull(id, uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_LEDGER_ERROR)
+    }
+
+    suspend fun findByIdAndUidOrNull(id: Long, uid: Long): Ledger? {
+        return withContext(Dispatchers.IO) { ledgerRepository.findByIdAndUid(id, uid) }
+    }
+
     suspend fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Ledger> {
         return withContext(Dispatchers.IO) { ledgerRepository.findAllByUidAndIdIn(uid, ids) }
     }

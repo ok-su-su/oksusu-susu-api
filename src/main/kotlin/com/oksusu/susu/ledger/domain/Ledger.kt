@@ -22,6 +22,12 @@ class Ledger(
 
     var description: String? = null,
 
+    @Column(name = "total_sent_amounts")
+    var totalSentAmounts: Long = 0,
+
+    @Column(name = "total_received_amounts")
+    var totalReceivedAmounts: Long = 0,
+
     @Column(name = "start_at")
     var startAt: LocalDateTime,
 

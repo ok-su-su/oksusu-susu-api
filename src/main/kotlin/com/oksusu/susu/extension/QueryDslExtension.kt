@@ -6,7 +6,11 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
-import org.springframework.data.domain.*
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
+import org.springframework.data.domain.SliceImpl
 import org.springframework.data.jpa.repository.support.Querydsl
 
 fun <T> Querydsl?.execute(query: JPAQuery<T>, pageable: Pageable): Page<T> {
@@ -44,5 +48,9 @@ fun NumberPath<Long>.isEquals(parameter: Long?): BooleanExpression? {
 }
 
 fun StringPath.isContains(parameter: String?): BooleanExpression? {
-    return parameter?.let { this.eq(parameter) }
+    return parameter?.let { this.like(parameter) }
+}
+
+fun NumberPath<Long>.isIn(parameters: Set<Long>?): BooleanExpression? {
+    return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.`in`(params) }
 }

@@ -13,6 +13,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     COROUTINE_CANCELLATION_ERROR(HttpStatus.BAD_REQUEST, "coroutine cancellation error"),
     NO_AUTHORITY_ERROR(HttpStatus.FORBIDDEN, "수정 권한이 없습니다."),
     FAIL_TO_TRANSACTION_TEMPLATE_EXECUTE_ERROR(HttpStatus.BAD_REQUEST, "fail to tx-templates execute error"),
+    FAIL_TO_REDIS_EXECUTE_ERROR(HttpStatus.BAD_REQUEST, "fail to redis execute error"),
 
     /** Auth Error Code */
     FAIL_TO_VERIFY_TOKEN_ERROR(HttpStatus.UNAUTHORIZED, "fail to verify token"),
@@ -56,6 +57,12 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** Term Error Code */
     NOT_FOUND_TERM_ERROR(HttpStatus.NOT_FOUND, "약관 정보를 찾을 수 없습니다."),
 
+    /** Vote Option Summary Error Code */
+    NOT_FOUND_VOTE_OPTION_SUMMARY_ERROR(HttpStatus.BAD_REQUEST, "투표 옵션 요약 정보를 찾을 수 없습니다."),
+
+    /** Vote Summary Error Code */
+    NOT_FOUND_VOTE_SUMMARY_ERROR(HttpStatus.BAD_REQUEST, "투표 요약 정보를 찾을 수 없습니다."),
+
     /** Vote History Error Code */
     ALREADY_VOTED_POST(HttpStatus.BAD_REQUEST, "이미 진행된 투표입니다."),
 
@@ -67,5 +74,8 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** Report Error Code */
     NOT_FOUND_REPORT_METADATA_ERROR(HttpStatus.NOT_FOUND, "신고 메타데이터 정보를 찾을 수 없습니다."),
     ALREADY_EXISTS_REPORT_HISTORY_ERROR(HttpStatus.BAD_REQUEST, "이미 신고한 상태입니다."),
+
+    /** Statistic Error Code */
+    NOT_FOUND_SUSU_BASIC_STATISTIC_ERROR(HttpStatus.NOT_FOUND, "수수 통계 자료를 찾을 수 없습니다."),
     ;
 }
