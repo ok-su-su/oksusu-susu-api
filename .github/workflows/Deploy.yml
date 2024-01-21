@@ -75,8 +75,7 @@ jobs:
           script: |
             cd susu
             
-            sudo touch .env
-            echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
+            sudo echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
             
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker rm $(sudo docker ps -a -q)
