@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.domain.Range
 import org.springframework.data.redis.core.DefaultTypedTuple
@@ -60,6 +61,18 @@ class SuspendableCacheService(
             when (e) {
                 is CancellationException -> logger.debug { "Redis Read job cancelled." }
                 else -> logger.error(e) { "fail to read data from redis. key : ${cache.key}" }
+            }
+        }.getOrNull()
+    }
+
+    override suspend fun <VALUE_TYPE : Any> delete(cache: Cache<VALUE_TYPE>) {
+        runCatching {
+            keyValueOps.delete(cache.key)
+                .awaitSingle()
+        }.onFailure { e ->
+            when (e) {
+                is CancellationException -> logger.debug { "Redis Delete job cancelled." }
+                else -> logger.error(e) { "fail to delete data from redis. key : ${cache.key}" }
             }
         }.getOrNull()
     }

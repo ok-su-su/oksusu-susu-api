@@ -1,8 +1,8 @@
 package com.oksusu.susu.auth.application
 
 import com.oksusu.susu.auth.model.OauthProvider
-import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
-import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
+import com.oksusu.susu.auth.model.response.OauthLoginLinkResponse
+import com.oksusu.susu.auth.model.response.OauthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.KakaoOauthService
 import org.springframework.stereotype.Service
 

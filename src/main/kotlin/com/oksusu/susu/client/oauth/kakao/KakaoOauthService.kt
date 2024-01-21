@@ -1,8 +1,8 @@
 package com.oksusu.susu.client.oauth.kakao
 
-import com.oksusu.susu.auth.model.dto.OauthUserInfoDto
-import com.oksusu.susu.auth.model.dto.response.OauthLoginLinkResponse
-import com.oksusu.susu.auth.model.dto.response.OauthTokenResponse
+import com.oksusu.susu.auth.model.OauthUserInfoDto
+import com.oksusu.susu.auth.model.response.OauthLoginLinkResponse
+import com.oksusu.susu.auth.model.response.OauthTokenResponse
 import com.oksusu.susu.common.properties.KakaoOauthProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

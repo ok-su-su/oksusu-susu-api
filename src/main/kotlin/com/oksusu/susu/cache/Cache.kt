@@ -41,5 +41,13 @@ class Cache<VALUE_TYPE>(
                 duration = Duration.ofSeconds(USER_STATISTIC_TTL)
             )
         }
+
+        fun getRefreshTokenCache(key: String, ttl: Long): Cache<String> {
+            return Cache(
+                key = key,
+                type = String::class.java.toTypeReference(),
+                duration = Duration.ofSeconds(ttl)
+            )
+        }
     }
 }
