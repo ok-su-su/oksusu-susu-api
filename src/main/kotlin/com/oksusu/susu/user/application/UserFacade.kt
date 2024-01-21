@@ -18,7 +18,7 @@ class UserFacade(
     }
 
     suspend fun updateUserInfo(uid: Long, user: AuthUser, request: UpdateUserInfoRequest): UserInfoResponse {
-        user.isAuthorThrow(uid)
+        user.isNotAuthorThrow(uid)
 
         val beforeChangedUser = userService.findByIdOrThrow(user.id)
 

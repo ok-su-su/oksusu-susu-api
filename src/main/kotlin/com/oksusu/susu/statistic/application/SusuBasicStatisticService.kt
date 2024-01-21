@@ -3,6 +3,8 @@ package com.oksusu.susu.statistic.application
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
+import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.FailToExecuteException
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicStatisticRepository
@@ -73,9 +75,7 @@ class SusuBasicStatisticService(
     }
 
     suspend fun getStatisticOrThrow(): SusuBasicStatistic {
-        // TODO : !!보다는 throw하는 로직이 더 좋을 듯 합니다.
-        /** 통계 없으면 에러 띄우기 */
-        return getStatisticOrNull()!!
+        return getStatisticOrNull() ?: throw FailToExecuteException(ErrorCode.NOT_FOUND_SUSU_BASIC_STATISTIC_ERROR)
     }
 
     suspend fun getStatisticOrNull(): SusuBasicStatistic? {

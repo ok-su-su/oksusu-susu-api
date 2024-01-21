@@ -13,7 +13,7 @@ class VoteOptionSummaryService(
     suspend fun saveAll(voteOptionSummaries: List<VoteOptionSummary>) {
         // value : voteOptionId, score : count
         val tuples = voteOptionSummaries.associate { option ->
-            option.voteOptionId.toString() to option.count.toLong()
+            option.voteOptionId to option.count.toDouble()
         }
 
         withContext(Dispatchers.IO) {

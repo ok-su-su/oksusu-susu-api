@@ -1,16 +1,17 @@
 package com.oksusu.susu.user.model.response
 
-import com.oksusu.susu.common.annotation.DateFormat
 import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.domain.vo.Gender
-import java.time.LocalDate
 
 class UserInfoResponse(
+    /** 유저 id */
     val id: Long,
+    /** 이름 */
     val name: String,
+    /** 성별 */
     val gender: Gender?,
-    @DateFormat
-    val birth: LocalDate?,
+    /** 출생년도 */
+    val birth: Int?,
 ) {
     companion object {
         fun from(user: User): UserInfoResponse {
@@ -18,7 +19,7 @@ class UserInfoResponse(
                 id = user.id,
                 name = user.name,
                 gender = user.gender,
-                birth = user.birth
+                birth = user.birth?.year
             )
         }
     }
