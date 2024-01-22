@@ -143,7 +143,7 @@ class LedgerFacade(
             title = request.title,
             categoryIds = request.categoryIds,
             fromStartAt = request.fromStartAt,
-            toStartAt = request.toEndAt
+            toStartAt = request.toStartAt
         )
 
         val response = ledgerService.search(searchSpec, pageRequest.toDefault())

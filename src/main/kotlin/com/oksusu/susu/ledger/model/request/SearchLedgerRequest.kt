@@ -6,5 +6,5 @@ data class SearchLedgerRequest(
     val title: String?,
     val categoryIds: Set<Long>?,
     val fromStartAt: LocalDateTime?,
-    val toEndAt: LocalDateTime?,
+    val toStartAt: LocalDateTime?,
 )

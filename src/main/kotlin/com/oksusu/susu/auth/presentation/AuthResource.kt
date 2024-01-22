@@ -2,7 +2,7 @@ package com.oksusu.susu.auth.presentation
 
 import com.oksusu.susu.auth.application.AuthFacade
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.auth.model.dto.response.TokenRefreshRequest
+import com.oksusu.susu.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.extension.wrapVoid

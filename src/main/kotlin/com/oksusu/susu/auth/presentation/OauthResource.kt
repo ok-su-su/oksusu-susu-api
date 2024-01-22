@@ -3,8 +3,8 @@ package com.oksusu.susu.auth.presentation
 import com.oksusu.susu.auth.application.OAuthFacade
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.OauthProvider
-import com.oksusu.susu.auth.model.dto.request.OAuthLoginRequest
-import com.oksusu.susu.auth.model.dto.request.OauthRegisterRequest
+import com.oksusu.susu.auth.model.request.OAuthLoginRequest
+import com.oksusu.susu.auth.model.request.OauthRegisterRequest
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk

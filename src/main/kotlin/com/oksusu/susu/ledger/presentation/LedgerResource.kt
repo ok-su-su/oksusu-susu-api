@@ -56,6 +56,12 @@ class LedgerResource(
         @PathVariable id: Long,
     ) = ledgerFacade.get(user, id).wrapOk()
 
+    /**
+     * **검색 정렬 조건**
+     * - createdAt (생성)
+     * - totalSentAmounts (보낸 금액 총합)
+     * - totalReceivedAmounts (받은 금액 총합)
+     */
     @Operation(summary = "장부 검색")
     @GetMapping
     suspend fun search(

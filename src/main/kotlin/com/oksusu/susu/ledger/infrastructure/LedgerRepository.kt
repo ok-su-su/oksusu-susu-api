@@ -14,7 +14,6 @@ import com.oksusu.susu.ledger.infrastructure.model.QLedgerDetailModel
 import com.oksusu.susu.ledger.infrastructure.model.QSearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerModel
 import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
-import com.querydsl.core.types.ExpressionUtils.allOf
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -69,10 +68,8 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
                 qLedger.title.isContains(spec.title),
                 qCategoryAssignment.categoryId.isIn(spec.categoryIds),
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER),
-                allOf(
-                    qLedger.startAt.after(spec.fromStartAt),
-                    qLedger.endAt.before(spec.toStartAt)
-                )
+                spec.fromStartAt?.let { fromStartAt -> qLedger.startAt.after(fromStartAt) },
+                spec.fromStartAt?.let { toStartAt -> qLedger.startAt.before(toStartAt) }
             )
 
         return querydsl.execute(query, pageable)
