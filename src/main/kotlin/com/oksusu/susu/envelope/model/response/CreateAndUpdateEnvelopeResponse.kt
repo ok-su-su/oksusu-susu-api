@@ -12,7 +12,7 @@ data class CreateAndUpdateEnvelopeResponse(
     val amount: Long,
     val gift: String?,
     val memo: String?,
-    val hasVisited: Boolean,
+    val hasVisited: Boolean?,
     val handedOverAt: LocalDateTime,
 ) {
     companion object {

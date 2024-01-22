@@ -12,7 +12,7 @@ class AllEnvelopeSheetDataDto(
     val relationship: String,
     val friendName: String,
     val amount: Long,
-    val hasVisited: String,
+    val hasVisited: String?,
     val gift: String?,
     val memo: String?,
     val phoneNumber: String?,
@@ -29,7 +29,7 @@ class AllEnvelopeSheetDataDto(
                 relationship = relationship.relation,
                 friendName = model.friend.name,
                 amount = model.envelope.amount,
-                hasVisited = model.envelope.hasVisited.toOX(),
+                hasVisited = model.envelope.hasVisited?.toOX(),
                 gift = model.envelope.gift,
                 memo = model.envelope.memo,
                 phoneNumber = model.friend.phoneNumber
@@ -47,7 +47,7 @@ class AllEnvelopeSheetDataDto(
                 relationship = relationship.relation,
                 friendName = model.friend.name,
                 amount = model.envelope.amount,
-                hasVisited = model.envelope.hasVisited.toOX(),
+                hasVisited = model.envelope.hasVisited?.toOX(),
                 gift = model.envelope.gift,
                 memo = model.envelope.memo,
                 phoneNumber = model.friend.phoneNumber
