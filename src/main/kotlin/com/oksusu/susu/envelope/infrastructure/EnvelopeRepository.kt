@@ -37,6 +37,9 @@ interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepo
 
     @Transactional(readOnly = true)
     fun findAllByLedgerId(ledgerId: Long): List<Envelope>
+
+    @Transactional(readOnly = true)
+    fun findTop1ByUidAndTypeOrderByAmount(uid: Long, type: EnvelopeType): Envelope?
 }
 
 interface EnvelopeCustomRepository {
