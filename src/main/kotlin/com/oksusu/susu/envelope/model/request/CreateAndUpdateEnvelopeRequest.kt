@@ -11,7 +11,7 @@ data class CreateAndUpdateEnvelopeRequest(
     val amount: Long,
     val gift: String? = null,
     val memo: String? = null,
-    val hasVisited: Boolean,
+    val hasVisited: Boolean? = null,
     val handedOverAt: LocalDateTime,
     val category: CreateCategoryAssignmentRequest,
 )

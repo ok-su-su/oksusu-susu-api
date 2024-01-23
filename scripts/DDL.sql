@@ -113,7 +113,7 @@ CREATE TABLE `envelope`
     `amount`         int          NOT NULL COMMENT '금액',
     `gift`           varchar(512) DEFAULT NULL COMMENT '선물',
     `memo`           varchar(512) DEFAULT NULL COMMENT '메모',
-    `has_visited`    tinyint      NOT NULL COMMENT '방문 : 1, 미방문 : 0',
+    `has_visited`    tinyint      DEFAULT NULL COMMENT '방문 : 1, 미방문 : 0, null인 경우 미선택',
     `handed_over_at` datetime     NOT NULL COMMENT '전달일',
     `created_at`     datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at`    datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',

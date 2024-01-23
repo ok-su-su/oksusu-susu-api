@@ -22,4 +22,14 @@ class EnvelopeConfigResource(
     suspend fun getCreateEnvelopesConfig(
         user: AuthUser,
     ) = envelopeConfigService.getCreateEnvelopesConfig(user).wrapOk()
+
+    /**
+     * **봉투 검색 필터링 config**
+     * - 봉투가 없는 경우, maxReceivedAmount는 0
+     */
+    @Operation(summary = "봉투 검색 필터링 config")
+    @GetMapping("/search-filter")
+    suspend fun getSearchFilter(
+        user: AuthUser,
+    ) = envelopeConfigService.getSearchFilter(user).wrapOk()
 }

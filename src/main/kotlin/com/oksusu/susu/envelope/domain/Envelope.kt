@@ -38,7 +38,7 @@ class Envelope(
     var memo: String? = null,
 
     @Column(name = "has_visited")
-    var hasVisited: Boolean,
+    var hasVisited: Boolean? = null,
 
     @Column(name = "handed_over_at")
     var handedOverAt: LocalDateTime,

@@ -2,9 +2,7 @@ package com.oksusu.susu.extension
 
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.SusuException
-import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
 import com.querydsl.core.types.dsl.BooleanExpression
-import com.querydsl.core.types.dsl.DateTimeExpression
 import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
@@ -50,7 +48,7 @@ fun NumberPath<Long>.isEquals(parameter: Long?): BooleanExpression? {
 }
 
 fun StringPath.isContains(parameter: String?): BooleanExpression? {
-    return parameter?.let { this.like(parameter) }
+    return parameter?.let { this.contains(parameter) }
 }
 
 fun NumberPath<Long>.isIn(parameters: Set<Long>?): BooleanExpression? {
