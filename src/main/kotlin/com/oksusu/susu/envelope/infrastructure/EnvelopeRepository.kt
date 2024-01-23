@@ -91,6 +91,9 @@ interface EnvelopeCustomRepository {
         envelopeType: EnvelopeType,
         pageable: Pageable,
     ): Slice<EnvelopeDetailAndLedgerModel>
+
+    @Transactional(readOnly = true)
+    fun findLatestFriendEnvelopes(friendIds: Set<Long>): List<Envelope>
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -390,5 +393,15 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             )
 
         return querydsl.executeSlice(query, pageable)
+    }
+
+    override fun findLatestFriendEnvelopes(friendIds: Set<Long>): List<Envelope> {
+        return JPAQuery<Envelope>(entityManager)
+            .select(qEnvelope)
+            .from(qEnvelope)
+            .where(qEnvelope.friendId.`in`(friendIds))
+            .groupBy(qEnvelope.friendId)
+            .having(qEnvelope.handedOverAt.eq(qEnvelope.handedOverAt.max()))
+            .fetch()
     }
 }

@@ -3,7 +3,17 @@ package com.oksusu.susu.envelope.application
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.EnvelopeRepository
-import com.oksusu.susu.envelope.infrastructure.model.*
+import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
+import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
+import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
+import com.oksusu.susu.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
+import com.oksusu.susu.envelope.infrastructure.model.EnvelopeAndFriendModel
+import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailAndLedgerModel
+import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailModel
+import com.oksusu.susu.envelope.infrastructure.model.FriendStatisticsModel
+import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeModel
+import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
+import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import kotlinx.coroutines.Dispatchers
@@ -131,5 +141,11 @@ class EnvelopeService(
         pageable: Pageable,
     ): Page<FriendStatisticsModel> {
         return withContext(Dispatchers.IO) { envelopeRepository.findFriendStatistics(searchSpec, pageable) }
+    }
+
+    suspend fun findLatestFriendEnvelopes(friendIds: Set<Long>): List<Envelope> {
+        return withContext(Dispatchers.IO) {
+            envelopeRepository.findLatestFriendEnvelopes(friendIds)
+        }
     }
 }

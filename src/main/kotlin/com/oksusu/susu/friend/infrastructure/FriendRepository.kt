@@ -46,14 +46,11 @@ class FriendCustomRepositoryImpl : FriendCustomRepository, QuerydslRepositorySup
     private val qFriend = QFriend.friend
     private val qFriendRelationship = QFriendRelationship.friendRelationship
 
-    override fun search(
-        spec: SearchFriendSpec,
-        pageable: Pageable,
-    ): Page<FriendAndFriendRelationshipModel> {
+    override fun search(spec: SearchFriendSpec, pageable: Pageable): Page<FriendAndFriendRelationshipModel> {
         val query = JPAQuery<QFriend>(entityManager)
             .select(QFriendAndFriendRelationshipModel(qFriend, qFriendRelationship))
             .from(qFriend)
-            .join(qFriend).on(qFriendRelationship.friendId.eq(qFriend.id))
+            .join(qFriendRelationship).on(qFriend.id.eq(qFriendRelationship.friendId))
             .where(
                 qFriend.uid.eq(spec.uid),
                 qFriend.name.isEquals(spec.name),

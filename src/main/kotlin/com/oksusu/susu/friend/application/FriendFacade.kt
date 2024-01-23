@@ -1,8 +1,12 @@
 package com.oksusu.susu.friend.application
 
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.category.application.CategoryAssignmentService
+import com.oksusu.susu.category.application.CategoryService
+import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
+import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.exception.AlreadyException
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.extension.coExecute
@@ -12,6 +16,7 @@ import com.oksusu.susu.friend.infrastructure.model.SearchFriendSpec
 import com.oksusu.susu.friend.model.request.CreateFriendRequest
 import com.oksusu.susu.friend.model.request.SearchFriendRequest
 import com.oksusu.susu.friend.model.response.CreateFriendResponse
+import com.oksusu.susu.friend.model.response.RecentEnvelopeModel
 import com.oksusu.susu.friend.model.response.SearchFriendResponse
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
@@ -22,6 +27,9 @@ class FriendFacade(
     private val friendRelationshipService: FriendRelationshipService,
     private val relationshipService: RelationshipService,
     private val txTemplates: TransactionTemplates,
+    private val envelopeService: EnvelopeService,
+    private val categoryAssignmentService: CategoryAssignmentService,
+    private val categoryService: CategoryService,
 ) {
     suspend fun search(
         user: AuthUser,
@@ -37,13 +45,38 @@ class FriendFacade(
             pageable = pageRequest.toDefault()
         )
 
+        val friendIds = searchResponse.map { it.friend.id }.toSet()
+
+        val envelopes = envelopeService.findLatestFriendEnvelopes(friendIds)
+
+        val envelopeMap = envelopes.associateBy { envelope -> envelope.friendId }
+
+        val categoryAssignments = categoryAssignmentService.findAllByTypeAndIdIn(
+            targetType = CategoryAssignmentType.ENVELOPE,
+            targetIds = envelopes.map { envelope -> envelope.id }
+        ).associateBy { categoryAssignment -> categoryAssignment.targetId }
+
         return searchResponse.map { (friend, friendRelationship) ->
             val relationship = relationshipService.getRelationship(friendRelationship.relationshipId)
+
+            val envelope = envelopeMap[friend.id]
+            val categoryAssignment = envelope?.let { target -> categoryAssignments[target.id] }
+            val category = categoryAssignment?.categoryId?.let { target -> categoryService.getCategory(target) }
+
+            val recentEnvelopeModel = if (envelope != null && category != null && categoryAssignment != null) {
+                RecentEnvelopeModel(
+                    category = categoryAssignment.customCategory ?: category.name,
+                    handedOverAt = envelope.handedOverAt
+                )
+            } else {
+                null
+            }
 
             SearchFriendResponse.of(
                 friend = friend,
                 relationship = relationship,
-                friendRelationship = friendRelationship
+                friendRelationship = friendRelationship,
+                recentEnvelope = recentEnvelopeModel
             )
         }
     }
