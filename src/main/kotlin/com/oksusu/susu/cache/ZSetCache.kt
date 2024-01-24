@@ -3,7 +3,7 @@ package com.oksusu.susu.cache
 import com.fasterxml.jackson.core.type.TypeReference
 import com.oksusu.susu.common.consts.VOTE_OPTION_SUMMARY_KEY
 import com.oksusu.susu.common.consts.VOTE_SUMMARY_KEY
-import com.oksusu.susu.extension.toTypeReference
+import com.oksusu.susu.common.util.toTypeReference
 
 class ZSetCache<VALUE_TYPE>(
     val key: String,
@@ -13,7 +13,7 @@ class ZSetCache<VALUE_TYPE>(
         fun getVoteOptionSummaryCache(): ZSetCache<Long> {
             return ZSetCache(
                 key = VOTE_OPTION_SUMMARY_KEY,
-                type = Long::class.java.toTypeReference()
+                type = toTypeReference<Long>()
             )
         }
 
@@ -23,7 +23,7 @@ class ZSetCache<VALUE_TYPE>(
         fun getVoteSummaryCache(): ZSetCache<Long> {
             return ZSetCache(
                 key = VOTE_SUMMARY_KEY,
-                type = Long::class.java.toTypeReference()
+                type = toTypeReference<Long>()
             )
         }
 

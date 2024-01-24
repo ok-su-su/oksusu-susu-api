@@ -67,7 +67,7 @@ object DependencyVersion {
     const val FASTEXCEL_VERSION = "0.16.5"
     const val SPRING_CLOUD_VERSION = "2022.0.4"
     const val SPRING_CLOUD_BOOTSTRAP_VERSION = "4.1.0"
-    const val AWS_SECRET_MANAGER_CONFIG_VERSION = "2.4.4"
+    const val AWS_PARAMETER_STORE_CONFIG_VERSION = "2.2.6.RELEASE"
 }
 
 dependencies {
@@ -129,8 +129,8 @@ dependencies {
     implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL_VERSION}")
 
     /** aws */
-    implementation("io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:${DependencyVersion.AWS_SECRET_MANAGER_CONFIG_VERSION}")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:${DependencyVersion.SPRING_CLOUD_BOOTSTRAP_VERSION}")
+    implementation("org.springframework.cloud:spring-cloud-starter-aws-parameter-store-config:${DependencyVersion.AWS_PARAMETER_STORE_CONFIG_VERSION}")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")

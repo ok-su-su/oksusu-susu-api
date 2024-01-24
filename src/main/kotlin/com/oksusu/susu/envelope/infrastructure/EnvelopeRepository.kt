@@ -204,7 +204,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
         return JPAQuery<Envelope>(entityManager)
             .select(
                 QCountPerHandedOverAtModel(
-                    qEnvelope.handedOverAt.month(),
+                    qEnvelope.handedOverAt.yearMonth(),
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
@@ -213,7 +213,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 qEnvelope.type.eq(type),
                 qEnvelope.handedOverAt.between(from, to),
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
-            ).groupBy(qEnvelope.handedOverAt.month())
+            ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
 
@@ -226,7 +226,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
         return JPAQuery<Envelope>(entityManager)
             .select(
                 QCountPerHandedOverAtModel(
-                    qEnvelope.handedOverAt.month(),
+                    qEnvelope.handedOverAt.yearMonth(),
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
@@ -236,7 +236,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 qEnvelope.type.eq(type),
                 qEnvelope.handedOverAt.between(from, to),
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
-            ).groupBy(qEnvelope.handedOverAt.month())
+            ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
 
