@@ -5,6 +5,7 @@ import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToExecuteException
+import com.oksusu.susu.extension.toYearMonth
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicStatisticRepository
@@ -28,7 +29,9 @@ class SusuBasicStatisticService(
     ): SusuBasicStatistic {
         // 최근 사용 금액
         val envelopHandOverAtMonthCountModel = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
-            ?.map { count -> TitleValueModel(count.handedOverAtMonth.toString(), count.totalCounts) }
+            ?.map { count ->
+                TitleValueModel(count.handedOverAtMonth.toYearMonth(), count.totalCounts)
+            }?.sortedBy { model -> model.title }
 
         // 경조사비를 가장 많이 쓴 달
         val mostSpentMonth = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }

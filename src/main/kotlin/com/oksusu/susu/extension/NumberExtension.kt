@@ -10,3 +10,11 @@ fun Long.toAgeGroup(): Long {
     }
     return ages[idx.toInt()]
 }
+
+fun Int.toYearMonth(): String {
+    val strNum = this.toString()
+    val year = strNum.substring(0, 4)
+    val month = strNum.substring(4, 6)
+
+    return "$year.$month"
+}
