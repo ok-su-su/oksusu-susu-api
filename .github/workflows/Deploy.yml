@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['main', 'feature/MZ-26']
+    branches: ['main']
 
 env:
   ACTIVE_PROFILE: "prod"
