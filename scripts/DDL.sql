@@ -225,6 +225,7 @@ CREATE TABLE `block`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '차단';
 CREATE UNIQUE INDEX idx__uid__target_id ON block (uid, target_id);
 
+-- 신고 기록
 CREATE TABLE `report_history`
 (
     `id`          bigint       NOT NULL AUTO_INCREMENT,
@@ -239,6 +240,7 @@ CREATE TABLE `report_history`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '신고 기록';
 CREATE INDEX idx__uid__target_id ON report_history (target_id, target_type);
 
+-- 신고 메타데이터
 CREATE TABLE `report_metadata`
 (
     `id`          bigint       NOT NULL AUTO_INCREMENT,
@@ -251,6 +253,7 @@ CREATE TABLE `report_metadata`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '신고 메타데이터';
 
+-- 신고 결과
 CREATE TABLE `report_result`
 (
     `id`          bigint NOT NULL AUTO_INCREMENT,
@@ -261,3 +264,17 @@ CREATE TABLE `report_result`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '신고 결과';
 CREATE INDEX idx__uid ON report_result (uid);
+
+-- 카운트
+CREATE TABLE `count`
+(
+    `id`          bigint NOT NULL AUTO_INCREMENT COMMENT '카운트 id',
+    `target_id`   bigint NOT NULL COMMENT '대상 id',
+    `target_type` int    NOT NULL COMMENT '대상 type / 0:POST, 1:VOTE_OPTION',
+    `count_type`  int    NOT NULL COMMENT '카운트 type / 0:VOTE',
+    `count`       int    NOT NULL COMMENT '카운트',
+    `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '카운트';
+CREATE INDEX idx__target_id ON count (target_id);

@@ -18,5 +18,14 @@ class SearchVoteSpec(
                 categoryId = request.categoryId
             )
         }
+
+        fun defaultPopularSpec(): SearchVoteSpec {
+            return SearchVoteSpec(
+                content = null,
+                mine = null,
+                sortType = VoteSortType.POPULAR,
+                categoryId = null
+            )
+        }
     }
 }

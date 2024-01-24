@@ -1,23 +1,28 @@
 package com.oksusu.susu.post.model
 
+import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.post.domain.VoteOption
-import com.oksusu.susu.post.domain.vo.VoteOptionSummary
 
 data class VoteOptionCountModel(
+    /** 투표 옵션 id */
     val id: Long,
+    /** 투표 id */
     val postId: Long,
+    /** 옵션 내용 */
     val content: String,
+    /** 순서 */
     val seq: Int,
-    val count: Int,
+    /** 투표 수 */
+    val count: Long,
 ) {
     companion object {
-        fun of(option: VoteOption, summary: VoteOptionSummary): VoteOptionCountModel {
+        fun of(option: VoteOption, count: Count): VoteOptionCountModel {
             return VoteOptionCountModel(
                 id = option.id,
                 postId = option.postId,
                 content = option.content,
                 seq = option.seq,
-                count = summary.count
+                count = count.count
             )
         }
     }

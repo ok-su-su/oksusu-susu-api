@@ -8,8 +8,6 @@ import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Slice
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,20 +19,6 @@ class PostService(
     @Transactional
     fun saveSync(post: Post): Post {
         return postRepository.save(post)
-    }
-
-    suspend fun findAllByIsActiveAndTypeOrderByCreatedAtDes(
-        isActive: Boolean,
-        type: PostType,
-        pageable: Pageable,
-    ): Slice<Post> {
-        return withContext(Dispatchers.IO) {
-            postRepository.findAllByIsActiveAndTypeOrderByCreatedAtDesc(
-                isActive = isActive,
-                type = type,
-                toDefault = pageable
-            )
-        }
     }
 
     suspend fun findByIdOrThrow(id: Long): Post {
@@ -49,28 +33,6 @@ class PostService(
         return withContext(Dispatchers.IO) {
             postRepository.findByIdAndIsActiveAndType(id, true, PostType.VOTE)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
-    }
-
-    suspend fun findByIsActiveAndTypeAndIdInExceptBlock(
-        isActive: Boolean,
-        type: PostType,
-        ids: List<Long>,
-        userBlockIds: List<Long>,
-        postBlockIds: List<Long>,
-    ): List<Post> {
-        return withContext(Dispatchers.IO) {
-            postRepository.findByIsActiveAndTypeAndIdInExceptBlock(
-                isActive = isActive,
-                type = type,
-                ids = ids,
-                userBlockIds = userBlockIds,
-                postBlockIds = postBlockIds
-            )
-        }
-    }
-
-    suspend fun countAllByIsActiveAndType(isActive: Boolean, type: PostType): Long {
-        return withContext(Dispatchers.IO) { postRepository.countAllByIsActiveAndType(isActive, type) }
     }
 
     suspend fun validateExist(id: Long) {
