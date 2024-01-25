@@ -6,6 +6,7 @@ import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.category.model.CategoryWithCustomModel
+import com.oksusu.susu.category.model.request.CreateCategoryAssignmentRequest
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
@@ -45,8 +46,13 @@ class EnvelopeFacade(
     private val txTemplates: TransactionTemplates,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
+        val categoryAssignmentRequest = when (request.category == null) {
+            true -> CreateCategoryAssignmentRequest(5)
+            false -> request.category
+        }
+
         val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.id)
-        val category = categoryService.getCategory(request.category.id)
+        val category = categoryService.getCategory(categoryAssignmentRequest.id)
         val ledger = when (request.ledgerId != null) {
             true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.id)
             false -> null
@@ -54,7 +60,7 @@ class EnvelopeFacade(
 
         /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
         val customCategory = when (category.id == 5L) {
-            true -> request.category.customCategory
+            true -> categoryAssignmentRequest.customCategory
             else -> null
         }
 
@@ -102,12 +108,17 @@ class EnvelopeFacade(
         id: Long,
         request: CreateAndUpdateEnvelopeRequest,
     ): CreateAndUpdateEnvelopeResponse {
+        val categoryAssignmentRequest = when (request.category == null) {
+            true -> CreateCategoryAssignmentRequest(5)
+            false -> request.category
+        }
+
         val (envelope, friend, _, categoryAssignment) = envelopeService.getDetail(id, user.id)
-        val category = categoryService.getCategory(request.category.id)
+        val category = categoryService.getCategory(categoryAssignmentRequest.id)
 
         /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
         val customCategory = when (category.id == 5L) {
-            true -> request.category.customCategory
+            true -> categoryAssignmentRequest.customCategory
             else -> null
         }
 
