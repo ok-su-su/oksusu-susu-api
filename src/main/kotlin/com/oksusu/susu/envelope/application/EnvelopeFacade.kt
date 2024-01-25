@@ -10,6 +10,7 @@ import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.envelope.infrastructure.model.IncludeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.envelope.model.EnvelopeModel
@@ -24,6 +25,7 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
@@ -39,6 +41,7 @@ class EnvelopeFacade(
     private val categoryService: CategoryService,
     private val categoryAssignmentService: CategoryAssignmentService,
     private val ledgerService: LedgerService,
+    private val friendRelationshipService: FriendRelationshipService,
     private val txTemplates: TransactionTemplates,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
@@ -158,6 +161,7 @@ class EnvelopeFacade(
         }
     }
 
+    // TODO: 개선 필요
     suspend fun search(
         user: AuthUser,
         request: SearchEnvelopeRequest,
@@ -165,24 +169,44 @@ class EnvelopeFacade(
     ): Page<SearchEnvelopeResponse> {
         val searchSpec = SearchEnvelopeSpec(
             uid = user.id,
+            friendId = request.friendId,
             ledgerId = request.ledgerId,
             include = request.include ?: emptySet()
         )
         val pageable = pageRequest.toDefault()
 
         val response = envelopeService.search(searchSpec, pageable)
+        val friendIds = response.content.map { it.friendId }
 
-        return response.map { searchModel ->
-            val category = searchModel.categoryAssignment?.categoryId?.let { categoryId ->
-                categoryService.getCategory(categoryId)
-            }?.run { CategoryWithCustomModel.of(this, searchModel.categoryAssignment) }
-            val relation = searchModel.friendRelationship?.relationshipId?.let { relationshipId ->
-                relationshipService.getRelationship(relationshipId)
+        val friendRelationShips = when (searchSpec.include.contains(IncludeSpec.RELATION)) {
+            true -> friendRelationshipService.findAllByFriendIds(friendIds)
+            false -> emptyList()
+        }.associateBy { it.friendId }
+
+        val categoryAssignments = when (searchSpec.include.contains(IncludeSpec.CATEGORY)) {
+            true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, friendIds)
+            else -> emptyList()
+        }.associateBy { it.targetId }
+
+        val friends = when (searchSpec.include.contains(IncludeSpec.FRIEND)) {
+            true -> friendService.findAllByIdIn(friendIds)
+            false -> emptyList()
+        }.associateBy { it.id }
+
+        return response.map { envelope ->
+            val category = categoryAssignments[envelope.friendId]?.let { categoryAssignment ->
+                val category = categoryService.getCategory(categoryAssignment.categoryId)
+                CategoryWithCustomModel.of(category, categoryAssignment)
             }
-            val friend = searchModel.friend?.let { friend -> FriendModel.from(friend) }
+            val relation = friendRelationShips[envelope.friendId]?.let {
+                relationshipService.getRelationship(it.relationshipId)
+            }
+            val friend = friends[envelope.friendId]?.let {
+                FriendModel.from(it)
+            }
 
             SearchEnvelopeResponse(
-                envelope = EnvelopeModel.from(searchModel.envelope),
+                envelope = EnvelopeModel.from(envelope),
                 category = category,
                 relation = relation,
                 friend = friend

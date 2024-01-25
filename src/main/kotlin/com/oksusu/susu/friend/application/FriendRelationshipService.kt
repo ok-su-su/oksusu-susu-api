@@ -28,4 +28,8 @@ class FriendRelationshipService(
             friendRelationshipRepository.countPerRelationshipIdByUid(uid)
         }
     }
+
+    suspend fun findAllByFriendIds(friendIds: List<Long>): List<FriendRelationship> {
+        return withContext(Dispatchers.IO) { friendRelationshipRepository.findAllByFriendIdIn(friendIds) }
+    }
 }

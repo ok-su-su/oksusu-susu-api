@@ -11,7 +11,6 @@ import com.oksusu.susu.envelope.infrastructure.model.EnvelopeAndFriendModel
 import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailAndLedgerModel
 import com.oksusu.susu.envelope.infrastructure.model.EnvelopeDetailModel
 import com.oksusu.susu.envelope.infrastructure.model.FriendStatisticsModel
-import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeModel
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.exception.ErrorCode
@@ -132,7 +131,7 @@ class EnvelopeService(
         }
     }
 
-    suspend fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel> {
+    suspend fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope> {
         return withContext(Dispatchers.IO) { envelopeRepository.search(spec, pageable) }
     }
 

@@ -83,10 +83,10 @@ interface EnvelopeCustomRepository {
     suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel>
 
     @Transactional(readOnly = true)
-    fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel>
+    fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope>
 
     @Transactional(readOnly = true)
-    fun findFriendStatistics(sepc: SearchFriendStatisticsSpec, pageable: Pageable): Page<FriendStatisticsModel>
+    fun findFriendStatistics(spec: SearchFriendStatisticsSpec, pageable: Pageable): Page<FriendStatisticsModel>
 
     @Transactional(readOnly = true)
     fun findAllDetailEnvelopeAndLedgerByEnvelopeType(
@@ -295,32 +295,16 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel> {
+    override fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope> {
         /** select */
         val query = JPAQuery<Envelope>(entityManager)
-            .select(
-                QSearchEnvelopeModel(
-                    qEnvelope,
-                    if (spec.include.contains(IncludeSpec.FRIEND)) qFriend else null,
-                    if (spec.include.contains(IncludeSpec.RELATION)) qFriendRelationship else null,
-                    if (spec.include.contains(IncludeSpec.CATEGORY)) qCategoryAssignment else null
-                )
-            ).from(qEnvelope)
-
-        /** join */
-        if (spec.include.contains(IncludeSpec.FRIEND)) {
-            query.join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
-        }
-        if (spec.include.contains(IncludeSpec.RELATION)) {
-            query.join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
-        }
-        if (spec.include.contains(IncludeSpec.CATEGORY)) {
-            query.join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
-        }
+            .select(qEnvelope)
+            .from(qEnvelope)
 
         /** where */
         query.where(
             qEnvelope.uid.eq(spec.uid),
+            qEnvelope.friendId.isEquals(spec.friendId),
             qEnvelope.ledgerId.isEquals(spec.ledgerId)
         )
 
