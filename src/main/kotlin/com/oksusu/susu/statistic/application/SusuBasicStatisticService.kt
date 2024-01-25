@@ -30,7 +30,7 @@ class SusuBasicStatisticService(
         // 최근 사용 금액
         val envelopHandOverAtMonthCountModel = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
             ?.map { count ->
-                TitleValueModel(count.handedOverAtMonth.toYearMonth(), count.totalCounts)
+                TitleValueModel(count.handedOverAtMonth.toString(), count.totalCounts)
             }?.sortedBy { model -> model.title }
 
         // 경조사비를 가장 많이 쓴 달

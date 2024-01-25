@@ -9,15 +9,24 @@ import com.oksusu.susu.user.model.UserProfileModel
 import java.time.LocalDateTime
 
 data class VoteAndOptionsWithCountResponse(
+    /** 투표 id */
     val id: Long,
+    /** 본인 소유 여부 */
     val isMine: Boolean,
+    /** 카테고리 명 */
     val category: String,
+    /** 내용 */
     val content: String,
-    val count: Int,
+    /** 총 투표 수 */
+    val count: Long,
+    /** 생성일 */
     @DateFormat
     val createdAt: LocalDateTime,
+    /** 생성자 profile */
     val creatorProfile: UserProfileModel,
+    /** 수정 여부 */
     val isModified: Boolean,
+    /** 투표 옵션 */
     val options: List<VoteOptionCountModel>,
 ) {
     companion object {
