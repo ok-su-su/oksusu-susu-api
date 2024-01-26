@@ -2,11 +2,17 @@ package com.oksusu.susu.category.model
 
 import com.oksusu.susu.category.domain.CategoryAssignment
 
+/** 커스텀 카테고리 정보를 포함 모델 */
 data class CategoryWithCustomModel(
+    /** 카테고리 id */
     val id: Long,
+    /** 카테고리 순서 */
     val seq: Long,
+    /** 카테고리 */
     val category: String,
+    /** 커스텀 카테고리, 기타 항목일 경우에만 제공 */
     val customCategory: String? = null,
+    /** 카테고리 스타일 */
     val style: String,
 ) {
     companion object {

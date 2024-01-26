@@ -3,8 +3,6 @@ package com.oksusu.susu.category.application
 import com.oksusu.susu.category.domain.CategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.category.infrastructure.CategoryAssignmentRepository
-import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.NotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -27,11 +25,6 @@ class CategoryAssignmentService(
     @Transactional
     fun deleteAllByTargetTypeAndTargetIdIn(targetType: CategoryAssignmentType, targetIds: List<Long>) {
         categoryAssignmentRepository.deleteAllByTargetTypeAndTargetIdIn(targetType, targetIds)
-    }
-
-    suspend fun findByIdAndTypeOrThrow(targetId: Long, targetType: CategoryAssignmentType): CategoryAssignment {
-        return findByIdAndTypeOrNull(targetId, targetType)
-            ?: throw NotFoundException(ErrorCode.NOT_FOUND_CATEGORY_ASSIGNMENT_ERROR_CODE)
     }
 
     suspend fun findByIdAndTypeOrNull(targetId: Long, targetType: CategoryAssignmentType): CategoryAssignment? {

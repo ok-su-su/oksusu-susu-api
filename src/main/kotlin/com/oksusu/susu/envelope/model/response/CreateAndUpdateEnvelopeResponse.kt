@@ -7,14 +7,23 @@ import com.oksusu.susu.friend.model.FriendModel
 import java.time.LocalDateTime
 
 data class CreateAndUpdateEnvelopeResponse(
+    /** 봉투 id */
     val id: Long = -1,
+    /** user id */
     val uid: Long,
+    /** type: SENT, RECEIVED */
     val type: EnvelopeType,
+    /** 금액 */
     val amount: Long,
+    /** 선물 */
     val gift: String?,
+    /** 메모 */
     val memo: String?,
+    /** 방문 : 1, 미방문 : 0, null인 경우 미선택 */
     val hasVisited: Boolean?,
+    /** 전달일 */
     val handedOverAt: LocalDateTime,
+    /** 지인 */
     val friend: FriendModel,
 ) {
     companion object {

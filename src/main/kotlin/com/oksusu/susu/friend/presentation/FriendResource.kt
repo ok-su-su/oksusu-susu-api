@@ -18,12 +18,19 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.FRIEND_SWAGGER_TAG)
+@Tag(name = SwaggerTag.FRIEND_SWAGGER_TAG, description = "친구 관리 API")
 @RestController
 @RequestMapping(value = ["/api/v1/friends"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class FriendResource(
     private val friendFacade: FriendFacade,
 ) {
+    /**
+     * **검색조건**
+     * - name, phoneNumber 검색 조건은 현재 nullable
+     *
+     * **검색 정렬 조건**
+     * - createdAt (생성)
+     */
     @Operation(summary = "친구 검색")
     @GetMapping
     suspend fun search(

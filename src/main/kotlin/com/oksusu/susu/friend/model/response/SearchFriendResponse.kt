@@ -8,8 +8,11 @@ import com.oksusu.susu.friend.model.RelationshipModel
 import java.time.LocalDateTime
 
 data class SearchFriendResponse(
+    /** 친구 */
     val friend: FriendModel,
+    /** 관계 */
     val relationship: RelationshipInfoModel,
+    /** 최근 생성된 봉투 정보 */
     val recentEnvelope: RecentEnvelopeModel?,
 ) {
     companion object {
@@ -29,6 +32,8 @@ data class SearchFriendResponse(
 }
 
 data class RecentEnvelopeModel(
+    /** 카테고리 */
     val category: String,
+    /** 전달일 */
     val handedOverAt: LocalDateTime,
 )

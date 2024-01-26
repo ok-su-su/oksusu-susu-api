@@ -51,7 +51,7 @@ class VoteFacade(
 
         return txTemplates.writer.coExecute {
             val createdPost = Post(
-                uid = user.id,
+                uid = user.uid,
                 type = PostType.VOTE,
                 content = request.content,
                 postCategoryId = request.postCategoryId
@@ -67,7 +67,7 @@ class VoteFacade(
             countService.saveAllSync(voteOptionCounts.plus(voteCount))
 
             CreateAndUpdateVoteResponse.of(
-                uid = user.id,
+                uid = user.uid,
                 post = createdPost,
                 optionModels = options.map { option -> VoteOptionModel.from(option) },
                 postCategoryModel = postCategoryService.getCategory(request.postCategoryId)
@@ -82,10 +82,10 @@ class VoteFacade(
     ): Slice<VoteAndOptionsWithCountResponse> {
         val searchSpec = SearchVoteSpec.from(searchRequest)
 
-        val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.id)
+        val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.uid)
 
         val getAllVoteSpec = GetAllVoteSpec(
-            uid = user.id,
+            uid = user.uid,
             searchSpec = searchSpec,
             userBlockIds = userAndPostBlockIdModel.userBlockIds,
             postBlockIds = userAndPostBlockIdModel.postBlockIds,
@@ -133,15 +133,15 @@ class VoteFacade(
                 ),
                 options = optionCountModels,
                 creator = creator,
-                isMine = user.id == creator.id
+                isMine = user.uid == creator.id
             )
         }
     }
 
     suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
         when (request.isCancel) {
-            true -> cancelVote(user.id, id, request.optionId)
-            false -> castVote(user.id, id, request.optionId)
+            true -> cancelVote(user.uid, id, request.optionId)
+            false -> castVote(user.uid, id, request.optionId)
         }
     }
 
@@ -183,7 +183,7 @@ class VoteFacade(
     }
 
     suspend fun deleteVote(user: AuthUser, id: Long) {
-        postService.validateAuthority(id, user.id)
+        postService.validateAuthority(id, user.uid)
 
         val (vote, options) = parZip(
             { voteService.getVote(id) },
@@ -204,10 +204,10 @@ class VoteFacade(
     }
 
     suspend fun getPopularVotes(user: AuthUser, size: Int): List<VoteWithCountResponse> {
-        val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.id)
+        val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.uid)
 
         val voteAndCountModels = voteService.getPopularVotesExceptBlock(
-            uid = user.id,
+            uid = user.uid,
             userBlockIds = userAndPostBlockIdModel.userBlockIds,
             postBlockIds = userAndPostBlockIdModel.postBlockIds,
             size = size
@@ -223,7 +223,7 @@ class VoteFacade(
 
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
         return parZip(
-            { postService.validateAuthority(id, user.id) },
+            { postService.validateAuthority(id, user.uid) },
             { voteHistoryService.validateHistoryNotExist(id) },
             { postCategoryService.getCategory(request.postCategoryId) },
             { voteService.getVoteAndOptions(id) }
@@ -239,7 +239,7 @@ class VoteFacade(
             }
 
             CreateAndUpdateVoteResponse.of(
-                uid = user.id,
+                uid = user.uid,
                 post = updatedVote,
                 optionModels = options,
                 postCategoryModel = updatedPostCategory
