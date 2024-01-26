@@ -331,6 +331,8 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .then(QEnvelope.envelope.amount)
             .otherwise(0)
 
+        val totalAmount = sentAmount.sum().add(receivedAmount.sum())
+
         val query = JPAQuery<Envelope>(entityManager)
             .select(
                 QFriendStatisticsModel(
@@ -340,22 +342,14 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 )
             )
             .from(QEnvelope.envelope)
-            .where(qEnvelope.uid.eq(spec.uid))
-
-        if (!spec.friendIds.isNullOrEmpty()) {
-            query
-                .where(qEnvelope.friendId.`in`(spec.friendIds))
-        }
-
-        val totalAmount = sentAmount.sum().add(receivedAmount.sum())
-        if (spec.fromTotalAmounts != null) {
-            query.where(totalAmount.goe(totalAmount))
-        }
-        if (spec.toTotalAmounts != null) {
-            query.where(totalAmount.loe(totalAmount))
-        }
-
-        query.groupBy(qEnvelope.friendId)
+            .where(
+                qEnvelope.uid.eq(spec.uid),
+                qEnvelope.friendId.isIn(spec.friendIds)
+            ).groupBy(qEnvelope.friendId)
+            .having(
+                totalAmount.isGoe(spec.fromTotalAmounts),
+                totalAmount.isLoe(spec.toTotalAmounts)
+            )
 
         return querydsl.execute(query, pageable)
     }
