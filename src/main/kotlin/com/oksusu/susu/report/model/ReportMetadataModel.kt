@@ -10,6 +10,7 @@ data class ReportMetadataModel(
     val seq: Int,
     /** 메타데이터 seq */
     val targetType: ReportTargetType,
+    /** 신고 메타데이터 */
     val metadata: String,
 ) {
     companion object {
