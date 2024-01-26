@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.ENVELOPE_CONFIG_SWAGGER_TAG)
+@Tag(name = SwaggerTag.ENVELOPE_CONFIG_SWAGGER_TAG, description = "봉투 관련 config api")
 @RestController
 @RequestMapping(value = ["/api/v1/envelopes/configs"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class EnvelopeConfigResource(
