@@ -182,6 +182,7 @@ class EnvelopeFacade(
             uid = user.id,
             friendId = request.friendId,
             ledgerId = request.ledgerId,
+            types = request.types,
             include = request.include ?: emptySet(),
             fromAmount = request.fromAmount,
             toAmount = request.toAmount

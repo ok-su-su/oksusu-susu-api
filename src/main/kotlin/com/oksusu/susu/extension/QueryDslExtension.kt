@@ -3,6 +3,7 @@ package com.oksusu.susu.extension
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.SusuException
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.EnumPath
 import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
@@ -53,6 +54,10 @@ fun StringPath.isContains(parameter: String?): BooleanExpression? {
 
 fun NumberPath<Long>.isIn(parameters: Set<Long>?): BooleanExpression? {
     return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.`in`(params) }
+}
+
+fun <T : Enum<T>> EnumPath<T>.isIn(parameters: Set<T>?): BooleanExpression? {
+    return parameters?.takeIf { params -> params.isNotEmpty() }?.let { params -> this.`in`(params) }
 }
 
 fun NumberPath<Long>.isGoe(parameter: Long?): BooleanExpression? {
