@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable
 class GetAllVoteSpec(
     val uid: Long,
     val searchSpec: SearchVoteSpec,
-    val userBlockIds: List<Long>,
-    val postBlockIds: List<Long>,
+    val userBlockIds: Set<Long>,
+    val postBlockIds: Set<Long>,
     val pageable: Pageable,
 )

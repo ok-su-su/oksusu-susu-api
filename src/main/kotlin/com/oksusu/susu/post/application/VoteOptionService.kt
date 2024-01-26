@@ -4,7 +4,7 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.infrastructure.repository.VoteOptionRepository
-import com.oksusu.susu.post.model.VoteOptionModel
+import com.oksusu.susu.post.model.VoteOptionWithoutIdModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -19,7 +19,7 @@ class VoteOptionService(
         return voteOptionRepository.saveAll(voteOptions)
     }
 
-    fun validateSeq(optionModels: List<VoteOptionModel>) {
+    fun validateSeq(optionModels: List<VoteOptionWithoutIdModel>) {
         optionModels.map { option -> option.seq }.toSet().count { seq -> seq > 0 }.run {
             if (this != optionModels.size) {
                 throw InvalidRequestException(ErrorCode.INVALID_VOTE_OPTION_SEQUENCE)

@@ -67,3 +67,7 @@ fun NumberPath<Long>.isGoe(parameter: Long?): BooleanExpression? {
 fun NumberPath<Long>.isLoe(parameter: Long?): BooleanExpression? {
     return parameter?.let { param -> this.loe(param) }
 }
+
+fun NumberPath<Long>.isNotIn(parameters: Set<Long>?): BooleanExpression? {
+    return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.notIn(params) }
+}
