@@ -3,6 +3,7 @@ package com.oksusu.susu.extension
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.SusuException
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.EnumPath
 import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
@@ -40,17 +41,29 @@ fun <T> Querydsl?.executeSlice(query: JPAQuery<T>, pageable: Pageable): Slice<T>
 }
 
 fun StringPath.isEquals(parameter: String?): BooleanExpression? {
-    return parameter?.let { this.eq(parameter) }
+    return parameter?.let { param -> this.eq(param) }
 }
 
 fun NumberPath<Long>.isEquals(parameter: Long?): BooleanExpression? {
-    return parameter?.let { this.eq(parameter) }
+    return parameter?.let { param -> this.eq(param) }
 }
 
 fun StringPath.isContains(parameter: String?): BooleanExpression? {
-    return parameter?.let { this.contains(parameter) }
+    return parameter?.let { param -> this.contains(param) }
 }
 
 fun NumberPath<Long>.isIn(parameters: Set<Long>?): BooleanExpression? {
     return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.`in`(params) }
+}
+
+fun <T : Enum<T>> EnumPath<T>.isIn(parameters: Set<T>?): BooleanExpression? {
+    return parameters?.takeIf { params -> params.isNotEmpty() }?.let { params -> this.`in`(params) }
+}
+
+fun NumberPath<Long>.isGoe(parameter: Long?): BooleanExpression? {
+    return parameter?.let { param -> this.goe(param) }
+}
+
+fun NumberPath<Long>.isLoe(parameter: Long?): BooleanExpression? {
+    return parameter?.let { param -> this.loe(param) }
 }
