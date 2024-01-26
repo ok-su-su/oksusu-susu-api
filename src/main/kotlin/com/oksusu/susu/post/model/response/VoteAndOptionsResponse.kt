@@ -4,6 +4,7 @@ import com.oksusu.susu.extension.equalsFromYearToSec
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.model.PostCategoryModel
 import com.oksusu.susu.post.model.VoteOptionModel
+import java.time.LocalDateTime
 
 class VoteAndOptionsResponse(
     /** 투표 id */
@@ -18,6 +19,8 @@ class VoteAndOptionsResponse(
     val isModified: Boolean,
     /** 투표 옵션 */
     val options: List<VoteOptionModel>,
+    /** 투표 생성일 */
+    val createdAt: LocalDateTime
 ) {
     companion object {
         fun of(
@@ -31,7 +34,8 @@ class VoteAndOptionsResponse(
                 category = postCategoryModel.name,
                 content = vote.content,
                 isModified = !vote.createdAt.equalsFromYearToSec(vote.modifiedAt),
-                options = options.filter { it.postId == vote.id }
+                options = options.filter { it.postId == vote.id },
+                createdAt = vote.createdAt,
             )
         }
     }

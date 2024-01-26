@@ -69,6 +69,7 @@ class VoteFacade(
             countService.saveAllSync(voteOptionCounts.plus(voteCount))
 
             CreateAndUpdateVoteResponse.of(
+                uid = user.id,
                 post = createdPost,
                 optionModels = options.map { option -> VoteOptionModel.from(option) },
                 postCategoryModel = postCategoryService.getCategory(request.postCategoryId)
@@ -241,6 +242,7 @@ class VoteFacade(
             }
 
             CreateAndUpdateVoteResponse.of(
+                uid = user.id,
                 post = updatedVote,
                 optionModels = options,
                 postCategoryModel = updatedPostCategory
