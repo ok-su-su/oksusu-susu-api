@@ -54,3 +54,7 @@ fun StringPath.isContains(parameter: String?): BooleanExpression? {
 fun NumberPath<Long>.isIn(parameters: Set<Long>?): BooleanExpression? {
     return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.`in`(params) }
 }
+
+fun NumberPath<Long>.isNotIn(parameters: Set<Long>?): BooleanExpression? {
+    return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.notIn(params) }
+}

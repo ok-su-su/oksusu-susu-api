@@ -38,9 +38,9 @@ class BlockService(
         val blocks = findAllByUid(uid)
 
         val userBlockIds = blocks.filter { it.targetType == BlockTargetType.USER }
-            .map { block -> block.targetId }
+            .map { block -> block.targetId }.toSet()
         val postBlockIds = blocks.filter { it.targetType == BlockTargetType.POST }
-            .map { block -> block.targetId }
+            .map { block -> block.targetId }.toSet()
 
         return UserAndPostBlockIdModel(
             userBlockIds = userBlockIds,

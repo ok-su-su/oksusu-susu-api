@@ -1,51 +1,46 @@
 package com.oksusu.susu.post.model.response
 
-import com.oksusu.susu.common.annotation.DateFormat
+import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.extension.equalsFromYearToSec
-import com.oksusu.susu.post.model.VoteCountModel
-import com.oksusu.susu.post.model.VoteOptionCountModel
-import com.oksusu.susu.user.domain.User
-import com.oksusu.susu.user.model.UserProfileModel
+import com.oksusu.susu.post.domain.Post
+import com.oksusu.susu.post.model.PostCategoryModel
+import com.oksusu.susu.post.model.VoteOptionModel
 import java.time.LocalDateTime
 
-data class VoteAndOptionsWithCountResponse(
+class VoteAndOptionsWithCountResponse(
     /** 투표 id */
     val id: Long,
-    /** 본인 소유 여부 */
-    val isMine: Boolean,
+    /** 투표 생성자 id */
+    val uid: Long,
     /** 카테고리 명 */
     val category: String,
     /** 내용 */
     val content: String,
-    /** 총 투표 수 */
-    val count: Long,
-    /** 생성일 */
-    @DateFormat
-    val createdAt: LocalDateTime,
-    /** 생성자 profile */
-    val creatorProfile: UserProfileModel,
     /** 수정 여부 */
     val isModified: Boolean,
+    /** 총 투표 수 */
+    val count: Long,
     /** 투표 옵션 */
-    val options: List<VoteOptionCountModel>,
+    val options: List<VoteOptionModel>,
+    /** 투표 생성일 */
+    val createdAt: LocalDateTime,
 ) {
     companion object {
         fun of(
-            vote: VoteCountModel,
-            options: List<VoteOptionCountModel>,
-            creator: User,
-            isMine: Boolean,
+            vote: Post,
+            count: Count,
+            options: List<VoteOptionModel>,
+            postCategoryModel: PostCategoryModel,
         ): VoteAndOptionsWithCountResponse {
             return VoteAndOptionsWithCountResponse(
                 id = vote.id,
-                isMine = isMine,
-                category = vote.category,
+                uid = vote.uid,
+                category = postCategoryModel.name,
                 content = vote.content,
-                count = vote.count,
-                createdAt = vote.createdAt,
-                creatorProfile = UserProfileModel.from(creator),
                 isModified = !vote.createdAt.equalsFromYearToSec(vote.modifiedAt),
-                options = options
+                count = count.count,
+                options = options.filter { it.postId == vote.id },
+                createdAt = vote.createdAt
             )
         }
     }

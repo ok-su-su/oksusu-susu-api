@@ -22,7 +22,7 @@ class VoteService(
 ) {
     val logger = mu.KotlinLogging.logger { }
 
-    suspend fun getAllVotesExceptBlock(getAllVoteSpec: GetAllVoteSpec): Slice<Post> {
+    suspend fun getAllVotesExceptBlock(getAllVoteSpec: GetAllVoteSpec): Slice<PostAndCountModel> {
         return withContext(Dispatchers.IO) {
             postRepository.getAllVotesExceptBlock(getAllVoteSpec)
         }
@@ -40,11 +40,11 @@ class VoteService(
 
     suspend fun getPopularVotesExceptBlock(
         uid: Long,
-        userBlockIds: List<Long>,
-        postBlockIds: List<Long>,
+        userBlockIds: Set<Long>,
+        postBlockIds: Set<Long>,
         size: Int,
     ): List<PostAndCountModel> {
-        val getAllVoteSpec = GetAllVoteSpec(
+        val spec = GetAllVoteSpec(
             uid = uid,
             searchSpec = SearchVoteSpec.defaultPopularSpec(),
             userBlockIds = userBlockIds,
@@ -52,12 +52,6 @@ class VoteService(
             pageable = PageRequest.of(0, size)
         )
 
-        return withContext(Dispatchers.IO) { postRepository.getPopularVotesExceptBlock(getAllVoteSpec) }.content
-    }
-
-    suspend fun getAllVotesOrderByPopular(
-        spec: GetAllVoteSpec,
-    ): Slice<Post> {
-        return withContext(Dispatchers.IO) { postRepository.getPopularVotesExceptBlock(spec) }.map { model -> model.post }
+        return withContext(Dispatchers.IO) { postRepository.getAllVotesExceptBlock(spec) }.content
     }
 }

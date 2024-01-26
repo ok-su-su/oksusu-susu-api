@@ -20,7 +20,7 @@ data class CreateAndUpdateVoteResponse(
     /** 투표 옵션 */
     val options: List<VoteOptionModel>,
     /** 투표 생성일 */
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
 ) {
     companion object {
         fun of(

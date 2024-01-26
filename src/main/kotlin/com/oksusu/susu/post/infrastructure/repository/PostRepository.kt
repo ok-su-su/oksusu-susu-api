@@ -2,7 +2,9 @@ package com.oksusu.susu.post.infrastructure.repository
 
 import com.oksusu.susu.count.domain.QCount
 import com.oksusu.susu.extension.executeSlice
+import com.oksusu.susu.extension.isContains
 import com.oksusu.susu.extension.isEquals
+import com.oksusu.susu.extension.isNotIn
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.QPost
 import com.oksusu.susu.post.domain.QPostCategory
@@ -13,6 +15,7 @@ import com.oksusu.susu.post.infrastructure.repository.model.PostAndCountModel
 import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
 import com.oksusu.susu.post.infrastructure.repository.model.QPostAndCountModel
 import com.oksusu.susu.post.infrastructure.repository.model.QPostAndVoteOptionModel
+import com.oksusu.susu.post.model.vo.VoteSortType
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,12 +37,7 @@ interface PostCustomRepository {
     fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel>
 
     @Transactional(readOnly = true)
-    fun getAllVotesExceptBlock(spec: GetAllVoteSpec): Slice<Post>
-
-    @Transactional(readOnly = true)
-    fun getPopularVotesExceptBlock(
-        spec: GetAllVoteSpec,
-    ): Slice<PostAndCountModel>
+    fun getAllVotesExceptBlock(spec: GetAllVoteSpec): Slice<PostAndCountModel>
 }
 
 class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport(Post::class.java) {
@@ -66,48 +64,18 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             ).fetch()
     }
 
-    override fun getAllVotesExceptBlock(spec: GetAllVoteSpec): Slice<Post> {
-        val uidFilter = spec.searchSpec.mine?.let {
-            if (it) {
-                qPost.uid.eq(spec.uid)
-            } else {
-                qPost.uid.ne(spec.uid)
-            }
-        } ?: qPost.uid.notIn(spec.userBlockIds)
-        val categoryFilter = qPostCategory.id.isEquals(spec.searchSpec.categoryId)
-        val contentFilter = spec.searchSpec.content?.let { qPost.content.contains(it) }
-        val postIdFilter = qPost.id.notIn(spec.postBlockIds)
+    override fun getAllVotesExceptBlock(spec: GetAllVoteSpec): Slice<PostAndCountModel> {
+        val uidFilter = spec.searchSpec.mine?.takeIf { mine -> mine }?.let {
+            qPost.uid.isEquals(spec.uid)
+        } ?: qPost.uid.isNotIn(spec.userBlockIds)
+        val categoryFilter = qPost.postCategoryId.isEquals(spec.searchSpec.categoryId)
+        val contentFilter = qPost.content.isContains(spec.searchSpec.content)
+        val postIdFilter = qPost.id.isNotIn(spec.postBlockIds)
 
-        val query = JPAQuery<QPost>(entityManager)
-            .select(qPost)
-            .from(qPost)
-            .join(qPostCategory).on(qPost.postCategoryId.eq(qPostCategory.id))
-            .where(
-                qPost.isActive.eq(true),
-                uidFilter,
-                categoryFilter,
-                postIdFilter,
-                contentFilter
-            ).orderBy(
-                qPost.createdAt.desc()
-            )
-
-        return querydsl.executeSlice(query, spec.pageable)
-    }
-
-    override fun getPopularVotesExceptBlock(
-        spec: GetAllVoteSpec,
-    ): Slice<PostAndCountModel> {
-        val uidFilter = spec.searchSpec.mine?.let {
-            if (it) {
-                qPost.uid.eq(spec.uid)
-            } else {
-                qPost.uid.ne(spec.uid)
-            }
-        } ?: qPost.uid.notIn(spec.userBlockIds)
-        val categoryFilter = qPostCategory.id.isEquals(spec.searchSpec.categoryId)
-        val contentFilter = spec.searchSpec.content?.let { qPost.content.contains(it) }
-        val postIdFilter = qPost.id.notIn(spec.postBlockIds)
+        val orders = when (spec.searchSpec.sortType) {
+            VoteSortType.POPULAR -> arrayOf(qCount.count.desc())
+            VoteSortType.LATEST -> emptyArray()
+        }
 
         val query = JPAQuery<QPost>(entityManager)
             .select(
@@ -117,7 +85,6 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
                 )
             )
             .from(qPost)
-            .join(qPostCategory).on(qPost.postCategoryId.eq(qPostCategory.id))
             .join(qCount).on(qPost.id.eq(qCount.targetId))
             .where(
                 qPost.type.eq(PostType.VOTE),
@@ -126,8 +93,7 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
                 categoryFilter,
                 postIdFilter,
                 contentFilter
-            )
-            .orderBy(qCount.count.desc())
+            ).orderBy(*orders)
 
         return querydsl.executeSlice(query, spec.pageable)
     }
