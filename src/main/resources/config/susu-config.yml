@@ -1,0 +1,10 @@
+# Susu Config
+
+susu:
+  ledger-config:
+    create-form:
+      only-start-at-category-ids:
+        - 1
+        - 2
+        - 3
+        - 5

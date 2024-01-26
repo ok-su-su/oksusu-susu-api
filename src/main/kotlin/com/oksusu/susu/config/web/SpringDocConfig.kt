@@ -78,6 +78,7 @@ object SwaggerTag {
     const val FRIEND_SWAGGER_TAG = "Friend API"
     const val HEALTH_SWAGGER_TAG = "Health API"
     const val LEDGER_SWAGGER_TAG = "Ledger API"
+    const val LEDGER_CONFIG_SWAGGER_TAG = "Ledger Config API"
     const val POST_CONFIG_SWAGGER_TAG = "Post Config API"
     const val VOTE_SWAGGER_TAG = "Vote API"
     const val EXCEL_SWAGGER_TAG = "Excel API"

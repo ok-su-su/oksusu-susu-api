@@ -25,8 +25,8 @@ data class SusuPageRequest(
             return Sort.by("createdAt").descending()
         }
 
-        val requestedSortField = Sort.Order.by(sortSpec[0])
-        val direction = Sort.Direction.fromString(sortSpec[1])
+        val requestedSortField = Sort.Order.by(sortSpec[0].trim())
+        val direction = Sort.Direction.fromString(sortSpec[1].trim())
 
         return Sort.by(requestedSortField.with(direction))
     }
