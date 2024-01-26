@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
+/** 지인 */
 @Entity
 @Table(name = "friend")
 class Friend(
@@ -15,10 +16,13 @@ class Friend(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
+    /** user id */
     val uid: Long,
 
+    /** 지인 이름 */
     val name: String,
 
+    /** 전화번호 */
     @Column(name = "phone_number")
     val phoneNumber: String? = null,
 ) : BaseEntity()

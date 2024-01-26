@@ -45,7 +45,7 @@ class FriendFacade(
             pageable = pageRequest.toDefault()
         )
 
-        val friendIds = searchResponse.map { it.friend.id }.toSet()
+        val friendIds = searchResponse.content.map { response -> response.friend.id }.toSet()
 
         val envelopes = envelopeService.findLatestFriendEnvelopes(friendIds)
 
