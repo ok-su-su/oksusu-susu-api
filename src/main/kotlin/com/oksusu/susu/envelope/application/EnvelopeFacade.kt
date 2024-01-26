@@ -191,6 +191,12 @@ class EnvelopeFacade(
 
         val response = envelopeService.search(searchSpec, pageable)
         val friendIds = response.content.map { it.friendId }
+        val envelopeIds = response.content.map { it.id }
+
+        val friends = when (searchSpec.include.contains(IncludeSpec.FRIEND)) {
+            true -> friendService.findAllByIdIn(friendIds)
+            false -> emptyList()
+        }.associateBy { it.id }
 
         val friendRelationShips = when (searchSpec.include.contains(IncludeSpec.RELATION)) {
             true -> friendRelationshipService.findAllByFriendIds(friendIds)
@@ -198,17 +204,12 @@ class EnvelopeFacade(
         }.associateBy { it.friendId }
 
         val categoryAssignments = when (searchSpec.include.contains(IncludeSpec.CATEGORY)) {
-            true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, friendIds)
+            true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, envelopeIds)
             else -> emptyList()
         }.associateBy { it.targetId }
 
-        val friends = when (searchSpec.include.contains(IncludeSpec.FRIEND)) {
-            true -> friendService.findAllByIdIn(friendIds)
-            false -> emptyList()
-        }.associateBy { it.id }
-
         return response.map { envelope ->
-            val category = categoryAssignments[envelope.friendId]?.let { categoryAssignment ->
+            val category = categoryAssignments[envelope.id]?.let { categoryAssignment ->
                 val category = categoryService.getCategory(categoryAssignment.categoryId)
                 CategoryWithCustomModel.of(category, categoryAssignment)
             }
