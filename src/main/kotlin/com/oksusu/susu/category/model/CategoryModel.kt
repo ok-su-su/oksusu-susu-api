@@ -3,9 +3,13 @@ package com.oksusu.susu.category.model
 import com.oksusu.susu.category.domain.Category
 
 data class CategoryModel(
+    /** category id */
     val id: Long,
+    /** category seq */
     val seq: Long,
+    /** category */
     val name: String,
+    /** category style */
     val style: String,
 ) {
     companion object {

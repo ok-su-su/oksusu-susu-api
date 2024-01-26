@@ -2,6 +2,7 @@ package com.oksusu.susu.category.model
 
 import com.oksusu.susu.category.domain.CategoryAssignment
 
+/** 커스텀 카테고리 정보를 포함 모델 */
 data class CategoryWithCustomModel(
     /** 카테고리 id */
     val id: Long,
