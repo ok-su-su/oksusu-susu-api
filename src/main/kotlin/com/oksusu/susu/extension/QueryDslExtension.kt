@@ -4,6 +4,7 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.SusuException
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.EnumPath
+import com.querydsl.core.types.dsl.NumberExpression
 import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.jpa.impl.JPAQuery
@@ -62,6 +63,14 @@ fun <T : Enum<T>> EnumPath<T>.isIn(parameters: Set<T>?): BooleanExpression? {
 
 fun NumberPath<Long>.isGoe(parameter: Long?): BooleanExpression? {
     return parameter?.let { param -> this.goe(param) }
+}
+
+fun NumberExpression<Long>.isGoe(parameter: Long?): BooleanExpression? {
+    return parameter?.let { param -> this.goe(param) }
+}
+
+fun NumberExpression<Long>.isLoe(parameter: Long?): BooleanExpression? {
+    return parameter?.let { param -> this.loe(param) }
 }
 
 fun NumberPath<Long>.isLoe(parameter: Long?): BooleanExpression? {

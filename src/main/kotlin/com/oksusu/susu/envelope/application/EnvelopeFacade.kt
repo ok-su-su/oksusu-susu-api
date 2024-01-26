@@ -237,7 +237,7 @@ class EnvelopeFacade(
         val pageable = pageRequest.toDefault()
         val searchSpec = SearchFriendStatisticsSpec(
             uid = user.id,
-            friendIds = request.friendIds?.toList(),
+            friendIds = request.friendIds,
             fromTotalAmounts = request.fromTotalAmounts,
             toTotalAmounts = request.toTotalAmounts
         )
