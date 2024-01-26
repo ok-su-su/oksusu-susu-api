@@ -83,5 +83,5 @@ object SwaggerTag {
     const val VOTE_SWAGGER_TAG = "Vote API"
     const val EXCEL_SWAGGER_TAG = "Excel API"
     const val BLOCK_SWAGGER_TAG = "Block API"
-    const val REPORT_SWAGGER_TAG = "Block API"
+    const val REPORT_SWAGGER_TAG = "Report API"
 }
