@@ -182,7 +182,9 @@ class EnvelopeFacade(
             uid = user.id,
             friendId = request.friendId,
             ledgerId = request.ledgerId,
-            include = request.include ?: emptySet()
+            include = request.include ?: emptySet(),
+            fromAmount = request.fromAmount,
+            toAmount = request.toAmount
         )
         val pageable = pageRequest.toDefault()
 

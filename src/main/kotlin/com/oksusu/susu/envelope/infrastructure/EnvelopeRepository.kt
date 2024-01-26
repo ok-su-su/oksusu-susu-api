@@ -9,6 +9,8 @@ import com.oksusu.susu.envelope.infrastructure.model.*
 import com.oksusu.susu.extension.execute
 import com.oksusu.susu.extension.executeSlice
 import com.oksusu.susu.extension.isEquals
+import com.oksusu.susu.extension.isGoe
+import com.oksusu.susu.extension.isLoe
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.oksusu.susu.ledger.domain.QLedger
@@ -305,7 +307,9 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
         query.where(
             qEnvelope.uid.eq(spec.uid),
             qEnvelope.friendId.isEquals(spec.friendId),
-            qEnvelope.ledgerId.isEquals(spec.ledgerId)
+            qEnvelope.ledgerId.isEquals(spec.ledgerId),
+            qEnvelope.amount.isGoe(spec.fromAmount),
+            qEnvelope.amount.isLoe(spec.toAmount)
         )
 
         return querydsl.execute(query, pageable)
