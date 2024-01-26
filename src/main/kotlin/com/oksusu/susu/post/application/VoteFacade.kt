@@ -93,7 +93,9 @@ class VoteFacade(
         )
 
         val voteAndCountModels = voteService.getAllVotesExceptBlock(getAllVoteSpec)
-        val optionModels = voteOptionService.getOptionsByPostIdIn(voteAndCountModels.content.map { model -> model.post.id })
+        val optionModels = voteOptionService.getOptionsByPostIdIn(
+            voteAndCountModels.content.map { model -> model.post.id }
+        )
             .map { VoteOptionModel.from(it) }
 
         return voteAndCountModels.map { vote ->

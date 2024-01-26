@@ -100,7 +100,7 @@ class EnvelopeFacade(
             createdEnvelope
         }
 
-        return CreateAndUpdateEnvelopeResponse.from(createdEnvelope)
+        return CreateAndUpdateEnvelopeResponse.of(createdEnvelope, friend)
     }
 
     suspend fun update(
@@ -141,7 +141,7 @@ class EnvelopeFacade(
             updatedEnvelope
         }
 
-        return CreateAndUpdateEnvelopeResponse.from(updatedEnvelope)
+        return CreateAndUpdateEnvelopeResponse.of(updatedEnvelope, friend)
     }
 
     suspend fun getDetail(user: AuthUser, id: Long): EnvelopeDetailResponse {

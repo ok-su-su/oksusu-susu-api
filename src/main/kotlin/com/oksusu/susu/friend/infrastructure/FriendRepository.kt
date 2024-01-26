@@ -1,6 +1,7 @@
 package com.oksusu.susu.friend.infrastructure
 
 import com.oksusu.susu.extension.execute
+import com.oksusu.susu.extension.isContains
 import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.domain.QFriend
@@ -53,7 +54,7 @@ class FriendCustomRepositoryImpl : FriendCustomRepository, QuerydslRepositorySup
             .join(qFriendRelationship).on(qFriend.id.eq(qFriendRelationship.friendId))
             .where(
                 qFriend.uid.eq(spec.uid),
-                qFriend.name.isEquals(spec.name),
+                qFriend.name.isContains(spec.name),
                 qFriend.phoneNumber.isEquals(spec.phoneNumber)
             )
 
