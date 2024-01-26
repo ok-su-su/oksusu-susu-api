@@ -11,13 +11,17 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.LEDGER_CONFIG_SWAGGER_TAG)
+@Tag(name = SwaggerTag.LEDGER_CONFIG_SWAGGER_TAG, description = "장부 관련 config api")
 @RestController
 @RequestMapping(value = ["/api/v1/ledgers/configs"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class LedgerConfigResource(
     private val ledgerConfigService: LedgerConfigService,
 ) {
-    @Operation(summary = "장부 생성 config")
+    /**
+     * **장부 생성 config**
+     * - 장부 생성시, 시작일 정보만 필요한 categoryIds
+     */
+    @Operation(summary = "장부 생성 config", description = "장부 생성시 필요한 config 데이터 제공")
     @GetMapping("/create-ledger")
     suspend fun getCreateLedgerConfig(user: AuthUser) = ledgerConfigService.getCreateLedgerConfig(user).wrapOk()
 }

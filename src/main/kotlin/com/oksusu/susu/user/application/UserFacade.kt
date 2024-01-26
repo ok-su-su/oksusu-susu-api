@@ -13,14 +13,14 @@ class UserFacade(
     private val txTemplate: TransactionTemplates,
 ) {
     suspend fun getUserInfo(user: AuthUser): UserInfoResponse {
-        return userService.findByIdOrThrow(user.id)
+        return userService.findByIdOrThrow(user.uid)
             .run { UserInfoResponse.from(this) }
     }
 
     suspend fun updateUserInfo(uid: Long, user: AuthUser, request: UpdateUserInfoRequest): UserInfoResponse {
         user.isNotAuthorThrow(uid)
 
-        val beforeChangedUser = userService.findByIdOrThrow(user.id)
+        val beforeChangedUser = userService.findByIdOrThrow(user.uid)
 
         val updatedUser = txTemplate.writer.coExecute {
             beforeChangedUser.apply {

@@ -6,7 +6,9 @@ import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.ledger.model.LedgerModel
 
 data class CreateAndUpdateLedgerResponse(
+    /** 장부 */
     val ledger: LedgerModel,
+    /** 카테고리 */
     val category: CategoryWithCustomModel,
 ) {
     companion object {

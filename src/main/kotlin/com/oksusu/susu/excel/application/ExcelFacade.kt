@@ -31,8 +31,8 @@ class ExcelFacade(
         return withContext(Dispatchers.Default) {
             val (wb, os) = excelService.initWorkbook()
 
-            val sent = async { createSheet(user.id, wb, SentSheet.getSheet(), excelDataHelper.getSentData) }
-            val received = async { createSheet(user.id, wb, ReceivedSheet.getSheet(), excelDataHelper.getReceivedData) }
+            val sent = async { createSheet(user.uid, wb, SentSheet.getSheet(), excelDataHelper.getSentData) }
+            val received = async { createSheet(user.uid, wb, ReceivedSheet.getSheet(), excelDataHelper.getReceivedData) }
             awaitAll(sent, received)
 
             wb.finish()

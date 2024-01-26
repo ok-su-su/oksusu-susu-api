@@ -38,7 +38,7 @@ class FriendFacade(
     ): Page<SearchFriendResponse> {
         val searchResponse = friendService.search(
             spec = SearchFriendSpec(
-                uid = user.id,
+                uid = user.uid,
                 name = searchRequest.name,
                 phoneNumber = searchRequest.phoneNumber
             ),
@@ -83,7 +83,7 @@ class FriendFacade(
 
     suspend fun create(user: AuthUser, request: CreateFriendRequest): CreateFriendResponse {
         if (request.phoneNumber != null) {
-            if (friendService.existsByPhoneNumber(user.id, request.phoneNumber)) {
+            if (friendService.existsByPhoneNumber(user.uid, request.phoneNumber)) {
                 throw AlreadyException(ErrorCode.ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR)
             }
         }
@@ -96,7 +96,7 @@ class FriendFacade(
 
         val createdFriend = txTemplates.writer.coExecute {
             val createdFriend = Friend(
-                uid = user.id,
+                uid = user.uid,
                 name = request.name,
                 phoneNumber = request.phoneNumber
             ).run { friendService.saveSync(this) }

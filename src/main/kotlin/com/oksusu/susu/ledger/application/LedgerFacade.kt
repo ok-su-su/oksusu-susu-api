@@ -51,7 +51,7 @@ class LedgerFacade(
 
         val createdLedger = txTemplate.writer.coExecute {
             val createdLedger = Ledger(
-                uid = user.id,
+                uid = user.uid,
                 title = request.title,
                 description = request.description,
                 startAt = request.startAt,
@@ -84,7 +84,7 @@ class LedgerFacade(
             throw InvalidRequestException(ErrorCode.LEDGER_INVALID_DUE_DATE_ERROR)
         }
 
-        val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.id)
+        val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.uid)
 
         val category = categoryService.getCategory(request.categoryId)
 
@@ -118,7 +118,7 @@ class LedgerFacade(
     }
 
     suspend fun get(user: AuthUser, id: Long): LedgerDetailResponse {
-        val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.id)
+        val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.uid)
 
         return parZip(
             { categoryService.getCategory(categoryAssignment.categoryId) },
@@ -139,7 +139,7 @@ class LedgerFacade(
         pageRequest: SusuPageRequest,
     ): Page<SearchLedgerResponse> {
         val searchSpec = SearchLedgerSpec(
-            uid = user.id,
+            uid = user.uid,
             title = request.title,
             categoryIds = request.categoryIds,
             fromStartAt = request.fromStartAt,
@@ -166,7 +166,7 @@ class LedgerFacade(
     }
 
     suspend fun delete(user: AuthUser, ids: Set<Long>) {
-        val ledgers = ledgerService.findAllByUidAndIdIn(user.id, ids.toList())
+        val ledgers = ledgerService.findAllByUidAndIdIn(user.uid, ids.toList())
 
         ledgers.forEach { leder ->
             txTemplate.writer.coExecuteOrNull {

@@ -21,7 +21,7 @@ class BlockFacade(
     suspend fun createBlock(user: AuthUser, request: CreateBlockRequest) {
         coroutineScope {
             val validateNotBlock = async {
-                blockService.validateNotAlreadyBlock(user.id, request.targetId, request.targetType)
+                blockService.validateNotAlreadyBlock(user.uid, request.targetId, request.targetType)
             }
             val validateTargetExist = when (request.targetType) {
                 BlockTargetType.POST -> async { postService.validateExist(request.targetId) }
@@ -33,7 +33,7 @@ class BlockFacade(
 
         txTemplates.writer.coExecute {
             Block(
-                uid = user.id,
+                uid = user.uid,
                 targetId = request.targetId,
                 targetType = request.targetType,
                 reason = request.reason
@@ -42,7 +42,7 @@ class BlockFacade(
     }
 
     suspend fun deleteBlock(user: AuthUser, id: Long) {
-        blockService.validateAuthority(user.id, id)
+        blockService.validateAuthority(user.uid, id)
 
         txTemplates.writer.coExecute {
             blockService.deleteById(id)

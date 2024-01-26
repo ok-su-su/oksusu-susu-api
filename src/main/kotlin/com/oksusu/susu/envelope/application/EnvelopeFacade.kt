@@ -51,10 +51,10 @@ class EnvelopeFacade(
             false -> request.category
         }
 
-        val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.id)
+        val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.uid)
         val category = categoryService.getCategory(categoryAssignmentRequest.id)
         val ledger = when (request.ledgerId != null) {
-            true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.id)
+            true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.uid)
             false -> null
         }
 
@@ -66,7 +66,7 @@ class EnvelopeFacade(
 
         val createdEnvelope = txTemplates.writer.coExecute {
             val createdEnvelope = Envelope(
-                uid = user.id,
+                uid = user.uid,
                 type = request.type,
                 friendId = friend.id,
                 ledgerId = request.ledgerId,
@@ -113,7 +113,7 @@ class EnvelopeFacade(
             false -> request.category
         }
 
-        val (envelope, friend, _, categoryAssignment) = envelopeService.getDetail(id, user.id)
+        val (envelope, friend, _, categoryAssignment) = envelopeService.getDetail(id, user.uid)
         val category = categoryService.getCategory(categoryAssignmentRequest.id)
 
         /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
@@ -145,7 +145,7 @@ class EnvelopeFacade(
     }
 
     suspend fun getDetail(user: AuthUser, id: Long): EnvelopeDetailResponse {
-        val envelopeDetail = envelopeService.getDetail(id, user.id)
+        val envelopeDetail = envelopeService.getDetail(id, user.uid)
         val category = categoryService.getCategory(envelopeDetail.categoryAssignment.categoryId)
         val relation = relationshipService.getRelationship(envelopeDetail.friendRelationship.relationshipId)
 
@@ -158,7 +158,7 @@ class EnvelopeFacade(
     }
 
     suspend fun delete(user: AuthUser, id: Long) {
-        val envelope = envelopeService.findByIdOrThrow(id, user.id)
+        val envelope = envelopeService.findByIdOrThrow(id, user.uid)
 
         txTemplates.writer.coExecuteOrNull {
             /** 봉투 삭제 */
@@ -179,7 +179,7 @@ class EnvelopeFacade(
         pageRequest: SusuPageRequest,
     ): Page<SearchEnvelopeResponse> {
         val searchSpec = SearchEnvelopeSpec(
-            uid = user.id,
+            uid = user.uid,
             friendId = request.friendId,
             ledgerId = request.ledgerId,
             types = request.types,
@@ -236,7 +236,7 @@ class EnvelopeFacade(
     ): Page<GetFriendStatisticsResponse> {
         val pageable = pageRequest.toDefault()
         val searchSpec = SearchFriendStatisticsSpec(
-            uid = user.id,
+            uid = user.uid,
             friendIds = request.friendIds,
             fromTotalAmounts = request.fromTotalAmounts,
             toTotalAmounts = request.toTotalAmounts
