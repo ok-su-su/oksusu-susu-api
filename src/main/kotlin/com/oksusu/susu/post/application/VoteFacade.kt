@@ -23,13 +23,11 @@ import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.post.model.request.CreateVoteRequest
 import com.oksusu.susu.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.post.model.response.CreateAndUpdateVoteResponse
-import com.oksusu.susu.post.model.response.VoteAndOptionsResponse
+import com.oksusu.susu.post.model.response.VoteAllInfoResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
-import com.oksusu.susu.post.model.vo.VoteSortType
 import com.oksusu.susu.user.application.UserService
-import kotlinx.coroutines.*
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 
@@ -69,6 +67,7 @@ class VoteFacade(
             countService.saveAllSync(voteOptionCounts.plus(voteCount))
 
             CreateAndUpdateVoteResponse.of(
+                uid = user.id,
                 post = createdPost,
                 optionModels = options.map { option -> VoteOptionModel.from(option) },
                 postCategoryModel = postCategoryService.getCategory(request.postCategoryId)
@@ -80,7 +79,7 @@ class VoteFacade(
         user: AuthUser,
         searchRequest: SearchVoteRequest,
         pageRequest: SusuPageRequest,
-    ): Slice<VoteAndOptionsResponse> {
+    ): Slice<VoteAndOptionsWithCountResponse> {
         val searchSpec = SearchVoteSpec.from(searchRequest)
 
         val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.id)
@@ -93,24 +92,21 @@ class VoteFacade(
             pageable = pageRequest.toDefault()
         )
 
-        val votes = when (searchSpec.sortType) {
-            VoteSortType.LATEST -> voteService.getAllVotesExceptBlock(getAllVoteSpec)
-            VoteSortType.POPULAR -> voteService.getAllVotesOrderByPopular(getAllVoteSpec)
-        }
-
-        val optionModels = voteOptionService.getOptionsByPostIdIn(votes.content.map { vote -> vote.id })
+        val voteAndCountModels = voteService.getAllVotesExceptBlock(getAllVoteSpec)
+        val optionModels = voteOptionService.getOptionsByPostIdIn(voteAndCountModels.content.map { model -> model.post.id })
             .map { VoteOptionModel.from(it) }
 
-        return votes.map { vote ->
-            VoteAndOptionsResponse.of(
-                vote = vote,
-                options = optionModels.filter { option -> option.postId == vote.id },
-                postCategoryModel = postCategoryService.getCategory(vote.postCategoryId)
+        return voteAndCountModels.map { vote ->
+            VoteAndOptionsWithCountResponse.of(
+                vote = vote.post,
+                count = vote.count,
+                options = optionModels.filter { option -> option.postId == vote.post.id },
+                postCategoryModel = postCategoryService.getCategory(vote.post.postCategoryId)
             )
         }
     }
 
-    suspend fun getVote(user: AuthUser, id: Long): VoteAndOptionsWithCountResponse {
+    suspend fun getVote(user: AuthUser, id: Long): VoteAllInfoResponse {
         val voteInfos = voteService.getVoteAndOptions(id)
 
         val vote = voteInfos[0].post
@@ -127,7 +123,7 @@ class VoteFacade(
                 VoteOptionCountModel.of(option, optionCount.first { it.targetId == option.id })
             }
 
-            VoteAndOptionsWithCountResponse.of(
+            VoteAllInfoResponse.of(
                 vote = VoteCountModel.of(
                     vote,
                     voteCount,
@@ -241,6 +237,7 @@ class VoteFacade(
             }
 
             CreateAndUpdateVoteResponse.of(
+                uid = user.id,
                 post = updatedVote,
                 optionModels = options,
                 postCategoryModel = updatedPostCategory
