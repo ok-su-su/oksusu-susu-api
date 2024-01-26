@@ -4,8 +4,11 @@ import com.oksusu.susu.report.domain.ReportMetadata
 import com.oksusu.susu.report.domain.vo.ReportTargetType
 
 data class ReportMetadataModel(
+    /** 메타데이터 id */
     val id: Long,
+    /** 메타데이터 seq */
     val seq: Int,
+    /** 메타데이터 seq */
     val targetType: ReportTargetType,
     val metadata: String,
 ) {
