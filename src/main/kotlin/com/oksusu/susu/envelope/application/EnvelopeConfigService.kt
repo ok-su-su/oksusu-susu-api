@@ -23,7 +23,7 @@ class EnvelopeConfigService(
 
     suspend fun getSearchFilter(user: AuthUser): SearchFilterEnvelopeResponse {
         val maxReceivedAmount = envelopeService.findTop1ByUidAndTypeOrderByAmount(
-            uid = user.id,
+            uid = user.uid,
             type = EnvelopeType.RECEIVED
         )?.amount ?: 0L
 

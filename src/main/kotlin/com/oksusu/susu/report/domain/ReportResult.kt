@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
+/** 신고 결과 */
 @Entity
 @Table(name = "report_result")
 class ReportResult(
@@ -18,8 +19,10 @@ class ReportResult(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
+    /** 신고 대상 uid */
     val uid: Long,
 
+    /** 신고 결과 상태 */
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     val status: ReportResultStatus,

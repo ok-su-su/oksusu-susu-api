@@ -33,7 +33,7 @@ class ReportFacade(
         val metadata = reportMetadataService.get(request.metadataId)
 
         val isExistsReportHistory = reportHistoryService.existsByUidAndTargetIdAndTargetType(
-            uid = user.id,
+            uid = user.uid,
             targetId = request.targetId,
             targetType = request.targetType
         )
@@ -57,7 +57,7 @@ class ReportFacade(
 
         val createdReportHistory = txTemplates.writer.coExecute {
             ReportHistory(
-                uid = user.id,
+                uid = user.uid,
                 targetId = request.targetId,
                 targetType = request.targetType,
                 metadataId = metadata.id,

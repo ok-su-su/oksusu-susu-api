@@ -38,7 +38,7 @@ class AuthFacade(
 
     @Transactional
     suspend fun logout(user: AuthUser) {
-        refreshTokenService.deleteByKey(user.id.toString())
+        refreshTokenService.deleteByKey(user.uid.toString())
     }
 
     @Transactional
@@ -65,11 +65,11 @@ class AuthFacade(
 
     @Transactional
     suspend fun withdraw(authUser: AuthUser) {
-        val user = userService.findByIdOrThrow(authUser.id)
+        val user = userService.findByIdOrThrow(authUser.uid)
 
         parZip(
             { oauthService.withdraw(user.oauthInfo) },
-            { userService.withdraw(authUser.id) }
+            { userService.withdraw(authUser.uid) }
         ) { _, _ ->
             /** 현재는 추가적인 로직은 없음 */
         }

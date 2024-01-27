@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.LEDGER_SWAGGER_TAG)
+@Tag(name = SwaggerTag.LEDGER_SWAGGER_TAG, description = "장부 관리")
 @RestController
 @RequestMapping(value = ["/api/v1/ledgers"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class LedgerResource(
@@ -57,6 +57,9 @@ class LedgerResource(
     ) = ledgerFacade.get(user, id).wrapOk()
 
     /**
+     * **검색조건**
+     * - title, categoryIds, fromStartAT, toStartAt 모두 현재 조건상 nullable
+     *
      * **검색 정렬 조건**
      * - createdAt (생성)
      * - totalSentAmounts (보낸 금액 총합)

@@ -5,9 +5,15 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 
 data class SusuPageRequest(
+    /** page, 0부터 시작 */
     val page: Int?,
+    /** size, default is 10 */
     val size: Int?,
-    /** createdAt, desc */
+    /**
+     * **정렬조건**
+     * - ex: createdAt, desc
+     * - 각 api의 정렬 조건에 맞추어 진행
+     */
     val sort: String?,
 ) {
     fun toDefault(): Pageable {

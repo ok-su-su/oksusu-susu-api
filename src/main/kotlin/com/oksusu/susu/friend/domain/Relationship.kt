@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
+/** 관계 */
 @Entity
 @Table(name = "relationship")
 class Relationship(
@@ -15,10 +16,13 @@ class Relationship(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
+    /** 관계 */
     val relation: String,
 
+    /** 상세 설명 */
     val description: String,
 
+    /** 활성화 : 1, 비활성화 : 0 */
     @Column(name = "is_active")
     val isActive: Boolean,
 ) : BaseEntity()

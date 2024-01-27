@@ -1,7 +1,5 @@
 package com.oksusu.susu.friend.infrastructure
 
-import com.oksusu.susu.category.domain.QCategory
-import com.oksusu.susu.category.domain.QCategoryAssignment
 import com.oksusu.susu.envelope.domain.QEnvelope
 import com.oksusu.susu.friend.domain.*
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
@@ -41,8 +39,6 @@ class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepositor
     private val qEnvelope = QEnvelope.envelope
     private val qFriend = QFriend.friend
     private val qFriendRelationship = QFriendRelationship.friendRelationship
-    private val qCategoryAssignment = QCategoryAssignment.categoryAssignment
-    private val qCategory = QCategory.category
     private val qRelationShip = QRelationship.relationship
 
     override suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {

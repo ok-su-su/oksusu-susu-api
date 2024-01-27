@@ -1,18 +1,19 @@
 package com.oksusu.susu.config.async
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
 import org.springframework.stereotype.Component
 import java.lang.reflect.Method
 
 @Component
 class AsyncExceptionHandler : AsyncUncaughtExceptionHandler {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     override fun handleUncaughtException(throwable: Throwable, method: Method, vararg params: Any) {
-        logger.error("Exception message - $throwable")
-        logger.error("Method name - " + method.name)
+        logger.error { "Exception message - $throwable" }
+        logger.error { "Method name - " + method.name }
         for (param in params) {
-            logger.error("Parameter value - $param")
+            logger.error { "Parameter value - $param" }
         }
     }
 }

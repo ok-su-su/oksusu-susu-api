@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.ENVELOPE_SWAGGER_TAG)
+@Tag(name = SwaggerTag.ENVELOPE_SWAGGER_TAG, description = "봉투 관리 API")
 @RestController
 @RequestMapping(value = ["/api/v1/envelopes"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class EnvelopeResource(
@@ -56,6 +56,7 @@ class EnvelopeResource(
         @PathVariable id: Long,
     ) = envelopeFacade.getDetail(user, id).wrapOk()
 
+    /** 봉투 및 카테고리 매핑 데이터 제거 */
     @Operation(summary = "삭제")
     @DeleteMapping("/{id}")
     suspend fun delete(
@@ -63,6 +64,13 @@ class EnvelopeResource(
         @PathVariable id: Long,
     ) = envelopeFacade.delete(user, id).wrapVoid()
 
+    /**
+     * **검색조건**
+     * - types: SENT: 보낸 봉투만, RECEIVED: 받은 봉투만, 그외 케이스는 전체 봉투 정보
+     *
+     * **정렬조건**
+     * - createdAt: 생성일
+     */
     @Operation(summary = "검색")
     @GetMapping
     suspend fun search(

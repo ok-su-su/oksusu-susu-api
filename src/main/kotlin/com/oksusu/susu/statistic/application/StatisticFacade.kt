@@ -13,6 +13,7 @@ import com.oksusu.susu.statistic.model.TitleValueModel
 import com.oksusu.susu.statistic.model.response.SusuStatisticResponse
 import com.oksusu.susu.statistic.model.response.UserStatisticResponse
 import com.oksusu.susu.statistic.model.vo.SusuStatisticRequest
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,34 +27,36 @@ class StatisticFacade(
     private val susuSpecificStatisticService: SusuSpecificStatisticService,
     private val relationshipService: RelationshipService,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     suspend fun getUserStatistic(user: AuthUser): UserStatisticResponse {
         // caching 된거 확인
-        userStatisticService.getStatisticOrNull(user.id)?.run {
-            logger.debug { "${user.id} user statistic cache hit" }
+        userStatisticService.getStatisticOrNull(user.uid)?.run {
+            logger.debug { "${user.uid} user statistic cache hit" }
             return UserStatisticResponse.from(this)
         }
 
         val userStatisticResponse = parZip(
             // 최근 사용 금액
             // 경조사비를 가장 많이 쓴 달
-            { envelopeService.countPerHandedOverAtInLast8MonthByUid(user.id, EnvelopeType.SENT) },
+            { envelopeService.countPerHandedOverAtInLast8MonthByUid(user.uid, EnvelopeType.SENT) },
             // 최다 수수 관계
-            { friendRelationshipService.countPerRelationshipIdByUid(user.id) },
+            { friendRelationshipService.countPerRelationshipIdByUid(user.uid) },
             // 최다 수수 경조사
-            { envelopeService.countPerCategoryIdByUid(user.id) },
-            { ledgerService.countPerCategoryIdByUid(user.id) },
+            { envelopeService.countPerCategoryIdByUid(user.uid) },
+            { ledgerService.countPerCategoryIdByUid(user.uid) },
             // 가장 많이 받은 금액
-            { envelopeService.getMaxAmountEnvelopeInfoByUid(user.id, EnvelopeType.RECEIVED) },
+            { envelopeService.getMaxAmountEnvelopeInfoByUid(user.uid, EnvelopeType.RECEIVED) },
             // 가장 많이 보낸 금액
-            { envelopeService.getMaxAmountEnvelopeInfoByUid(user.id, EnvelopeType.SENT) }
-        ) { envelopHandOverAtMonthCount,
-            relationShipConuts,
-            envelopeCategoryCounts,
-            ledgerCategoryCounts,
-            receivedMaxAmount,
-            sentMaxAmount, ->
+            { envelopeService.getMaxAmountEnvelopeInfoByUid(user.uid, EnvelopeType.SENT) }
+        ) {
+                envelopHandOverAtMonthCount,
+                relationShipConuts,
+                envelopeCategoryCounts,
+                ledgerCategoryCounts,
+                receivedMaxAmount,
+                sentMaxAmount,
+            ->
 
             // 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사
             val basicStatistic = susuBasicStatisticService.constructBasicStatistic(
@@ -81,7 +84,7 @@ class StatisticFacade(
         }
 
         UserStatistic.from(userStatisticResponse).run {
-            userStatisticService.save(uid = user.id, userStatistic = this)
+            userStatisticService.save(uid = user.uid, userStatistic = this)
         }
 
         return userStatisticResponse

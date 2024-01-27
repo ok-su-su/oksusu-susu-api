@@ -142,6 +142,6 @@ class OAuthFacade(
     }
 
     suspend fun getOAuthInfo(user: AuthUser): UserOAuthInfoResponse {
-        return userService.findByIdOrThrow(user.id).run { UserOAuthInfoResponse.from(this) }
+        return userService.findByIdOrThrow(user.uid).run { UserOAuthInfoResponse.from(this) }
     }
 }

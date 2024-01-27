@@ -7,6 +7,7 @@ import com.oksusu.susu.report.domain.ReportMetadata
 import com.oksusu.susu.report.domain.vo.ReportTargetType
 import com.oksusu.susu.report.infrastructure.ReportMetadataRepository
 import com.oksusu.susu.report.model.ReportMetadataModel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service
 class ReportMetadataService(
     private val reportMetadataRepository: ReportMetadataRepository,
 ) {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
     private var reportMetadata: Map<Long, ReportMetadataModel> = emptyMap()
 
     @Scheduled(

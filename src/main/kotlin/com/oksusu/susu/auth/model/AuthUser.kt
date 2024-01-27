@@ -4,7 +4,8 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NoAuthorityException
 
 interface AuthUser {
-    val id: Long
+    /** user id */
+    val uid: Long
 
     fun isAuthor(uid: Long): Boolean
 
@@ -14,10 +15,10 @@ interface AuthUser {
 }
 
 class AuthUserImpl(
-    override val id: Long,
+    override val uid: Long,
 ) : AuthUser {
     override fun isAuthor(uid: Long): Boolean {
-        return this.id == uid
+        return this.uid == uid
     }
 
     override fun isAuthorThrow(uid: Long) {

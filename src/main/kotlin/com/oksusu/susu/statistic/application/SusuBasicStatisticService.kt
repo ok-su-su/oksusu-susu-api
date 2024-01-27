@@ -9,6 +9,7 @@ import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicStatisticRepository
 import com.oksusu.susu.statistic.model.TitleValueModel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -18,7 +19,7 @@ class SusuBasicStatisticService(
     private val susuBasicStatisticRepository: SusuBasicStatisticRepository,
     private val categoryService: CategoryService,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     suspend fun constructBasicStatistic(
         envelopHandOverAtMonthCount: List<CountPerHandedOverAtModel>,

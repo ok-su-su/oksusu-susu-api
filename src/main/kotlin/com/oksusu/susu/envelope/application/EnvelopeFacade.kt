@@ -1,5 +1,6 @@
 package com.oksusu.susu.envelope.application
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.category.application.CategoryAssignmentService
 import com.oksusu.susu.category.application.CategoryService
@@ -51,10 +52,10 @@ class EnvelopeFacade(
             false -> request.category
         }
 
-        val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.id)
+        val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.uid)
         val category = categoryService.getCategory(categoryAssignmentRequest.id)
         val ledger = when (request.ledgerId != null) {
-            true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.id)
+            true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.uid)
             false -> null
         }
 
@@ -66,7 +67,7 @@ class EnvelopeFacade(
 
         val createdEnvelope = txTemplates.writer.coExecute {
             val createdEnvelope = Envelope(
-                uid = user.id,
+                uid = user.uid,
                 type = request.type,
                 friendId = friend.id,
                 ledgerId = request.ledgerId,
@@ -113,7 +114,7 @@ class EnvelopeFacade(
             false -> request.category
         }
 
-        val (envelope, friend, _, categoryAssignment) = envelopeService.getDetail(id, user.id)
+        val (envelope, friend, _, categoryAssignment) = envelopeService.getDetail(id, user.uid)
         val category = categoryService.getCategory(categoryAssignmentRequest.id)
 
         /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
@@ -145,7 +146,7 @@ class EnvelopeFacade(
     }
 
     suspend fun getDetail(user: AuthUser, id: Long): EnvelopeDetailResponse {
-        val envelopeDetail = envelopeService.getDetail(id, user.id)
+        val envelopeDetail = envelopeService.getDetail(id, user.uid)
         val category = categoryService.getCategory(envelopeDetail.categoryAssignment.categoryId)
         val relation = relationshipService.getRelationship(envelopeDetail.friendRelationship.relationshipId)
 
@@ -158,7 +159,7 @@ class EnvelopeFacade(
     }
 
     suspend fun delete(user: AuthUser, id: Long) {
-        val envelope = envelopeService.findByIdOrThrow(id, user.id)
+        val envelope = envelopeService.findByIdOrThrow(id, user.uid)
 
         txTemplates.writer.coExecuteOrNull {
             /** 봉투 삭제 */
@@ -172,14 +173,13 @@ class EnvelopeFacade(
         }
     }
 
-    // TODO: 개선 필요
     suspend fun search(
         user: AuthUser,
         request: SearchEnvelopeRequest,
         pageRequest: SusuPageRequest,
     ): Page<SearchEnvelopeResponse> {
         val searchSpec = SearchEnvelopeSpec(
-            uid = user.id,
+            uid = user.uid,
             friendId = request.friendId,
             ledgerId = request.ledgerId,
             types = request.types,
@@ -190,42 +190,48 @@ class EnvelopeFacade(
         val pageable = pageRequest.toDefault()
 
         val response = envelopeService.search(searchSpec, pageable)
-        val friendIds = response.content.map { it.friendId }
-        val envelopeIds = response.content.map { it.id }
+        val friendIds = response.content.map { envelope -> envelope.friendId }
+        val envelopeIds = response.content.map { envelope -> envelope.id }
 
-        val friends = when (searchSpec.include.contains(IncludeSpec.FRIEND)) {
-            true -> friendService.findAllByIdIn(friendIds)
-            false -> emptyList()
-        }.associateBy { it.id }
-
-        val friendRelationShips = when (searchSpec.include.contains(IncludeSpec.RELATION)) {
-            true -> friendRelationshipService.findAllByFriendIds(friendIds)
-            false -> emptyList()
-        }.associateBy { it.friendId }
-
-        val categoryAssignments = when (searchSpec.include.contains(IncludeSpec.CATEGORY)) {
-            true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, envelopeIds)
-            else -> emptyList()
-        }.associateBy { it.targetId }
-
-        return response.map { envelope ->
-            val category = categoryAssignments[envelope.id]?.let { categoryAssignment ->
-                val category = categoryService.getCategory(categoryAssignment.categoryId)
-                CategoryWithCustomModel.of(category, categoryAssignment)
+        return parZip(
+            {
+                when (searchSpec.include.contains(IncludeSpec.FRIEND)) {
+                    true -> friendService.findAllByIdIn(friendIds)
+                    false -> emptyList()
+                }.associateBy { it.id }
+            },
+            {
+                when (searchSpec.include.contains(IncludeSpec.RELATION)) {
+                    true -> friendRelationshipService.findAllByFriendIds(friendIds)
+                    false -> emptyList()
+                }.associateBy { friendRelationShip -> friendRelationShip.friendId }
+            },
+            {
+                when (searchSpec.include.contains(IncludeSpec.CATEGORY)) {
+                    true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, envelopeIds)
+                    else -> emptyList()
+                }.associateBy { categoryAssignment -> categoryAssignment.targetId }
             }
-            val relation = friendRelationShips[envelope.friendId]?.let {
-                relationshipService.getRelationship(it.relationshipId)
-            }
-            val friend = friends[envelope.friendId]?.let {
-                FriendModel.from(it)
-            }
+        ) { friends, friendRelationShips, categoryAssignments ->
+            response.map { envelope ->
+                val category = categoryAssignments[envelope.id]?.let { categoryAssignment ->
+                    val category = categoryService.getCategory(categoryAssignment.categoryId)
+                    CategoryWithCustomModel.of(category, categoryAssignment)
+                }
+                val relation = friendRelationShips[envelope.friendId]?.let {
+                    relationshipService.getRelationship(it.relationshipId)
+                }
+                val friend = friends[envelope.friendId]?.let {
+                    FriendModel.from(it)
+                }
 
-            SearchEnvelopeResponse(
-                envelope = EnvelopeModel.from(envelope),
-                category = category,
-                relation = relation,
-                friend = friend
-            )
+                SearchEnvelopeResponse(
+                    envelope = EnvelopeModel.from(envelope),
+                    category = category,
+                    relation = relation,
+                    friend = friend
+                )
+            }
         }
     }
 
@@ -236,8 +242,8 @@ class EnvelopeFacade(
     ): Page<GetFriendStatisticsResponse> {
         val pageable = pageRequest.toDefault()
         val searchSpec = SearchFriendStatisticsSpec(
-            uid = user.id,
-            friendIds = request.friendIds?.toList(),
+            uid = user.uid,
+            friendIds = request.friendIds,
             fromTotalAmounts = request.fromTotalAmounts,
             toTotalAmounts = request.toTotalAmounts
         )
@@ -251,7 +257,7 @@ class EnvelopeFacade(
             val friend = friends[statistics.friendId] ?: throw NotFoundException(ErrorCode.NOT_FOUND_FRIEND_ERROR)
 
             GetFriendStatisticsResponse(
-                friend = friend,
+                friend = FriendModel.from(friend),
                 totalAmounts = statistics.sentAmounts + statistics.receivedAmounts,
                 sentAmounts = statistics.sentAmounts,
                 receivedAmounts = statistics.receivedAmounts

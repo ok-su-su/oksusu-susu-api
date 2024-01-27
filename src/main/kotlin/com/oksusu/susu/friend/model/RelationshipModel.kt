@@ -3,8 +3,11 @@ package com.oksusu.susu.friend.model
 import com.oksusu.susu.friend.domain.Relationship
 
 data class RelationshipModel(
+    /** 관계 id */
     val id: Long,
+    /** 관계 */
     val relation: String,
+    /** 설명 */
     val description: String?,
 ) {
     companion object {

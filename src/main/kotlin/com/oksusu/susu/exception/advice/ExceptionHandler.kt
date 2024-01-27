@@ -1,9 +1,9 @@
 package com.oksusu.susu.exception.advice
 
 import com.oksusu.susu.common.dto.ErrorResponse
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.CancellationException
-import mu.KotlinLogging
 import org.hibernate.TypeMismatchException
 import org.springframework.core.codec.DecodingException
 import org.springframework.http.HttpStatus

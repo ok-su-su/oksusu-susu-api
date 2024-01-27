@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.CATEGORY_SWAGGER_TAG)
+@Tag(name = SwaggerTag.CATEGORY_SWAGGER_TAG, description = "카테고리 관리")
 @RestController
 @RequestMapping(value = ["/api/v1/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class CategoryResource(
