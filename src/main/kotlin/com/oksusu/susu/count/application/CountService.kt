@@ -40,7 +40,7 @@ class CountService(
     }
 
     @Transactional
-    fun deleteAllByTargetTypeAndTargetIdIn(type: CountTargetType, optionIds: List<Long>) {
-        countRepository.deleteAllByTargetTypeAndTargetIdIn(type, optionIds)
+    fun deleteAllByTargetTypeAndTargetIdIn(type: CountTargetType, targetIds: List<Long>) {
+        countRepository.deleteAllByTargetTypeAndTargetIdIn(type, targetIds)
     }
 }

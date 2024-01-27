@@ -18,5 +18,5 @@ interface CountRepository : JpaRepository<Count, Long> {
     fun deleteByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType)
 
     @Transactional
-    fun deleteAllByTargetTypeAndTargetIdIn(voteOption: CountTargetType, optionIds: List<Long>)
+    fun deleteAllByTargetTypeAndTargetIdIn(targetType: CountTargetType, targetIds: List<Long>)
 }

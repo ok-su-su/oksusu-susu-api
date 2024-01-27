@@ -277,4 +277,4 @@ CREATE TABLE `count`
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '카운트';
-CREATE INDEX idx__target_id ON count (target_id);
+CREATE INDEX idx__target_type__target_id ON count (target_type, target_id);

@@ -7,6 +7,7 @@ import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.VoteOption
 import jakarta.persistence.*
 
+/** 카운트 */
 @Entity
 @Table(name = "count")
 class Count(
@@ -14,17 +15,21 @@ class Count(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
+    /** 카운트 타켓 id */
     @Column(name = "target_id")
     val targetId: Long,
 
+    /** 카운트 타겟 타입 */
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "target_type")
     val targetType: CountTargetType,
 
+    /** 카운트 타입 */
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "count_type")
     val countType: CountType,
 
+    /** 카운트 */
     var count: Long = 0,
 ) : BaseEntity() {
     companion object {

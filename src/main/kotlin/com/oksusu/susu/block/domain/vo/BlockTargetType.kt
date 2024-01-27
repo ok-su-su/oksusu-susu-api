@@ -4,6 +4,7 @@ package com.oksusu.susu.block.domain.vo
 enum class BlockTargetType {
     /** 유저 */
     USER,
+
     /** 게시글 */
     POST,
     ;
