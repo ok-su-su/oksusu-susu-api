@@ -7,6 +7,7 @@ import com.oksusu.susu.common.consts.BEARER
 import com.oksusu.susu.common.consts.KAKAO_AK
 import com.oksusu.susu.common.properties.KakaoOauthProperties
 import com.oksusu.susu.config.webClient.SusuWebClient
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
@@ -17,7 +18,7 @@ class KakaoClient(
     private val kakaoOauthProperties: KakaoOauthProperties,
     private val susuWebClient: SusuWebClient,
 ) {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun kakaoTokenClient(
         redirectUrl: String,

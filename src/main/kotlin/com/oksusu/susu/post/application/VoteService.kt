@@ -9,6 +9,7 @@ import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
 import com.oksusu.susu.post.infrastructure.repository.model.PostAndCountModel
 import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
 import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.PageRequest
@@ -20,7 +21,7 @@ class VoteService(
     private val postService: PostService,
     private val postRepository: PostRepository,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     suspend fun getAllVotesExceptBlock(getAllVoteSpec: GetAllVoteSpec): Slice<PostAndCountModel> {
         return withContext(Dispatchers.IO) {

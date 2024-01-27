@@ -13,6 +13,7 @@ import com.oksusu.susu.statistic.model.TitleValueModel
 import com.oksusu.susu.statistic.model.response.SusuStatisticResponse
 import com.oksusu.susu.statistic.model.response.UserStatisticResponse
 import com.oksusu.susu.statistic.model.vo.SusuStatisticRequest
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,7 +27,7 @@ class StatisticFacade(
     private val susuSpecificStatisticService: SusuSpecificStatisticService,
     private val relationshipService: RelationshipService,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     suspend fun getUserStatistic(user: AuthUser): UserStatisticResponse {
         // caching 된거 확인
@@ -48,12 +49,14 @@ class StatisticFacade(
             { envelopeService.getMaxAmountEnvelopeInfoByUid(user.uid, EnvelopeType.RECEIVED) },
             // 가장 많이 보낸 금액
             { envelopeService.getMaxAmountEnvelopeInfoByUid(user.uid, EnvelopeType.SENT) }
-        ) { envelopHandOverAtMonthCount,
-            relationShipConuts,
-            envelopeCategoryCounts,
-            ledgerCategoryCounts,
-            receivedMaxAmount,
-            sentMaxAmount, ->
+        ) {
+                envelopHandOverAtMonthCount,
+                relationShipConuts,
+                envelopeCategoryCounts,
+                ledgerCategoryCounts,
+                receivedMaxAmount,
+                sentMaxAmount,
+            ->
 
             // 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사
             val basicStatistic = susuBasicStatisticService.constructBasicStatistic(

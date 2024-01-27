@@ -1,6 +1,7 @@
 package com.oksusu.susu
 
 import com.oksusu.susu.extension.Zone
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.info.BuildProperties
@@ -16,14 +17,10 @@ class Application(
     private val buildProperties: BuildProperties,
     private val environment: Environment,
 ) : ApplicationListener<ApplicationReadyEvent> {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     override fun onApplicationEvent(event: ApplicationReadyEvent) {
-        logger.info(
-            "{} applicationReady, profiles = {}",
-            buildProperties.name,
-            environment.activeProfiles.contentToString()
-        )
+        logger.info { "${buildProperties.name} applicationReady, profiles = ${environment.activeProfiles.contentToString()}" }
     }
 }
 

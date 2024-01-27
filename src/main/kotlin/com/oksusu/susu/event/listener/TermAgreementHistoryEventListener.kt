@@ -3,6 +3,7 @@ package com.oksusu.susu.event.listener
 import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.term.application.TermAgreementHistoryService
 import com.oksusu.susu.term.domain.TermAgreementHistory
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,7 +14,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 class TermAgreementHistoryEventListener(
     private val termAgreementHistoryService: TermAgreementHistoryService,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createTermAgreementHistoryService(event: TermAgreementHistoryCreateEvent) {

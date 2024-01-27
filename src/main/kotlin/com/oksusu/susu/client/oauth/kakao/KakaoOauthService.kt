@@ -4,6 +4,7 @@ import com.oksusu.susu.auth.model.OauthUserInfoDto
 import com.oksusu.susu.auth.model.response.OauthLoginLinkResponse
 import com.oksusu.susu.auth.model.response.OauthTokenResponse
 import com.oksusu.susu.common.properties.KakaoOauthProperties
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
@@ -16,7 +17,7 @@ class KakaoOauthService(
     @Value("\${server.domain-name}")
     private val domainName: String,
 ) {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     /** link */
     suspend fun getOauthLoginLinkDev(): OauthLoginLinkResponse {

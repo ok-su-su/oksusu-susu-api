@@ -15,6 +15,7 @@ import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.Page
@@ -28,7 +29,7 @@ import java.time.LocalDate
 class EnvelopeService(
     private val envelopeRepository: EnvelopeRepository,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     @Transactional
     fun saveSync(envelope: Envelope): Envelope {

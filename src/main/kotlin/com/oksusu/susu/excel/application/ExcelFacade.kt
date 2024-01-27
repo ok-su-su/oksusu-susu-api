@@ -4,7 +4,11 @@ import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.excel.model.ReceivedSheet
 import com.oksusu.susu.excel.model.SentSheet
 import com.oksusu.susu.excel.model.Sheet
-import kotlinx.coroutines.*
+import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 import org.dhatim.fastexcel.Workbook
 import org.springframework.core.io.buffer.DefaultDataBuffer
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
@@ -18,7 +22,7 @@ class ExcelFacade(
     private val excelService: ExcelService,
     private val excelDataHelper: ExcelDataHelper,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     companion object {
         const val PAGE_SIZE = 100
@@ -32,7 +36,8 @@ class ExcelFacade(
             val (wb, os) = excelService.initWorkbook()
 
             val sent = async { createSheet(user.uid, wb, SentSheet.getSheet(), excelDataHelper.getSentData) }
-            val received = async { createSheet(user.uid, wb, ReceivedSheet.getSheet(), excelDataHelper.getReceivedData) }
+            val received =
+                async { createSheet(user.uid, wb, ReceivedSheet.getSheet(), excelDataHelper.getReceivedData) }
             awaitAll(sent, received)
 
             wb.finish()

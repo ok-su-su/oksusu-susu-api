@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.8.22"
+    val kotlinVersion = "1.9.21"
 
-    id("org.springframework.boot") version "3.1.5"
-    id("io.spring.dependency-management") version "1.1.3"
+    id("org.springframework.boot") version "3.2.1"
+    id("io.spring.dependency-management") version "1.1.4"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
@@ -53,35 +53,31 @@ allOpen {
 springBoot.buildInfo { properties { } }
 
 object DependencyVersion {
-    /** external */
     const val QUERYDSL_VERSION = "5.0.0"
-    const val ARROW_FX_VERSION = "1.1.3"
+    const val ARROW_FX_VERSION = "1.1.5"
     const val JWT_VERSION = "4.1.0"
     const val SPRINGDOC_VERSION = "2.2.0"
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
-    const val KOTLIN_LOGGING_VERSION = "2.0.11"
-    const val LOGBACK_ENCODER_VERSION = "6.6"
+    const val KOTLIN_LOGGING_VERSION = "6.0.3"
+    const val LOGBACK_ENCODER_VERSION = "7.3"
     const val KOTEST_VERSION = "5.7.2"
     const val KOTEST_EXTENSION_VERSION = "1.1.2"
-    const val MOCKK_VERSION = "1.4.1"
+    const val MOCKK_VERSION = "1.13.4"
     const val FASTEXCEL_VERSION = "0.16.5"
-    const val SPRING_CLOUD_VERSION = "2022.0.4"
-    const val SPRING_CLOUD_BOOTSTRAP_VERSION = "4.1.0"
-    const val AWS_PARAMETER_STORE_CONFIG_VERSION = "2.2.6.RELEASE"
+    const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
+    const val AWS_SDK_VERSION = "1.12.238"
+    const val AWS_SDK_V2_VERSION = "2.17.107"
 }
 
 dependencies {
     /** kotlin */
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     /** spring starter */
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -89,8 +85,6 @@ dependencies {
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     /** querydsl */
-    implementation("com.querydsl:querydsl-collections:${DependencyVersion.QUERYDSL_VERSION}")
-    implementation("com.querydsl:querydsl-sql:${DependencyVersion.QUERYDSL_VERSION}")
     implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
     kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
 
@@ -110,7 +104,7 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
 
     /** logger */
-    implementation("io.github.microutils:kotlin-logging:${DependencyVersion.KOTLIN_LOGGING_VERSION}")
+    implementation("io.github.oshai:kotlin-logging-jvm:${DependencyVersion.KOTLIN_LOGGING_VERSION}")
     implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER_VERSION}")
 
     /** test **/
@@ -128,18 +122,20 @@ dependencies {
     /** fastexcel */
     implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL_VERSION}")
 
-    /** aws */
-    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap:${DependencyVersion.SPRING_CLOUD_BOOTSTRAP_VERSION}")
-    implementation("org.springframework.cloud:spring-cloud-starter-aws-parameter-store-config:${DependencyVersion.AWS_PARAMETER_STORE_CONFIG_VERSION}")
+    /** aws v1 */
+    implementation(platform("com.amazonaws:aws-java-sdk-bom:${DependencyVersion.AWS_SDK_VERSION}"))
+    implementation("com.amazonaws:aws-java-sdk-sts")
+
+    /** aws v2 */
+    implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2_VERSION}"))
+    implementation("software.amazon.awssdk:sts")
+
+    /** ssm */
+    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}"))
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${DependencyVersion.SPRING_CLOUD_VERSION}")
-    }
 }
 
 defaultTasks("bootRun")
@@ -160,7 +156,7 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "8.4"
+    gradleVersion = "8.5"
 }
 
 when {

@@ -11,10 +11,11 @@ import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.extension.decodeBase64
 import com.oksusu.susu.extension.mapper
 import com.oksusu.susu.extension.toInstant
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Date
 
 private const val ACCESS_TOKEN = "accessToken"
 private const val REFRESH_TOKEN = "refreshToken"
@@ -23,7 +24,7 @@ private const val REFRESH_TOKEN = "refreshToken"
 class JwtTokenService(
     private val jwtConfig: JwtConfig,
 ) {
-    private val logger = mu.KotlinLogging.logger {}
+    private val logger = KotlinLogging.logger {}
 
     private val accessJwtVerifier = JWT
         .require(Algorithm.HMAC256(jwtConfig.secretKey))

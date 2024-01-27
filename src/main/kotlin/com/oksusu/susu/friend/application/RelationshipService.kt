@@ -6,6 +6,7 @@ import com.oksusu.susu.extension.resolveCancellation
 import com.oksusu.susu.friend.domain.Relationship
 import com.oksusu.susu.friend.infrastructure.RelationshipRepository
 import com.oksusu.susu.friend.model.RelationshipModel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service
 class RelationshipService(
     private val relationshipRepository: RelationshipRepository,
 ) {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
     private var relationships: Map<Long, RelationshipModel> = emptyMap()
 
     @Scheduled(
