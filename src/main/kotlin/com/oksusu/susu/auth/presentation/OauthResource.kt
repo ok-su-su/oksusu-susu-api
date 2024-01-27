@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = SwaggerTag.OAUTH_SWAGGER_TAG)
+@Tag(name = SwaggerTag.OAUTH_SWAGGER_TAG, description = "OAuth API")
 @RestController
 @RequestMapping(value = ["/api/v1/oauth"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class OauthResource(

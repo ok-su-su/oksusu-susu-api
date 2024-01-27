@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.EXCEL_SWAGGER_TAG)
+@Tag(name = SwaggerTag.EXCEL_SWAGGER_TAG, description = "Excel API")
 @RestController
 @RequestMapping(value = ["/api/v1/excel"])
 class ExcelResource(
