@@ -17,6 +17,9 @@ logging:
 
 # SPRING
 spring:
+  config:
+    import:
+      - aws-parameterstore:/susu/api-server_prod/
   jackson:
     serialization:
       indent_output: true

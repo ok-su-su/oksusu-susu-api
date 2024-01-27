@@ -24,6 +24,7 @@ import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.domain.UserDevice
 import com.oksusu.susu.user.model.UserDeviceContext
 import com.oksusu.susu.user.model.UserDeviceContextImpl
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -42,7 +43,7 @@ class OAuthFacade(
     private val termAgreementService: TermAgreementService,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
-    val logger = mu.KotlinLogging.logger {}
+    val logger = KotlinLogging.logger {}
 
     /** 회원가입 가능 여부 체크. */
     suspend fun checkRegisterValid(provider: OauthProvider, accessToken: String): AbleRegisterResponse {
@@ -61,8 +62,6 @@ class OAuthFacade(
         deviceContext: UserDeviceContext,
     ): TokenDto {
         val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
-
-        logger.info { deviceContext }
 
         coroutineScope {
             val validateNotRegistered = async(Dispatchers.IO) { userService.validateNotRegistered(oauthInfo) }
@@ -92,7 +91,6 @@ class OAuthFacade(
 
             createdUser
         }
-
 
         return generateTokenDto(user.id)
     }

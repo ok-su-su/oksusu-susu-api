@@ -5,6 +5,7 @@ import com.oksusu.susu.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.user.application.UserDeviceService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +17,7 @@ class UserDeviceEventListener(
     private val userDeviceService: UserDeviceService,
     private val txTemplates: TransactionTemplates,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createUserDevice(event: CreateUserDeviceEvent) {
