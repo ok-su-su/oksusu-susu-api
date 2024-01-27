@@ -2,6 +2,7 @@ package com.oksusu.susu.user.model
 
 import com.oksusu.susu.user.domain.User
 
+/** 유저 profile */
 data class UserProfileModel(
     /** 유저 id */
     val id: Long,
