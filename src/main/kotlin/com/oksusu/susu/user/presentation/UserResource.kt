@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.USER_SWAGGER_TAG)
+@Tag(name = SwaggerTag.USER_SWAGGER_TAG, description = "유저 API")
 @RestController
 @RequestMapping(value = ["/api/v1/users"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserResource(
