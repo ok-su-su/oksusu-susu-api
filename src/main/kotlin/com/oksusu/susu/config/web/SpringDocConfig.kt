@@ -2,6 +2,7 @@ package com.oksusu.susu.config.web
 
 import com.oksusu.susu.auth.model.AUTH_TOKEN_KEY
 import com.oksusu.susu.auth.model.AuthUser
+import com.oksusu.susu.user.model.UserDeviceContext
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
@@ -30,6 +31,7 @@ class SpringDocConfig(
         SpringDocUtils
             .getConfig()
             .addRequestWrapperToIgnore(
+                UserDeviceContext::class.java,
                 AuthUser::class.java,
                 WebSession::class.java,
                 RequestContext::class.java

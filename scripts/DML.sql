@@ -38,9 +38,9 @@ VALUES ('term5', 'des5', 1, 1);
 INSERT INTO susu.post_category (seq, name, is_active)
 VALUES (1, '결혼식', 1);
 INSERT INTO susu.post_category (seq, name, is_active)
-VALUES (2, '장례식', 1);
+VALUES (2, '돌잔치', 1);
 INSERT INTO susu.post_category (seq, name, is_active)
-VALUES (3, '돌잔치', 1);
+VALUES (3, '장례식', 1);
 INSERT INTO susu.post_category (seq, name, is_active)
 VALUES (4, '생일 기념일', 1);
 INSERT INTO susu.post_category (seq, name, is_active)
