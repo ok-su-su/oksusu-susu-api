@@ -26,6 +26,4 @@ class TokenGenerateHelper(
             refreshTokenExp = refreshTokenExpiresIn
         )
     }
-
-    fun getRefreshTokenTtlSecond(): Int = jwtConfig.refreshExp
 }

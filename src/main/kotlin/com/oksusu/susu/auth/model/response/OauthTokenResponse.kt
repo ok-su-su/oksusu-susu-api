@@ -3,7 +3,9 @@ package com.oksusu.susu.auth.model.response
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthTokenResponse
 
 class OauthTokenResponse(
+    /** oauth access token */
     val accessToken: String,
+    /** oauth refresh token */
     val refreshToken: String,
 ) {
     companion object {

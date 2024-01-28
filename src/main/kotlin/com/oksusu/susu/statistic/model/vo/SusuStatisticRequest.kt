@@ -6,7 +6,7 @@ data class SusuStatisticRequest(
     /** required */
     val relationshipId: Long,
     /** required */
-    val postCategoryId: Long,
+    val categoryId: Long,
 )
 
 enum class AgeType(

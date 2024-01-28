@@ -12,8 +12,8 @@ class CacheKeyGenerateHelper {
         return "$USER_STATISTIC_KEY_PREFIX$uid"
     }
 
-    suspend fun getSusuSpecificStatisticKey(age: Long, postCategoryId: Long, relationshipId: Long): String {
-        return "$SUSU_SPECIFIC_STATISTIC_KEY_PREFIX$age:$postCategoryId:$relationshipId"
+    suspend fun getSusuSpecificStatisticKey(age: Long, categoryId: Long, relationshipId: Long): String {
+        return "$SUSU_SPECIFIC_STATISTIC_KEY_PREFIX$age:$categoryId:$relationshipId"
     }
 
     suspend fun getSusuSpecificStatisticKey(key: String): String {

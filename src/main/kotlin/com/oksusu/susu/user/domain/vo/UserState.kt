@@ -1,5 +1,6 @@
 package com.oksusu.susu.user.domain.vo
 
+/** 유저 계정 상태 */
 enum class UserState {
     /** 활동 유저 */
     ACTIVE,

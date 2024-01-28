@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.TERM_SWAGGER_TAG)
+@Tag(name = SwaggerTag.TERM_SWAGGER_TAG, description = "약관 정보 API")
 @RestController
 @RequestMapping(value = ["/api/v1/terms"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class TermResource(

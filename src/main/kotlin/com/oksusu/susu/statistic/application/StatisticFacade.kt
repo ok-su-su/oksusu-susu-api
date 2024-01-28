@@ -96,7 +96,7 @@ class StatisticFacade(
             { susuBasicStatisticService.getStatisticOrThrow() }
         ) { tempSpecific, basic ->
             val specific = tempSpecific.apply {
-                this.averageCategory?.apply { title = categoryService.getCategory(requestParam.postCategoryId).name }
+                this.averageCategory?.apply { title = categoryService.getCategory(requestParam.categoryId).name }
                 this.averageRelationship?.apply {
                     title = relationshipService.getRelationship(requestParam.relationshipId).relation
                 }

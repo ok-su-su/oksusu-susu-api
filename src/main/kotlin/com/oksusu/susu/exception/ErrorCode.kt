@@ -54,8 +54,8 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     NOT_FOUND_VOTE_ERROR(HttpStatus.NOT_FOUND, "투표 정보를 찾을 수 없습니다."),
     DUPLICATED_VOTE_ERROR(HttpStatus.NOT_FOUND, "중복 투표를 할 수 없습니다."),
 
-    /** Post Category Error Code */
-    NOT_FOUND_POST_CATEGORY_ERROR(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
+    /** Board Error Code */
+    NOT_FOUND_BOARD_ERROR(HttpStatus.NOT_FOUND, "보드 정보를 찾을 수 없습니다."),
 
     /** Term Error Code */
     NOT_FOUND_TERM_ERROR(HttpStatus.NOT_FOUND, "약관 정보를 찾을 수 없습니다."),
@@ -80,5 +80,8 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Statistic Error Code */
     NOT_FOUND_SUSU_BASIC_STATISTIC_ERROR(HttpStatus.NOT_FOUND, "수수 통계 자료를 찾을 수 없습니다."),
+
+    /** Count Error Code */
+    NOT_FOUND_COUNT_ERROR(HttpStatus.NOT_FOUND, "카운트 정보를 찾을 수 없습니다."),
     ;
 }

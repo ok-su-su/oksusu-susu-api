@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = SwaggerTag.BLOCK_SWAGGER_TAG)
+@Tag(name = SwaggerTag.BLOCK_SWAGGER_TAG, description = "차단 API")
 @RestController
 @RequestMapping(value = ["/api/v1/blocks"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BlockResource(

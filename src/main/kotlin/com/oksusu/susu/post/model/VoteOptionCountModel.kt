@@ -3,6 +3,7 @@ package com.oksusu.susu.post.model
 import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.post.domain.VoteOption
 
+/** 투표 옵션 + 투표 수 모델 */
 data class VoteOptionCountModel(
     /** 투표 옵션 id */
     val id: Long,

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class KakaoOauthTokenResponse(
+    /** 카카오 access token */
     val accessToken: String,
+    /** 카카오 refresh token */
     val refreshToken: String,
 )

@@ -11,10 +11,10 @@ import java.time.LocalDateTime
 data class VoteAllInfoResponse(
     /** 투표 id */
     val id: Long,
-    /** 본인 소유 여부 */
+    /** 본인 소유 글 여부 / 내 글 : 1, 전체 글 : 0 */
     val isMine: Boolean,
-    /** 카테고리 명 */
-    val category: String,
+    /** 보드 명 */
+    val boardName: String,
     /** 내용 */
     val content: String,
     /** 총 투표 수 */
@@ -24,7 +24,7 @@ data class VoteAllInfoResponse(
     val createdAt: LocalDateTime,
     /** 생성자 profile */
     val creatorProfile: UserProfileModel,
-    /** 수정 여부 */
+    /** 수정 여부 / 수정함 : true, 수정 안함 : false */
     val isModified: Boolean,
     /** 투표 옵션 */
     val options: List<VoteOptionCountModel>,
@@ -39,7 +39,7 @@ data class VoteAllInfoResponse(
             return VoteAllInfoResponse(
                 id = vote.id,
                 isMine = isMine,
-                category = vote.category,
+                boardName = vote.boardName,
                 content = vote.content,
                 count = vote.count,
                 createdAt = vote.createdAt,

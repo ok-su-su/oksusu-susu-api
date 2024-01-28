@@ -1,13 +1,13 @@
 package com.oksusu.susu.post.infrastructure.repository
 
 import com.oksusu.susu.count.domain.QCount
+import com.oksusu.susu.count.domain.vo.CountTargetType
 import com.oksusu.susu.extension.executeSlice
 import com.oksusu.susu.extension.isContains
 import com.oksusu.susu.extension.isEquals
 import com.oksusu.susu.extension.isNotIn
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.QPost
-import com.oksusu.susu.post.domain.QPostCategory
 import com.oksusu.susu.post.domain.QVoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
@@ -49,7 +49,6 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
 
     private val qPost = QPost.post
     private val qVoteOption = QVoteOption.voteOption
-    private val qPostCategory = QPostCategory.postCategory
     private val qCount = QCount.count1
 
     override fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
@@ -68,7 +67,7 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         val uidFilter = spec.searchSpec.mine?.takeIf { mine -> mine }?.let {
             qPost.uid.isEquals(spec.uid)
         } ?: qPost.uid.isNotIn(spec.userBlockIds)
-        val categoryFilter = qPost.postCategoryId.isEquals(spec.searchSpec.categoryId)
+        val boardFilter = qPost.boardId.isEquals(spec.searchSpec.boardId)
         val contentFilter = qPost.content.isContains(spec.searchSpec.content)
         val postIdFilter = qPost.id.isNotIn(spec.postBlockIds)
 
@@ -85,12 +84,12 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
                 )
             )
             .from(qPost)
-            .join(qCount).on(qPost.id.eq(qCount.targetId))
+            .join(qCount).on(qCount.targetType.eq(CountTargetType.POST).and(qPost.id.eq(qCount.targetId)))
             .where(
                 qPost.type.eq(PostType.VOTE),
                 qPost.isActive.eq(true),
                 uidFilter,
-                categoryFilter,
+                boardFilter,
                 postIdFilter,
                 contentFilter
             ).orderBy(*orders)
