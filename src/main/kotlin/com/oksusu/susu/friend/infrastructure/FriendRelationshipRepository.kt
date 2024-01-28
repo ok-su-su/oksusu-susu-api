@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional
 interface FriendRelationshipRepository : JpaRepository<FriendRelationship, Long>, FriendRelationshipCustomRepository {
     @Transactional(readOnly = true)
     fun findAllByFriendIdIn(friendIds: List<Long>): List<FriendRelationship>
+
+    @Transactional(readOnly = true)
+    fun findByFriendId(friendId: Long): FriendRelationship?
 }
 
 interface FriendRelationshipCustomRepository {
