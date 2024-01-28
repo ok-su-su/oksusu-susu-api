@@ -5,17 +5,17 @@ import com.oksusu.susu.statistic.model.response.UserStatisticResponse
 
 class UserStatistic(
     /** 최근 사용 금액 */
-    val recentSpent: List<TitleValueModel>?,
+    val recentSpent: List<TitleValueModel<Long>>?,
     /** 경조사비를 가장 많이 쓴 달 */
     val mostSpentMonth: Long?,
     /** 최다 수수 관계 */
-    val mostRelationship: TitleValueModel?,
+    val mostRelationship: TitleValueModel<Long>?,
     /** 최다 수수 경조사 */
-    val mostCategory: TitleValueModel?,
+    val mostCategory: TitleValueModel<Long>?,
     /** 가장 많이 받은 금액 */
-    val highestAmountReceived: TitleValueModel?,
+    val highestAmountReceived: TitleValueModel<Long>?,
     /** 가장 많이 보낸 금액 */
-    val highestAmountSent: TitleValueModel?,
+    val highestAmountSent: TitleValueModel<Long>?,
 ) {
     companion object {
         fun from(statistic: UserStatisticResponse): UserStatistic {

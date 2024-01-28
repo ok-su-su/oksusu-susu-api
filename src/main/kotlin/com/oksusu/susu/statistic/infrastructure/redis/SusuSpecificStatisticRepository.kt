@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository
 class SusuSpecificStatisticRepository(
     private val cacheService: CacheService,
 ) {
-    suspend fun findByKey(key: String): String? {
+    suspend fun findByKey(key: String): Long? {
         return cacheService.getOrNull(Cache.getSusuSpecificStatisticCache(key))
     }
 
-    suspend fun save(key: String, value: String) {
+    suspend fun save(key: String, value: Long) {
         cacheService.set(Cache.getSusuSpecificStatisticCache(key), value)
     }
 }
