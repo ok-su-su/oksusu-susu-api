@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.STATISTIC_SWAGGER_TAG)
+@Tag(name = SwaggerTag.STATISTIC_SWAGGER_TAG, description = "통계 API")
 @RestController
 @RequestMapping(value = ["/api/v1/statistics"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class StatisticResource(
