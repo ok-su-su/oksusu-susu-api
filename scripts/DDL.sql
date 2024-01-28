@@ -159,6 +159,7 @@ CREATE TABLE `vote_option`
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='투표 선택지';
+CREATE INDEX idx__post_id ON vote_option(post_id);
 
 -- 투표 유저 매핑
 CREATE TABLE `vote_history`

@@ -45,5 +45,3 @@ INSERT INTO susu.post_category (seq, name, is_active)
 VALUES (4, '생일 기념일', 1);
 INSERT INTO susu.post_category (seq, name, is_active)
 VALUES (5, '자유', 1);
-INSERT INTO susu.post_category (seq, name, is_active)
-VALUES (6, '명예의 전당', 1);

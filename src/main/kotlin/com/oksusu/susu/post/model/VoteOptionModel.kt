@@ -2,6 +2,7 @@ package com.oksusu.susu.post.model
 
 import com.oksusu.susu.post.domain.VoteOption
 
+/** 투표 옵션 모델 */
 data class VoteOptionModel(
     /** 투표 옵션 id */
     val id: Long,

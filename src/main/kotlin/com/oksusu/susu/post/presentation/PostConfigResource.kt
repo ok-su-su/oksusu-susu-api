@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = SwaggerTag.POST_CONFIG_SWAGGER_TAG)
+@Tag(name = SwaggerTag.POST_CONFIG_SWAGGER_TAG, description = "게시글 관련 config API")
 @RestController
 @RequestMapping(value = ["/api/v1/posts/configs"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class PostConfigResource(

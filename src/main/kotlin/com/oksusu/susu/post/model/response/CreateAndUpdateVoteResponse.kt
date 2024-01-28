@@ -15,7 +15,7 @@ data class CreateAndUpdateVoteResponse(
     val category: String,
     /** 내용 */
     val content: String,
-    /** 수정 여부 */
+    /** 수정 여부 / 수정함 : true, 수정 안함 : false */
     val isModified: Boolean,
     /** 투표 옵션 */
     val options: List<VoteOptionModel>,

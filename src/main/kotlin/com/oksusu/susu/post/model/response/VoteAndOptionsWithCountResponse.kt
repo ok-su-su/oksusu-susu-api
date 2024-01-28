@@ -16,7 +16,7 @@ class VoteAndOptionsWithCountResponse(
     val category: String,
     /** 내용 */
     val content: String,
-    /** 수정 여부 */
+    /** 수정 여부 / 수정함 : true, 수정 안함 : false */
     val isModified: Boolean,
     /** 총 투표 수 */
     val count: Long,
