@@ -307,7 +307,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
         /** where */
         query.where(
             qEnvelope.uid.eq(spec.uid),
-            qEnvelope.friendId.isEquals(spec.friendId),
+            qEnvelope.friendId.isIn(spec.friendId),
             qEnvelope.ledgerId.isEquals(spec.ledgerId),
             qEnvelope.type.isIn(spec.types),
             qEnvelope.amount.isGoe(spec.fromAmount),

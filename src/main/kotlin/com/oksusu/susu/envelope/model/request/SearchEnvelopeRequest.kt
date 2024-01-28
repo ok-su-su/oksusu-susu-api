@@ -5,7 +5,7 @@ import com.oksusu.susu.envelope.infrastructure.model.IncludeSpec
 
 data class SearchEnvelopeRequest(
     /** 지인 id */
-    val friendId: Long?,
+    val friendIds: Set<Long>?,
     /** 장부 id */
     val ledgerId: Long?,
     /** type: SENT, RECEIVED */

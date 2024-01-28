@@ -185,7 +185,7 @@ class EnvelopeFacade(
     ): Page<SearchEnvelopeResponse> {
         val searchSpec = SearchEnvelopeSpec(
             uid = user.uid,
-            friendId = request.friendId,
+            friendId = request.friendIds,
             ledgerId = request.ledgerId,
             types = request.types,
             include = request.include ?: emptySet(),
