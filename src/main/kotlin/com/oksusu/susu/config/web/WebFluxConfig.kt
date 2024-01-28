@@ -3,6 +3,7 @@ package com.oksusu.susu.config.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.oksusu.susu.auth.application.AuthFacade
 import com.oksusu.susu.auth.resolver.ReactiveAuthResolver
+import com.oksusu.susu.user.resolver.ReactiveDeviceContextResolver
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.ReactiveAdapterRegistry
@@ -58,6 +59,7 @@ class WebFluxConfig(
         configureHttpMessageCodecs(serverCodecConfigurer)
 
         configurer.addCustomResolver(
+            ReactiveDeviceContextResolver(registry),
             ReactiveAuthResolver(registry, authFacade),
             ReactiveSortHandlerMethodArgumentResolver(),
             ReactivePageableHandlerMethodArgumentResolver()
