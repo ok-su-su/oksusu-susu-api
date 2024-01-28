@@ -118,7 +118,7 @@ class EnvelopeService(
         }
     }
 
-    suspend fun countAvgAmountPerCategoryIdAndRelationshipIdAndBirth(): List<CountAvgAmountPerStatisticGroupModel> {
+    suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel> {
         return withContext(Dispatchers.IO) {
             envelopeRepository.countAvgAmountPerStatisticGroup()
         }

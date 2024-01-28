@@ -173,11 +173,9 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .where(
                 qEnvelope.type.eq(type),
-                qEnvelope.handedOverAt.between(from, to),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+                qEnvelope.handedOverAt.between(from, to)
             ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
@@ -198,7 +196,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .where(
                 qEnvelope.uid.eq(uid),
                 qEnvelope.type.eq(type),
-                qEnvelope.handedOverAt.between(from, to),
+                qEnvelope.handedOverAt.between(from, to)
             ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
@@ -247,9 +245,6 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
-            .where(
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
-            )
             .groupBy(
                 qCategoryAssignment.categoryId,
                 qFriendRelationship.relationshipId,

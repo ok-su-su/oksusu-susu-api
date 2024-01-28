@@ -44,10 +44,8 @@ class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepositor
     override suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
         return JPAQuery<FriendRelationship>(entityManager)
             .select(
-                QCountPerRelationshipIdModel(qRelationShip.id, qEnvelope.id.count())
+                QCountPerRelationshipIdModel(qFriendRelationship.relationshipId, qEnvelope.id.count())
             ).from(qFriendRelationship)
-            .join(qFriend).on(qFriendRelationship.friendId.eq(qFriend.id))
-            .join(qRelationShip).on(qFriendRelationship.relationshipId.eq(qRelationShip.id))
             .join(qEnvelope).on(qFriendRelationship.friendId.eq(qEnvelope.friendId))
             .groupBy(qFriendRelationship.relationshipId)
             .fetch()
