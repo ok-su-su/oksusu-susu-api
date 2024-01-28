@@ -52,3 +52,4 @@ susu:
       hibernate.hbm2ddl.auto: none
     show-sql: false
     database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect

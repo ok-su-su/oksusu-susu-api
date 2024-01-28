@@ -2,7 +2,7 @@ package com.oksusu.susu.exception.advice
 
 import com.oksusu.susu.common.dto.ErrorResponse
 import com.oksusu.susu.exception.SusuException
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice

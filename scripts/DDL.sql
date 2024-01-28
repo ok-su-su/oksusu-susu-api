@@ -278,3 +278,41 @@ CREATE TABLE `count`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '카운트';
 CREATE INDEX idx__target_id ON count (target_id);
+
+-- 유저 디바이스 정보
+CREATE TABLE `user_device`
+(
+    `id`                      bigint NOT NULL AUTO_INCREMENT COMMENT '유저 디바이스 정보 id',
+    `uid`                     bigint NOT NULL COMMENT '유저 id',
+    `application_version`     varchar(256) DEFAULT NULL COMMENT '어플리케이션 버전',
+    `device_id`               varchar(256) DEFAULT NULL COMMENT 'IMEI',
+    `device_software_version` varchar(256) DEFAULT NULL COMMENT 'SW버전',
+    `line_number`             varchar(256) DEFAULT NULL COMMENT '전화번호',
+    `network_country_iso`     varchar(256) DEFAULT NULL COMMENT '국가코드',
+    `network_operator`        varchar(256) DEFAULT NULL COMMENT '망 사업자코드',
+    `network_operator_name`   varchar(256) DEFAULT NULL COMMENT '망 사업자명 ',
+    `network_type`            varchar(256) DEFAULT NULL COMMENT '망 시스템 방식',
+    `phone_type`              varchar(256) DEFAULT NULL COMMENT '단말기 종류',
+    `sim_serial_number`       varchar(256) DEFAULT NULL COMMENT 'SIM카드 Serial Number',
+    `sim_state`               varchar(256) DEFAULT NULL COMMENT '가입자 ID',
+    `created_at`              datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`             datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '유저 디바이스 정보';
+CREATE INDEX idx__uid ON user_device (uid);
+
+
+CREATE TABLE `system_action_log`
+(
+    `id`          bigint NOT NULL AUTO_INCREMENT,
+    `host`        varchar(255)                    DEFAULT NULL,
+    `http_method` varchar(255)                    DEFAULT NULL,
+    `ip_address`  varchar(255)                    DEFAULT NULL,
+    `path`        varchar(255)                    DEFAULT NULL,
+    `referer`     varchar(255)                    DEFAULT NULL,
+    `user_agent`  varchar(255)                    DEFAULT NULL,
+    `extra`       text COLLATE utf8mb4_general_ci DEFAULT NULL,
+    `created_at`  datetime                        DEFAULT CURRENT_TIMESTAMP,
+    `modified_at` datetime                        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '카운트';

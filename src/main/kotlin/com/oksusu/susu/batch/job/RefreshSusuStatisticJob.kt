@@ -12,6 +12,7 @@ import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.ledger.application.LedgerService
 import com.oksusu.susu.statistic.application.SusuBasicStatisticService
 import com.oksusu.susu.statistic.application.SusuSpecificStatisticService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import org.springframework.stereotype.Component
 
@@ -24,7 +25,7 @@ class RefreshSusuStatisticJob(
     private val susuSpecificStatisticService: SusuSpecificStatisticService,
     private val cacheKeyGenerateHelper: CacheKeyGenerateHelper,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     suspend fun refreshSusuStatistic() {
         logger.info { "start susu statistic refresh" }
@@ -39,11 +40,13 @@ class RefreshSusuStatisticJob(
             { ledgerService.countPerCategoryId() },
             /** 평균 수수 */
             { envelopeService.countAvgAmountPerCategoryIdAndRelationshipIdAndBirth() }
-        ) { envelopHandOverAtMonthCount,
-            relationShipConuts,
-            envelopeCategoryCounts,
-            ledgerCategoryCounts,
-            avgAmountModels, ->
+        ) {
+                envelopHandOverAtMonthCount,
+                relationShipConuts,
+                envelopeCategoryCounts,
+                ledgerCategoryCounts,
+                avgAmountModels,
+            ->
 
             /** 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사 레디스 저장 */
             susuBasicStatisticService.save(

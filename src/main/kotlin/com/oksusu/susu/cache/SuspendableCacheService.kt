@@ -4,6 +4,7 @@ import com.oksusu.susu.cache.model.ZSetModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToExecuteException
 import com.oksusu.susu.extension.mapper
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Service
 class SuspendableCacheService(
     private val reactiveStringRedisTemplate: ReactiveStringRedisTemplate,
 ) : CacheService {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
     private val zSetOps = reactiveStringRedisTemplate.opsForZSet()
     private val keyValueOps = reactiveStringRedisTemplate.opsForValue()
 

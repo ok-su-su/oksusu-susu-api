@@ -4,7 +4,6 @@ import jakarta.validation.ClockProvider
 import jakarta.validation.ParameterNameProvider
 import org.hibernate.validator.internal.engine.DefaultClockProvider
 import org.springframework.core.KotlinReflectionParameterNameDiscoverer
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer
 import org.springframework.core.ParameterNameDiscoverer
 import org.springframework.core.PrioritizedParameterNameDiscoverer
 import org.springframework.core.StandardReflectionParameterNameDiscoverer
@@ -24,7 +23,6 @@ class CoroutinesLocalValidatorFactoryBean : LocalValidatorFactoryBean() {
         val discoverer = PrioritizedParameterNameDiscoverer().apply {
             this.addDiscoverer(SuspendAwareKotlinParameterNameDiscoverer())
             this.addDiscoverer(StandardReflectionParameterNameDiscoverer())
-            this.addDiscoverer(LocalVariableTableParameterNameDiscoverer())
         }
 
         val defaultProvider = configuration.defaultParameterNameProvider

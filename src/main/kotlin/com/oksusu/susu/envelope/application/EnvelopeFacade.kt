@@ -47,61 +47,66 @@ class EnvelopeFacade(
     private val txTemplates: TransactionTemplates,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
-        val categoryAssignmentRequest = when (request.category == null) {
-            true -> CreateCategoryAssignmentRequest(5)
-            false -> request.category
-        }
-
-        val friend = friendService.findByIdAndUidOrThrow(request.friendId, user.uid)
-        val category = categoryService.getCategory(categoryAssignmentRequest.id)
-        val ledger = when (request.ledgerId != null) {
-            true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.uid)
-            false -> null
-        }
-
-        /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
-        val customCategory = when (category.id == 5L) {
-            true -> categoryAssignmentRequest.customCategory
-            else -> null
-        }
-
-        val createdEnvelope = txTemplates.writer.coExecute {
-            val createdEnvelope = Envelope(
-                uid = user.uid,
-                type = request.type,
-                friendId = friend.id,
-                ledgerId = request.ledgerId,
-                amount = request.amount,
-                gift = request.gift,
-                memo = request.memo,
-                hasVisited = request.hasVisited,
-                handedOverAt = request.handedOverAt
-            ).run { envelopeService.saveSync(this) }
-
-            CategoryAssignment(
-                targetId = createdEnvelope.id,
-                targetType = CategoryAssignmentType.ENVELOPE,
-                categoryId = category.id,
-                customCategory = customCategory
-            ).run { categoryAssignmentService.saveSync(this) }
-
-            // TODO 바꿔야함..
-            ledger?.let {
-                if (createdEnvelope.type == EnvelopeType.RECEIVED) {
-                    it.totalReceivedAmounts = it.totalReceivedAmounts + createdEnvelope.amount
+        return parZip(
+            { friendService.findByIdAndUidOrThrow(request.friendId, user.uid) },
+            {
+                when (request.ledgerId != null) {
+                    true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.uid)
+                    false -> null
                 }
-
-                if (createdEnvelope.type == EnvelopeType.SENT) {
-                    it.totalSentAmounts = it.totalSentAmounts + createdEnvelope.amount
-                }
-
-                ledgerService.saveSync(it)
+            }
+        ) { friend, ledger ->
+            val categoryAssignmentRequest = when (request.category == null) {
+                true -> CreateCategoryAssignmentRequest(5)
+                false -> request.category
             }
 
-            createdEnvelope
-        }
+            val category = categoryService.getCategory(categoryAssignmentRequest.id)
 
-        return CreateAndUpdateEnvelopeResponse.of(createdEnvelope, friend)
+            /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
+            val customCategory = when (category.isMiscCategory()) {
+                true -> categoryAssignmentRequest.customCategory
+                false -> null
+            }
+
+            val createdEnvelope = txTemplates.writer.coExecute {
+                val createdEnvelope = Envelope(
+                    uid = user.uid,
+                    type = request.type,
+                    friendId = friend.id,
+                    ledgerId = request.ledgerId,
+                    amount = request.amount,
+                    gift = request.gift,
+                    memo = request.memo,
+                    hasVisited = request.hasVisited,
+                    handedOverAt = request.handedOverAt
+                ).run { envelopeService.saveSync(this) }
+
+                CategoryAssignment(
+                    targetId = createdEnvelope.id,
+                    targetType = CategoryAssignmentType.ENVELOPE,
+                    categoryId = category.id,
+                    customCategory = customCategory
+                ).run { categoryAssignmentService.saveSync(this) }
+
+                // TODO 바꿔야함..
+                ledger?.let {
+                    if (createdEnvelope.type == EnvelopeType.RECEIVED) {
+                        it.totalReceivedAmounts = it.totalReceivedAmounts + createdEnvelope.amount
+                    }
+
+                    if (createdEnvelope.type == EnvelopeType.SENT) {
+                        it.totalSentAmounts = it.totalSentAmounts + createdEnvelope.amount
+                    }
+
+                    ledgerService.saveSync(it)
+                }
+
+                createdEnvelope
+            }
+
+            CreateAndUpdateEnvelopeResponse.of(createdEnvelope, friend)
+        }
     }
 
     suspend fun update(
@@ -118,7 +123,7 @@ class EnvelopeFacade(
         val category = categoryService.getCategory(categoryAssignmentRequest.id)
 
         /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
-        val customCategory = when (category.id == 5L) {
+        val customCategory = when (category.isMiscCategory()) {
             true -> categoryAssignmentRequest.customCategory
             else -> null
         }
@@ -198,7 +203,7 @@ class EnvelopeFacade(
                 when (searchSpec.include.contains(IncludeSpec.FRIEND)) {
                     true -> friendService.findAllByIdIn(friendIds)
                     false -> emptyList()
-                }.associateBy { it.id }
+                }.associateBy { friend -> friend.id }
             },
             {
                 when (searchSpec.include.contains(IncludeSpec.RELATION)) {
@@ -209,7 +214,7 @@ class EnvelopeFacade(
             {
                 when (searchSpec.include.contains(IncludeSpec.CATEGORY)) {
                     true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, envelopeIds)
-                    else -> emptyList()
+                    false -> emptyList()
                 }.associateBy { categoryAssignment -> categoryAssignment.targetId }
             }
         ) { friends, friendRelationShips, categoryAssignments ->

@@ -28,6 +28,7 @@ import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.user.application.UserService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 
@@ -43,7 +44,7 @@ class VoteFacade(
     private val blockService: BlockService,
     private val countService: CountService,
 ) {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
         voteOptionService.validateSeq(request.options)

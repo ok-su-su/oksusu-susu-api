@@ -2,6 +2,7 @@ package com.oksusu.susu.excel.application
 
 import com.oksusu.susu.excel.model.Sheet
 import com.oksusu.susu.extension.getPropertyValues
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.dhatim.fastexcel.BorderStyle
 import org.dhatim.fastexcel.Workbook
 import org.dhatim.fastexcel.Worksheet
@@ -10,7 +11,7 @@ import java.io.ByteArrayOutputStream
 
 @Service
 class ExcelService {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     /** 제목 입력 */
     fun insertTitle(ws: Worksheet, sheet: Sheet) {

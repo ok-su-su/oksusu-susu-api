@@ -8,6 +8,7 @@ import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificStatisticRepos
 import com.oksusu.susu.statistic.model.SusuSpecificStatisticModel
 import com.oksusu.susu.statistic.model.TitleStringModel
 import com.oksusu.susu.statistic.model.vo.SusuStatisticRequest
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -17,7 +18,7 @@ class SusuSpecificStatisticService(
     private val susuSpecificStatisticRepository: SusuSpecificStatisticRepository,
     private val cacheKeyGenerateHelper: CacheKeyGenerateHelper,
 ) {
-    val logger = mu.KotlinLogging.logger { }
+    val logger = KotlinLogging.logger { }
 
     suspend fun getSusuSpecificStatistic(request: SusuStatisticRequest): SusuSpecificStatisticModel {
         val ageCategoryRelationshipKey = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(

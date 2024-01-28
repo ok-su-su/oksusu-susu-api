@@ -1,5 +1,6 @@
 package com.oksusu.susu.config.webClient
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.ChannelOption
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
@@ -8,7 +9,11 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.http.codec.HttpMessageWriter
 import org.springframework.http.codec.LoggingCodecSupport
-import org.springframework.web.reactive.function.client.*
+import org.springframework.web.reactive.function.client.ClientRequest
+import org.springframework.web.reactive.function.client.ClientResponse
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction
+import org.springframework.web.reactive.function.client.ExchangeStrategies
+import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
 import java.time.Duration
@@ -16,7 +21,7 @@ import java.util.concurrent.TimeUnit
 
 @Configuration
 class SusuWebClient {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @Bean
     fun webClient(): WebClient {

@@ -6,6 +6,7 @@ import com.oksusu.susu.extension.resolveCancellation
 import com.oksusu.susu.post.domain.PostCategory
 import com.oksusu.susu.post.infrastructure.repository.PostCategoryRepository
 import com.oksusu.susu.post.model.PostCategoryModel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service
 class PostCategoryService(
     private val postCategoryRepository: PostCategoryRepository,
 ) {
-    private val logger = mu.KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
     private var postCategories: Map<Long, PostCategoryModel> = emptyMap()
 
     @Scheduled(

@@ -1,7 +1,7 @@
 package com.oksusu.susu.extension
 
+import io.github.oshai.kotlinlogging.KLogger
 import kotlinx.coroutines.CancellationException
-import mu.KLogger
 
 fun KLogger.resolveCancellation(name: String, throwable: Throwable, other: (KLogger.() -> Unit)? = null) {
     when (throwable) {

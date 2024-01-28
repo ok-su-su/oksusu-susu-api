@@ -25,6 +25,9 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     NOT_FOUND_USER_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
     ALREADY_REGISTERED_USER(HttpStatus.NOT_FOUND, "이미 가입된 유저입니다."),
 
+    /** User Device Error Code */
+    NOT_FOUND_USER_DEVICE_ERROR(HttpStatus.NOT_FOUND, "유저 디바이스 정보를 찾을 수 없습니다."),
+
     /** Ledger Error Code */
     LEDGER_INVALID_DUE_DATE_ERROR(HttpStatus.BAD_REQUEST, "잘못된 일정 등록 요청입니다."),
     NOT_FOUND_LEDGER_ERROR(HttpStatus.NOT_FOUND, "장부 정보가 없습니다."),
