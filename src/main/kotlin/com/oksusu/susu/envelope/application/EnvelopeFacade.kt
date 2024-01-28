@@ -49,13 +49,14 @@ class EnvelopeFacade(
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
         return parZip(
             { friendService.findByIdAndUidOrThrow(request.friendId, user.uid) },
+            { friendRelationshipService.findByFriendIdOrThrow(request.friendId) },
             {
                 when (request.ledgerId != null) {
                     true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.uid)
                     false -> null
                 }
             }
-        ) { friend, ledger ->
+        ) { friend, friendRelationship, ledger ->
             val categoryAssignmentRequest = when (request.category == null) {
                 true -> CreateCategoryAssignmentRequest(5)
                 false -> request.category
@@ -104,8 +105,14 @@ class EnvelopeFacade(
 
                 createdEnvelope
             }
+            val relationship = relationshipService.getRelationship(friendRelationship.relationshipId)
 
-            CreateAndUpdateEnvelopeResponse.of(createdEnvelope, friend)
+            CreateAndUpdateEnvelopeResponse.of(
+                envelope = createdEnvelope,
+                friend = friend,
+                friendRelationship = friendRelationship,
+                relationship = relationship
+            )
         }
     }
 
@@ -119,7 +126,7 @@ class EnvelopeFacade(
             false -> request.category
         }
 
-        val (envelope, friend, _, categoryAssignment) = envelopeService.getDetail(id, user.uid)
+        val (envelope, friend, friendRelationship, categoryAssignment) = envelopeService.getDetail(id, user.uid)
         val category = categoryService.getCategory(categoryAssignmentRequest.id)
 
         /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
@@ -147,7 +154,14 @@ class EnvelopeFacade(
             updatedEnvelope
         }
 
-        return CreateAndUpdateEnvelopeResponse.of(updatedEnvelope, friend)
+        val relationship = relationshipService.getRelationship(friendRelationship.relationshipId)
+
+        return CreateAndUpdateEnvelopeResponse.of(
+            envelope = updatedEnvelope,
+            friend = friend,
+            friendRelationship = friendRelationship,
+            relationship = relationship
+        )
     }
 
     suspend fun getDetail(user: AuthUser, id: Long): EnvelopeDetailResponse {

@@ -11,6 +11,7 @@ import com.oksusu.susu.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.exception.NoAuthorityException
+import com.oksusu.susu.post.application.PostService
 import com.oksusu.susu.user.application.UserService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,6 +24,7 @@ class AuthFacade(
     private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
     private val oauthService: OAuthService,
+    private val postService: PostService,
 ) {
     fun resolveAuthUser(token: Mono<AuthUserToken>): Mono<Any> {
         return jwtTokenService.verifyTokenMono(token)
@@ -71,7 +73,14 @@ class AuthFacade(
             { oauthService.withdraw(user.oauthInfo) },
             { userService.withdraw(authUser.uid) }
         ) { _, _ ->
-            /** 현재는 추가적인 로직은 없음 */
+            val deactivatedPosts = postService.findAllByUid(authUser.uid)
+                .map { post ->
+                    post.apply {
+                        isActive = false
+                    }
+                }
+
+            postService.saveAllSync(deactivatedPosts)
         }
     }
 }
