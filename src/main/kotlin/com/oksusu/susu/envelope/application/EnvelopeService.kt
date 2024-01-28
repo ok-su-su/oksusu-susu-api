@@ -82,17 +82,9 @@ class EnvelopeService(
         }
     }
 
-    suspend fun getMaxAmountByUidAndTypeByUid(uid: Long, type: EnvelopeType): Long? {
-        return withContext(Dispatchers.IO) {
-            envelopeRepository.getMaxAmountByUid(uid, type)
-        }
-    }
-
     suspend fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel? {
-        return getMaxAmountByUidAndTypeByUid(uid, type)?.let { maxAmount ->
-            withContext(Dispatchers.IO) {
-                envelopeRepository.findEnvelopeAndFriendByUid(maxAmount, uid, type)
-            }
+        return withContext(Dispatchers.IO) {
+            envelopeRepository.getMaxAmountEnvelopeInfoByUid(uid, type)
         }
     }
 

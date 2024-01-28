@@ -5,6 +5,7 @@ import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.envelope.infrastructure.model.CountPerHandedOverAtModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToExecuteException
+import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
 import com.oksusu.susu.statistic.domain.SusuBasicStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicStatisticRepository
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service
 class SusuBasicStatisticService(
     private val susuBasicStatisticRepository: SusuBasicStatisticRepository,
     private val categoryService: CategoryService,
+    private val relationshipService: RelationshipService,
 ) {
     val logger = KotlinLogging.logger { }
 
@@ -44,7 +46,7 @@ class SusuBasicStatisticService(
             ?.maxBy { it.totalCounts }
             ?.run {
                 TitleValueModel(
-                    title = this.relationship.relation,
+                    title = relationshipService.getRelationship(this.relationshipId).relation,
                     value = this.totalCounts
                 )
             }
