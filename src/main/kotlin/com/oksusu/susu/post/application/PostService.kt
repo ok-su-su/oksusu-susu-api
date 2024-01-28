@@ -21,6 +21,11 @@ class PostService(
         return postRepository.save(post)
     }
 
+    @Transactional
+    fun saveAllSync(posts: List<Post>): List<Post> {
+        return postRepository.saveAll(posts)
+    }
+
     suspend fun findByIdOrThrow(id: Long): Post {
         return findByIdOrNull(id) ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
@@ -49,5 +54,11 @@ class PostService(
 
     suspend fun existsById(id: Long): Boolean {
         return withContext(Dispatchers.IO) { postRepository.existsById(id) }
+    }
+
+    suspend fun findAllByUid(uid: Long): List<Post> {
+        return withContext(Dispatchers.IO) {
+            postRepository.findAllByUid(uid)
+        }
     }
 }
