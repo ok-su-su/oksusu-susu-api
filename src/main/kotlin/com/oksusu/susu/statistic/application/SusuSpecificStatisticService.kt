@@ -23,13 +23,13 @@ class SusuSpecificStatisticService(
     suspend fun getSusuSpecificStatistic(request: SusuStatisticRequest): SusuSpecificStatisticModel {
         val ageCategoryRelationshipKey = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(
             age = request.age.number,
-            postCategoryId = request.postCategoryId,
+            categoryId = request.categoryId,
             relationshipId = request.relationshipId
         )
 
         return parZip(
             { findByKey(ageCategoryRelationshipKey) },
-            { findByKey(cacheKeyGenerateHelper.getSusuCategoryStatisticKey(request.postCategoryId)) },
+            { findByKey(cacheKeyGenerateHelper.getSusuCategoryStatisticKey(request.categoryId)) },
             { findByKey(cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)) }
         ) { averageSent, categoryAmount, relationShipAmount ->
             SusuSpecificStatisticModel(
@@ -48,7 +48,7 @@ class SusuSpecificStatisticService(
     suspend fun save(model: CountAvgAmountPerStatisticGroupModel) {
         val key = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(
             age = model.birth.toAgeGroup(),
-            postCategoryId = model.categoryId,
+            categoryId = model.categoryId,
             relationshipId = model.relationshipId
         )
 
