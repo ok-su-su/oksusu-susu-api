@@ -13,8 +13,8 @@ data class VoteAllInfoResponse(
     val id: Long,
     /** 본인 소유 글 여부 / 내 글 : 1, 전체 글 : 0 */
     val isMine: Boolean,
-    /** 카테고리 명 */
-    val category: String,
+    /** 보드 명 */
+    val boardName: String,
     /** 내용 */
     val content: String,
     /** 총 투표 수 */
@@ -39,7 +39,7 @@ data class VoteAllInfoResponse(
             return VoteAllInfoResponse(
                 id = vote.id,
                 isMine = isMine,
-                category = vote.category,
+                boardName = vote.boardName,
                 content = vote.content,
                 count = vote.count,
                 createdAt = vote.createdAt,

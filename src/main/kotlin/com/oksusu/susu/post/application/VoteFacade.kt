@@ -40,7 +40,7 @@ class VoteFacade(
     private val voteOptionService: VoteOptionService,
     private val voteHistoryService: VoteHistoryService,
     private val userService: UserService,
-    private val postCategoryService: PostCategoryService,
+    private val boardService: BoardService,
     private val blockService: BlockService,
     private val countService: CountService,
 ) {
@@ -48,14 +48,14 @@ class VoteFacade(
 
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
         voteOptionService.validateSeq(request.options)
-        postCategoryService.validateExistCategory(request.postCategoryId)
+        boardService.validateExistCategory(request.boardId)
 
         return txTemplates.writer.coExecute {
             val createdPost = Post(
                 uid = user.uid,
                 type = PostType.VOTE,
                 content = request.content,
-                postCategoryId = request.postCategoryId
+                boardId = request.boardId
             ).run { postService.saveSync(this) }
 
             val options = request.options.map { option ->
@@ -71,7 +71,7 @@ class VoteFacade(
                 uid = user.uid,
                 post = createdPost,
                 optionModels = options.map { option -> VoteOptionModel.from(option) },
-                postCategoryModel = postCategoryService.getCategory(request.postCategoryId)
+                boardModel = boardService.getCategory(request.boardId)
             )
         }
     }
@@ -104,7 +104,7 @@ class VoteFacade(
                 vote = vote.post,
                 count = vote.count,
                 options = optionModels.filter { option -> option.postId == vote.post.id },
-                postCategoryModel = postCategoryService.getCategory(vote.post.postCategoryId)
+                boardModel = boardService.getCategory(vote.post.boardId)
             )
         }
     }
@@ -120,8 +120,8 @@ class VoteFacade(
             { userService.findByIdOrThrow(vote.uid) },
             { countService.findByTargetIdAndTargetType(vote.id, CountTargetType.POST) },
             { countService.findAllByTargetTypeAndTargetIdIn(optionIds, CountTargetType.VOTE_OPTION) },
-            { postCategoryService.getCategory(vote.postCategoryId) }
-        ) { creator, voteCount, optionCount, postCategoryModel ->
+            { boardService.getCategory(vote.boardId) }
+        ) { creator, voteCount, optionCount, boardModel ->
             val optionCountModels = options.map { option ->
                 VoteOptionCountModel.of(option, optionCount.first { it.targetId == option.id })
             }
@@ -130,7 +130,7 @@ class VoteFacade(
                 vote = VoteCountModel.of(
                     vote,
                     voteCount,
-                    postCategoryModel
+                    boardModel
                 ),
                 options = optionCountModels,
                 creator = creator,
@@ -217,7 +217,7 @@ class VoteFacade(
         return voteAndCountModels.map { model ->
             VoteWithCountResponse.of(
                 model = model,
-                postCategoryModel = postCategoryService.getCategory(model.post.postCategoryId)
+                boardModel = boardService.getCategory(model.post.boardId)
             )
         }
     }
@@ -226,16 +226,16 @@ class VoteFacade(
         return parZip(
             { postService.validateAuthority(id, user.uid) },
             { voteHistoryService.validateHistoryNotExist(id) },
-            { postCategoryService.getCategory(request.postCategoryId) },
+            { boardService.getCategory(request.boardId) },
             { voteService.getVoteAndOptions(id) }
-        ) { _, _, updatedPostCategory, voteInfos ->
+        ) { _, _, boardModel, voteInfos ->
             val vote = voteInfos[0].post
             val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
 
             val updatedVote = txTemplates.writer.coExecute {
                 vote.apply {
                     content = request.content
-                    postCategoryId = request.postCategoryId
+                    boardId = request.boardId
                 }.run { postService.saveSync(this) }
             }
 
@@ -243,7 +243,7 @@ class VoteFacade(
                 uid = user.uid,
                 post = updatedVote,
                 optionModels = options,
-                postCategoryModel = updatedPostCategory
+                boardModel = boardModel
             )
         }
     }

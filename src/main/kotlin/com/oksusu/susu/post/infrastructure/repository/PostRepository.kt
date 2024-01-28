@@ -67,7 +67,7 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         val uidFilter = spec.searchSpec.mine?.takeIf { mine -> mine }?.let {
             qPost.uid.isEquals(spec.uid)
         } ?: qPost.uid.isNotIn(spec.userBlockIds)
-        val categoryFilter = qPost.postCategoryId.isEquals(spec.searchSpec.categoryId)
+        val boardFilter = qPost.boardId.isEquals(spec.searchSpec.boardId)
         val contentFilter = qPost.content.isContains(spec.searchSpec.content)
         val postIdFilter = qPost.id.isNotIn(spec.postBlockIds)
 
@@ -89,7 +89,7 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
                 qPost.type.eq(PostType.VOTE),
                 qPost.isActive.eq(true),
                 uidFilter,
-                categoryFilter,
+                boardFilter,
                 postIdFilter,
                 contentFilter
             ).orderBy(*orders)

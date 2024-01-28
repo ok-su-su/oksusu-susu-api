@@ -3,10 +3,10 @@ package com.oksusu.susu.post.domain
 import com.oksusu.susu.common.domain.BaseEntity
 import jakarta.persistence.*
 
-/** 게시글 카테고리 */
+/** 보드 */
 @Entity
-@Table(name = "post_category")
-class PostCategory(
+@Table(name = "board")
+class Board(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,

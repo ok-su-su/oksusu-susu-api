@@ -15,9 +15,9 @@ class Post(
     /** 작성자 id */
     val uid: Long,
 
-    /** 게시글 카테고리 id */
-    @Column(name = "post_category_id")
-    var postCategoryId: Long,
+    /** 보드 id */
+    @Column(name = "board_id")
+    var boardId: Long,
 
     /** 게시글 타입 */
     val type: PostType,

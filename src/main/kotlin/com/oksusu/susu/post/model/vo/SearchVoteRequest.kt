@@ -8,8 +8,8 @@ data class SearchVoteRequest(
     val mine: Boolean?,
     /** 정렬 기준 / 최신순 : LATEST, 투표 많은 순 : POPULAR */
     val sortType: VoteSortType?,
-    /** 게시글 카테고리 id */
-    val categoryId: Long?,
+    /** 보드 id */
+    val boardId: Long?,
 )
 
 enum class VoteSortType {

@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 @Repository
 interface CountRepository : JpaRepository<Count, Long> {
     @Transactional
-    fun findByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType): Count
+    fun findByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType): Count?
 
     @Transactional
     fun findByTargetTypeAndTargetIdIn(targetType: CountTargetType, targetIds: List<Long>): List<Count>

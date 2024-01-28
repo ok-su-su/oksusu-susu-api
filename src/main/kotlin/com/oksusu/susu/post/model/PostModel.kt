@@ -8,8 +8,8 @@ data class PostModel(
     val id: Long,
     /** 작성자 id */
     val uid: Long,
-    /** 게시글 카테고리 id */
-    var postCategoryId: Long,
+    /** 보드 id */
+    var boardId: Long,
     /** 게시글 타입 */
     val type: PostType,
     /** 제목 */

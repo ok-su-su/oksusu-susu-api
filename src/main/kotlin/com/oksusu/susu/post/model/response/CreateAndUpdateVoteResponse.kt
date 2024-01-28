@@ -2,7 +2,7 @@ package com.oksusu.susu.post.model.response
 
 import com.oksusu.susu.extension.equalsFromYearToSec
 import com.oksusu.susu.post.domain.Post
-import com.oksusu.susu.post.model.PostCategoryModel
+import com.oksusu.susu.post.model.BoardModel
 import com.oksusu.susu.post.model.VoteOptionModel
 import java.time.LocalDateTime
 
@@ -11,8 +11,8 @@ data class CreateAndUpdateVoteResponse(
     val id: Long,
     /** 투표 생성자 id */
     val uid: Long,
-    /** 카테고리 명 */
-    val category: String,
+    /** 보드 명 */
+    val boardName: String,
     /** 내용 */
     val content: String,
     /** 수정 여부 / 수정함 : true, 수정 안함 : false */
@@ -27,12 +27,12 @@ data class CreateAndUpdateVoteResponse(
             uid: Long,
             post: Post,
             optionModels: List<VoteOptionModel>,
-            postCategoryModel: PostCategoryModel,
+            boardModel: BoardModel,
         ): CreateAndUpdateVoteResponse {
             return CreateAndUpdateVoteResponse(
                 id = post.id,
                 uid = uid,
-                category = postCategoryModel.name,
+                boardName = boardModel.name,
                 content = post.content,
                 isModified = !post.createdAt.equalsFromYearToSec(post.modifiedAt),
                 options = optionModels,

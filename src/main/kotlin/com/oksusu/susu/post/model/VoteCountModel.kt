@@ -10,8 +10,8 @@ data class VoteCountModel(
     val id: Long,
     /** 작성자 id */
     val uid: Long,
-    /** 게시글 카테고리 명 */
-    val category: String,
+    /** 보드 명 */
+    val boardName: String,
     /** 내용 */
     var content: String,
     /** 생성일 */
@@ -22,11 +22,11 @@ data class VoteCountModel(
     val count: Long,
 ) {
     companion object {
-        fun of(post: Post, count: Count, postCategoryModel: PostCategoryModel): VoteCountModel {
+        fun of(post: Post, count: Count, boardModel: BoardModel): VoteCountModel {
             return VoteCountModel(
                 id = post.id,
                 uid = post.uid,
-                category = postCategoryModel.name,
+                boardName = boardModel.name,
                 content = post.content,
                 createdAt = post.createdAt,
                 modifiedAt = post.modifiedAt,
