@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
-@Tag(name = SwaggerTag.HEALTH_SWAGGER_TAG)
+@Tag(name = SwaggerTag.HEALTH_SWAGGER_TAG, description = "Health API")
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class HealthResource(

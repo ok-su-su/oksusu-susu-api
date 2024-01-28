@@ -1,13 +1,13 @@
 package com.oksusu.susu.post.application
 
-import com.oksusu.susu.post.model.PostCategoryModel
+import com.oksusu.susu.post.model.BoardModel
 import org.springframework.stereotype.Service
 
 @Service
 class PostConfigService(
-    private val postCategoryService: PostCategoryService,
+    private val boardService: BoardService,
 ) {
-    suspend fun getAll(): List<PostCategoryModel> {
-        return postCategoryService.getAll()
+    suspend fun getAll(): List<BoardModel> {
+        return boardService.getAll()
     }
 }

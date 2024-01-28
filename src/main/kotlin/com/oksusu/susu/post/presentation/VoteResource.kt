@@ -18,7 +18,7 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = SwaggerTag.VOTE_SWAGGER_TAG)
+@Tag(name = SwaggerTag.VOTE_SWAGGER_TAG, description = "투표 API")
 @RestController
 @RequestMapping(value = ["/api/v1/votes"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class VoteResource(
