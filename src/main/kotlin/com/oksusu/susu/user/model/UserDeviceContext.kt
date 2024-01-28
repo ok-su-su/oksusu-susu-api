@@ -1,16 +1,29 @@
 package com.oksusu.susu.user.model
 
+import jakarta.persistence.Column
+
 interface UserDeviceContext {
+    /** 어플리케이션 버전 */
     val applicationVersion: String?
+    /** IMEI */
     val deviceId: String?
+    /** SW버전 */
     val deviceSoftwareVersion: String?
+    /** 전화번호 */
     val lineNumber: String?
+    /** 국가코드 */
     val networkCountryIso: String?
+    /** 망 사업자코드 */
     val networkOperator: String?
+    /** 망 사업자명 */
     val networkOperatorName: String?
+    /** 망 시스템 방식 */
     val networkType: String?
+    /** 단말기 종류 */
     val phoneType: String?
+    /** SIM카드 Serial Number */
     val simSerialNumber: String?
+    /** 가입자 ID */
     val simState: String?
 }
 

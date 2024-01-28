@@ -1,0 +1,63 @@
+### device context checker login with context test
+POST http://localhost:8080/api/v1/oauth/KAKAO/login
+Content-Type: application/json
+Application-Version: Application-Version
+Device-Id: Device-Id
+Device-Software-Version: Device-Software-Version
+Line-Number: Line-Number
+Network-Country-Iso: Network-Country-Iso
+Network-Operator: Network-Operator
+Network-Operator-Name: Network-Operator-Name
+Network-Type: Network-Type
+Phone-Type: Phone-Type
+Sim-Serial-Number: Sim-Serial-Number
+Sim-State: Sim-State
+
+{
+  "accessToken": ""
+}
+
+### device context checker login without context test
+POST http://localhost:8080/api/v1/oauth/KAKAO/login
+Content-Type: application/json
+
+{
+  "accessToken": ""
+}
+
+### device context checker register with context test
+POST http://localhost:8080/api/v1/oauth/KAKAO/sign-up?accessToken=asd
+Content-Type: application/json
+Application-Version: Application-Version
+Device-Id: Device-Id
+Device-Software-Version: Device-Software-Version
+Line-Number: Line-Number
+Network-Country-Iso: Network-Country-Iso
+Network-Operator: Network-Operator
+Network-Operator-Name: Network-Operator-Name
+Network-Type: Network-Type
+Phone-Type: Phone-Type
+Sim-Serial-Number: Sim-Serial-Number
+Sim-State: Sim-State
+
+{
+  "name": "string",
+  "termAgreement": [
+    1
+  ],
+  "gender": "M",
+  "birth": 0
+}
+
+### device context checker register without context test
+POST http://localhost:8080/api/v1/oauth/KAKAO/sign-up?accessToken=asd
+Content-Type: application/json
+
+{
+  "name": "string",
+  "termAgreement": [
+    1
+  ],
+  "gender": "M",
+  "birth": 0
+}
