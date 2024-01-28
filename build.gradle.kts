@@ -53,20 +53,35 @@ allOpen {
 springBoot.buildInfo { properties { } }
 
 object DependencyVersion {
+    /** querydsl */
     const val QUERYDSL_VERSION = "5.0.0"
+
+    /** arrow fx */
     const val ARROW_FX_VERSION = "1.1.5"
+
+    /** jwt */
     const val JWT_VERSION = "4.1.0"
+
+    /** springdoc */
     const val SPRINGDOC_VERSION = "2.2.0"
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
+
+    /** log */
     const val KOTLIN_LOGGING_VERSION = "6.0.3"
     const val LOGBACK_ENCODER_VERSION = "7.3"
-    const val KOTEST_VERSION = "5.7.2"
-    const val KOTEST_EXTENSION_VERSION = "1.1.2"
-    const val MOCKK_VERSION = "1.13.4"
+
+    /** fastexcel */
     const val FASTEXCEL_VERSION = "0.16.5"
-    const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
+
+    /** aws */
     const val AWS_SDK_VERSION = "1.12.238"
     const val AWS_SDK_V2_VERSION = "2.17.107"
+    const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
+
+    /** test */
+    const val MOCKK_VERSION = "1.13.4"
+    const val KOTEST_VERSION = "5.7.2"
+    const val KOTEST_EXTENSION_VERSION = "1.1.2"
 }
 
 dependencies {
@@ -107,15 +122,6 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:${DependencyVersion.KOTLIN_LOGGING_VERSION}")
     implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER_VERSION}")
 
-    /** test **/
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK_VERSION}")
-
-    /** kotest */
-    testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST_VERSION}")
-    testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
-
     /** thymeleaf */
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
@@ -130,12 +136,21 @@ dependencies {
     implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2_VERSION}"))
     implementation("software.amazon.awssdk:sts")
 
-    /** ssm */
+    /** aws ssm */
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}"))
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    /** test **/
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK_VERSION}")
+
+    /** kotest */
+    testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST_VERSION}")
+    testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
 }
 
 defaultTasks("bootRun")
@@ -249,7 +264,7 @@ sonarqube {
         property(
             "sonar.exclusions",
             "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, " +
-                "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+                    "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.java.binaries", "$buildDir/classes")

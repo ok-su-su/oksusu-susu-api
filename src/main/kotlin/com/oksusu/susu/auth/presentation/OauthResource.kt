@@ -8,6 +8,7 @@ import com.oksusu.susu.auth.model.request.OauthRegisterRequest
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
+import com.oksusu.susu.user.model.UserDeviceContext
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*
 class OauthResource(
     private val oAuthFacade: OAuthFacade,
 ) {
+
     /** 가입된 유저인지 체크합니다. */
     @Operation(summary = "register valid check")
     @GetMapping("/{provider}/sign-up/valid")
@@ -31,18 +33,20 @@ class OauthResource(
     @Operation(summary = "register")
     @PostMapping("/{provider}/sign-up")
     suspend fun register(
+        deviceContext: UserDeviceContext,
         @PathVariable provider: OauthProvider,
         @RequestBody oauthRegisterRequest: OauthRegisterRequest,
         @RequestParam accessToken: String,
-    ) = oAuthFacade.register(provider, accessToken, oauthRegisterRequest).wrapCreated()
+    ) = oAuthFacade.register(provider, accessToken, oauthRegisterRequest, deviceContext).wrapCreated()
 
     /** 로그인을 합니다. */
     @Operation(summary = "login")
     @PostMapping("/{provider}/login")
     suspend fun login(
+        deviceContext: UserDeviceContext,
         @PathVariable provider: OauthProvider,
         @RequestBody request: OAuthLoginRequest,
-    ) = oAuthFacade.login(provider, request).wrapOk()
+    ) = oAuthFacade.login(provider, request, deviceContext).wrapOk()
 
     @Operation(summary = "연동된 소셜 로그인 정보 조회")
     @GetMapping("/oauth")

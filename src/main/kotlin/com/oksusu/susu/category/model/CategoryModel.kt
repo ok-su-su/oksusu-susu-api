@@ -22,4 +22,8 @@ data class CategoryModel(
             )
         }
     }
+
+    fun isMiscCategory(): Boolean {
+        return id == 5L
+    }
 }
