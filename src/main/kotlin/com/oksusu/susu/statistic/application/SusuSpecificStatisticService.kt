@@ -6,7 +6,7 @@ import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticG
 import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificStatisticRepository
 import com.oksusu.susu.statistic.model.SusuSpecificStatisticModel
-import com.oksusu.susu.statistic.model.TitleStringModel
+import com.oksusu.susu.statistic.model.TitleValueModel
 import com.oksusu.susu.statistic.model.vo.SusuStatisticRequest
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
@@ -35,12 +35,12 @@ class SusuSpecificStatisticService(
             SusuSpecificStatisticModel(
                 averageSent = averageSent,
                 averageRelationship = relationShipAmount?.let {
-                    TitleStringModel(
+                    TitleValueModel(
                         title = "temp",
                         value = relationShipAmount
                     )
                 },
-                averageCategory = categoryAmount?.let { TitleStringModel(title = "temp", value = categoryAmount) }
+                averageCategory = categoryAmount?.let { TitleValueModel(title = "temp", value = categoryAmount) }
             )
         }
     }
@@ -55,18 +55,18 @@ class SusuSpecificStatisticService(
         withContext(Dispatchers.IO) {
             susuSpecificStatisticRepository.save(
                 key = key,
-                value = model.averageAmount.toString()
+                value = model.averageAmount
             )
         }
     }
 
     suspend fun save(key: String, value: Long) {
         withContext(Dispatchers.IO) {
-            susuSpecificStatisticRepository.save(key, value.toString())
+            susuSpecificStatisticRepository.save(key, value)
         }
     }
 
-    suspend fun findByKey(key: String): String? {
+    suspend fun findByKey(key: String): Long? {
         return withContext(Dispatchers.IO) { susuSpecificStatisticRepository.findByKey(key) }
     }
 }

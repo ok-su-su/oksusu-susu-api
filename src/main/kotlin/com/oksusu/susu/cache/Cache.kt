@@ -26,10 +26,10 @@ class Cache<VALUE_TYPE>(
         val getSusuBasicStatisticCache: Factory.() -> Cache<SusuBasicStatistic> =
             { getSusuBasicStatisticCache() }
 
-        fun getSusuSpecificStatisticCache(key: String): Cache<String> {
+        fun getSusuSpecificStatisticCache(key: String): Cache<Long> {
             return Cache(
                 key = key,
-                type = toTypeReference<String>(),
+                type = toTypeReference<Long>(),
                 duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }

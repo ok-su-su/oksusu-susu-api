@@ -28,7 +28,7 @@ class RefreshSusuStatisticJob(
     val logger = KotlinLogging.logger { }
 
     suspend fun refreshSusuStatistic() {
-        logger.info { "start susu statistic refresh" }
+        logger.info { "start refresh susu statistic" }
 
         parZip(
             /** 최근 사용 금액, 경조사비를 가장 많이 쓴 달 */
@@ -39,7 +39,7 @@ class RefreshSusuStatisticJob(
             { envelopeService.countPerCategoryId() },
             { ledgerService.countPerCategoryId() },
             /** 평균 수수 */
-            { envelopeService.countAvgAmountPerCategoryIdAndRelationshipIdAndBirth() }
+            { envelopeService.countAvgAmountPerStatisticGroup() }
         ) {
                 envelopHandOverAtMonthCount,
                 relationShipConuts,
@@ -82,7 +82,7 @@ class RefreshSusuStatisticJob(
                 async { susuSpecificStatisticService.save(key, avgAmount) }
             }
 
-            logger.info { "end susu statistic refresh" }
+            logger.info { "finish refresh susu statistic" }
         }
     }
 
@@ -96,11 +96,15 @@ class RefreshSusuStatisticJob(
             }
         }.associate { ageCategory -> ageCategory.first to ageCategory.second }
 
-        return ageCategorys.flatMap { ageCategory ->
+        val groups = ageCategorys.flatMap { ageCategory ->
             val groups = ageCategory.value.groupBy { it.relationshipId }
             groups.map { group ->
-                "${ageCategory.key}:${group.key}" to ageCategory.value
+                "${ageCategory.key}:${group.key}" to group.value
             }
-        }.associate { group -> group.first to group.second.sumOf { it.averageAmount } / group.second.size }
+        }.associate { group -> group.first to group.second }
+
+        return groups.map { group ->
+            group.key to group.value.sumOf { value -> value.averageAmount } / group.value.size
+        }.toMap()
     }
 }
