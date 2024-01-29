@@ -6,7 +6,6 @@ import com.oksusu.susu.post.domain.VoteHistory
 import com.oksusu.susu.post.infrastructure.repository.VoteHistoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,14 +47,15 @@ class VoteHistoryService(
         voteHistoryRepository.deleteByUidAndPostId(uid, postId)
     }
 
-    suspend fun findByIdOrNull(id: Long): VoteHistory? {
+    suspend fun existsByPostId(postId: Long): Boolean {
         return withContext(Dispatchers.IO) {
-            voteHistoryRepository.findByIdOrNull(id)
+            voteHistoryRepository.existsByPostId(postId)
         }
     }
 
-    suspend fun validateHistoryNotExist(id: Long) {
-        findByIdOrNull(id)?.run { throw InvalidRequestException(ErrorCode.ALREADY_VOTED_POST) }
+    suspend fun validateHistoryNotExist(postId: Long) {
+        existsByPostId(postId).takeUnless { exist -> exist }
+            ?: throw InvalidRequestException(ErrorCode.ALREADY_VOTED_POST)
     }
 
     suspend fun findByUidAndPostId(uid: Long, postId: Long): VoteHistory? {
