@@ -1,7 +1,6 @@
 package com.oksusu.susu.envelope.model.request
 
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
-import com.oksusu.susu.envelope.infrastructure.model.IncludeSpec
 
 data class SearchEnvelopeRequest(
     /** 지인 id */
@@ -16,4 +15,24 @@ data class SearchEnvelopeRequest(
     val fromAmount: Long?,
     /** 금액 조건 to */
     val toAmount: Long?,
-)
+) {
+    enum class IncludeSpec {
+        CATEGORY,
+        FRIEND,
+        RELATIONSHIP,
+        FRIEND_RELATIONSHIP,
+        ;
+    }
+
+    val includeCategory: Boolean
+        get() = include?.contains(IncludeSpec.CATEGORY) == true
+
+    val includeFriend: Boolean
+        get() = include?.contains(IncludeSpec.FRIEND) == true
+
+    val includeRelationship: Boolean
+        get() = include?.contains(IncludeSpec.RELATIONSHIP) == true
+
+    val includeFriendRelationship: Boolean
+        get() = include?.contains(IncludeSpec.FRIEND_RELATIONSHIP) == true
+}

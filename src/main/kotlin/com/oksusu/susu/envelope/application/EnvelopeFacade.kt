@@ -12,7 +12,6 @@ import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
-import com.oksusu.susu.envelope.infrastructure.model.IncludeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.envelope.model.EnvelopeModel
@@ -31,6 +30,7 @@ import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
+import com.oksusu.susu.friend.model.FriendRelationshipModel
 import com.oksusu.susu.ledger.application.LedgerService
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
@@ -202,7 +202,6 @@ class EnvelopeFacade(
             friendId = request.friendIds,
             ledgerId = request.ledgerId,
             types = request.types,
-            include = request.include ?: emptySet(),
             fromAmount = request.fromAmount,
             toAmount = request.toAmount
         )
@@ -214,41 +213,45 @@ class EnvelopeFacade(
 
         return parZip(
             {
-                when (searchSpec.include.contains(IncludeSpec.FRIEND)) {
+                when (request.includeFriend) {
                     true -> friendService.findAllByIdIn(friendIds)
                     false -> emptyList()
                 }.associateBy { friend -> friend.id }
             },
             {
-                when (searchSpec.include.contains(IncludeSpec.RELATION)) {
+                when (request.includeRelationship || request.includeFriendRelationship) {
                     true -> friendRelationshipService.findAllByFriendIds(friendIds)
                     false -> emptyList()
                 }.associateBy { friendRelationShip -> friendRelationShip.friendId }
             },
             {
-                when (searchSpec.include.contains(IncludeSpec.CATEGORY)) {
+                when (request.includeCategory) {
                     true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, envelopeIds)
                     false -> emptyList()
                 }.associateBy { categoryAssignment -> categoryAssignment.targetId }
             }
-        ) { friends, friendRelationShips, categoryAssignments ->
+        ) { friends, friendRelationships, categoryAssignments ->
             response.map { envelope ->
                 val category = categoryAssignments[envelope.id]?.let { categoryAssignment ->
                     val category = categoryService.getCategory(categoryAssignment.categoryId)
                     CategoryWithCustomModel.of(category, categoryAssignment)
                 }
-                val relation = friendRelationShips[envelope.friendId]?.let {
-                    relationshipService.getRelationship(it.relationshipId)
+                val relationship = friendRelationships[envelope.friendId]?.let { friendRelationship ->
+                    relationshipService.getRelationship(friendRelationship.relationshipId)
                 }
-                val friend = friends[envelope.friendId]?.let {
-                    FriendModel.from(it)
+                val friend = friends[envelope.friendId]?.let { friend ->
+                    FriendModel.from(friend)
+                }
+                val friendRelationship = friendRelationships[envelope.friendId]?.let { friendRelationship ->
+                    FriendRelationshipModel.from(friendRelationship)
                 }
 
                 SearchEnvelopeResponse(
                     envelope = EnvelopeModel.from(envelope),
                     category = category,
-                    relation = relation,
-                    friend = friend
+                    friend = friend,
+                    relationship = relationship,
+                    friendRelationship = friendRelationship
                 )
             }
         }
