@@ -1,6 +1,5 @@
 package com.oksusu.susu.post.model.response
 
-import com.oksusu.susu.common.annotation.DateFormat
 import com.oksusu.susu.extension.equalsFromYearToSec
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
@@ -20,7 +19,6 @@ data class VoteAllInfoResponse(
     /** 총 투표 수 */
     val count: Long,
     /** 생성일 */
-    @DateFormat
     val createdAt: LocalDateTime,
     /** 생성자 profile */
     val creatorProfile: UserProfileModel,
