@@ -120,17 +120,23 @@ class VoteFacade(
             { userService.findByIdOrThrow(vote.uid) },
             { countService.findByTargetIdAndTargetType(vote.id, CountTargetType.POST) },
             { countService.findAllByTargetTypeAndTargetIdIn(optionIds, CountTargetType.VOTE_OPTION) },
-            { boardService.getCategory(vote.boardId) }
-        ) { creator, voteCount, optionCount, boardModel ->
+            { voteHistoryService.findByUidAndPostId(user.uid, id) }
+        ) { creator, voteCount, optionCount, voteHistory ->
             val optionCountModels = options.map { option ->
-                VoteOptionCountModel.of(option, optionCount.first { it.targetId == option.id })
+                VoteOptionCountModel.of(
+                    option = option,
+                    count = optionCount.first { it.targetId == option.id },
+                    isVoted = voteHistory?.takeIf { history -> history.voteOptionId == option.id }
+                        ?.let { true }
+                        ?: false
+                )
             }
 
             VoteAllInfoResponse.of(
                 vote = VoteCountModel.of(
                     vote,
                     voteCount,
-                    boardModel
+                    boardService.getCategory(vote.boardId)
                 ),
                 options = optionCountModels,
                 creator = creator,

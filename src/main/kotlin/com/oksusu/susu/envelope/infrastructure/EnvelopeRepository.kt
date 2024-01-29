@@ -56,12 +56,6 @@ interface EnvelopeCustomRepository {
     fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel?
 
     @Transactional(readOnly = true)
-    suspend fun getMaxAmountByUid(uid: Long, type: EnvelopeType): Long?
-
-    @Transactional(readOnly = true)
-    suspend fun findEnvelopeAndFriendByUid(maxAmount: Long, uid: Long, type: EnvelopeType): EnvelopeAndFriendModel?
-
-    @Transactional(readOnly = true)
     suspend fun countPerHandedOverAtBetween(
         type: EnvelopeType,
         from: LocalDateTime,
@@ -100,6 +94,9 @@ interface EnvelopeCustomRepository {
 
     @Transactional(readOnly = true)
     fun findLatestFriendEnvelopes(friendIds: Set<Long>): List<Envelope>
+
+    @Transactional(readOnly = true)
+    fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -164,41 +161,6 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).fetchFirst()
     }
 
-    override suspend fun getMaxAmountByUid(uid: Long, type: EnvelopeType): Long? {
-        return JPAQuery<Envelope>(entityManager)
-            .select(
-                qEnvelope.amount.max()
-            ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
-            .where(
-                qEnvelope.uid.eq(uid),
-                qEnvelope.type.eq(type),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
-            ).fetchFirst()
-    }
-
-    override suspend fun findEnvelopeAndFriendByUid(
-        maxAmount: Long,
-        uid: Long,
-        type: EnvelopeType,
-    ): EnvelopeAndFriendModel? {
-        return JPAQuery<Envelope>(entityManager)
-            .select(
-                QEnvelopeAndFriendModel(
-                    qEnvelope,
-                    qFriend
-                )
-            ).from(qEnvelope)
-            .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
-            .where(
-                qEnvelope.uid.eq(uid),
-                qEnvelope.type.eq(type),
-                qEnvelope.amount.eq(maxAmount),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
-            ).fetchFirst()
-    }
-
     override suspend fun countPerHandedOverAtBetween(
         type: EnvelopeType,
         from: LocalDateTime,
@@ -211,11 +173,9 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .where(
                 qEnvelope.type.eq(type),
-                qEnvelope.handedOverAt.between(from, to),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+                qEnvelope.handedOverAt.between(from, to)
             ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
@@ -233,12 +193,10 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .where(
                 qEnvelope.uid.eq(uid),
                 qEnvelope.type.eq(type),
-                qEnvelope.handedOverAt.between(from, to),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+                qEnvelope.handedOverAt.between(from, to)
             ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
@@ -287,9 +245,6 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
-            .where(
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
-            )
             .groupBy(
                 qCategoryAssignment.categoryId,
                 qFriendRelationship.relationshipId,
@@ -390,5 +345,21 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .groupBy(qEnvelope.friendId)
             .having(qEnvelope.handedOverAt.eq(qEnvelope.handedOverAt.max()))
             .fetch()
+    }
+
+    override fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QEnvelopeAndFriendModel(
+                    qEnvelope,
+                    qFriend
+                )
+            ).from(qEnvelope)
+            .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
+            .where(
+                qEnvelope.uid.eq(uid),
+                qEnvelope.type.eq(type)
+            ).orderBy(qEnvelope.amount.desc())
+            .fetchFirst()
     }
 }

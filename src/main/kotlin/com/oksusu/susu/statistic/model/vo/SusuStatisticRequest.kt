@@ -1,11 +1,11 @@
 package com.oksusu.susu.statistic.model.vo
 
 data class SusuStatisticRequest(
-    /** required */
+    /** required | 나이 */
     val age: AgeType,
-    /** required */
+    /** required | 관계 id */
     val relationshipId: Long,
-    /** required */
+    /** required | 카테고리 id */
     val categoryId: Long,
 )
 
