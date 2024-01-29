@@ -3,7 +3,7 @@ package com.oksusu.susu.post.model.response
 import com.oksusu.susu.extension.equalsFromYearToSec
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.model.BoardModel
-import com.oksusu.susu.post.model.VoteOptionModel
+import com.oksusu.susu.post.model.VoteOptionAndHistoryModel
 import java.time.LocalDateTime
 
 data class CreateAndUpdateVoteResponse(
@@ -18,7 +18,7 @@ data class CreateAndUpdateVoteResponse(
     /** 수정 여부 / 수정함 : true, 수정 안함 : false */
     val isModified: Boolean,
     /** 투표 옵션 */
-    val options: List<VoteOptionModel>,
+    val options: List<VoteOptionAndHistoryModel>,
     /** 투표 생성일 */
     val createdAt: LocalDateTime,
 ) {
@@ -26,7 +26,7 @@ data class CreateAndUpdateVoteResponse(
         fun of(
             uid: Long,
             post: Post,
-            optionModels: List<VoteOptionModel>,
+            optionModels: List<VoteOptionAndHistoryModel>,
             boardModel: BoardModel,
         ): CreateAndUpdateVoteResponse {
             return CreateAndUpdateVoteResponse(

@@ -17,6 +17,7 @@ import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
 import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import com.oksusu.susu.post.model.VoteCountModel
+import com.oksusu.susu.post.model.VoteOptionAndHistoryModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
 import com.oksusu.susu.post.model.VoteOptionModel
 import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
@@ -70,7 +71,9 @@ class VoteFacade(
             CreateAndUpdateVoteResponse.of(
                 uid = user.uid,
                 post = createdPost,
-                optionModels = options.map { option -> VoteOptionModel.from(option) },
+                optionModels = options.map { option ->
+                    VoteOptionAndHistoryModel.of(option = option, isVoted = false)
+                },
                 boardModel = boardService.getCategory(request.boardId)
             )
         }
@@ -96,8 +99,7 @@ class VoteFacade(
         val voteAndCountModels = voteService.getAllVotesExceptBlock(getAllVoteSpec)
         val optionModels = voteOptionService.getOptionsByPostIdIn(
             voteAndCountModels.content.map { model -> model.post.id }
-        )
-            .map { VoteOptionModel.from(it) }
+        ).map { VoteOptionModel.from(it) }
 
         return voteAndCountModels.map { vote ->
             VoteAndOptionsWithCountResponse.of(
@@ -236,7 +238,9 @@ class VoteFacade(
             { voteService.getVoteAndOptions(id) }
         ) { _, _, boardModel, voteInfos ->
             val vote = voteInfos[0].post
-            val options = voteInfos.map { voteInfo -> VoteOptionModel.from(voteInfo.voteOption) }
+            val options = voteInfos.map { voteInfo ->
+                VoteOptionAndHistoryModel.of(option = voteInfo.voteOption, isVoted = false)
+            }
 
             val updatedVote = txTemplates.writer.coExecute {
                 vote.apply {
