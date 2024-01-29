@@ -7,14 +7,6 @@ data class SearchEnvelopeSpec(
     val friendId: Set<Long>?,
     val ledgerId: Long?,
     val types: Set<EnvelopeType>?,
-    val include: Set<IncludeSpec>,
     val fromAmount: Long?,
     val toAmount: Long?,
 )
-
-enum class IncludeSpec {
-    CATEGORY,
-    FRIEND,
-    RELATION,
-    ;
-}
