@@ -1,5 +1,6 @@
 package com.oksusu.susu.slack.application
 
+import com.oksusu.susu.extension.isProd
 import com.oksusu.susu.slack.config.SlackAlarmConfig
 import com.oksusu.susu.slack.infrastructure.SlackAlarmSender
 import com.oksusu.susu.slack.model.ErrorWebhookDataModel
@@ -24,9 +25,9 @@ class SuspendableSlackAlarmService(
 
     private suspend fun sendAlarm(model: SlackAlarmConfig.SlackAlarmModel, layoutBlocks: List<LayoutBlock>) {
         /** prod 환경에서만 작동 */
-//        if (!environment.isProd()) {
-//            return
-//        }
+        if (!environment.isProd()) {
+            return
+        }
 
         val payload = Payload.builder()
             .text(model.text)
