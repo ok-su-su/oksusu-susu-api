@@ -172,7 +172,8 @@ class EnvelopeFacade(
         return EnvelopeDetailResponse(
             envelope = EnvelopeModel.from(envelopeDetail.envelope),
             category = CategoryWithCustomModel.of(category, envelopeDetail.categoryAssignment),
-            relation = relation,
+            relationship = relation,
+            friendRelationship = FriendRelationshipModel.from(envelopeDetail.friendRelationship),
             friend = FriendModel.from(envelopeDetail.friend)
         )
     }
