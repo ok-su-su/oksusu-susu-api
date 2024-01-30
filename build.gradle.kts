@@ -140,6 +140,11 @@ dependencies {
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}"))
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
+    /** slack */
+    implementation("com.slack.api:slack-api-client:1.38.0")
+    implementation("com.slack.api:slack-api-model-kotlin-extension:1.38.0")
+    implementation("com.slack.api:slack-api-client-kotlin-extension:1.38.0")
+
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
