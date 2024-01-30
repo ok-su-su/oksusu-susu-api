@@ -1,6 +1,6 @@
 package com.oksusu.susu.friend.model.response
 
-data class CreateFriendResponse(
+data class CreateAndUpdateFriendResponse(
     /** friend Id */
     val id: Long,
 )

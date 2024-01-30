@@ -22,9 +22,9 @@ data class FriendRelationship(
 
     /** 관계 id */
     @Column(name = "relationship_id")
-    val relationshipId: Long = -1L,
+    var relationshipId: Long = -1L,
 
     /** 기타 항목인 경우, 별도 입력을 위한 컬럼 */
     @Column(name = "custom_relation")
-    val customRelation: String? = null,
+    var customRelation: String? = null,
 ) : BaseEntity()
