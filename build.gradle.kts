@@ -78,6 +78,9 @@ object DependencyVersion {
     const val AWS_SDK_V2_VERSION = "2.17.107"
     const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
 
+    /** slack */
+    const val SLACK_API_VERSION = "1.38.0"
+
     /** test */
     const val MOCKK_VERSION = "1.13.4"
     const val KOTEST_VERSION = "5.7.2"
@@ -141,9 +144,9 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
     /** slack */
-    implementation("com.slack.api:slack-api-client:1.38.0")
-    implementation("com.slack.api:slack-api-model-kotlin-extension:1.38.0")
-    implementation("com.slack.api:slack-api-client-kotlin-extension:1.38.0")
+    implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API_VERSION}")
+    implementation("com.slack.api:slack-api-model-kotlin-extension:${DependencyVersion.SLACK_API_VERSION}")
+    implementation("com.slack.api:slack-api-client-kotlin-extension:${DependencyVersion.SLACK_API_VERSION}")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
