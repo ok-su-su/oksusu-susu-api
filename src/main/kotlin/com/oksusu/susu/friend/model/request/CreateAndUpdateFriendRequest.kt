@@ -1,6 +1,6 @@
 package com.oksusu.susu.friend.model.request
 
-data class CreateFriendRequest(
+data class CreateAndUpdateFriendRequest(
     /** 지인 이름 */
     val name: String,
     /** 전화번호 */

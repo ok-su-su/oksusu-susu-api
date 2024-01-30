@@ -20,9 +20,9 @@ class Friend(
     val uid: Long,
 
     /** 지인 이름 */
-    val name: String,
+    var name: String,
 
     /** 전화번호 */
     @Column(name = "phone_number")
-    val phoneNumber: String? = null,
+    var phoneNumber: String? = null,
 ) : BaseEntity()

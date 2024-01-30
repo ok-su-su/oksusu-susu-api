@@ -13,9 +13,9 @@ import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.domain.FriendRelationship
 import com.oksusu.susu.friend.infrastructure.model.SearchFriendSpec
-import com.oksusu.susu.friend.model.request.CreateFriendRequest
+import com.oksusu.susu.friend.model.request.CreateAndUpdateFriendRequest
 import com.oksusu.susu.friend.model.request.SearchFriendRequest
-import com.oksusu.susu.friend.model.response.CreateFriendResponse
+import com.oksusu.susu.friend.model.response.CreateAndUpdateFriendResponse
 import com.oksusu.susu.friend.model.response.RecentEnvelopeModel
 import com.oksusu.susu.friend.model.response.SearchFriendResponse
 import org.springframework.data.domain.Page
@@ -81,7 +81,7 @@ class FriendFacade(
         }
     }
 
-    suspend fun create(user: AuthUser, request: CreateFriendRequest): CreateFriendResponse {
+    suspend fun create(user: AuthUser, request: CreateAndUpdateFriendRequest): CreateAndUpdateFriendResponse {
         if (request.phoneNumber != null) {
             if (friendService.existsByPhoneNumber(user.uid, request.phoneNumber)) {
                 throw AlreadyException(ErrorCode.ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR)
@@ -110,6 +110,43 @@ class FriendFacade(
             createdFriend
         }
 
-        return CreateFriendResponse(createdFriend.id)
+        return CreateAndUpdateFriendResponse(createdFriend.id)
+    }
+
+    suspend fun update(
+        user: AuthUser,
+        id: Long,
+        request: CreateAndUpdateFriendRequest,
+    ): CreateAndUpdateFriendResponse {
+        val friend = friendService.findByIdAndUidOrThrow(id, user.uid)
+        val friendRelationship = friendRelationshipService.findByFriendIdOrThrow(friend.id)
+
+        if (request.phoneNumber != null) {
+            if (friendService.existsByPhoneNumber(user.uid, request.phoneNumber)) {
+                throw AlreadyException(ErrorCode.ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR)
+            }
+        }
+
+        val relationship = relationshipService.getRelationship(request.relationshipId)
+        val customRelation = when (relationship.id == 5L) {
+            true -> request.customRelation
+            false -> null
+        }
+
+        val createdFriend = txTemplates.writer.coExecute {
+            val createdFriend = friend.apply {
+                this.name = request.name
+                this.phoneNumber = request.phoneNumber
+            }.run { friendService.saveSync(this) }
+
+            friendRelationship.apply {
+                this.relationshipId = relationship.id
+                this.customRelation = customRelation
+            }.run { friendRelationshipService.saveSync(this) }
+
+            createdFriend
+        }
+
+        return CreateAndUpdateFriendResponse(createdFriend.id)
     }
 }
