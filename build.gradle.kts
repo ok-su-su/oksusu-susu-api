@@ -145,8 +145,6 @@ dependencies {
 
     /** slack */
     implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API_VERSION}")
-    implementation("com.slack.api:slack-api-model-kotlin-extension:${DependencyVersion.SLACK_API_VERSION}")
-    implementation("com.slack.api:slack-api-client-kotlin-extension:${DependencyVersion.SLACK_API_VERSION}")
 
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
