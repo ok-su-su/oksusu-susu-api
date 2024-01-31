@@ -74,3 +74,12 @@ slack:
       url: ${SLACK_ALARM_ERROR_URL}
       text: ${SLACK_ALARM_ERROR_TEXT}
       user-name: ${SLACK_ALARM_ERROR_USERNAME}
+
+# SENTRY
+sentry:
+  dsn: ${SENTRY_DSN}
+  traces-sample-rate: 1.0
+  enable-tracing: true
+  environment: dev
+  serverName: api-server
+  send-default-pii: true

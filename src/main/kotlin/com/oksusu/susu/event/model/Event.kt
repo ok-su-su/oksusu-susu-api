@@ -67,3 +67,8 @@ data class SlackErrorAlarmEvent(
     val request: ServerHttpRequest,
     val exception: Exception,
 ) : BaseEvent()
+
+data class SentryCaptureExceptionEvent(
+    val request: ServerHttpRequest,
+    val exception: Exception,
+) : BaseEvent()

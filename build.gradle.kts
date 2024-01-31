@@ -146,6 +146,11 @@ dependencies {
     /** slack */
     implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API_VERSION}")
 
+    /** sentry */
+    implementation(platform("io.sentry:sentry-bom:7.3.0")) // import bom
+    implementation("io.sentry:sentry-spring-boot-starter-jakarta")
+    implementation("io.sentry:sentry-logback")
+
     /** etc */
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
