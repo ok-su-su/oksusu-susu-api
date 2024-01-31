@@ -2,7 +2,6 @@ package com.oksusu.susu.exception.advice
 
 import com.oksusu.susu.common.dto.ErrorResponse
 import com.oksusu.susu.event.model.SlackErrorAlarmEvent
-import com.oksusu.susu.slack.application.SuspendableSlackAlarmService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.CancellationException
@@ -20,7 +19,6 @@ import org.springframework.web.server.ServerWebInputException
 
 @RestControllerAdvice
 class ExceptionHandler(
-    private val suspendableSlackAlarmService: SuspendableSlackAlarmService,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     private val logger = KotlinLogging.logger { }
@@ -106,14 +104,14 @@ class ExceptionHandler(
         e: Exception,
         exchange: ServerWebExchange,
     ): ResponseEntity<ErrorResponse> {
-        logger.warn { "Exception ${e.message}, requestUri=${exchange.request.uri} \n$e" }
+        logger.error { "Exception ${e.message}, requestUri=${exchange.request.uri} \n$e" }
         eventPublisher.publishEvent(
             SlackErrorAlarmEvent(
                 request = exchange.request,
                 exception = e
             )
         )
-//        return e
+
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)

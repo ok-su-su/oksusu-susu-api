@@ -8,7 +8,7 @@ import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.composition.BlockCompositions
 import com.slack.api.model.block.composition.MarkdownTextObject
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Component
@@ -32,10 +32,9 @@ class SlackBlockHelper {
                 dataBuffer.read(bytes)
                 DataBufferUtils.release(dataBuffer)
                 bytes.decodeToString()
-            }.awaitSingle()
-//        logger.error { "body : ${body}" }
+            }.awaitSingleOrNull()
 
-        val errorMessage = e.message
+        val errorMessage = e.toString()
         val errorStack = getErrorStack(e)
         val errorUserIP = request.remoteIp
         val errorRequestParam = getRequestParam(request)
