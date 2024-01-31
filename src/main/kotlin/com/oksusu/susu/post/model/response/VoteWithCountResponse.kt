@@ -7,8 +7,8 @@ import com.oksusu.susu.post.model.BoardModel
 data class VoteWithCountResponse(
     /** 투표 id */
     val id: Long,
-    /** 보드 명 */
-    val boardName: String,
+    /** 보드 */
+    val board: BoardModel,
     /** 내용 */
     val content: String,
     /** 총 투표 수 */
@@ -20,7 +20,7 @@ data class VoteWithCountResponse(
         fun of(model: PostAndCountModel, boardModel: BoardModel): VoteWithCountResponse {
             return VoteWithCountResponse(
                 id = model.post.id,
-                boardName = boardModel.name,
+                board = boardModel,
                 content = model.post.content,
                 count = model.count.count,
                 isModified = model.post.createdAt.equalsFromYearToSec(model.post.modifiedAt)

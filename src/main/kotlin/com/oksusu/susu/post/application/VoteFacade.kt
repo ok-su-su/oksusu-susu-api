@@ -49,7 +49,7 @@ class VoteFacade(
 
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
         voteOptionService.validateSeq(request.options)
-        boardService.validateExistCategory(request.boardId)
+        boardService.validateExistBoard(request.boardId)
 
         return txTemplates.writer.coExecute {
             val createdPost = Post(
@@ -74,7 +74,7 @@ class VoteFacade(
                 optionModels = options.map { option ->
                     VoteOptionAndHistoryModel.of(option = option, isVoted = false)
                 },
-                boardModel = boardService.getCategory(request.boardId)
+                boardModel = boardService.getBoard(request.boardId)
             )
         }
     }
@@ -106,7 +106,7 @@ class VoteFacade(
                 vote = vote.post,
                 count = vote.count,
                 options = optionModels.filter { option -> option.postId == vote.post.id },
-                boardModel = boardService.getCategory(vote.post.boardId)
+                boardModel = boardService.getBoard(vote.post.boardId)
             )
         }
     }
@@ -138,7 +138,7 @@ class VoteFacade(
                 vote = VoteCountModel.of(
                     vote,
                     voteCount,
-                    boardService.getCategory(vote.boardId)
+                    boardService.getBoard(vote.boardId)
                 ),
                 options = optionCountModels,
                 creator = creator,
@@ -225,7 +225,7 @@ class VoteFacade(
         return voteAndCountModels.map { model ->
             VoteWithCountResponse.of(
                 model = model,
-                boardModel = boardService.getCategory(model.post.boardId)
+                boardModel = boardService.getBoard(model.post.boardId)
             )
         }
     }
@@ -234,7 +234,7 @@ class VoteFacade(
         return parZip(
             { postService.validateAuthority(id, user.uid) },
             { voteHistoryService.validateHistoryNotExist(id) },
-            { boardService.getCategory(request.boardId) },
+            { boardService.getBoard(request.boardId) },
             { voteService.getVoteAndOptions(id) }
         ) { _, _, boardModel, voteInfos ->
             val vote = voteInfos[0].post
