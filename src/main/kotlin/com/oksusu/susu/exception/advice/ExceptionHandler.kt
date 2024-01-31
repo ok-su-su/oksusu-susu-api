@@ -1,10 +1,12 @@
 package com.oksusu.susu.exception.advice
 
 import com.oksusu.susu.common.dto.ErrorResponse
+import com.oksusu.susu.event.model.SlackErrorAlarmEvent
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.CancellationException
 import org.hibernate.TypeMismatchException
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.codec.DecodingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -16,7 +18,9 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.ServerWebInputException
 
 @RestControllerAdvice
-class ExceptionHandler {
+class ExceptionHandler(
+    private val eventPublisher: ApplicationEventPublisher,
+) {
     private val logger = KotlinLogging.logger { }
 
     @ExceptionHandler(WebExchangeBindException::class)
@@ -91,6 +95,25 @@ class ExceptionHandler {
         logger.warn { "CancellationException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(ErrorResponse.of(e))
+    }
+
+    @ExceptionHandler(Exception::class)
+    protected fun handleException(
+        e: Exception,
+        exchange: ServerWebExchange,
+    ): ResponseEntity<ErrorResponse> {
+        logger.error { "Exception ${e.message}, requestUri=${exchange.request.uri} \n$e" }
+        eventPublisher.publishEvent(
+            SlackErrorAlarmEvent(
+                request = exchange.request,
+                exception = e
+            )
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse.of(e))
     }

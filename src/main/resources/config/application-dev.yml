@@ -77,3 +77,11 @@ auth:
     secret-key: ${JWT_SECRET_KEY}
     access-exp: ${JWT_ACCESS_EXP}
     refresh-exp: ${JWT_REFRESH_EXP}
+
+# SLACK
+slack:
+  alarm:
+    error-webhook:
+      url: ${SLACK_ALARM_ERROR_URL}
+      text: ${SLACK_ALARM_ERROR_TEXT}
+      user-name: ${SLACK_ALARM_ERROR_USERNAME}
