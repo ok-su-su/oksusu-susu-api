@@ -121,7 +121,7 @@ class FriendFacade(
         val friend = friendService.findByIdAndUidOrThrow(id, user.uid)
         val friendRelationship = friendRelationshipService.findByFriendIdOrThrow(friend.id)
 
-        if (request.phoneNumber != null) {
+        if (request.phoneNumber != null && request.phoneNumber != friend.phoneNumber) {
             if (friendService.existsByPhoneNumber(user.uid, request.phoneNumber)) {
                 throw AlreadyException(ErrorCode.ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR)
             }
