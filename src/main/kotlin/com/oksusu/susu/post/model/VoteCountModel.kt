@@ -10,8 +10,8 @@ data class VoteCountModel(
     val id: Long,
     /** 작성자 id */
     val uid: Long,
-    /** 보드 명 */
-    val boardName: String,
+    /** 보드 */
+    val board: BoardModel,
     /** 내용 */
     var content: String,
     /** 생성일 */
@@ -26,7 +26,7 @@ data class VoteCountModel(
             return VoteCountModel(
                 id = post.id,
                 uid = post.uid,
-                boardName = boardModel.name,
+                board = boardModel,
                 content = post.content,
                 createdAt = post.createdAt,
                 modifiedAt = post.modifiedAt,

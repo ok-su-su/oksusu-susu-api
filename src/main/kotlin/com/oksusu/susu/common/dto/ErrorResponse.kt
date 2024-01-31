@@ -61,5 +61,13 @@ data class ErrorResponse(
                 reason = e.message ?: errorCode.description
             )
         }
+
+        fun of(e: Exception): ErrorResponse {
+            val errorCode = ErrorCode.INTERNAL_SERVER_ERROR
+            return ErrorResponse(
+                errorCode = errorCode.name,
+                reason = e.message ?: errorCode.description
+            )
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.oksusu.susu.post.model.response
 
 import com.oksusu.susu.extension.equalsFromYearToSec
+import com.oksusu.susu.post.model.BoardModel
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
 import com.oksusu.susu.user.domain.User
@@ -12,8 +13,8 @@ data class VoteAllInfoResponse(
     val id: Long,
     /** 본인 소유 글 여부 / 내 글 : 1, 전체 글 : 0 */
     val isMine: Boolean,
-    /** 보드 명 */
-    val boardName: String,
+    /** 보드 */
+    val board: BoardModel,
     /** 내용 */
     val content: String,
     /** 총 투표 수 */
@@ -37,7 +38,7 @@ data class VoteAllInfoResponse(
             return VoteAllInfoResponse(
                 id = vote.id,
                 isMine = isMine,
-                boardName = vote.boardName,
+                board = vote.board,
                 content = vote.content,
                 count = vote.count,
                 createdAt = vote.createdAt,

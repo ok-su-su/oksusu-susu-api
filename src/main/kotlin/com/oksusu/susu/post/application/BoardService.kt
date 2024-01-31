@@ -49,11 +49,11 @@ class BoardService(
         return withContext(Dispatchers.IO) { boardRepository.findAllByIsActive(isActive) }
     }
 
-    fun getCategory(id: Long): BoardModel {
+    fun getBoard(id: Long): BoardModel {
         return boards[id] ?: throw NotFoundException(ErrorCode.NOT_FOUND_BOARD_ERROR)
     }
 
-    fun validateExistCategory(boardId: Long) {
-        getCategory(boardId)
+    fun validateExistBoard(boardId: Long) {
+        getBoard(boardId)
     }
 }

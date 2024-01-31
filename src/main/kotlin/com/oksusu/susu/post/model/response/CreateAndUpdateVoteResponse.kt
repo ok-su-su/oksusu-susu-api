@@ -11,8 +11,8 @@ data class CreateAndUpdateVoteResponse(
     val id: Long,
     /** 투표 생성자 id */
     val uid: Long,
-    /** 보드 명 */
-    val boardName: String,
+    /** 보드 */
+    val board: BoardModel,
     /** 내용 */
     val content: String,
     /** 수정 여부 / 수정함 : true, 수정 안함 : false */
@@ -32,7 +32,7 @@ data class CreateAndUpdateVoteResponse(
             return CreateAndUpdateVoteResponse(
                 id = post.id,
                 uid = uid,
-                boardName = boardModel.name,
+                board = boardModel,
                 content = post.content,
                 isModified = !post.createdAt.equalsFromYearToSec(post.modifiedAt),
                 options = optionModels,

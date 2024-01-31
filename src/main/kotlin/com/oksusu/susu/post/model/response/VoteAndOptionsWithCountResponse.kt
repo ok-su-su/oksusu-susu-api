@@ -2,6 +2,7 @@ package com.oksusu.susu.post.model.response
 
 import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.extension.equalsFromYearToSec
+import com.oksusu.susu.post.domain.Board
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.model.BoardModel
 import com.oksusu.susu.post.model.VoteOptionModel
@@ -12,8 +13,8 @@ class VoteAndOptionsWithCountResponse(
     val id: Long,
     /** 투표 생성자 id */
     val uid: Long,
-    /** 보드 명 */
-    val boardName: String,
+    /** 보드 */
+    val board: BoardModel,
     /** 내용 */
     val content: String,
     /** 수정 여부 / 수정함 : true, 수정 안함 : false */
@@ -35,7 +36,7 @@ class VoteAndOptionsWithCountResponse(
             return VoteAndOptionsWithCountResponse(
                 id = vote.id,
                 uid = vote.uid,
-                boardName = boardModel.name,
+                board = boardModel,
                 content = vote.content,
                 isModified = !vote.createdAt.equalsFromYearToSec(vote.modifiedAt),
                 count = count.count,
