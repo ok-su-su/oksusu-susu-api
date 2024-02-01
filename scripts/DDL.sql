@@ -21,7 +21,7 @@ CREATE UNIQUE INDEX uidx__oauth_id__oauth_provider ON user (oauth_id, oauth_prov
 CREATE TABLE `status`
 (
     `id`          bigint  NOT NULL AUTO_INCREMENT COMMENT '상태 정보 id',
-    `status_type` int     NOT NULL COMMENT '상태 정보 타입 / 활동 : 0, 탈퇴 : 1,  일시 정지 7일 : 2, 영구 정지 : 3',
+    `status_type` int     NOT NULL COMMENT '상태 정보 타입 / 활동 : 1, 탈퇴 : 2,  일시 정지 7일 : 3, 영구 정지 : 4',
     `is_active`   tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
     `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
@@ -46,7 +46,7 @@ CREATE TABLE `user_status_history`
 (
     `id`                     bigint NOT NULL AUTO_INCREMENT COMMENT '유저 상태 변경 기록 id',
     `uid`                    bigint NOT NULL COMMENT '해당 유저 id',
-    `status_assignment_type` int      DEFAULT NULL COMMENT '변경된 유저 상태 타입 / 계정 상태 : 0, 커뮤니티 활동 상태 : 1',
+    `status_assignment_type` int      DEFAULT NULL COMMENT '변경된 유저 상태 타입 / 계정 상태 : 1, 커뮤니티 활동 상태 : 2',
     `from_status_id`         int    NOT NULL COMMENT '변경 이전 상태 id',
     `to_status_id`           int    NOT NULL COMMENT '변경 후 상태 id',
     `created_at`             datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
