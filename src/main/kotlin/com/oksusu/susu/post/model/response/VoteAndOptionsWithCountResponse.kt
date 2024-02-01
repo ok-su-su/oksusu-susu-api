@@ -2,7 +2,6 @@ package com.oksusu.susu.post.model.response
 
 import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.extension.equalsFromYearToSec
-import com.oksusu.susu.post.domain.Board
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.model.BoardModel
 import com.oksusu.susu.post.model.VoteOptionModel
