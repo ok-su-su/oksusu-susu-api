@@ -87,5 +87,8 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Count Error Code */
     NOT_FOUND_COUNT_ERROR(HttpStatus.NOT_FOUND, "카운트 정보를 찾을 수 없습니다."),
+
+    /** Status Error Code */
+    NOT_FOUND_STATUS_ERROR(HttpStatus.NOT_FOUND, "상태 정보를 찾을 수 없습니다."),
     ;
 }

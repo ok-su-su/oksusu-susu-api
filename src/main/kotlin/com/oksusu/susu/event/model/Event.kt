@@ -6,6 +6,7 @@ import com.oksusu.susu.ledger.domain.Ledger
 import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.user.domain.UserDevice
+import com.oksusu.susu.user.domain.UserStatusHistory
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.server.ServerWebExchange
 import java.time.LocalDateTime
@@ -66,4 +67,8 @@ data class SystemActionLogEvent(
 data class SlackErrorAlarmEvent(
     val request: ServerHttpRequest,
     val exception: Exception,
+) : BaseEvent()
+
+data class CreateUserStatusHistoryEvent(
+    val userStatusHistory: UserStatusHistory,
 ) : BaseEvent()

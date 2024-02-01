@@ -23,9 +23,10 @@ CREATE TABLE `status`
 (
     `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT '상태 정보 id',
     `description`  varchar(256) NOT NULL COMMENT '상태 정보 설명',
-    `has_penalty`  tinyint      NOT NULL COMMENT '패널티 보유 여부 / 패널티 있음 : 1, 패널티 없음 : 0',
+    `status_type` int NOT NULL COMMENT '상태 정보 타입 / 활동 : 0, 탈퇴 : 1, 처벌 : 2'
     `penalty_type` int      DEFAULT NULL COMMENT '패널티 타입 / 일시 정지 : 0, 영구 정지 : 1',
     `degree`       int      DEFAULT NULL COMMENT '형량',
+    `is_active`   tinyint      NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
     `created_at`   datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at`  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
