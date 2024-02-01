@@ -15,7 +15,7 @@ class UserStatusHistory(
     /** 해당 유저 id */
     val uid: Long,
 
-    /** 관련된 유저 상태 타입 */
+    /** 변경된 유저 상태 타입 */
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "status_assignment_type")
     val statusAssignmentType: StatusAssignmentType,

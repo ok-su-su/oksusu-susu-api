@@ -8,7 +8,10 @@ enum class StatusType {
     /** 탈퇴 */
     DELETED,
 
-    /** 처벌 */
-    PUNISHED,
+    /** 일시 정지 7일 */
+    RESTRICTED_7_DAYS,
+
+    /** 영구 정지 */
+    BANISHED,
     ;
 }

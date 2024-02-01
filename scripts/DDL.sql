@@ -21,14 +21,11 @@ CREATE UNIQUE INDEX uidx__oauth_id__oauth_provider ON user (oauth_id, oauth_prov
 -- 상태 정보
 CREATE TABLE `status`
 (
-    `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT '상태 정보 id',
-    `description`  varchar(256) NOT NULL COMMENT '상태 정보 설명',
-    `status_type` int NOT NULL COMMENT '상태 정보 타입 / 활동 : 0, 탈퇴 : 1, 처벌 : 2'
-    `penalty_type` int      DEFAULT NULL COMMENT '패널티 타입 / 일시 정지 : 0, 영구 정지 : 1',
-    `degree`       int      DEFAULT NULL COMMENT '형량',
-    `is_active`   tinyint      NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
-    `created_at`   datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    `modified_at`  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `id`          bigint  NOT NULL AUTO_INCREMENT COMMENT '상태 정보 id',
+    `status_type` int     NOT NULL COMMENT '상태 정보 타입 / 활동 : 0, 탈퇴 : 1,  일시 정지 7일 : 2, 영구 정지 : 3',
+    `is_active`   tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
+    `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='상태 정보';
 
@@ -48,13 +45,13 @@ CREATE UNIQUE INDEX idx__uid ON user_status (uid);
 -- 유저 상태 변경 기록
 CREATE TABLE `user_status_history`
 (
-    `id`             bigint NOT NULL AUTO_INCREMENT COMMENT '유저 상태 변경 기록 id',
-    `uid`            bigint NOT NULL COMMENT '해당 유저 id',
-    `status_type`    int      DEFAULT NULL COMMENT '변경된 유저 상태 타입 / 계정 상태 : 0, 커뮤니티 활동 상태 : 1',
-    `from_status_id` int    NOT NULL COMMENT '변경 이전 상태 id',
-    `to_status_id`   int    NOT NULL COMMENT '변경 후 상태 id',
-    `created_at`     datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    `modified_at`    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `id`                     bigint NOT NULL AUTO_INCREMENT COMMENT '유저 상태 변경 기록 id',
+    `uid`                    bigint NOT NULL COMMENT '해당 유저 id',
+    `status_assignment_type` int      DEFAULT NULL COMMENT '변경된 유저 상태 타입 / 계정 상태 : 0, 커뮤니티 활동 상태 : 1',
+    `from_status_id`         int    NOT NULL COMMENT '변경 이전 상태 id',
+    `to_status_id`           int    NOT NULL COMMENT '변경 후 상태 id',
+    `created_at`             datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`            datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
 CREATE UNIQUE INDEX idx__uid ON user_status_history (uid);
