@@ -8,12 +8,23 @@ import com.oksusu.susu.auth.model.AuthUserImpl
 import com.oksusu.susu.auth.model.AuthUserToken
 import com.oksusu.susu.auth.model.TokenDto
 import com.oksusu.susu.auth.model.response.TokenRefreshRequest
+import com.oksusu.susu.config.database.TransactionTemplates
+import com.oksusu.susu.event.model.CreateUserStatusHistoryEvent
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.exception.NoAuthorityException
+import com.oksusu.susu.extension.coExecute
+import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.post.application.PostService
+import com.oksusu.susu.user.application.StatusService
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserStatusService
+import com.oksusu.susu.user.domain.UserStatusHistory
+import com.oksusu.susu.user.domain.vo.StatusAssignmentType
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
@@ -27,6 +38,9 @@ class AuthFacade(
     private val oauthService: OAuthService,
     private val postService: PostService,
     private val userStatusService: UserStatusService,
+    private val eventPublisher: ApplicationEventPublisher,
+    private val txTemplates: TransactionTemplates,
+    private val statusService: StatusService,
 ) {
     fun resolveAuthUser(token: Mono<AuthUserToken>): Mono<Any> {
         return jwtTokenService.verifyTokenMono(token)
@@ -69,21 +83,49 @@ class AuthFacade(
 
     @Transactional
     suspend fun withdraw(authUser: AuthUser) {
-        val user = userService.findByIdOrThrow(authUser.uid)
+        val (deactivatedPosts, userAndUserStatusModel) = parZip(
+            { postService.findAllByUid(authUser.uid) },
+            { userService.getUserAndUserStatus(authUser.uid) }
+        ) { posts, userAndUserStatusModel ->
+            val deactivatedPosts = posts.map { post -> post.apply { isActive = false } }
 
-        parZip(
-            { oauthService.withdraw(user.oauthInfo) },
-            { userService.withdraw(authUser.uid) },
-            { userStatusService.withdraw(authUser.uid) }
-        ) { _, _, _ ->
-            val deactivatedPosts = postService.findAllByUid(authUser.uid)
-                .map { post ->
-                    post.apply {
-                        isActive = false
-                    }
+            deactivatedPosts to userAndUserStatusModel
+        }
+
+        val user = userAndUserStatusModel.user
+        val userStatus = userAndUserStatusModel.userStatus
+
+        coroutineScope {
+            val txDeferred = async {
+                txTemplates.writer.coExecuteOrNull {
+                    user.apply {
+                        this.oauthInfo = oauthInfo.withdrawOauthInfo()
+                    }.run { userService.saveSync(this) }
+
+                    userStatus.apply {
+                        accountStatusId = statusService.getDeletedStatusId()
+                    }.run { userStatusService.saveSync(this) }
+
+                    postService.saveAllSync(deactivatedPosts)
+
+                    eventPublisher.publishEvent(
+                        CreateUserStatusHistoryEvent(
+                            userStatusHistory = UserStatusHistory(
+                                uid = user.id,
+                                statusAssignmentType = StatusAssignmentType.ACCOUNT,
+                                fromStatusId = userStatus.accountStatusId,
+                                toStatusId = statusService.getDeletedStatusId()
+                            )
+                        )
+                    )
                 }
+            }
 
-            postService.saveAllSync(deactivatedPosts)
+            val oauthDeferred = async {
+                oauthService.withdraw(user.oauthInfo)
+            }
+
+            awaitAll(txDeferred, oauthDeferred)
         }
     }
 }

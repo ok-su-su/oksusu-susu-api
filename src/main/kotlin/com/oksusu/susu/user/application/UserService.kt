@@ -8,8 +8,10 @@ import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.infrastructure.UserRepository
+import com.oksusu.susu.user.infrastructure.model.UserAndUserStatusModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.aspectj.weaver.ast.Not
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val txTemplates: TransactionTemplates,
 ) {
     suspend fun validateNotRegistered(oauthInfo: OauthInfo) {
         existsByOauthInfo(oauthInfo).takeUnless { isExists -> isExists }
@@ -57,16 +58,6 @@ class UserService(
         return userRepository.findByIdOrNull(uid)
     }
 
-    suspend fun withdraw(uid: Long) {
-        val user = findByIdOrThrow(uid)
-
-        txTemplates.writer.coExecute {
-            user.apply {
-                this.oauthInfo = oauthInfo.withdrawOauthInfo()
-            }.run { saveSync(this) }
-        }
-    }
-
     suspend fun validateExist(id: Long) {
         withContext(Dispatchers.IO) {
             userRepository.existsById(id)
@@ -75,5 +66,11 @@ class UserService(
 
     suspend fun existsById(id: Long): Boolean {
         return withContext(Dispatchers.IO) { userRepository.existsById(id) }
+    }
+
+    suspend fun getUserAndUserStatus(uid: Long): UserAndUserStatusModel {
+        return withContext(Dispatchers.IO) {
+            userRepository.getUserAndUserStatus(uid)
+        } ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 }
