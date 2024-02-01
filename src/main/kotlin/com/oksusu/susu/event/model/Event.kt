@@ -72,3 +72,8 @@ data class SlackErrorAlarmEvent(
 data class CreateUserStatusHistoryEvent(
     val userStatusHistory: UserStatusHistory,
 ) : BaseEvent()
+
+data class SentryCaptureExceptionEvent(
+    val request: ServerHttpRequest,
+    val exception: Exception,
+) : BaseEvent()

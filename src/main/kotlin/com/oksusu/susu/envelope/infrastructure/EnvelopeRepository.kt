@@ -96,7 +96,7 @@ interface EnvelopeCustomRepository {
     fun findLatestFriendEnvelopes(friendIds: Set<Long>): List<Envelope>
 
     @Transactional(readOnly = true)
-    fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel
+    fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel?
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -347,7 +347,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel {
+    override fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel? {
         return JPAQuery<Envelope>(entityManager)
             .select(
                 QEnvelopeAndFriendModel(

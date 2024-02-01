@@ -27,6 +27,6 @@ class EnvelopeConfigService(
             type = EnvelopeType.RECEIVED
         )?.amount ?: 0L
 
-        return SearchFilterEnvelopeResponse(maxReceivedAmount)
+        return SearchFilterEnvelopeResponse(0L, maxReceivedAmount)
     }
 }

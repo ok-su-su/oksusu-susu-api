@@ -67,4 +67,10 @@ class BlockService(
     fun deleteById(id: Long) {
         blockRepository.deleteById(id)
     }
+
+    suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: BlockTargetType): Block {
+        return withContext(Dispatchers.IO) {
+            blockRepository.findByTargetIdAndTargetType(targetId, targetType)
+        } ?: throw NotFoundException(ErrorCode.NOT_FOUND_BLOCK_ERROR)
+    }
 }

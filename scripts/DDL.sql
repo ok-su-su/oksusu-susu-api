@@ -1,6 +1,5 @@
 -- scheme
-CREATE
-DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- 유저 정보
 CREATE TABLE `user`

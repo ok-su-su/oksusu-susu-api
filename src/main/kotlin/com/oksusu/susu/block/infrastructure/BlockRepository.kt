@@ -13,4 +13,7 @@ interface BlockRepository : JpaRepository<Block, Long> {
 
     @Transactional(readOnly = true)
     fun findAllByUid(uid: Long): List<Block>
+
+    @Transactional(readOnly = true)
+    fun findByTargetIdAndTargetType(targetId: Long, targetType: BlockTargetType): Block?
 }
