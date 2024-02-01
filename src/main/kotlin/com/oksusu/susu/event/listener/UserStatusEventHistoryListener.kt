@@ -1,9 +1,6 @@
 package com.oksusu.susu.event.listener
 
 import com.oksusu.susu.event.model.CreateUserStatusHistoryEvent
-import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
-import com.oksusu.susu.term.application.TermAgreementHistoryService
-import com.oksusu.susu.term.domain.TermAgreementHistory
 import com.oksusu.susu.user.infrastructure.UserStatusHistoryRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope

@@ -11,7 +11,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Service
 
+@Service
 class StatusService(
     private val statusRepository: StatusRepository,
 ) {
@@ -42,13 +44,13 @@ class StatusService(
         return statuses[id] ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
     }
 
-    fun getActiveStatus(): StatusModel {
-        return statuses.values.firstOrNull { status -> status.statusType == StatusType.ACTIVE }
+    fun getActiveStatusId(): Long {
+        return statuses.values.firstOrNull { status -> status.statusType == StatusType.ACTIVE }?.id
             ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
     }
 
-    fun getDeletedStatus(): StatusModel {
-        return statuses.values.firstOrNull { status -> status.statusType == StatusType.DELETED }
+    fun getDeletedStatusId(): Long {
+        return statuses.values.firstOrNull { status -> status.statusType == StatusType.DELETED }?.id
             ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
     }
 }

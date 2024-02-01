@@ -16,9 +16,9 @@ class UserStatus(
 
     /** 계정 상태 id */
     @Column(name = "account_status_id")
-    val accountStatusId: Long,
+    var accountStatusId: Long,
 
     /** 커뮤니티 활동 상태 id */
     @Column(name = "community_status_id")
-    val communityStatusId: Long,
-): BaseEntity()
+    var communityStatusId: Long,
+) : BaseEntity()

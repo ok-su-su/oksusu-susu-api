@@ -12,12 +12,12 @@ class StatusModel(
     val isActive: Boolean,
 ) {
     companion object {
-         fun from(status: Status): StatusModel {
-             return StatusModel(
-                 id = status.id,
-                 statusType = status.statusType,
-                 isActive = status.isActive,
-             )
-         }
+        fun from(status: Status): StatusModel {
+            return StatusModel(
+                id = status.id,
+                statusType = status.statusType,
+                isActive = status.isActive
+            )
+        }
     }
 }

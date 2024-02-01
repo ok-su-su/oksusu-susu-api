@@ -27,4 +27,4 @@ class UserStatusHistory(
     /** 변경 후 상태 id */
     @Column(name = "to_status_id")
     val toStatusId: Long,
-): BaseEntity()
+) : BaseEntity()

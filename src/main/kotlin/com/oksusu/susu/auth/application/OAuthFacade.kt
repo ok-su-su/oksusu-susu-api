@@ -19,9 +19,12 @@ import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
+import com.oksusu.susu.user.application.StatusService
 import com.oksusu.susu.user.application.UserService
+import com.oksusu.susu.user.application.UserStatusService
 import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.domain.UserDevice
+import com.oksusu.susu.user.domain.UserStatus
 import com.oksusu.susu.user.model.UserDeviceContext
 import com.oksusu.susu.user.model.UserDeviceContextImpl
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -42,6 +45,8 @@ class OAuthFacade(
     private val termService: TermService,
     private val termAgreementService: TermAgreementService,
     private val eventPublisher: ApplicationEventPublisher,
+    private val userStatusService: UserStatusService,
+    private val statusService: StatusService,
 ) {
     val logger = KotlinLogging.logger {}
 
@@ -74,6 +79,12 @@ class OAuthFacade(
         val user = txTemplates.writer.coExecute {
             val createdUser = User.toEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
+
+            UserStatus(
+                uid = createdUser.id,
+                accountStatusId = statusService.getActiveStatusId(),
+                communityStatusId = statusService.getActiveStatusId()
+            ).run { userStatusService.saveSync(this) }
 
             val termAgreements = request.termAgreement
                 .map { TermAgreement(uid = createdUser.id, termId = it) }

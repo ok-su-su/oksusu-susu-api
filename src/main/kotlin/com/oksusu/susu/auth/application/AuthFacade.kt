@@ -13,6 +13,7 @@ import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.exception.NoAuthorityException
 import com.oksusu.susu.post.application.PostService
 import com.oksusu.susu.user.application.UserService
+import com.oksusu.susu.user.application.UserStatusService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
@@ -25,6 +26,7 @@ class AuthFacade(
     private val tokenGenerateHelper: TokenGenerateHelper,
     private val oauthService: OAuthService,
     private val postService: PostService,
+    private val userStatusService: UserStatusService,
 ) {
     fun resolveAuthUser(token: Mono<AuthUserToken>): Mono<Any> {
         return jwtTokenService.verifyTokenMono(token)
@@ -71,8 +73,9 @@ class AuthFacade(
 
         parZip(
             { oauthService.withdraw(user.oauthInfo) },
-            { userService.withdraw(authUser.uid) }
-        ) { _, _ ->
+            { userService.withdraw(authUser.uid) },
+            { userStatusService.withdraw(authUser.uid) }
+        ) { _, _, _ ->
             val deactivatedPosts = postService.findAllByUid(authUser.uid)
                 .map { post ->
                     post.apply {
