@@ -7,7 +7,6 @@ import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.User
-import com.oksusu.susu.user.domain.vo.UserState
 import com.oksusu.susu.user.infrastructure.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -63,7 +62,6 @@ class UserService(
 
         txTemplates.writer.coExecute {
             user.apply {
-                this.userState = UserState.DELETED
                 this.oauthInfo = oauthInfo.withdrawOauthInfo()
             }.run { saveSync(this) }
         }

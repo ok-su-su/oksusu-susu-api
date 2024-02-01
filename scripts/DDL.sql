@@ -1,5 +1,6 @@
 -- scheme
-CREATE DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE
+DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- 유저 정보
 CREATE TABLE `user`
@@ -7,7 +8,6 @@ CREATE TABLE `user`
     `id`                bigint       NOT NULL AUTO_INCREMENT COMMENT 'user id',
     `oauth_provider`    int          NOT NULL COMMENT 'oauth 제공자, KAKAO: 0',
     `oauth_id`          varchar(256) NOT NULL COMMENT 'oauth id',
-    `user_state`        int          NOT NULL COMMENT '유저 계정 상태, 활동 유저: 0, 탈퇴한 유저: 1, 정지 유저: 2, 영구 정지: 3',
     `name`              varchar(256) NOT NULL COMMENT 'user 이름',
     `gender`            int          DEFAULT NULL COMMENT 'user 성별, 남성: 0, 여성: 1',
     `birth`             date         DEFAULT NULL COMMENT 'user 출생년도',
@@ -17,6 +17,46 @@ CREATE TABLE `user`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 정보';
 CREATE UNIQUE INDEX uidx__oauth_id__oauth_provider ON user (oauth_id, oauth_provider);
+
+-- 상태 정보
+CREATE TABLE `status`
+(
+    `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT '상태 정보 id',
+    `description`  varchar(256) NOT NULL COMMENT '상태 정보 설명',
+    `has_penalty`  tinyint      NOT NULL COMMENT '패널티 보유 여부 / 패널티 있음 : 1, 패널티 없음 : 0',
+    `penalty_type` int      DEFAULT NULL COMMENT '패널티 타입 / 일시 정지 : 0, 영구 정지 : 1',
+    `degree`       int      DEFAULT NULL COMMENT '형량',
+    `created_at`   datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='상태 정보';
+
+-- 유저 상태 정보
+CREATE TABLE `user_status`
+(
+    `id`                  bigint NOT NULL AUTO_INCREMENT COMMENT '유저 상태 정보 id',
+    `uid`                 bigint NOT NULL COMMENT '해당 유저 id',
+    `account_status_id`   bigint NOT NULL COMMENT '계정 상태 id',
+    `community_status_id` bigint NOT NULL COMMENT '커뮤니티 활동 상태 id',
+    `created_at`          datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`         datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 정보';
+CREATE UNIQUE INDEX idx__uid ON user_status (uid);
+
+-- 유저 상태 변경 기록
+CREATE TABLE `user_status_history`
+(
+    `id`             bigint NOT NULL AUTO_INCREMENT COMMENT '유저 상태 변경 기록 id',
+    `uid`            bigint NOT NULL COMMENT '해당 유저 id',
+    `status_type`    int      DEFAULT NULL COMMENT '변경된 유저 상태 타입 / 계정 상태 : 0, 커뮤니티 활동 상태 : 1',
+    `from_status_id` int    NOT NULL COMMENT '변경 이전 상태 id',
+    `to_status_id`   int    NOT NULL COMMENT '변경 후 상태 id',
+    `created_at`     datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
+CREATE UNIQUE INDEX idx__uid ON user_status_history (uid);
 
 -- 장부
 CREATE TABLE `ledger`
@@ -302,7 +342,7 @@ CREATE TABLE `user_device`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '유저 디바이스 정보';
 CREATE INDEX idx__uid ON user_device (uid);
 
-
+-- system log
 CREATE TABLE `system_action_log`
 (
     `id`          bigint NOT NULL AUTO_INCREMENT,
@@ -316,4 +356,4 @@ CREATE TABLE `system_action_log`
     `created_at`  datetime                        DEFAULT CURRENT_TIMESTAMP,
     `modified_at` datetime                        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '카운트';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT 'system log';

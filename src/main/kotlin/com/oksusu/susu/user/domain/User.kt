@@ -3,7 +3,6 @@ package com.oksusu.susu.user.domain
 import com.oksusu.susu.auth.model.request.OauthRegisterRequest
 import com.oksusu.susu.common.domain.BaseEntity
 import com.oksusu.susu.user.domain.vo.Gender
-import com.oksusu.susu.user.domain.vo.UserState
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -19,11 +18,6 @@ class User(
     /** oauth 정보 */
     @Embedded
     var oauthInfo: OauthInfo,
-
-    /** 유저 계정 상태 */
-    @Column(name = "user_state")
-    @Enumerated(EnumType.ORDINAL)
-    var userState: UserState = UserState.ACTIVE,
 
     /** 이름 */
     var name: String,
