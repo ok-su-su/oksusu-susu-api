@@ -81,6 +81,9 @@ object DependencyVersion {
     /** slack */
     const val SLACK_API_VERSION = "1.38.0"
 
+    /** sentry */
+    const val SENTRY_VERSION = "7.3.0"
+
     /** test */
     const val MOCKK_VERSION = "1.13.4"
     const val KOTEST_VERSION = "5.7.2"
@@ -147,7 +150,7 @@ dependencies {
     implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API_VERSION}")
 
     /** sentry */
-    implementation(platform("io.sentry:sentry-bom:7.3.0")) // import bom
+    implementation(platform("io.sentry:sentry-bom:${DependencyVersion.SENTRY_VERSION}"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 

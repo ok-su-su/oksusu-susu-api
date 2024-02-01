@@ -80,6 +80,6 @@ sentry:
   dsn: ${SENTRY_DSN}
   traces-sample-rate: 1.0
   enable-tracing: true
-  environment: dev
+  environment: prod
   serverName: api-server
   send-default-pii: true
