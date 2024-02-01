@@ -47,11 +47,11 @@ class ReportFacade(
             ReportTargetType.USER -> userService.existsById(request.targetId)
         }
 
-        if (isExists && request.targetType == ReportTargetType.POST) {
+        if (!isExists && request.targetType == ReportTargetType.POST) {
             throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
         }
 
-        if (isExists && request.targetType == ReportTargetType.USER) {
+        if (!isExists && request.targetType == ReportTargetType.USER) {
             throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
         }
 
