@@ -8,17 +8,28 @@ import kotlin.reflect.full.declaredMemberProperties
 
 @Configuration
 @EnableConfigurationProperties(
-    SusuConfig.LedgerCreateFormConfig::class
+    SusuConfig.LedgerCreateFormConfig::class,
+    SusuConfig.SlackWebhookConfig::class
 )
-class SusuConfig {
+data class SusuConfig(
+    val ledgerCreateFormConfig: LedgerCreateFormConfig,
+    val slackWebhookConfig: SlackWebhookConfig,
+) {
     init {
         val logger = KotlinLogging.logger { }
         SusuConfig::class.declaredMemberProperties
-            .forEach { config -> logger.info { config.get(this).toString() } }
+            .forEach { config ->
+                logger.info { config.get(this).toString() }
+            }
     }
 
-    @ConfigurationProperties("susu.ledger-config.create-form")
+    @ConfigurationProperties(prefix = "susu.ledger-config.create-form")
     data class LedgerCreateFormConfig(
         val onlyStartAtCategoryIds: List<Long>,
+    )
+
+    @ConfigurationProperties(prefix = "slack")
+    class SlackWebhookConfig(
+        val token: String,
     )
 }
