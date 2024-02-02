@@ -6,7 +6,7 @@ import com.oksusu.susu.auth.model.response.OauthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.KakaoOauthService
 import com.oksusu.susu.user.domain.OauthInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.http.server.reactive.AbstractServerHttpRequest
+import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,7 +26,7 @@ class OAuthService(
     suspend fun getOauthToken(
         provider: OauthProvider,
         code: String,
-        request: AbstractServerHttpRequest,
+        request: ServerHttpRequest,
     ): OauthTokenResponse {
         return when (provider) {
             OauthProvider.KAKAO -> kakaoOauthService.getOauthToken(code, request.uri.toString())

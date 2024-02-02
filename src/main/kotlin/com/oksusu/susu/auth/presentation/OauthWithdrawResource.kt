@@ -3,7 +3,6 @@ package com.oksusu.susu.auth.presentation
 import com.oksusu.susu.auth.application.OAuthFacade
 import com.oksusu.susu.auth.application.OAuthService
 import com.oksusu.susu.auth.model.OauthProvider
-import org.springframework.http.server.reactive.AbstractServerHttpRequest
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -22,9 +21,8 @@ class OauthWithdrawResource(
     @GetMapping("/withdraw/login")
     suspend fun getWithdrawLoginPage(
         model: Model,
-        serverHttpRequest: ServerHttpRequest,
+        request: ServerHttpRequest,
     ): String {
-        val request = serverHttpRequest as AbstractServerHttpRequest
         val kakaoRedirectUrl = oAuthService.getOauthLoginLink(OauthProvider.KAKAO, request.uri.toString()).link
         model.addAttribute("kakaoRedirectUrl", kakaoRedirectUrl)
         return "withdrawLogin"
@@ -34,10 +32,9 @@ class OauthWithdrawResource(
     @GetMapping("kakao/callback")
     suspend fun getKakaoCallbackPage(
         model: Model,
-        serverHttpRequest: ServerHttpRequest,
+        request: ServerHttpRequest,
         @RequestParam code: String,
     ): RedirectView {
-        val request = serverHttpRequest as AbstractServerHttpRequest
         val susuToken = oAuthFacade.loginWithCode(OauthProvider.KAKAO, code, request)
         return RedirectView("/withdraw?xSusuAuthToken=$susuToken")
     }
