@@ -2,6 +2,8 @@ package com.oksusu.susu.log.application
 
 import com.oksusu.susu.log.domain.SystemActionLog
 import com.oksusu.susu.log.infrastructure.SystemActionLogRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -22,5 +24,12 @@ class SystemActionLogService(
     @Transactional
     fun deleteAllBy(systemActionLogs: List<SystemActionLog>) {
         systemActionLogRepository.deleteAllInBatch(systemActionLogs)
+    }
+
+    suspend fun countByCreatedAtBetween(
+        startAt: LocalDateTime,
+        endAt: LocalDateTime,
+    ): Long {
+        return withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(startAt, endAt) }
     }
 }
