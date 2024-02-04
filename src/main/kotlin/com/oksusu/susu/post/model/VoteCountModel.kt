@@ -1,6 +1,5 @@
 package com.oksusu.susu.post.model
 
-import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.post.domain.Post
 import java.time.LocalDateTime
 

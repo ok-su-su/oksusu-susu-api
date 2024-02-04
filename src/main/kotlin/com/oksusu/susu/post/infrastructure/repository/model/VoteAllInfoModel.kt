@@ -9,5 +9,5 @@ class VoteAllInfoModel @QueryProjection constructor(
     val post: Post,
     val voteOption: VoteOption,
     val optionCount: Long,
-    val creator: User
+    val creator: User,
 )

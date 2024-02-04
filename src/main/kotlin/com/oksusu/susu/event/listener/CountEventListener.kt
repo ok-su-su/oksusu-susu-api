@@ -15,14 +15,14 @@ class CountEventListener(
     private val countService: CountService,
     private val txTemplates: TransactionTemplates,
 ) {
-    val logger = KotlinLogging.logger {  }
+    val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
-    fun deleteCount(event: DeleteVoteCountEvent){
+    fun deleteCount(event: DeleteVoteCountEvent) {
         CoroutineScope(Dispatchers.IO).launch {
             logger.info { "[${event.publishAt}] ${event.postId} post 관련 count delete 시작" }
 
-            txTemplates.writer.coExecuteOrNull{
+            txTemplates.writer.coExecuteOrNull {
                 /** post count 삭제 */
                 countService.deleteByTargetIdAndTargetType(event.postId, CountTargetType.POST)
 

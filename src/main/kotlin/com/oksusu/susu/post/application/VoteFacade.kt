@@ -29,7 +29,6 @@ import com.oksusu.susu.post.model.response.VoteAllInfoResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
-import com.oksusu.susu.user.application.UserService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Slice
@@ -43,7 +42,6 @@ class VoteFacade(
     private val voteService: VoteService,
     private val voteOptionService: VoteOptionService,
     private val voteHistoryService: VoteHistoryService,
-    private val userService: UserService,
     private val boardService: BoardService,
     private val blockService: BlockService,
     private val countService: CountService,
@@ -157,7 +155,6 @@ class VoteFacade(
             creator = creator,
             isMine = user.uid == creator.id
         )
-
     }
 
     suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
@@ -187,10 +184,10 @@ class VoteFacade(
 
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
         val (voteCount, voteOptionCount) = parZip(
-            { voteHistoryService.validateVoteExist(uid, postId, optionId)},
+            { voteHistoryService.validateVoteExist(uid, postId, optionId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
-        ) {  _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
+        ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecuteOrNull {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
@@ -244,6 +241,7 @@ class VoteFacade(
         }
     }
 
+    /** 투표가 진행된 경우 업데이트 불가능 */
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
         return parZip(
             { postService.validateAuthority(id, user.uid) },
