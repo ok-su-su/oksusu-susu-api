@@ -52,7 +52,7 @@ class VoteService(
         userBlockIds: Set<Long>,
         postBlockIds: Set<Long>,
         size: Int,
-    ): List<PostAndCountModel> {
+    ): List<PostAndVoteCountModel> {
         val spec = GetVoteSpec(
             uid = uid,
             searchSpec = SearchVoteSpec.defaultPopularSpec(),

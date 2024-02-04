@@ -28,23 +28,6 @@ class VoteAndOptionsWithCountResponse(
     companion object {
         fun of(
             vote: Post,
-            count: Count,
-            options: List<VoteOptionModel>,
-            boardModel: BoardModel,
-        ): VoteAndOptionsWithCountResponse {
-            return VoteAndOptionsWithCountResponse(
-                id = vote.id,
-                uid = vote.uid,
-                board = boardModel,
-                content = vote.content,
-                isModified = !vote.createdAt.equalsFromYearToSec(vote.modifiedAt),
-                count = count.count,
-                options = options.filter { it.postId == vote.id },
-                createdAt = vote.createdAt
-            )
-        }
-        fun of(
-            vote: Post,
             count: Long,
             options: List<VoteOptionModel>,
             boardModel: BoardModel,

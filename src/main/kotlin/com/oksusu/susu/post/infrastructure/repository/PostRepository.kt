@@ -43,7 +43,7 @@ interface PostCustomRepository {
     fun getVoteAllInfo(id: Long): List<VoteAllInfoModel>
 
     @Transactional(readOnly = true)
-    fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndCountModel>
+    fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel>
 
     @Transactional(readOnly = true)
     fun getAllVotesExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteOptionAndOptionCountModel>
@@ -100,7 +100,7 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             ).fetch()
     }
 
-    override fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndCountModel> {
+    override fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel> {
         val uidFilter = spec.searchSpec.mine?.takeIf { mine -> mine }?.let {
             qPost.uid.isEquals(spec.uid)
         } ?: qPost.uid.isNotIn(spec.userBlockIds)
@@ -115,9 +115,9 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
 
         val query = JPAQuery<QPost>(entityManager)
             .select(
-                QPostAndCountModel(
+                QPostAndVoteCountModel(
                     qPost,
-                    qCount
+                    qCount.count
                 )
             )
             .from(qPost)
