@@ -8,6 +8,7 @@ import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.count.application.CountService
 import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.count.domain.vo.CountTargetType
+import com.oksusu.susu.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.post.domain.Post
@@ -30,6 +31,7 @@ import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.user.application.UserService
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 
@@ -44,6 +46,7 @@ class VoteFacade(
     private val boardService: BoardService,
     private val blockService: BlockService,
     private val countService: CountService,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -112,39 +115,41 @@ class VoteFacade(
     }
 
     suspend fun getVote(user: AuthUser, id: Long): VoteAllInfoResponse {
-        val voteInfos = voteService.getVoteAndOptions(id)
+        val (voteInfos, voteHistory) = parZip(
+            { voteService.getVoteAllInfo(id) },
+            { voteHistoryService.findByUidAndPostId(user.uid, id) }
+        ) { voteInfos, voteHistory ->
+            voteInfos to voteHistory
+        }
 
         val vote = voteInfos[0].post
+        val creator = voteInfos[0].creator
         val options = voteInfos.map { voteInfo -> voteInfo.voteOption }
-        val optionIds = options.map { option -> option.id }
+        val optionCounts = voteInfos.associate { voteInfo -> voteInfo.voteOption.id to voteInfo.optionCount }
 
-        return parZip(
-            { userService.findByIdOrThrow(vote.uid) },
-            { countService.findByTargetIdAndTargetType(vote.id, CountTargetType.POST) },
-            { countService.findAllByTargetTypeAndTargetIdIn(optionIds, CountTargetType.VOTE_OPTION) },
-            { voteHistoryService.findByUidAndPostId(user.uid, id) }
-        ) { creator, voteCount, optionCount, voteHistory ->
-            val optionCountModels = options.map { option ->
-                VoteOptionCountModel.of(
-                    option = option,
-                    count = optionCount.first { it.targetId == option.id },
-                    isVoted = voteHistory?.takeIf { history -> history.voteOptionId == option.id }
-                        ?.let { true }
-                        ?: false
-                )
-            }
-
-            VoteAllInfoResponse.of(
-                vote = VoteCountModel.of(
-                    vote,
-                    voteCount,
-                    boardService.getBoard(vote.boardId)
-                ),
-                options = optionCountModels,
-                creator = creator,
-                isMine = user.uid == creator.id
+        val optionCountModels = options.map { option ->
+            VoteOptionCountModel.of(
+                option = option,
+                count = optionCounts[option.id]!!,
+                isVoted = voteHistory?.takeIf { history -> history.voteOptionId == option.id }
+                    ?.let { true }
+                    ?: false
             )
         }
+
+        val voteCount = optionCounts.values.sum()
+
+        return VoteAllInfoResponse.of(
+            vote = VoteCountModel.of(
+                vote,
+                voteCount,
+                boardService.getBoard(vote.boardId)
+            ),
+            options = optionCountModels,
+            creator = creator,
+            isMine = user.uid == creator.id
+        )
+
     }
 
     suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
@@ -206,9 +211,12 @@ class VoteFacade(
                 postService.saveSync(this)
             }
 
-            countService.deleteByTargetIdAndTargetType(vote.id, CountTargetType.POST)
-
-            countService.deleteAllByTargetTypeAndTargetIdIn(CountTargetType.VOTE_OPTION, optionIds)
+            eventPublisher.publishEvent(
+                DeleteVoteCountEvent(
+                    postId = vote.id,
+                    optionIds = optionIds
+                )
+            )
         }
     }
 
@@ -234,9 +242,8 @@ class VoteFacade(
         return parZip(
             { postService.validateAuthority(id, user.uid) },
             { voteHistoryService.validateHistoryNotExist(id) },
-            { boardService.getBoard(request.boardId) },
             { voteService.getVoteAndOptions(id) }
-        ) { _, _, boardModel, voteInfos ->
+        ) { _, _, voteInfos ->
             val vote = voteInfos[0].post
             val options = voteInfos.map { voteInfo ->
                 VoteOptionAndHistoryModel.of(option = voteInfo.voteOption, isVoted = false)
@@ -253,7 +260,7 @@ class VoteFacade(
                 uid = user.uid,
                 post = updatedVote,
                 optionModels = options,
-                boardModel = boardModel
+                boardModel = boardService.getBoard(request.boardId)
             )
         }
     }

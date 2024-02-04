@@ -10,12 +10,9 @@ import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.QPost
 import com.oksusu.susu.post.domain.QVoteOption
 import com.oksusu.susu.post.domain.vo.PostType
-import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
-import com.oksusu.susu.post.infrastructure.repository.model.PostAndCountModel
-import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
-import com.oksusu.susu.post.infrastructure.repository.model.QPostAndCountModel
-import com.oksusu.susu.post.infrastructure.repository.model.QPostAndVoteOptionModel
+import com.oksusu.susu.post.infrastructure.repository.model.*
 import com.oksusu.susu.post.model.vo.VoteSortType
+import com.oksusu.susu.user.domain.QUser
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,6 +37,12 @@ interface PostCustomRepository {
     fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel>
 
     @Transactional(readOnly = true)
+    fun getVoteAndOptionsAndOptionCount(id: Long): List<PostAndVoteOptionAndOptionCountModel>
+
+    @Transactional(readOnly = true)
+    fun getVoteAllInfo(id: Long): List<VoteAllInfoModel>
+
+    @Transactional(readOnly = true)
     fun getAllVotesExceptBlock(spec: GetAllVoteSpec): Slice<PostAndCountModel>
 }
 
@@ -53,12 +56,40 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
     private val qPost = QPost.post
     private val qVoteOption = QVoteOption.voteOption
     private val qCount = QCount.count1
+    private val qUser = QUser.user
 
     override fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
         return JPAQuery<QPost>(entityManager)
             .select(QPostAndVoteOptionModel(qPost, qVoteOption))
             .from(qPost)
             .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
+            .where(
+                qPost.id.eq(id),
+                qPost.isActive.eq(true),
+                qPost.type.eq(PostType.VOTE)
+            ).fetch()
+    }
+
+    override fun getVoteAndOptionsAndOptionCount(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
+        return JPAQuery<QPost>(entityManager)
+            .select(QPostAndVoteOptionAndOptionCountModel(qPost, qVoteOption, qCount.count))
+            .from(qPost)
+            .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
+            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
+            .where(
+                qPost.id.eq(id),
+                qPost.isActive.eq(true),
+                qPost.type.eq(PostType.VOTE)
+            ).fetch()
+    }
+
+    override fun getVoteAllInfo(id: Long): List<VoteAllInfoModel> {
+        return JPAQuery<QPost>(entityManager)
+            .select(QVoteAllInfoModel(qPost, qVoteOption, qCount.count, qUser))
+            .from(qPost)
+            .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
+            .join(qUser).on(qPost.uid.eq(qUser.id))
+            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
             .where(
                 qPost.id.eq(id),
                 qPost.isActive.eq(true),

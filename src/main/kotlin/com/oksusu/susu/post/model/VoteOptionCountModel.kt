@@ -19,13 +19,13 @@ data class VoteOptionCountModel(
     val isVoted: Boolean,
 ) {
     companion object {
-        fun of(option: VoteOption, count: Count, isVoted: Boolean): VoteOptionCountModel {
+        fun of(option: VoteOption, count: Long, isVoted: Boolean): VoteOptionCountModel {
             return VoteOptionCountModel(
                 id = option.id,
                 postId = option.postId,
                 content = option.content,
                 seq = option.seq,
-                count = count.count,
+                count = count,
                 isVoted = isVoted
             )
         }

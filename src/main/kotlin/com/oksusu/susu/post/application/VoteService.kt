@@ -5,10 +5,7 @@ import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
-import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
-import com.oksusu.susu.post.infrastructure.repository.model.PostAndCountModel
-import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
-import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
+import com.oksusu.susu.post.infrastructure.repository.model.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,6 +33,18 @@ class VoteService(
     suspend fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
         return withContext(Dispatchers.IO) {
             postRepository.getVoteAndOptions(id)
+        }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
+    }
+
+    suspend fun getVoteAndOptionsAndOptionCount(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
+        return withContext(Dispatchers.IO) {
+            postRepository.getVoteAndOptionsAndOptionCount(id)
+        }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
+    }
+
+    suspend fun getVoteAllInfo(id: Long): List<VoteAllInfoModel> {
+        return withContext(Dispatchers.IO) {
+            postRepository.getVoteAllInfo(id)
         }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
     }
 
