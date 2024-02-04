@@ -1,6 +1,5 @@
 package com.oksusu.susu.post.model
 
-import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.post.domain.Post
 import java.time.LocalDateTime
 
@@ -22,7 +21,7 @@ data class VoteCountModel(
     val count: Long,
 ) {
     companion object {
-        fun of(post: Post, count: Count, boardModel: BoardModel): VoteCountModel {
+        fun of(post: Post, count: Long, boardModel: BoardModel): VoteCountModel {
             return VoteCountModel(
                 id = post.id,
                 uid = post.uid,
@@ -30,7 +29,7 @@ data class VoteCountModel(
                 content = post.content,
                 createdAt = post.createdAt,
                 modifiedAt = post.modifiedAt,
-                count = count.count
+                count = count
             )
         }
     }
