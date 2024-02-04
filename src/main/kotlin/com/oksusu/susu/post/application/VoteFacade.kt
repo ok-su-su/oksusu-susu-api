@@ -15,7 +15,7 @@ import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.VoteHistory
 import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.PostType
-import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
+import com.oksusu.susu.post.infrastructure.repository.model.GetVoteSpec
 import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionAndHistoryModel
@@ -33,6 +33,7 @@ import com.oksusu.susu.user.application.UserService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Slice
+import org.springframework.data.domain.SliceImpl
 import org.springframework.stereotype.Service
 
 @Service
@@ -87,31 +88,38 @@ class VoteFacade(
         searchRequest: SearchVoteRequest,
         pageRequest: SusuPageRequest,
     ): Slice<VoteAndOptionsWithCountResponse> {
-        val searchSpec = SearchVoteSpec.from(searchRequest)
-
         val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.uid)
 
-        val getAllVoteSpec = GetAllVoteSpec(
+        val getVoteSpec = GetVoteSpec(
             uid = user.uid,
-            searchSpec = searchSpec,
+            searchSpec = SearchVoteSpec.from(searchRequest),
             userBlockIds = userAndPostBlockIdModel.userBlockIds,
             postBlockIds = userAndPostBlockIdModel.postBlockIds,
             pageable = pageRequest.toDefault()
         )
 
-        val voteAndCountModels = voteService.getAllVotesExceptBlock(getAllVoteSpec)
-        val optionModels = voteOptionService.getOptionsByPostIdIn(
-            voteAndCountModels.content.map { model -> model.post.id }
-        ).map { VoteOptionModel.from(it) }
+        val models = voteService.getAllVotesExceptBlock(getVoteSpec)
 
-        return voteAndCountModels.map { vote ->
+        val groupByPostId = models.content.groupBy { model -> model.post.id }
+
+        val votes = models.content.map { model -> model.post }.distinct()
+        val options = groupByPostId.map { group ->
+            group.key to group.value.map { model -> VoteOptionModel.from(model.voteOption) }
+        }.toMap()
+        val counts = groupByPostId.map { group ->
+            group.key to group.value.sumOf { model -> model.optionCount }
+        }.toMap()
+
+        val contents = votes.map { vote ->
             VoteAndOptionsWithCountResponse.of(
-                vote = vote.post,
-                count = vote.count,
-                options = optionModels.filter { option -> option.postId == vote.post.id },
-                boardModel = boardService.getBoard(vote.post.boardId)
+                vote = vote,
+                count = counts[vote.id]!!,
+                options = options[vote.id]!!,
+                boardModel = boardService.getBoard(vote.boardId)
             )
         }
+
+        return SliceImpl(contents, pageRequest.toDefault(), models.hasNext())
     }
 
     suspend fun getVote(user: AuthUser, id: Long): VoteAllInfoResponse {
@@ -160,14 +168,13 @@ class VoteFacade(
     }
 
     private suspend fun castVote(uid: Long, postId: Long, optionId: Long) {
-        voteHistoryService.validateVoteNotExist(uid, postId)
-
         val (voteCount, voteOptionCount) = parZip(
+            { voteHistoryService.validateVoteNotExist(uid, postId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
-        ) { voteCount, voteOptionCount -> voteCount to voteOptionCount }
+        ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
-        txTemplates.writer.coExecute {
+        txTemplates.writer.coExecuteOrNull() {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
                 .run { voteHistoryService.saveSync(this) }
 
@@ -179,12 +186,11 @@ class VoteFacade(
     }
 
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
-        voteHistoryService.validateVoteExist(uid, postId, optionId)
-
         val (voteCount, voteOptionCount) = parZip(
+            { voteHistoryService.validateVoteExist(uid, postId, optionId)},
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
-        ) { voteCount, voteOptionCount -> voteCount to voteOptionCount }
+        ) {  _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecuteOrNull {
             voteHistoryService.deleteByUidAndPostId(uid, postId)

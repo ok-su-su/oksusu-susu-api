@@ -19,10 +19,9 @@ class VoteService(
     private val postRepository: PostRepository,
 ) {
     val logger = KotlinLogging.logger { }
-
-    suspend fun getAllVotesExceptBlock(getAllVoteSpec: GetAllVoteSpec): Slice<PostAndCountModel> {
+    suspend fun getAllVotesExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteOptionAndOptionCountModel> {
         return withContext(Dispatchers.IO) {
-            postRepository.getAllVotesExceptBlock(getAllVoteSpec)
+            postRepository.getAllVotesExceptBlock(spec)
         }
     }
 
@@ -54,7 +53,7 @@ class VoteService(
         postBlockIds: Set<Long>,
         size: Int,
     ): List<PostAndCountModel> {
-        val spec = GetAllVoteSpec(
+        val spec = GetVoteSpec(
             uid = uid,
             searchSpec = SearchVoteSpec.defaultPopularSpec(),
             userBlockIds = userBlockIds,
@@ -62,6 +61,6 @@ class VoteService(
             pageable = PageRequest.of(0, size)
         )
 
-        return withContext(Dispatchers.IO) { postRepository.getAllVotesExceptBlock(spec) }.content
+        return withContext(Dispatchers.IO) { postRepository.getVoteAndCountExceptBlock(spec) }.content
     }
 }
