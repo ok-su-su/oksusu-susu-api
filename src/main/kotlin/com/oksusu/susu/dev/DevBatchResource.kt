@@ -22,13 +22,17 @@ class DevBatchResource(
 ) {
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "hour summary 호출")
     @GetMapping("/hour-summaries")
-    suspend fun getHourSummaries() = CoroutineScope(Dispatchers.IO).launch {
-        susuStatisticsHourSummaryJob.runHourSummaryJob()
+    suspend fun getHourSummaries() {
+        CoroutineScope(Dispatchers.IO).launch {
+            susuStatisticsHourSummaryJob.runHourSummaryJob()
+        }
     }
 
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "daily summary 호출")
     @GetMapping("/daily-summaries")
-    suspend fun getDailySummaries() = CoroutineScope(Dispatchers.IO).launch {
-        susuStatisticsDailySummaryJob.runDailySummaryJob()
+    suspend fun getDailySummaries() {
+        CoroutineScope(Dispatchers.IO).launch {
+            susuStatisticsDailySummaryJob.runDailySummaryJob()
+        }
     }
 }
