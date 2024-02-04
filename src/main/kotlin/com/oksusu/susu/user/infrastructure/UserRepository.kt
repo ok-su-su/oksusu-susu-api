@@ -5,6 +5,7 @@ import com.oksusu.susu.user.domain.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
@@ -13,4 +14,7 @@ interface UserRepository : JpaRepository<User, Long> {
 
     @Transactional(readOnly = true)
     fun findByOauthInfo(oauthInfo: OauthInfo): User?
+
+    @Transactional(readOnly = true)
+    fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
 }
