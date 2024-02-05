@@ -4,21 +4,21 @@ import com.oksusu.susu.cache.Cache
 import com.oksusu.susu.cache.CacheService
 import com.oksusu.susu.cache.CacheService.Companion.getOrNull
 import com.oksusu.susu.cache.CacheService.Companion.set
-import com.oksusu.susu.statistic.domain.SusuBasicEnvelopeStatistic
+import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import org.springframework.stereotype.Repository
 
 @Repository
-class SusuBasicEnvelopeStatisticRepository(
+class SusuEnvelopeStatisticRepository(
     private val cacheService: CacheService,
 ) {
-    suspend fun save(value: SusuBasicEnvelopeStatistic) {
+    suspend fun save(value: SusuEnvelopeStatistic) {
         cacheService.set(
-            cache = Cache.getSusuBasicEnvelopeStatisticCache,
+            cache = Cache.getSusuEnvelopeStatisticCache,
             value = value
         )
     }
 
-    suspend fun getStatistic(): SusuBasicEnvelopeStatistic? {
-        return cacheService.getOrNull(cache = Cache.getSusuBasicEnvelopeStatisticCache)
+    suspend fun getStatistic(): SusuEnvelopeStatistic? {
+        return cacheService.getOrNull(cache = Cache.getSusuEnvelopeStatisticCache)
     }
 }

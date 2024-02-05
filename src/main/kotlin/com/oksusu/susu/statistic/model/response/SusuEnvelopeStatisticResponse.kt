@@ -1,6 +1,6 @@
 package com.oksusu.susu.statistic.model.response
 
-import com.oksusu.susu.statistic.domain.SusuBasicEnvelopeStatistic
+import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.statistic.model.TitleValueModel
 
@@ -21,15 +21,15 @@ data class SusuEnvelopeStatisticResponse(
     val mostCategory: TitleValueModel<Long>?,
 ) {
     companion object {
-        fun of(specific: SusuSpecificEnvelopeStatisticModel, basic: SusuBasicEnvelopeStatistic): SusuEnvelopeStatisticResponse {
+        fun of(specific: SusuSpecificEnvelopeStatisticModel, statistic: SusuEnvelopeStatistic): SusuEnvelopeStatisticResponse {
             return SusuEnvelopeStatisticResponse(
                 averageSent = specific.averageSent,
                 averageRelationship = specific.averageRelationship,
                 averageCategory = specific.averageCategory,
-                recentSpent = basic.recentSpent,
-                mostSpentMonth = basic.mostSpentMonth,
-                mostRelationship = basic.relationship,
-                mostCategory = basic.category
+                recentSpent = statistic.recentSpent,
+                mostSpentMonth = statistic.mostSpentMonth,
+                mostRelationship = statistic.mostFrequentRelationShip,
+                mostCategory = statistic.mostFrequentCategory
             )
         }
     }

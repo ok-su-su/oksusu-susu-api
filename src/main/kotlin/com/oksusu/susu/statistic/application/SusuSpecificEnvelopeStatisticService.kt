@@ -20,17 +20,19 @@ class SusuSpecificEnvelopeStatisticService(
 ) {
     val logger = KotlinLogging.logger { }
 
-    suspend fun getSusuSpecificStatistic(request: SusuEnvelopeStatisticRequest): SusuSpecificEnvelopeStatisticModel {
+    suspend fun getStatistic(request: SusuEnvelopeStatisticRequest): SusuSpecificEnvelopeStatisticModel {
         val ageCategoryRelationshipKey = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(
             age = request.age.number,
             categoryId = request.categoryId,
             relationshipId = request.relationshipId
         )
+        val categoryKey = cacheKeyGenerateHelper.getSusuCategoryStatisticKey(request.categoryId)
+        val relationshipKey = cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)
 
         return parZip(
             { findByKey(ageCategoryRelationshipKey) },
-            { findByKey(cacheKeyGenerateHelper.getSusuCategoryStatisticKey(request.categoryId)) },
-            { findByKey(cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)) }
+            { findByKey(categoryKey) },
+            { findByKey(relationshipKey) }
         ) { averageSent, categoryAmount, relationShipAmount ->
             SusuSpecificEnvelopeStatisticModel(
                 averageSent = averageSent,

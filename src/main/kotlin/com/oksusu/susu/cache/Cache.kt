@@ -1,11 +1,11 @@
 package com.oksusu.susu.cache
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.oksusu.susu.common.consts.SUSU_BASIC_STATISTIC_KEY
+import com.oksusu.susu.common.consts.SUSU_ENVELOPE_STATISTIC_KEY
 import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
 import com.oksusu.susu.common.util.toTypeReference
-import com.oksusu.susu.statistic.domain.SusuBasicEnvelopeStatistic
+import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
 import java.time.Duration
 
@@ -15,16 +15,16 @@ class Cache<VALUE_TYPE>(
     val duration: Duration,
 ) {
     companion object Factory {
-        fun getSusuBasicStatisticCache(): Cache<SusuBasicEnvelopeStatistic> {
+        fun getSusuEnvelopeStatisticCache(): Cache<SusuEnvelopeStatistic> {
             return Cache(
-                key = SUSU_BASIC_STATISTIC_KEY,
-                type = toTypeReference<SusuBasicEnvelopeStatistic>(),
+                key = SUSU_ENVELOPE_STATISTIC_KEY,
+                type = toTypeReference<SusuEnvelopeStatistic>(),
                 duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
 
-        val getSusuBasicEnvelopeStatisticCache: Factory.() -> Cache<SusuBasicEnvelopeStatistic> =
-            { getSusuBasicStatisticCache() }
+        val getSusuEnvelopeStatisticCache: Factory.() -> Cache<SusuEnvelopeStatistic> =
+            { getSusuEnvelopeStatisticCache() }
 
         fun getSusuSpecificStatisticCache(key: String): Cache<Long> {
             return Cache(

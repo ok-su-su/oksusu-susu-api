@@ -1,6 +1,6 @@
 package com.oksusu.susu.statistic.model.response
 
-import com.oksusu.susu.statistic.domain.SusuBasicEnvelopeStatistic
+import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.statistic.model.TitleValueModel
 
@@ -19,29 +19,14 @@ class UserEnvelopeStatisticResponse(
     val highestAmountSent: TitleValueModel<Long>?,
 ) {
     companion object {
-        fun of(
-            basicStatistic: SusuBasicEnvelopeStatistic,
-            receivedMaxAmountModel: TitleValueModel<Long>?,
-            sentMaxAmountModel: TitleValueModel<Long>?,
-        ): UserEnvelopeStatisticResponse {
-            return UserEnvelopeStatisticResponse(
-                recentSpent = basicStatistic.recentSpent,
-                mostSpentMonth = basicStatistic.mostSpentMonth,
-                mostRelationship = basicStatistic.relationship,
-                mostCategory = basicStatistic.category,
-                highestAmountReceived = receivedMaxAmountModel,
-                highestAmountSent = sentMaxAmountModel
-            )
-        }
-
         fun from(userEnvelopeStatistic: UserEnvelopeStatistic): UserEnvelopeStatisticResponse {
             return UserEnvelopeStatisticResponse(
                 recentSpent = userEnvelopeStatistic.recentSpent,
                 mostSpentMonth = userEnvelopeStatistic.mostSpentMonth,
-                mostRelationship = userEnvelopeStatistic.mostRelationship,
-                mostCategory = userEnvelopeStatistic.mostCategory,
-                highestAmountReceived = userEnvelopeStatistic.highestAmountReceived,
-                highestAmountSent = userEnvelopeStatistic.highestAmountSent
+                mostRelationship = userEnvelopeStatistic.mostFrequentRelationShip,
+                mostCategory = userEnvelopeStatistic.mostFrequentCategory,
+                highestAmountReceived = userEnvelopeStatistic.maxReceivedEnvelope,
+                highestAmountSent = userEnvelopeStatistic.maxSentEnvelope
             )
         }
     }

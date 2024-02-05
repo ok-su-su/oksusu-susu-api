@@ -9,11 +9,11 @@ class UserEnvelopeStatistic(
     /** 경조사비를 가장 많이 쓴 달 */
     val mostSpentMonth: Long?,
     /** 최다 수수 관계 */
-    val mostRelationship: TitleValueModel<Long>?,
+    val mostFrequentRelationShip: TitleValueModel<Long>?,
     /** 최다 수수 경조사 */
-    val mostCategory: TitleValueModel<Long>?,
+    val mostFrequentCategory: TitleValueModel<Long>?,
     /** 가장 많이 받은 금액 */
-    val highestAmountReceived: TitleValueModel<Long>?,
+    val maxReceivedEnvelope: TitleValueModel<Long>?,
     /** 가장 많이 보낸 금액 */
-    val highestAmountSent: TitleValueModel<Long>?,
+    val maxSentEnvelope: TitleValueModel<Long>?,
 )

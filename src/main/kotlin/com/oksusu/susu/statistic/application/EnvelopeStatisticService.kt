@@ -5,6 +5,7 @@ import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
+import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.ledger.application.LedgerService
@@ -12,7 +13,7 @@ import com.oksusu.susu.statistic.model.TitleValueModel
 import org.springframework.stereotype.Service
 
 @Service
-class EnvelopeStatisticService (
+class EnvelopeStatisticService(
     private val envelopeService: EnvelopeService,
     private val ledgerService: LedgerService,
     private val categoryService: CategoryService,
@@ -38,11 +39,18 @@ class EnvelopeStatisticService (
     }
 
     /** 최다 수수 경조사 */
-    suspend fun getMostFrequentCategory(uid: Long): TitleValueModel<Long>? {
-        val (envelopeCategoryCounts, ledgerCategoryCounts) = parZip(
-            { envelopeService.countPerCategoryIdByUid(uid) },
-            { ledgerService.countPerCategoryIdByUid(uid) },
-        ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
+    suspend fun getMostFrequentCategory(uid: Long?): TitleValueModel<Long>? {
+        val (envelopeCategoryCounts, ledgerCategoryCounts) = if (uid == null) {
+            parZip(
+                { envelopeService.countPerCategoryId() },
+                { ledgerService.countPerCategoryId() },
+            ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
+        } else {
+            parZip(
+                { envelopeService.countPerCategoryIdByUid(uid) },
+                { ledgerService.countPerCategoryIdByUid(uid) },
+            ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
+        }
 
         val categoryIdSet = envelopeCategoryCounts.map { count -> count.categoryId }.toSet()
             .union(ledgerCategoryCounts.map { count -> count.categoryId })
@@ -66,8 +74,13 @@ class EnvelopeStatisticService (
     }
 
     /** 최다 수수 관계 */
-    suspend fun getMostFrequentRelationship(uid: Long): TitleValueModel<Long>? {
-        val relationShipConuts = friendRelationshipService.countPerRelationshipIdByUid(uid)
+    suspend fun getMostFrequentRelationship(uid: Long?): TitleValueModel<Long>? {
+        val relationShipConuts = if (uid == null) {
+            friendRelationshipService.countPerRelationshipId()
+        } else {
+            friendRelationshipService.countPerRelationshipIdByUid(uid)
+        }
+
 
         return relationShipConuts.takeIf { it.isNotEmpty() }
             ?.maxBy { it.totalCounts }
@@ -80,8 +93,12 @@ class EnvelopeStatisticService (
     }
 
     /** 최근 사용 금액 */
-    suspend fun getRecentSpent(uid: Long): List<TitleValueModel<Long>>? {
-        val envelopHandOverAtMonthCount = envelopeService.countPerHandedOverAtInLast8MonthByUid(uid, EnvelopeType.SENT)
+    suspend fun getRecentSpent(uid: Long?): List<TitleValueModel<Long>>? {
+        val envelopHandOverAtMonthCount = if (uid == null) {
+            envelopeService.countPerHandedOverAtInLast8Month(EnvelopeType.SENT)
+        } else {
+            envelopeService.countPerHandedOverAtInLast8MonthByUid(uid, EnvelopeType.SENT)
+        }
 
         return envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
             ?.map { count ->
