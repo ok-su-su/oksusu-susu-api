@@ -8,11 +8,11 @@ import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.ledger.application.LedgerService
-import com.oksusu.susu.statistic.domain.UserStatistic
+import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.statistic.model.TitleValueModel
-import com.oksusu.susu.statistic.model.response.SusuStatisticResponse
-import com.oksusu.susu.statistic.model.response.UserStatisticResponse
-import com.oksusu.susu.statistic.model.vo.SusuStatisticRequest
+import com.oksusu.susu.statistic.model.response.SusuEnvelopeStatisticResponse
+import com.oksusu.susu.statistic.model.response.UserEnvelopeStatisticResponse
+import com.oksusu.susu.statistic.model.vo.SusuEnvelopeStatisticRequest
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -22,21 +22,21 @@ class StatisticFacade(
     private val friendRelationshipService: FriendRelationshipService,
     private val ledgerService: LedgerService,
     private val categoryService: CategoryService,
-    private val userStatisticService: UserStatisticService,
-    private val susuBasicStatisticService: SusuBasicStatisticService,
-    private val susuSpecificStatisticService: SusuSpecificStatisticService,
+    private val userEnvelopeStatisticService: UserEnvelopeStatisticService,
+    private val susuBasicEnvelopeStatisticService: SusuBasicEnvelopeStatisticService,
+    private val susuSpecificEnvelopeStatisticService: SusuSpecificEnvelopeStatisticService,
     private val relationshipService: RelationshipService,
 ) {
     val logger = KotlinLogging.logger { }
 
-    suspend fun getUserStatistic(user: AuthUser): UserStatisticResponse {
+    suspend fun getUserEnvelopeStatistic(user: AuthUser): UserEnvelopeStatisticResponse {
         // caching 된거 확인
-        userStatisticService.getStatisticOrNull(user.uid)?.run {
+        userEnvelopeStatisticService.getStatisticOrNull(user.uid)?.run {
             logger.debug { "${user.uid} user statistic cache hit" }
-            return UserStatisticResponse.from(this)
+            return UserEnvelopeStatisticResponse.from(this)
         }
 
-        val userStatisticResponse = parZip(
+        val userEnvelopeStatisticResponse = parZip(
             // 최근 사용 금액
             // 경조사비를 가장 많이 쓴 달
             { envelopeService.countPerHandedOverAtInLast8MonthByUid(user.uid, EnvelopeType.SENT) },
@@ -59,7 +59,7 @@ class StatisticFacade(
             ->
 
             // 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사
-            val basicStatistic = susuBasicStatisticService.constructBasicStatistic(
+            val basicStatistic = susuBasicEnvelopeStatisticService.constructBasicStatistic(
                 envelopHandOverAtMonthCount = envelopHandOverAtMonthCount,
                 relationShipConuts = relationShipConuts,
                 envelopeCategoryCounts = envelopeCategoryCounts,
@@ -76,24 +76,24 @@ class StatisticFacade(
                 TitleValueModel(title = this.friend.name, value = this.envelope.amount)
             }
 
-            UserStatisticResponse.of(
+            UserEnvelopeStatisticResponse.of(
                 basicStatistic = basicStatistic,
                 receivedMaxAmountModel = receivedMaxAmountModel,
                 sentMaxAmountModel = sentMaxAmountModel
             )
         }
 
-        UserStatistic.from(userStatisticResponse).run {
-            userStatisticService.save(uid = user.uid, userStatistic = this)
+        UserEnvelopeStatistic.from(userEnvelopeStatisticResponse).run {
+            userEnvelopeStatisticService.save(uid = user.uid, userEnvelopeStatistic = this)
         }
 
-        return userStatisticResponse
+        return userEnvelopeStatisticResponse
     }
 
-    suspend fun getSusuStatistic(requestParam: SusuStatisticRequest): SusuStatisticResponse {
+    suspend fun getSusuEnvelopeStatistic(requestParam: SusuEnvelopeStatisticRequest): SusuEnvelopeStatisticResponse {
         return parZip(
-            { susuSpecificStatisticService.getSusuSpecificStatistic(requestParam) },
-            { susuBasicStatisticService.getStatisticOrThrow() }
+            { susuSpecificEnvelopeStatisticService.getSusuSpecificStatistic(requestParam) },
+            { susuBasicEnvelopeStatisticService.getStatisticOrThrow() }
         ) { tempSpecific, basic ->
             val specific = tempSpecific.apply {
                 this.averageCategory?.apply { title = categoryService.getCategory(requestParam.categoryId).name }
@@ -101,7 +101,7 @@ class StatisticFacade(
                     title = relationshipService.getRelationship(requestParam.relationshipId).relation
                 }
             }
-            SusuStatisticResponse.of(specific, basic)
+            SusuEnvelopeStatisticResponse.of(specific, basic)
         }
     }
 }

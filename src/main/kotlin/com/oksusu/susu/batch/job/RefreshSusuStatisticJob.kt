@@ -10,8 +10,8 @@ import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticG
 import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.ledger.application.LedgerService
-import com.oksusu.susu.statistic.application.SusuBasicStatisticService
-import com.oksusu.susu.statistic.application.SusuSpecificStatisticService
+import com.oksusu.susu.statistic.application.SusuBasicEnvelopeStatisticService
+import com.oksusu.susu.statistic.application.SusuSpecificEnvelopeStatisticService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import org.springframework.stereotype.Component
@@ -21,8 +21,8 @@ class RefreshSusuStatisticJob(
     private val envelopeService: EnvelopeService,
     private val friendRelationshipService: FriendRelationshipService,
     private val ledgerService: LedgerService,
-    private val susuBasicStatisticService: SusuBasicStatisticService,
-    private val susuSpecificStatisticService: SusuSpecificStatisticService,
+    private val susuBasicEnvelopeStatisticService: SusuBasicEnvelopeStatisticService,
+    private val susuSpecificEnvelopeStatisticService: SusuSpecificEnvelopeStatisticService,
     private val cacheKeyGenerateHelper: CacheKeyGenerateHelper,
 ) {
     val logger = KotlinLogging.logger { }
@@ -49,8 +49,8 @@ class RefreshSusuStatisticJob(
             ->
 
             /** 최근 사용 금액 + 경조사비를 가장 많이 쓴 달 + 최다 수수 관계 + 최다 수수 경조사 레디스 저장 */
-            susuBasicStatisticService.save(
-                susuBasicStatisticService.constructBasicStatistic(
+            susuBasicEnvelopeStatisticService.save(
+                susuBasicEnvelopeStatisticService.constructBasicStatistic(
                     envelopHandOverAtMonthCount,
                     relationShipConuts,
                     envelopeCategoryCounts,
@@ -61,7 +61,7 @@ class RefreshSusuStatisticJob(
             /**  평균 수수 레디스 저장 key: age:categoryId:relationshipId, value: avg */
             parseIntoGroup(avgAmountModels).map { model ->
                 async {
-                    susuSpecificStatisticService.save(
+                    susuSpecificEnvelopeStatisticService.save(
                         cacheKeyGenerateHelper.getSusuSpecificStatisticKey(model.key),
                         model.value
                     )
@@ -72,14 +72,14 @@ class RefreshSusuStatisticJob(
             avgAmountModels.groupBy { it.categoryId }.map { modelsMap ->
                 val key = SUSU_CATEGORY_STATISTIC_KEY_PREFIX + modelsMap.key.toString()
                 val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
-                async { susuSpecificStatisticService.save(key, avgAmount) }
+                async { susuSpecificEnvelopeStatisticService.save(key, avgAmount) }
             }
 
             /** key: susu_relationship_statistic:relationshipId, value: avg */
             avgAmountModels.groupBy { it.relationshipId }.map { modelsMap ->
                 val key = SUSU_RELATIONSHIP_STATISTIC_KEY_PREFIX + modelsMap.key.toString()
                 val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
-                async { susuSpecificStatisticService.save(key, avgAmount) }
+                async { susuSpecificEnvelopeStatisticService.save(key, avgAmount) }
             }
 
             logger.info { "finish refresh susu statistic" }

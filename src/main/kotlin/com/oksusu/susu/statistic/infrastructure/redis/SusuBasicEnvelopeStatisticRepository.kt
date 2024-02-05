@@ -2,24 +2,23 @@ package com.oksusu.susu.statistic.infrastructure.redis
 
 import com.oksusu.susu.cache.Cache
 import com.oksusu.susu.cache.CacheService
-import com.oksusu.susu.cache.CacheService.Companion.get
 import com.oksusu.susu.cache.CacheService.Companion.getOrNull
 import com.oksusu.susu.cache.CacheService.Companion.set
-import com.oksusu.susu.statistic.domain.SusuBasicStatistic
+import com.oksusu.susu.statistic.domain.SusuBasicEnvelopeStatistic
 import org.springframework.stereotype.Repository
 
 @Repository
-class SusuBasicStatisticRepository(
+class SusuBasicEnvelopeStatisticRepository(
     private val cacheService: CacheService,
 ) {
-    suspend fun save(value: SusuBasicStatistic) {
+    suspend fun save(value: SusuBasicEnvelopeStatistic) {
         cacheService.set(
-            cache = Cache.getSusuBasicStatisticCache,
+            cache = Cache.getSusuBasicEnvelopeStatisticCache,
             value = value
         )
     }
 
-    suspend fun getStatistic(): SusuBasicStatistic? {
-        return cacheService.getOrNull(cache = Cache.getSusuBasicStatisticCache)
+    suspend fun getStatistic(): SusuBasicEnvelopeStatistic? {
+        return cacheService.getOrNull(cache = Cache.getSusuBasicEnvelopeStatisticCache)
     }
 }

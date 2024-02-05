@@ -1,6 +1,6 @@
 package com.oksusu.susu.statistic.model
 
-data class SusuSpecificStatisticModel(
+data class SusuSpecificEnvelopeStatisticModel(
     /** 평균 보낸 비용 */
     val averageSent: Long?,
     /** 관계 별 평균 */

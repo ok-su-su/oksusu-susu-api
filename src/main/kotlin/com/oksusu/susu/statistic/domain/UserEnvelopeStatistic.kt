@@ -1,9 +1,9 @@
 package com.oksusu.susu.statistic.domain
 
 import com.oksusu.susu.statistic.model.TitleValueModel
-import com.oksusu.susu.statistic.model.response.UserStatisticResponse
+import com.oksusu.susu.statistic.model.response.UserEnvelopeStatisticResponse
 
-class UserStatistic(
+class UserEnvelopeStatistic(
     /** 최근 사용 금액 */
     val recentSpent: List<TitleValueModel<Long>>?,
     /** 경조사비를 가장 많이 쓴 달 */
@@ -18,8 +18,8 @@ class UserStatistic(
     val highestAmountSent: TitleValueModel<Long>?,
 ) {
     companion object {
-        fun from(statistic: UserStatisticResponse): UserStatistic {
-            return UserStatistic(
+        fun from(statistic: UserEnvelopeStatisticResponse): UserEnvelopeStatistic {
+            return UserEnvelopeStatistic(
                 recentSpent = statistic.recentSpent,
                 mostSpentMonth = statistic.mostSpentMonth,
                 mostRelationship = statistic.mostRelationship,

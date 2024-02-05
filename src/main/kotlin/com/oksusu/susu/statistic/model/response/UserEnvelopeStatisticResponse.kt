@@ -1,10 +1,10 @@
 package com.oksusu.susu.statistic.model.response
 
-import com.oksusu.susu.statistic.domain.SusuBasicStatistic
-import com.oksusu.susu.statistic.domain.UserStatistic
+import com.oksusu.susu.statistic.domain.SusuBasicEnvelopeStatistic
+import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.statistic.model.TitleValueModel
 
-class UserStatisticResponse(
+class UserEnvelopeStatisticResponse(
     /** 최근 사용 금액 */
     val recentSpent: List<TitleValueModel<Long>>?,
     /** 경조사비를 가장 많이 쓴 달 */
@@ -20,11 +20,11 @@ class UserStatisticResponse(
 ) {
     companion object {
         fun of(
-            basicStatistic: SusuBasicStatistic,
+            basicStatistic: SusuBasicEnvelopeStatistic,
             receivedMaxAmountModel: TitleValueModel<Long>?,
             sentMaxAmountModel: TitleValueModel<Long>?,
-        ): UserStatisticResponse {
-            return UserStatisticResponse(
+        ): UserEnvelopeStatisticResponse {
+            return UserEnvelopeStatisticResponse(
                 recentSpent = basicStatistic.recentSpent,
                 mostSpentMonth = basicStatistic.mostSpentMonth,
                 mostRelationship = basicStatistic.relationship,
@@ -34,14 +34,14 @@ class UserStatisticResponse(
             )
         }
 
-        fun from(userStatistic: UserStatistic): UserStatisticResponse {
-            return UserStatisticResponse(
-                recentSpent = userStatistic.recentSpent,
-                mostSpentMonth = userStatistic.mostSpentMonth,
-                mostRelationship = userStatistic.mostRelationship,
-                mostCategory = userStatistic.mostCategory,
-                highestAmountReceived = userStatistic.highestAmountReceived,
-                highestAmountSent = userStatistic.highestAmountSent
+        fun from(userEnvelopeStatistic: UserEnvelopeStatistic): UserEnvelopeStatisticResponse {
+            return UserEnvelopeStatisticResponse(
+                recentSpent = userEnvelopeStatistic.recentSpent,
+                mostSpentMonth = userEnvelopeStatistic.mostSpentMonth,
+                mostRelationship = userEnvelopeStatistic.mostRelationship,
+                mostCategory = userEnvelopeStatistic.mostCategory,
+                highestAmountReceived = userEnvelopeStatistic.highestAmountReceived,
+                highestAmountSent = userEnvelopeStatistic.highestAmountSent
             )
         }
     }

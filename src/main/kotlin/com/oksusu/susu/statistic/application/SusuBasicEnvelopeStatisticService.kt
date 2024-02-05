@@ -7,8 +7,8 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToExecuteException
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
-import com.oksusu.susu.statistic.domain.SusuBasicStatistic
-import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicStatisticRepository
+import com.oksusu.susu.statistic.domain.SusuBasicEnvelopeStatistic
+import com.oksusu.susu.statistic.infrastructure.redis.SusuBasicEnvelopeStatisticRepository
 import com.oksusu.susu.statistic.model.TitleValueModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
@@ -16,8 +16,8 @@ import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
 @Service
-class SusuBasicStatisticService(
-    private val susuBasicStatisticRepository: SusuBasicStatisticRepository,
+class SusuBasicEnvelopeStatisticService(
+    private val susuBasicEnvelopeStatisticRepository: SusuBasicEnvelopeStatisticRepository,
     private val categoryService: CategoryService,
     private val relationshipService: RelationshipService,
 ) {
@@ -28,7 +28,7 @@ class SusuBasicStatisticService(
         relationShipConuts: List<CountPerRelationshipIdModel>,
         envelopeCategoryCounts: List<CountPerCategoryIdModel>,
         ledgerCategoryCounts: List<CountPerCategoryIdModel>,
-    ): SusuBasicStatistic {
+    ): SusuBasicEnvelopeStatistic {
         // 최근 사용 금액
         val envelopHandOverAtMonthCountModel = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
             ?.map { count ->
@@ -71,7 +71,7 @@ class SusuBasicStatisticService(
                 TitleValueModel(title = category.name, value = it.totalCounts)
             }
 
-        return SusuBasicStatistic(
+        return SusuBasicEnvelopeStatistic(
             recentSpent = envelopHandOverAtMonthCountModel,
             mostSpentMonth = mostSpentMonth,
             relationship = relationShipIdConutModel,
@@ -79,15 +79,15 @@ class SusuBasicStatisticService(
         )
     }
 
-    suspend fun getStatisticOrThrow(): SusuBasicStatistic {
+    suspend fun getStatisticOrThrow(): SusuBasicEnvelopeStatistic {
         return getStatisticOrNull() ?: throw FailToExecuteException(ErrorCode.NOT_FOUND_SUSU_BASIC_STATISTIC_ERROR)
     }
 
-    suspend fun getStatisticOrNull(): SusuBasicStatistic? {
-        return withContext(Dispatchers.IO) { susuBasicStatisticRepository.getStatistic() }
+    suspend fun getStatisticOrNull(): SusuBasicEnvelopeStatistic? {
+        return withContext(Dispatchers.IO) { susuBasicEnvelopeStatisticRepository.getStatistic() }
     }
 
-    suspend fun save(susuBasicStatistic: SusuBasicStatistic) {
-        withContext(Dispatchers.IO) { susuBasicStatisticRepository.save(susuBasicStatistic) }
+    suspend fun save(susuBasicEnvelopeStatistic: SusuBasicEnvelopeStatistic) {
+        withContext(Dispatchers.IO) { susuBasicEnvelopeStatisticRepository.save(susuBasicEnvelopeStatistic) }
     }
 }

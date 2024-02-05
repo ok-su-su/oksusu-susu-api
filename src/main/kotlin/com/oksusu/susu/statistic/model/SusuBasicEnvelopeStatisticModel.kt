@@ -1,8 +1,6 @@
-package com.oksusu.susu.statistic.domain
+package com.oksusu.susu.statistic.model
 
-import com.oksusu.susu.statistic.model.TitleValueModel
-
-class SusuBasicStatistic(
+class SusuBasicEnvelopeStatisticModel(
     /** 최근 사용 금액 */
     val recentSpent: List<TitleValueModel<Long>>?,
     /** 경조사비를 가장 많이 쓴 달 */
