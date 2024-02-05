@@ -1,16 +1,15 @@
-package com.oksusu.susu.block.application
+package com.oksusu.susu.user.application
 
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.block.domain.Block
-import com.oksusu.susu.block.domain.vo.BlockTargetType
-import com.oksusu.susu.block.model.request.CreateBlockRequest
-import com.oksusu.susu.block.model.request.DeleteBlockRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.post.application.PostService
-import com.oksusu.susu.user.application.UserService
+import com.oksusu.susu.user.domain.UserBlock
+import com.oksusu.susu.user.domain.vo.UserBlockTargetType
+import com.oksusu.susu.user.model.request.CreateBlockRequest
+import com.oksusu.susu.user.model.request.DeleteBlockRequest
 import kotlinx.coroutines.*
 import org.springframework.stereotype.Service
 
@@ -22,7 +21,7 @@ class BlockFacade(
     private val txTemplates: TransactionTemplates,
 ) {
     suspend fun createBlock(user: AuthUser, request: CreateBlockRequest) {
-        if (request.targetType == BlockTargetType.USER && user.isAuthor(request.targetId)) {
+        if (request.targetType == UserBlockTargetType.USER && user.isAuthor(request.targetId)) {
             throw InvalidRequestException(ErrorCode.CANNOT_BLOCK_MYSELF)
         }
 
@@ -31,15 +30,15 @@ class BlockFacade(
                 blockService.validateNotAlreadyBlock(user.uid, request.targetId, request.targetType)
             }
             val validateTargetExist = when (request.targetType) {
-                BlockTargetType.POST -> async { postService.validateExist(request.targetId) }
-                BlockTargetType.USER -> async { userService.validateExist(request.targetId) }
+                UserBlockTargetType.POST -> async { postService.validateExist(request.targetId) }
+                UserBlockTargetType.USER -> async { userService.validateExist(request.targetId) }
             }
 
             awaitAll(validateNotBlock, validateTargetExist)
         }
 
         txTemplates.writer.coExecute {
-            Block(
+            UserBlock(
                 uid = user.uid,
                 targetId = request.targetId,
                 targetType = request.targetType,

@@ -1,4 +1,4 @@
-package com.oksusu.susu.block.model
+package com.oksusu.susu.user.model
 
 /** 차단 유저, post id 제공하는 모델 */
 class UserAndPostBlockIdModel(

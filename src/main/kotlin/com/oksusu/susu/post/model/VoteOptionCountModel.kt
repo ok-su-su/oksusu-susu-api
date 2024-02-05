@@ -1,6 +1,5 @@
 package com.oksusu.susu.post.model
 
-import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.post.domain.VoteOption
 
 /** 투표 옵션 + 투표 수 모델 */
@@ -19,13 +18,13 @@ data class VoteOptionCountModel(
     val isVoted: Boolean,
 ) {
     companion object {
-        fun of(option: VoteOption, count: Count, isVoted: Boolean): VoteOptionCountModel {
+        fun of(option: VoteOption, count: Long, isVoted: Boolean): VoteOptionCountModel {
             return VoteOptionCountModel(
                 id = option.id,
                 postId = option.postId,
                 content = option.content,
                 seq = option.seq,
-                count = count.count,
+                count = count,
                 isVoted = isVoted
             )
         }

@@ -1,10 +1,11 @@
 package com.oksusu.susu.post.infrastructure.repository.model
 
-import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.post.domain.Post
 import com.querydsl.core.annotations.QueryProjection
 
-class PostAndCountModel @QueryProjection constructor(
+class PostAndVoteCountModel @QueryProjection constructor(
+    /** post */
     val post: Post,
-    val count: Count,
+    /** vote count 수 */
+    val voteCount: Long,
 )

@@ -24,6 +24,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository {
@@ -32,6 +33,9 @@ interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository
 
     @Transactional(readOnly = true)
     fun findByIdAndUid(id: Long, uid: Long): Ledger?
+
+    @Transactional(readOnly = true)
+    fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
 }
 
 interface LedgerCustomRepository {

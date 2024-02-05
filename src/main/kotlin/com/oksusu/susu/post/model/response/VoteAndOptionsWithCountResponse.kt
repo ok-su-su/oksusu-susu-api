@@ -1,6 +1,5 @@
 package com.oksusu.susu.post.model.response
 
-import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.extension.equalsFromYearToSec
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.model.BoardModel
@@ -28,7 +27,7 @@ class VoteAndOptionsWithCountResponse(
     companion object {
         fun of(
             vote: Post,
-            count: Count,
+            count: Long,
             options: List<VoteOptionModel>,
             boardModel: BoardModel,
         ): VoteAndOptionsWithCountResponse {
@@ -38,7 +37,7 @@ class VoteAndOptionsWithCountResponse(
                 board = boardModel,
                 content = vote.content,
                 isModified = !vote.createdAt.equalsFromYearToSec(vote.modifiedAt),
-                count = count.count,
+                count = count,
                 options = options.filter { it.postId == vote.id },
                 createdAt = vote.createdAt
             )

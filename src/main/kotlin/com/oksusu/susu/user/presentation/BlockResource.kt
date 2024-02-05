@@ -1,11 +1,11 @@
-package com.oksusu.susu.block.presentation
+package com.oksusu.susu.user.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.block.application.BlockFacade
-import com.oksusu.susu.block.model.request.CreateBlockRequest
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapVoid
+import com.oksusu.susu.user.application.BlockFacade
+import com.oksusu.susu.user.model.request.CreateBlockRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType

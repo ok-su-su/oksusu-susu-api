@@ -33,7 +33,6 @@ import javax.sql.DataSource
         "com.oksusu.susu.category.infrastructure",
         "com.oksusu.susu.post.infrastructure",
         "com.oksusu.susu.term.infrastructure",
-        "com.oksusu.susu.block.infrastructure",
         "com.oksusu.susu.report.infrastructure",
         "com.oksusu.susu.count.infrastructure",
         "com.oksusu.susu.log.infrastructure"
@@ -92,7 +91,6 @@ class SusuDatabaseConfig {
                 "com.oksusu.susu.category.domain",
                 "com.oksusu.susu.post.domain",
                 "com.oksusu.susu.term.domain",
-                "com.oksusu.susu.block.domain",
                 "com.oksusu.susu.report.domain",
                 "com.oksusu.susu.count.domain",
                 "com.oksusu.susu.log.domain"

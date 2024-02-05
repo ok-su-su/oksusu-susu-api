@@ -1,7 +1,6 @@
-package com.oksusu.susu.block.model
+package com.oksusu.susu.user.model
 
-import com.oksusu.susu.block.domain.vo.BlockTargetType
-import jakarta.persistence.*
+import com.oksusu.susu.user.domain.vo.UserBlockTargetType
 
 /** 차단 모델 */
 class BlockModel(
@@ -12,7 +11,7 @@ class BlockModel(
     /** 차단 타겟 id */
     val targetId: Long,
     /** 차단 타겟 타입 */
-    val targetType: BlockTargetType,
+    val targetType: UserBlockTargetType,
     /** 차단 이유 */
     val reason: String?,
 )

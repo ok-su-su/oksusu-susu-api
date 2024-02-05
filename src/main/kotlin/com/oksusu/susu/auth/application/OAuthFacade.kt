@@ -11,6 +11,7 @@ import com.oksusu.susu.auth.model.response.AbleRegisterResponse
 import com.oksusu.susu.auth.model.response.UserOAuthInfoResponse
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.CreateUserDeviceEvent
+import com.oksusu.susu.event.model.CreateUserStatusHistoryEvent
 import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.extension.coExecute
@@ -20,8 +21,13 @@ import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.user.application.UserService
+import com.oksusu.susu.user.application.UserStatusService
+import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.domain.UserDevice
+import com.oksusu.susu.user.domain.UserStatus
+import com.oksusu.susu.user.domain.UserStatusHistory
+import com.oksusu.susu.user.domain.vo.UserStatusAssignmentType
 import com.oksusu.susu.user.model.UserDeviceContext
 import com.oksusu.susu.user.model.UserDeviceContextImpl
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -42,6 +48,8 @@ class OAuthFacade(
     private val termService: TermService,
     private val termAgreementService: TermAgreementService,
     private val eventPublisher: ApplicationEventPublisher,
+    private val userStatusService: UserStatusService,
+    private val userStatusTypeService: UserStatusTypeService,
 ) {
     val logger = KotlinLogging.logger {}
 
@@ -75,6 +83,12 @@ class OAuthFacade(
             val createdUser = User.toEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
 
+            UserStatus(
+                uid = createdUser.id,
+                accountStatusId = userStatusTypeService.getActiveStatusId(),
+                communityStatusId = userStatusTypeService.getActiveStatusId()
+            ).run { userStatusService.saveSync(this) }
+
             val termAgreements = request.termAgreement
                 .map { TermAgreement(uid = createdUser.id, termId = it) }
                 .run { termAgreementService.saveAllSync(this) }
@@ -87,6 +101,16 @@ class OAuthFacade(
             )
             eventPublisher.publishEvent(
                 CreateUserDeviceEvent(UserDevice.of(deviceContext, createdUser.id))
+            )
+            eventPublisher.publishEvent(
+                CreateUserStatusHistoryEvent(
+                    userStatusHistory = UserStatusHistory(
+                        uid = createdUser.id,
+                        statusAssignmentType = UserStatusAssignmentType.ACCOUNT,
+                        fromStatusId = userStatusTypeService.getActiveStatusId(),
+                        toStatusId = userStatusTypeService.getActiveStatusId()
+                    )
+                )
             )
 
             createdUser

@@ -1,7 +1,7 @@
-package com.oksusu.susu.block.domain.vo
+package com.oksusu.susu.user.domain.vo
 
 /** 차단 타겟 타입 */
-enum class BlockTargetType {
+enum class UserBlockTargetType {
     /** 유저 */
     USER,
 
