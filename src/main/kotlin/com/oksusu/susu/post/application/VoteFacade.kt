@@ -2,7 +2,6 @@ package com.oksusu.susu.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.block.application.BlockService
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.count.application.CountService
@@ -29,6 +28,7 @@ import com.oksusu.susu.post.model.response.VoteAllInfoResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
+import com.oksusu.susu.user.application.BlockService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Slice

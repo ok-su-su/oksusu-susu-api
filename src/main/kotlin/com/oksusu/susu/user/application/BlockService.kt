@@ -1,12 +1,12 @@
-package com.oksusu.susu.block.application
+package com.oksusu.susu.user.application
 
-import com.oksusu.susu.block.domain.Block
-import com.oksusu.susu.block.domain.vo.BlockTargetType
-import com.oksusu.susu.block.infrastructure.BlockRepository
-import com.oksusu.susu.block.model.UserAndPostBlockIdModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.user.domain.UserBlock
+import com.oksusu.susu.user.domain.vo.UserBlockTargetType
+import com.oksusu.susu.user.infrastructure.UserBlockRepository
+import com.oksusu.susu.user.model.UserAndPostBlockIdModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
@@ -15,31 +15,31 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BlockService(
-    private val blockRepository: BlockRepository,
+    private val userBlockRepository: UserBlockRepository,
 ) {
-    suspend fun validateNotAlreadyBlock(uid: Long, targetId: Long, targetType: BlockTargetType) {
+    suspend fun validateNotAlreadyBlock(uid: Long, targetId: Long, targetType: UserBlockTargetType) {
         withContext(Dispatchers.IO) {
-            blockRepository.existsByUidAndTargetIdAndTargetType(uid, targetId, targetType)
+            userBlockRepository.existsByUidAndTargetIdAndTargetType(uid, targetId, targetType)
         }.takeUnless { isExist -> isExist } ?: throw InvalidRequestException(ErrorCode.ALREADY_BLOCKED_TARGET)
     }
 
     @Transactional
-    fun saveSync(block: Block): Block {
-        return blockRepository.save(block)
+    fun saveSync(userBlock: UserBlock): UserBlock {
+        return userBlockRepository.save(userBlock)
     }
 
-    suspend fun findAllByUid(uid: Long): List<Block> {
+    suspend fun findAllByUid(uid: Long): List<UserBlock> {
         return withContext(Dispatchers.IO) {
-            blockRepository.findAllByUid(uid)
+            userBlockRepository.findAllByUid(uid)
         }
     }
 
     suspend fun getUserAndPostBlockTargetIds(uid: Long): UserAndPostBlockIdModel {
         val blocks = findAllByUid(uid)
 
-        val userBlockIds = blocks.filter { it.targetType == BlockTargetType.USER }
+        val userBlockIds = blocks.filter { it.targetType == UserBlockTargetType.USER }
             .map { block -> block.targetId }.toSet()
-        val postBlockIds = blocks.filter { it.targetType == BlockTargetType.POST }
+        val postBlockIds = blocks.filter { it.targetType == UserBlockTargetType.POST }
             .map { block -> block.targetId }.toSet()
 
         return UserAndPostBlockIdModel(
@@ -48,13 +48,13 @@ class BlockService(
         )
     }
 
-    suspend fun findByIdOrNull(id: Long): Block? {
+    suspend fun findByIdOrNull(id: Long): UserBlock? {
         return withContext(Dispatchers.IO) {
-            blockRepository.findByIdOrNull(id)
+            userBlockRepository.findByIdOrNull(id)
         }
     }
 
-    suspend fun findByIdOrThrow(id: Long): Block {
+    suspend fun findByIdOrThrow(id: Long): UserBlock {
         return findByIdOrNull(id) ?: throw NotFoundException(ErrorCode.NOT_FOUND_BLOCK_ERROR)
     }
 
@@ -65,12 +65,12 @@ class BlockService(
 
     @Transactional
     fun deleteById(id: Long) {
-        blockRepository.deleteById(id)
+        userBlockRepository.deleteById(id)
     }
 
-    suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: BlockTargetType): Block {
+    suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: UserBlockTargetType): UserBlock {
         return withContext(Dispatchers.IO) {
-            blockRepository.findByTargetIdAndTargetType(targetId, targetType)
+            userBlockRepository.findByTargetIdAndTargetType(targetId, targetType)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_BLOCK_ERROR)
     }
 }
