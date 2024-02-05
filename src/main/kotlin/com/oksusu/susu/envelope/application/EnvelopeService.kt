@@ -140,6 +140,10 @@ class EnvelopeService(
         return withContext(Dispatchers.IO) { envelopeRepository.findLatestFriendEnvelopes(friendIds) }
     }
 
+    suspend fun findTop1ByUidAndTypeOrderByAmountAsc(uid: Long, type: EnvelopeType): Envelope? {
+        return withContext(Dispatchers.IO) { envelopeRepository.findTop1ByUidAndTypeOrderByAmountAsc(uid, type) }
+    }
+
     suspend fun findTop1ByUidAndTypeOrderByAmountDesc(uid: Long, type: EnvelopeType): Envelope? {
         return withContext(Dispatchers.IO) { envelopeRepository.findTop1ByUidAndTypeOrderByAmountDesc(uid, type) }
     }
