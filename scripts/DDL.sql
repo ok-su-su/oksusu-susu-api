@@ -250,7 +250,7 @@ CREATE TABLE `term_agreement_history`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보 동의 기록';
 
 -- 차단
-CREATE TABLE `block`
+CREATE TABLE `user_block`
 (
     `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '약관 정보 id',
     `uid`         bigint       NOT NULL COMMENT '유저 id',
@@ -261,7 +261,7 @@ CREATE TABLE `block`
     `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '차단';
-CREATE UNIQUE INDEX idx__uid__target_id ON block (uid, target_id);
+CREATE UNIQUE INDEX idx__uid__target_id ON user_block (uid, target_id);
 
 -- 신고 기록
 CREATE TABLE `report_history`

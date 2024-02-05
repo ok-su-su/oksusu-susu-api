@@ -28,12 +28,10 @@ import javax.sql.DataSource
     basePackages = [
         "com.oksusu.susu.user.infrastructure",
         "com.oksusu.susu.envelope.infrastructure",
-        "com.oksusu.susu.ledger.infrastructure",
         "com.oksusu.susu.friend.infrastructure",
         "com.oksusu.susu.category.infrastructure",
         "com.oksusu.susu.post.infrastructure",
         "com.oksusu.susu.term.infrastructure",
-        "com.oksusu.susu.block.infrastructure",
         "com.oksusu.susu.report.infrastructure",
         "com.oksusu.susu.count.infrastructure",
         "com.oksusu.susu.log.infrastructure"
@@ -87,12 +85,10 @@ class SusuDatabaseConfig {
             .packages(
                 "com.oksusu.susu.user.domain",
                 "com.oksusu.susu.envelope.domain",
-                "com.oksusu.susu.ledger.domain",
                 "com.oksusu.susu.friend.domain",
                 "com.oksusu.susu.category.domain",
                 "com.oksusu.susu.post.domain",
                 "com.oksusu.susu.term.domain",
-                "com.oksusu.susu.block.domain",
                 "com.oksusu.susu.report.domain",
                 "com.oksusu.susu.count.domain",
                 "com.oksusu.susu.log.domain"

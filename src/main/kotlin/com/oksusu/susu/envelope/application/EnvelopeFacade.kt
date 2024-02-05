@@ -31,7 +31,6 @@ import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
 import com.oksusu.susu.friend.model.FriendRelationshipModel
-import com.oksusu.susu.ledger.application.LedgerService
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
