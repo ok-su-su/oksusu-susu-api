@@ -42,7 +42,7 @@ interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepo
     fun findAllByLedgerId(ledgerId: Long): List<Envelope>
 
     @Transactional(readOnly = true)
-    fun findTop1ByUidAndTypeOrderByAmount(uid: Long, type: EnvelopeType): Envelope?
+    fun findTop1ByUidAndTypeOrderByAmountDesc(uid: Long, type: EnvelopeType): Envelope?
 
     @Transactional(readOnly = true)
     fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long

@@ -24,8 +24,8 @@ class EnvelopeConfigService(
 
     suspend fun getSearchFilter(user: AuthUser): SearchFilterEnvelopeResponse {
         return parZip(
-            { envelopeService.findTop1ByUidAndTypeOrderByAmount(user.uid, EnvelopeType.RECEIVED) },
-            { envelopeService.findTop1ByUidAndTypeOrderByAmount(user.uid, EnvelopeType.SENT) }
+            { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.RECEIVED) },
+            { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.SENT) }
         ) { maxReceivedAmount, maxSentAmount ->
             SearchFilterEnvelopeResponse(
                 minReceivedAmount = 0L,
