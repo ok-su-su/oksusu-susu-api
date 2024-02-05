@@ -5,11 +5,11 @@ import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
 import com.oksusu.susu.common.consts.SUSU_CATEGORY_STATISTIC_KEY_PREFIX
 import com.oksusu.susu.common.consts.SUSU_RELATIONSHIP_STATISTIC_KEY_PREFIX
 import com.oksusu.susu.envelope.application.EnvelopeService
+import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.friend.application.FriendRelationshipService
-import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.statistic.application.SusuBasicStatisticService
 import com.oksusu.susu.statistic.application.SusuSpecificStatisticService
 import io.github.oshai.kotlinlogging.KotlinLogging
