@@ -1,7 +1,7 @@
 package com.oksusu.susu.user.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
-import com.oksusu.susu.user.domain.vo.StatusAssignmentType
+import com.oksusu.susu.user.domain.vo.UserStatusAssignmentType
 import jakarta.persistence.*
 
 /** 유저 상태 변경 기록 */
@@ -18,7 +18,7 @@ class UserStatusHistory(
     /** 변경된 유저 상태 타입 */
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "status_assignment_type")
-    val statusAssignmentType: StatusAssignmentType,
+    val statusAssignmentType: UserStatusAssignmentType,
 
     /** 변경 이전 상태 id */
     @Column(name = "from_status_id")

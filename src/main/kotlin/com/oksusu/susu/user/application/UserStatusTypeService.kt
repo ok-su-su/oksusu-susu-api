@@ -3,9 +3,9 @@ package com.oksusu.susu.user.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
-import com.oksusu.susu.user.domain.vo.StatusType
-import com.oksusu.susu.user.infrastructure.StatusRepository
-import com.oksusu.susu.user.model.StatusModel
+import com.oksusu.susu.user.domain.vo.UserStatusTypeInfo
+import com.oksusu.susu.user.infrastructure.UserStatusTypeRepository
+import com.oksusu.susu.user.model.UserStatusTypeModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,11 +14,11 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-class StatusService(
-    private val statusRepository: StatusRepository,
+class UserStatusTypeService(
+    private val userStatusTypeRepository: UserStatusTypeRepository,
 ) {
     private val logger = KotlinLogging.logger { }
-    private var statuses: Map<Long, StatusModel> = emptyMap()
+    private var statuses: Map<Long, UserStatusTypeModel> = emptyMap()
 
     @Scheduled(
         fixedRate = 1000 * 60 * 3,
@@ -29,8 +29,8 @@ class StatusService(
             logger.info { "start refresh statuses" }
 
             statuses = runCatching {
-                statusRepository.findAllByIsActive(true)
-                    .map { status -> StatusModel.from(status) }
+                userStatusTypeRepository.findAllByIsActive(true)
+                    .map { status -> UserStatusTypeModel.from(status) }
                     .associateBy { statuses -> statuses.id }
             }.onFailure { e ->
                 logger.resolveCancellation("refreshBoards", e)
@@ -40,17 +40,17 @@ class StatusService(
         }
     }
 
-    fun getStatus(id: Long): StatusModel {
+    fun getStatus(id: Long): UserStatusTypeModel {
         return statuses[id] ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
     }
 
     fun getActiveStatusId(): Long {
-        return statuses.values.firstOrNull { status -> status.statusType == StatusType.ACTIVE }?.id
+        return statuses.values.firstOrNull { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }?.id
             ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
     }
 
     fun getDeletedStatusId(): Long {
-        return statuses.values.firstOrNull { status -> status.statusType == StatusType.DELETED }?.id
+        return statuses.values.firstOrNull { status -> status.statusTypeInfo == UserStatusTypeInfo.DELETED }?.id
             ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
     }
 }

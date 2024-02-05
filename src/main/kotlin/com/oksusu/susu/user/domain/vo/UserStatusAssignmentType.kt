@@ -1,7 +1,7 @@
 package com.oksusu.susu.user.domain.vo
 
 /** 관련된 상태 타입 */
-enum class StatusAssignmentType {
+enum class UserStatusAssignmentType {
     /** 계정 */
     ACCOUNT,
 

@@ -19,7 +19,7 @@ import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
-import com.oksusu.susu.user.application.StatusService
+import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserStatusService
 import com.oksusu.susu.user.domain.User
@@ -46,7 +46,7 @@ class OAuthFacade(
     private val termAgreementService: TermAgreementService,
     private val eventPublisher: ApplicationEventPublisher,
     private val userStatusService: UserStatusService,
-    private val statusService: StatusService,
+    private val userStatusTypeService: UserStatusTypeService,
 ) {
     val logger = KotlinLogging.logger {}
 
@@ -82,8 +82,8 @@ class OAuthFacade(
 
             UserStatus(
                 uid = createdUser.id,
-                accountStatusId = statusService.getActiveStatusId(),
-                communityStatusId = statusService.getActiveStatusId()
+                accountStatusId = userStatusTypeService.getActiveStatusId(),
+                communityStatusId = userStatusTypeService.getActiveStatusId()
             ).run { userStatusService.saveSync(this) }
 
             val termAgreements = request.termAgreement

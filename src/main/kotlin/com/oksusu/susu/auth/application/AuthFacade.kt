@@ -13,14 +13,13 @@ import com.oksusu.susu.event.model.CreateUserStatusHistoryEvent
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.exception.NoAuthorityException
-import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.post.application.PostService
-import com.oksusu.susu.user.application.StatusService
+import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserStatusService
 import com.oksusu.susu.user.domain.UserStatusHistory
-import com.oksusu.susu.user.domain.vo.StatusAssignmentType
+import com.oksusu.susu.user.domain.vo.UserStatusAssignmentType
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -40,7 +39,7 @@ class AuthFacade(
     private val userStatusService: UserStatusService,
     private val eventPublisher: ApplicationEventPublisher,
     private val txTemplates: TransactionTemplates,
-    private val statusService: StatusService,
+    private val userStatusTypeService: UserStatusTypeService,
 ) {
     fun resolveAuthUser(token: Mono<AuthUserToken>): Mono<Any> {
         return jwtTokenService.verifyTokenMono(token)
@@ -103,7 +102,7 @@ class AuthFacade(
                     }.run { userService.saveSync(this) }
 
                     userStatus.apply {
-                        accountStatusId = statusService.getDeletedStatusId()
+                        accountStatusId = userStatusTypeService.getDeletedStatusId()
                     }.run { userStatusService.saveSync(this) }
 
                     postService.saveAllSync(deactivatedPosts)
@@ -112,9 +111,9 @@ class AuthFacade(
                         CreateUserStatusHistoryEvent(
                             userStatusHistory = UserStatusHistory(
                                 uid = user.id,
-                                statusAssignmentType = StatusAssignmentType.ACCOUNT,
+                                statusAssignmentType = UserStatusAssignmentType.ACCOUNT,
                                 fromStatusId = userStatus.accountStatusId,
-                                toStatusId = statusService.getDeletedStatusId()
+                                toStatusId = userStatusTypeService.getDeletedStatusId()
                             )
                         )
                     )

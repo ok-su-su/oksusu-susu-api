@@ -1,7 +1,7 @@
 package com.oksusu.susu.user.domain.vo
 
-/** 상태 타입 */
-enum class StatusType {
+/** 상태 타입 분류 */
+enum class UserStatusTypeInfo {
     /** 활동 */
     ACTIVE,
 
