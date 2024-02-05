@@ -15,6 +15,7 @@ import org.aspectj.weaver.ast.Not
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class UserService(
@@ -66,6 +67,17 @@ class UserService(
 
     suspend fun existsById(id: Long): Boolean {
         return withContext(Dispatchers.IO) { userRepository.existsById(id) }
+    }
+
+    suspend fun countByCreatedAtBetween(
+        startAt: LocalDateTime,
+        endAt: LocalDateTime,
+    ): Long {
+        return withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(startAt, endAt) }
+    }
+
+    suspend fun count() {
+        return withContext(Dispatchers.IO) { userRepository.count() }
     }
 
     suspend fun getUserAndUserStatus(uid: Long): UserAndUserStatusModel {

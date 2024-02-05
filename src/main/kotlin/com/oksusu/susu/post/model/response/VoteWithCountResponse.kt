@@ -1,7 +1,7 @@
 package com.oksusu.susu.post.model.response
 
 import com.oksusu.susu.extension.equalsFromYearToSec
-import com.oksusu.susu.post.infrastructure.repository.model.PostAndCountModel
+import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteCountModel
 import com.oksusu.susu.post.model.BoardModel
 
 data class VoteWithCountResponse(
@@ -17,12 +17,12 @@ data class VoteWithCountResponse(
     val isModified: Boolean,
 ) {
     companion object {
-        fun of(model: PostAndCountModel, boardModel: BoardModel): VoteWithCountResponse {
+        fun of(model: PostAndVoteCountModel, boardModel: BoardModel): VoteWithCountResponse {
             return VoteWithCountResponse(
                 id = model.post.id,
                 board = boardModel,
                 content = model.post.content,
-                count = model.count.count,
+                count = model.voteCount,
                 isModified = model.post.createdAt.equalsFromYearToSec(model.post.modifiedAt)
             )
         }

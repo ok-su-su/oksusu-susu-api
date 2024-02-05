@@ -271,7 +271,7 @@ CREATE TABLE `report_history`
     `target_id`   bigint       NOT NULL COMMENT '신고 대상',
     `target_type` varchar(128) NOT NULL COMMENT '신고 대상 유형',
     `metadata_id` bigint       NOT NULL COMMENT '메타데이터 id',
-    `description` varchar(255) DEFAULT NULL COMMENT '신고 상세 설명',
+    `description` varchar(256) DEFAULT NULL COMMENT '신고 상세 설명',
     `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)

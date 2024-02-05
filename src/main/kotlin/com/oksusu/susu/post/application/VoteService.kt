@@ -5,10 +5,7 @@ import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
-import com.oksusu.susu.post.infrastructure.repository.model.GetAllVoteSpec
-import com.oksusu.susu.post.infrastructure.repository.model.PostAndCountModel
-import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
-import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
+import com.oksusu.susu.post.infrastructure.repository.model.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,10 +19,9 @@ class VoteService(
     private val postRepository: PostRepository,
 ) {
     val logger = KotlinLogging.logger { }
-
-    suspend fun getAllVotesExceptBlock(getAllVoteSpec: GetAllVoteSpec): Slice<PostAndCountModel> {
+    suspend fun getAllVotesExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteOptionAndOptionCountModel> {
         return withContext(Dispatchers.IO) {
-            postRepository.getAllVotesExceptBlock(getAllVoteSpec)
+            postRepository.getAllVotesExceptBlock(spec)
         }
     }
 
@@ -39,13 +35,25 @@ class VoteService(
         }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
     }
 
+    suspend fun getVoteAndOptionsAndOptionCount(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
+        return withContext(Dispatchers.IO) {
+            postRepository.getVoteAndOptionsAndOptionCount(id)
+        }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
+    }
+
+    suspend fun getVoteAllInfo(id: Long): List<VoteAllInfoModel> {
+        return withContext(Dispatchers.IO) {
+            postRepository.getVoteAllInfo(id)
+        }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
+    }
+
     suspend fun getPopularVotesExceptBlock(
         uid: Long,
         userBlockIds: Set<Long>,
         postBlockIds: Set<Long>,
         size: Int,
-    ): List<PostAndCountModel> {
-        val spec = GetAllVoteSpec(
+    ): List<PostAndVoteCountModel> {
+        val spec = GetVoteSpec(
             uid = uid,
             searchSpec = SearchVoteSpec.defaultPopularSpec(),
             userBlockIds = userBlockIds,
@@ -53,6 +61,6 @@ class VoteService(
             pageable = PageRequest.of(0, size)
         )
 
-        return withContext(Dispatchers.IO) { postRepository.getAllVotesExceptBlock(spec) }.content
+        return withContext(Dispatchers.IO) { postRepository.getVoteAndCountExceptBlock(spec) }.content
     }
 }

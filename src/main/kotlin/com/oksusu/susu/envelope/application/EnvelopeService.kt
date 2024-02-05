@@ -24,6 +24,7 @@ import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class EnvelopeService(
@@ -141,5 +142,13 @@ class EnvelopeService(
 
     suspend fun findTop1ByUidAndTypeOrderByAmount(uid: Long, type: EnvelopeType): Envelope? {
         return withContext(Dispatchers.IO) { envelopeRepository.findTop1ByUidAndTypeOrderByAmount(uid, type) }
+    }
+
+    suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
+        return withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(startAt, endAt) }
+    }
+
+    suspend fun count(): Long {
+        return withContext(Dispatchers.IO) { envelopeRepository.count() }
     }
 }

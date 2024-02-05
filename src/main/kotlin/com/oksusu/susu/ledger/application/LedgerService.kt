@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class LedgerService(
@@ -68,5 +69,9 @@ class LedgerService(
         return withContext(Dispatchers.IO) {
             ledgerRepository.countPerCategoryIdByUid(uid)
         }
+    }
+
+    suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
+        return withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(startAt, endAt) }
     }
 }

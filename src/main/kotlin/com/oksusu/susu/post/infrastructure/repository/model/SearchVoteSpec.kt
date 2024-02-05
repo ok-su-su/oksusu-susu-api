@@ -3,10 +3,15 @@ package com.oksusu.susu.post.infrastructure.repository.model
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.post.model.vo.VoteSortType
 
+/** 투표 검색 조건 */
 class SearchVoteSpec(
+    /** 검색 내용 */
     val content: String?,
+    /** 본인 소유 여부 */
     val mine: Boolean?,
+    /** 정렬 기준 */
     val sortType: VoteSortType,
+    /** board id */
     val boardId: Long?,
 ) {
     companion object {

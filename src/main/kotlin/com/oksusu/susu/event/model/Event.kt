@@ -77,3 +77,8 @@ data class SentryCaptureExceptionEvent(
     val request: ServerHttpRequest,
     val exception: Exception,
 ) : BaseEvent()
+
+data class DeleteVoteCountEvent(
+    val postId: Long,
+    val optionIds: List<Long>,
+) : BaseEvent()

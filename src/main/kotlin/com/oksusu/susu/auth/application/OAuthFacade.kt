@@ -32,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.http.server.reactive.AbstractServerHttpRequest
+import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -139,7 +139,7 @@ class OAuthFacade(
     suspend fun loginWithCode(
         provider: OauthProvider,
         code: String,
-        request: AbstractServerHttpRequest,
+        request: ServerHttpRequest,
     ): String {
         val oauthToken = oAuthService.getOauthToken(provider, code, request)
 
