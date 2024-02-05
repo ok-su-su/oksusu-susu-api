@@ -45,6 +45,9 @@ interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepo
     fun findTop1ByUidAndTypeOrderByAmountDesc(uid: Long, type: EnvelopeType): Envelope?
 
     @Transactional(readOnly = true)
+    fun findTop1ByUidAndTypeOrderByAmountAsc(uid: Long, type: EnvelopeType): Envelope?
+
+    @Transactional(readOnly = true)
     fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
 }
 
