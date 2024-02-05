@@ -1,9 +1,9 @@
-package com.oksusu.susu.ledger.presentation
+package com.oksusu.susu.envelope.presentation
 
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
-import com.oksusu.susu.ledger.application.LedgerConfigService
+import com.oksusu.susu.envelope.application.LedgerConfigService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType

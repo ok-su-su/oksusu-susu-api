@@ -1,13 +1,13 @@
-package com.oksusu.susu.ledger.application
+package com.oksusu.susu.envelope.application
 
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.ledger.domain.Ledger
-import com.oksusu.susu.ledger.infrastructure.LedgerRepository
-import com.oksusu.susu.ledger.infrastructure.model.LedgerDetailModel
-import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerModel
-import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
+import com.oksusu.susu.envelope.domain.Ledger
+import com.oksusu.susu.envelope.infrastructure.LedgerRepository
+import com.oksusu.susu.envelope.infrastructure.model.LedgerDetailModel
+import com.oksusu.susu.envelope.infrastructure.model.SearchLedgerModel
+import com.oksusu.susu.envelope.infrastructure.model.SearchLedgerSpec
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.Page

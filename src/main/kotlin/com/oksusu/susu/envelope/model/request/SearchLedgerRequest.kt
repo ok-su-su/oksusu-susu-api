@@ -1,4 +1,4 @@
-package com.oksusu.susu.ledger.model.request
+package com.oksusu.susu.envelope.model.request
 
 import java.time.LocalDateTime
 

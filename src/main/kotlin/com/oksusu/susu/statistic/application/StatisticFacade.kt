@@ -7,7 +7,7 @@ import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
-import com.oksusu.susu.ledger.application.LedgerService
+import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.statistic.domain.UserStatistic
 import com.oksusu.susu.statistic.model.TitleValueModel
 import com.oksusu.susu.statistic.model.response.SusuStatisticResponse

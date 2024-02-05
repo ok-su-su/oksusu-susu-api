@@ -1,4 +1,4 @@
-package com.oksusu.susu.ledger.domain
+package com.oksusu.susu.envelope.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
 import jakarta.persistence.Column

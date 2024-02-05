@@ -1,7 +1,7 @@
-package com.oksusu.susu.ledger.model.response
+package com.oksusu.susu.envelope.model.response
 
 import com.oksusu.susu.category.model.CategoryWithCustomModel
-import com.oksusu.susu.ledger.model.LedgerModel
+import com.oksusu.susu.envelope.model.LedgerModel
 
 data class LedgerDetailResponse(
     /** 장부 */

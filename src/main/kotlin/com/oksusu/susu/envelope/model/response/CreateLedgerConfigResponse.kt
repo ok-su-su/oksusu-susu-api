@@ -1,4 +1,4 @@
-package com.oksusu.susu.ledger.model.response
+package com.oksusu.susu.envelope.model.response
 
 data class CreateLedgerConfigResponse(
     /** 장부 생성시, 시작일 정보만 필요한 categoryIds */

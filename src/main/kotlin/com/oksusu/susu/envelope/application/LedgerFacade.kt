@@ -1,4 +1,4 @@
-package com.oksusu.susu.ledger.application
+package com.oksusu.susu.envelope.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
@@ -9,20 +9,19 @@ import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.category.model.CategoryWithCustomModel
 import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.config.database.TransactionTemplates
-import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.event.model.DeleteLedgerEvent
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
-import com.oksusu.susu.ledger.domain.Ledger
-import com.oksusu.susu.ledger.infrastructure.model.SearchLedgerSpec
-import com.oksusu.susu.ledger.model.LedgerModel
-import com.oksusu.susu.ledger.model.request.CreateAndUpdateLedgerRequest
-import com.oksusu.susu.ledger.model.request.SearchLedgerRequest
-import com.oksusu.susu.ledger.model.response.CreateAndUpdateLedgerResponse
-import com.oksusu.susu.ledger.model.response.LedgerDetailResponse
-import com.oksusu.susu.ledger.model.response.SearchLedgerResponse
+import com.oksusu.susu.envelope.domain.Ledger
+import com.oksusu.susu.envelope.infrastructure.model.SearchLedgerSpec
+import com.oksusu.susu.envelope.model.LedgerModel
+import com.oksusu.susu.envelope.model.request.CreateAndUpdateLedgerRequest
+import com.oksusu.susu.envelope.model.request.SearchLedgerRequest
+import com.oksusu.susu.envelope.model.response.CreateAndUpdateLedgerResponse
+import com.oksusu.susu.envelope.model.response.LedgerDetailResponse
+import com.oksusu.susu.envelope.model.response.SearchLedgerResponse
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service

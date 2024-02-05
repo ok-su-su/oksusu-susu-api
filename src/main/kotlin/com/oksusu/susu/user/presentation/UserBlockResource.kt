@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = SwaggerTag.BLOCK_SWAGGER_TAG, description = "차단 API")
 @RestController
 @RequestMapping(value = ["/api/v1/blocks"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class BlockResource(
+class UserBlockResource(
     private val blockFacade: BlockFacade,
 ) {
     @Operation(summary = "차단하기")
