@@ -101,10 +101,6 @@ class AuthFacade(
                         this.oauthInfo = oauthInfo.withdrawOauthInfo()
                     }.run { userService.saveSync(this) }
 
-                    userStatus.apply {
-                        accountStatusId = userStatusTypeService.getDeletedStatusId()
-                    }.run { userStatusService.saveSync(this) }
-
                     postService.saveAllSync(deactivatedPosts)
 
                     eventPublisher.publishEvent(
@@ -117,6 +113,10 @@ class AuthFacade(
                             )
                         )
                     )
+
+                    userStatus.apply {
+                        accountStatusId = userStatusTypeService.getDeletedStatusId()
+                    }.run { userStatusService.saveSync(this) }
                 }
             }
 

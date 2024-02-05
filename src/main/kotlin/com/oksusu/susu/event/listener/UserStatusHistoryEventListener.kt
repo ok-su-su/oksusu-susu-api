@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
-class UserStatusEventHistoryListener(
+class UserStatusHistoryEventListener(
     private val userStatusHistoryRepository: UserStatusHistoryRepository,
 ) {
     val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
-    fun createTermAgreementHistoryService(event: CreateUserStatusHistoryEvent) {
+    fun createUserStatusHistoryService(event: CreateUserStatusHistoryEvent) {
         CoroutineScope(Dispatchers.IO).launch {
             val history = event.userStatusHistory
 

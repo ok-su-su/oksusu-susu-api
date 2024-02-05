@@ -1,5 +1,6 @@
 -- scheme
-CREATE DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE
+DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- 유저 정보
 CREATE TABLE `user`
@@ -20,11 +21,11 @@ CREATE UNIQUE INDEX uidx__oauth_id__oauth_provider ON user (oauth_id, oauth_prov
 -- 유저 상태 정보 타입
 CREATE TABLE `user_status_type`
 (
-    `id`          bigint  NOT NULL AUTO_INCREMENT COMMENT '유저 상태 정보 타입 id',
-    `status_type` int     NOT NULL COMMENT '상태 정보 타입 / 활동 : 1, 탈퇴 : 2,  일시 정지 7일 : 3, 영구 정지 : 4',
-    `is_active`   tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
-    `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `id`               bigint  NOT NULL AUTO_INCREMENT COMMENT '유저 상태 정보 타입 id',
+    `status_type_info` int     NOT NULL COMMENT '상태 정보 타입 정보 / 활동 : 1, 탈퇴 : 2,  일시 정지 7일 : 3, 영구 정지 : 4',
+    `is_active`        tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
+    `created_at`       datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`      datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 정보 타입';
 
@@ -39,7 +40,7 @@ CREATE TABLE `user_status`
     `modified_at`         datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 정보';
-CREATE UNIQUE INDEX idx__uid ON user_status (uid);
+CREATE UNIQUE INDEX uidx__uid ON user_status (uid);
 
 -- 유저 상태 변경 기록
 CREATE TABLE `user_status_history`
@@ -53,7 +54,7 @@ CREATE TABLE `user_status_history`
     `modified_at`            datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
-CREATE UNIQUE INDEX idx__uid ON user_status_history (uid);
+CREATE INDEX idx__uid ON user_status_history (uid);
 
 -- 장부
 CREATE TABLE `ledger`

@@ -33,7 +33,7 @@ class UserStatusTypeService(
                     .map { status -> UserStatusTypeModel.from(status) }
                     .associateBy { statuses -> statuses.id }
             }.onFailure { e ->
-                logger.resolveCancellation("refreshBoards", e)
+                logger.resolveCancellation("refresh statuses", e)
             }.getOrDefault(statuses)
 
             logger.info { "finish refresh statuses" }

@@ -14,7 +14,7 @@ class UserStatusType(
 
     /** 상태 정보 타입 정보 */
     @Enumerated(EnumType.ORDINAL)
-    @Column(name = "status_type")
+    @Column(name = "status_type_info")
     val statusTypeInfo: UserStatusTypeInfo,
 
     /** 활성화 여부 / 활성화 : 1, 비활성화 : 0 */
