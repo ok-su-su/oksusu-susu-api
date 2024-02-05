@@ -34,7 +34,7 @@ class Cache<VALUE_TYPE>(
             )
         }
 
-        fun getUserStatisticCache(key: String): Cache<UserEnvelopeStatistic> {
+        fun getUserEnvelopeStatisticCache(key: String): Cache<UserEnvelopeStatistic> {
             return Cache(
                 key = key,
                 type = toTypeReference<UserEnvelopeStatistic>(),

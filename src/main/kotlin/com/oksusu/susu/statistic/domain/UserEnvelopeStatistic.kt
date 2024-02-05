@@ -16,17 +16,4 @@ class UserEnvelopeStatistic(
     val highestAmountReceived: TitleValueModel<Long>?,
     /** 가장 많이 보낸 금액 */
     val highestAmountSent: TitleValueModel<Long>?,
-) {
-    companion object {
-        fun from(statistic: UserEnvelopeStatisticResponse): UserEnvelopeStatistic {
-            return UserEnvelopeStatistic(
-                recentSpent = statistic.recentSpent,
-                mostSpentMonth = statistic.mostSpentMonth,
-                mostRelationship = statistic.mostRelationship,
-                mostCategory = statistic.mostCategory,
-                highestAmountReceived = statistic.highestAmountReceived,
-                highestAmountSent = statistic.highestAmountSent
-            )
-        }
-    }
-}
+)

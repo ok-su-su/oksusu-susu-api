@@ -14,12 +14,12 @@ class UserEnvelopeStatisticRepository(
     suspend fun save(uid: Long, value: UserEnvelopeStatistic) {
         val key = cacheKeyGenerateHelper.getUserStatisticKey(uid)
 
-        cacheService.set(Cache.getUserStatisticCache(key), value)
+        cacheService.set(Cache.getUserEnvelopeStatisticCache(key), value)
     }
 
     suspend fun getStatistic(uid: Long): UserEnvelopeStatistic? {
         val key = cacheKeyGenerateHelper.getUserStatisticKey(uid)
 
-        return cacheService.getOrNull(Cache.getUserStatisticCache(key))
+        return cacheService.getOrNull(Cache.getUserEnvelopeStatisticCache(key))
     }
 }
