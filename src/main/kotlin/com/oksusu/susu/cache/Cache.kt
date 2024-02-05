@@ -1,12 +1,12 @@
 package com.oksusu.susu.cache
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.oksusu.susu.common.consts.SUSU_BASIC_STATISTIC_KEY
+import com.oksusu.susu.common.consts.SUSU_ENVELOPE_STATISTIC_KEY
 import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
 import com.oksusu.susu.common.util.toTypeReference
-import com.oksusu.susu.statistic.domain.SusuBasicStatistic
-import com.oksusu.susu.statistic.domain.UserStatistic
+import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
+import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
 import java.time.Duration
 
 class Cache<VALUE_TYPE>(
@@ -15,16 +15,16 @@ class Cache<VALUE_TYPE>(
     val duration: Duration,
 ) {
     companion object Factory {
-        fun getSusuBasicStatisticCache(): Cache<SusuBasicStatistic> {
+        fun getSusuEnvelopeStatisticCache(): Cache<SusuEnvelopeStatistic> {
             return Cache(
-                key = SUSU_BASIC_STATISTIC_KEY,
-                type = toTypeReference<SusuBasicStatistic>(),
+                key = SUSU_ENVELOPE_STATISTIC_KEY,
+                type = toTypeReference<SusuEnvelopeStatistic>(),
                 duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
 
-        val getSusuBasicStatisticCache: Factory.() -> Cache<SusuBasicStatistic> =
-            { getSusuBasicStatisticCache() }
+        val getSusuEnvelopeStatisticCache: Factory.() -> Cache<SusuEnvelopeStatistic> =
+            { getSusuEnvelopeStatisticCache() }
 
         fun getSusuSpecificStatisticCache(key: String): Cache<Long> {
             return Cache(
@@ -34,10 +34,10 @@ class Cache<VALUE_TYPE>(
             )
         }
 
-        fun getUserStatisticCache(key: String): Cache<UserStatistic> {
+        fun getUserEnvelopeStatisticCache(key: String): Cache<UserEnvelopeStatistic> {
             return Cache(
                 key = key,
-                type = toTypeReference<UserStatistic>(),
+                type = toTypeReference<UserEnvelopeStatistic>(),
                 duration = Duration.ofSeconds(USER_STATISTIC_TTL)
             )
         }

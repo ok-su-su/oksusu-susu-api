@@ -84,7 +84,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     ALREADY_EXISTS_REPORT_HISTORY_ERROR(HttpStatus.BAD_REQUEST, "이미 신고한 상태입니다."),
 
     /** Statistic Error Code */
-    NOT_FOUND_SUSU_BASIC_STATISTIC_ERROR(HttpStatus.NOT_FOUND, "수수 통계 자료를 찾을 수 없습니다."),
+    NOT_FOUND_SUSU_STATISTIC_ERROR(HttpStatus.NOT_FOUND, "수수 통계 자료를 찾을 수 없습니다."),
 
     /** Count Error Code */
     NOT_FOUND_COUNT_ERROR(HttpStatus.NOT_FOUND, "카운트 정보를 찾을 수 없습니다."),

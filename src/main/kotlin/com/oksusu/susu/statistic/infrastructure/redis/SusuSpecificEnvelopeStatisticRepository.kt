@@ -5,7 +5,7 @@ import com.oksusu.susu.cache.CacheService
 import org.springframework.stereotype.Repository
 
 @Repository
-class SusuSpecificStatisticRepository(
+class SusuSpecificEnvelopeStatisticRepository(
     private val cacheService: CacheService,
 ) {
     suspend fun findByKey(key: String): Long? {
