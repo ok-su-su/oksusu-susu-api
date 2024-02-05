@@ -25,8 +25,7 @@ class EnvelopeConfigResource(
 
     /**
      * **봉투 검색 필터링 config**
-     * - minSentAmount, maxSentAmount는 초기 0
-     * - 봉투가 없는 경우, maxReceivedAmount, maxSentAmount은 0
+     * - 봉투가 없는 경우 0을 제공
      */
     @Operation(summary = "봉투 검색 필터링 config")
     @GetMapping("/search-filter")
