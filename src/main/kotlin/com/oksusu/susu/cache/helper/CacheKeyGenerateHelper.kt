@@ -1,8 +1,8 @@
 package com.oksusu.susu.cache.helper
 
-import com.oksusu.susu.common.consts.SUSU_CATEGORY_STATISTIC_KEY_PREFIX
-import com.oksusu.susu.common.consts.SUSU_RELATIONSHIP_STATISTIC_KEY_PREFIX
-import com.oksusu.susu.common.consts.SUSU_SPECIFIC_STATISTIC_KEY_PREFIX
+import com.oksusu.susu.common.consts.SUSU_CATEGORY_ENVELOPE_STATISTIC_KEY_PREFIX
+import com.oksusu.susu.common.consts.SUSU_RELATIONSHIP_ENVELOPE_STATISTIC_KEY_PREFIX
+import com.oksusu.susu.common.consts.SUSU_SPECIFIC_ENVELOPE_STATISTIC_KEY_PREFIX
 import com.oksusu.susu.common.consts.USER_STATISTIC_KEY_PREFIX
 import org.springframework.stereotype.Component
 
@@ -13,18 +13,18 @@ class CacheKeyGenerateHelper {
     }
 
     suspend fun getSusuSpecificStatisticKey(age: Long, categoryId: Long, relationshipId: Long): String {
-        return "$SUSU_SPECIFIC_STATISTIC_KEY_PREFIX$age:$categoryId:$relationshipId"
+        return "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_KEY_PREFIX$age:$categoryId:$relationshipId"
     }
 
     suspend fun getSusuSpecificStatisticKey(key: String): String {
-        return "$SUSU_SPECIFIC_STATISTIC_KEY_PREFIX$key"
+        return "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_KEY_PREFIX$key"
     }
 
     suspend fun getSusuCategoryStatisticKey(id: Long): String {
-        return "$SUSU_CATEGORY_STATISTIC_KEY_PREFIX$id"
+        return "$SUSU_CATEGORY_ENVELOPE_STATISTIC_KEY_PREFIX$id"
     }
 
     suspend fun getSusuRelationshipStatisticKey(id: Long): String {
-        return "$SUSU_RELATIONSHIP_STATISTIC_KEY_PREFIX$id"
+        return "$SUSU_RELATIONSHIP_ENVELOPE_STATISTIC_KEY_PREFIX$id"
     }
 }
