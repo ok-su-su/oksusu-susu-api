@@ -15,9 +15,9 @@ import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.exception.NoAuthorityException
 import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.post.application.PostService
-import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserStatusService
+import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.domain.UserStatusHistory
 import com.oksusu.susu.user.domain.vo.UserStatusAssignmentType
 import kotlinx.coroutines.async

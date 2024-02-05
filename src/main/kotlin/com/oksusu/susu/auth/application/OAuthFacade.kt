@@ -20,9 +20,9 @@ import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
-import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserStatusService
+import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.domain.UserDevice
 import com.oksusu.susu.user.domain.UserStatus
