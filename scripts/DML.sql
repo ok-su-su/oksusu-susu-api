@@ -46,12 +46,12 @@ VALUES (4, '생일 기념일', 1);
 INSERT INTO susu.board (seq, name, is_active)
 VALUES (5, '자유', 1);
 
--- status
-INSERT INTO susu.status (status_type, is_active)
+-- user_status_type
+INSERT INTO susu.user_status_type (status_type_info, is_active)
 VALUES (0, 1);
-INSERT INTO susu.status (status_type, is_active)
+INSERT INTO susu.user_status_type (status_type_info, is_active)
 VALUES (1, 1);
-INSERT INTO susu.status (status_type, is_active)
+INSERT INTO susu.user_status_type (status_type_info, is_active)
 VALUES (2, 1);
-INSERT INTO susu.status (status_type, is_active)
+INSERT INTO susu.user_status_type (status_type_info, is_active)
 VALUES (3, 1);

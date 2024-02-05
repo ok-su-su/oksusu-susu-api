@@ -41,16 +41,16 @@ class UserStatusTypeService(
     }
 
     fun getStatus(id: Long): UserStatusTypeModel {
-        return statuses[id] ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
+        return statuses[id] ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_STATUS_TYPE_ERROR)
     }
 
     fun getActiveStatusId(): Long {
         return statuses.values.firstOrNull { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }?.id
-            ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
+            ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_STATUS_TYPE_ERROR)
     }
 
     fun getDeletedStatusId(): Long {
         return statuses.values.firstOrNull { status -> status.statusTypeInfo == UserStatusTypeInfo.DELETED }?.id
-            ?: throw NotFoundException(ErrorCode.NOT_FOUND_STATUS_ERROR)
+            ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_STATUS_TYPE_ERROR)
     }
 }
