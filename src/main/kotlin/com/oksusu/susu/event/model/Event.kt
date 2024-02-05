@@ -86,5 +86,5 @@ data class DeleteVoteCountEvent(
 
 data class CacheUserEnvelopeStatisticEvent(
     val uid: Long,
-    val statistic: UserEnvelopeStatistic
+    val statistic: UserEnvelopeStatistic,
 ) : BaseEvent()

@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component
 class StatisticEventListener(
     private val userEnvelopeStatisticService: UserEnvelopeStatisticService,
 ) {
-    val logger = KotlinLogging.logger {  }
+    val logger = KotlinLogging.logger { }
 
     @EventListener
-    fun cacheUserEnvelopStatistic(event: CacheUserEnvelopeStatisticEvent){
+    fun cacheUserEnvelopStatistic(event: CacheUserEnvelopeStatisticEvent) {
         CoroutineScope(Dispatchers.IO).launch {
             logger.info { "[${event.publishAt}] ${event.uid} 유저 봉투 통계 캐싱 시작" }
 

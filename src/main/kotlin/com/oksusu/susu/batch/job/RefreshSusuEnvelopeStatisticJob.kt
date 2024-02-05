@@ -2,13 +2,9 @@ package com.oksusu.susu.batch.job
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.common.consts.SUSU_CATEGORY_STATISTIC_KEY_PREFIX
-import com.oksusu.susu.common.consts.SUSU_RELATIONSHIP_STATISTIC_KEY_PREFIX
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toAgeGroup
-import com.oksusu.susu.friend.application.FriendRelationshipService
-import com.oksusu.susu.ledger.application.LedgerService
 import com.oksusu.susu.statistic.application.EnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuEnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuSpecificEnvelopeStatisticService
@@ -54,7 +50,7 @@ class RefreshSusuEnvelopeStatisticJob(
                     recentSpent = recentSpent,
                     mostSpentMonth = mostSpentMonth,
                     mostFrequentCategory = mostFrequentCategory,
-                    mostFrequentRelationShip = mostFrequentRelationShip,
+                    mostFrequentRelationShip = mostFrequentRelationShip
                 )
             )
 

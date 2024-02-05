@@ -5,7 +5,6 @@ import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
-import com.oksusu.susu.extension.toAgeGroup
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.ledger.application.LedgerService
@@ -43,12 +42,12 @@ class EnvelopeStatisticService(
         val (envelopeCategoryCounts, ledgerCategoryCounts) = if (uid == null) {
             parZip(
                 { envelopeService.countPerCategoryId() },
-                { ledgerService.countPerCategoryId() },
+                { ledgerService.countPerCategoryId() }
             ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
         } else {
             parZip(
                 { envelopeService.countPerCategoryIdByUid(uid) },
-                { ledgerService.countPerCategoryIdByUid(uid) },
+                { ledgerService.countPerCategoryIdByUid(uid) }
             ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
         }
 
@@ -80,7 +79,6 @@ class EnvelopeStatisticService(
         } else {
             friendRelationshipService.countPerRelationshipIdByUid(uid)
         }
-
 
         return relationShipConuts.takeIf { it.isNotEmpty() }
             ?.maxBy { it.totalCounts }

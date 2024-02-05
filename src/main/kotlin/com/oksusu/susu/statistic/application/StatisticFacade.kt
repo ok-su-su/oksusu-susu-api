@@ -61,7 +61,7 @@ class StatisticFacade(
                 mostFrequentRelationShip = mostFrequentRelationShip,
                 mostFrequentCategory = mostFrequentCategory,
                 maxReceivedEnvelope = maxReceivedEnvelope,
-                maxSentEnvelope = maxSentEnvelope,
+                maxSentEnvelope = maxSentEnvelope
             )
         }
 
