@@ -4,6 +4,7 @@ import com.oksusu.susu.category.domain.QCategoryAssignment
 import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.QEnvelope
+import com.oksusu.susu.envelope.domain.QLedger
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.*
 import com.oksusu.susu.extension.execute
@@ -14,7 +15,6 @@ import com.oksusu.susu.extension.isIn
 import com.oksusu.susu.extension.isLoe
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
-import com.oksusu.susu.ledger.domain.QLedger
 import com.oksusu.susu.user.domain.QUser
 import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.jpa.impl.JPAQuery
