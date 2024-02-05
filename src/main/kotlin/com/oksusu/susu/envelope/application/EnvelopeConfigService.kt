@@ -1,5 +1,6 @@
 package com.oksusu.susu.envelope.application
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
@@ -22,11 +23,16 @@ class EnvelopeConfigService(
     }
 
     suspend fun getSearchFilter(user: AuthUser): SearchFilterEnvelopeResponse {
-        val maxReceivedAmount = envelopeService.findTop1ByUidAndTypeOrderByAmount(
-            uid = user.uid,
-            type = EnvelopeType.RECEIVED
-        )?.amount ?: 0L
-
-        return SearchFilterEnvelopeResponse(0L, maxReceivedAmount)
+        return parZip(
+            { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.RECEIVED) },
+            { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.SENT) }
+        ) { maxReceivedAmount, maxSentAmount ->
+            SearchFilterEnvelopeResponse(
+                minReceivedAmount = 0L,
+                maxReceivedAmount = maxReceivedAmount?.amount ?: 0L,
+                minSentAmount = 0L,
+                maxSentAmount = maxSentAmount?.amount ?: 0L
+            )
+        }
     }
 }

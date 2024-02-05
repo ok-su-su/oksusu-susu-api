@@ -1,6 +1,6 @@
 package com.oksusu.susu.statistic.model.vo
 
-data class SusuStatisticRequest(
+data class SusuEnvelopeStatisticRequest(
     /** required | 나이 */
     val age: AgeType,
     /** required | 관계 id */

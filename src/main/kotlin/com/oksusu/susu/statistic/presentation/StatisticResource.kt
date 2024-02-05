@@ -4,7 +4,7 @@ import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import com.oksusu.susu.statistic.application.StatisticFacade
-import com.oksusu.susu.statistic.model.vo.SusuStatisticRequest
+import com.oksusu.susu.statistic.model.vo.SusuEnvelopeStatisticRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springdoc.core.annotations.ParameterObject
@@ -20,15 +20,15 @@ class StatisticResource(
     private val statisticFacade: StatisticFacade,
 ) {
     @Operation(summary = "나의 통계")
-    @GetMapping("/mine")
-    suspend fun getUserStatistic(
+    @GetMapping("/mine/envelope")
+    suspend fun getUserEnvelopeStatistic(
         user: AuthUser,
-    ) = statisticFacade.getUserStatistic(user).wrapOk()
+    ) = statisticFacade.getUserEnvelopeStatistic(user).wrapOk()
 
     @Operation(summary = "수수 통계")
-    @GetMapping("/susu")
-    suspend fun getSusuStatistic(
+    @GetMapping("/susu/envelope")
+    suspend fun getSusuEnvelopeStatistic(
         user: AuthUser,
-        @ParameterObject susuStatisticRequest: SusuStatisticRequest,
-    ) = statisticFacade.getSusuStatistic(susuStatisticRequest).wrapOk()
+        @ParameterObject susuStatisticRequest: SusuEnvelopeStatisticRequest,
+    ) = statisticFacade.getSusuEnvelopeStatistic(susuStatisticRequest).wrapOk()
 }

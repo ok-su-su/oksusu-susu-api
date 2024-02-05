@@ -1,10 +1,10 @@
 package com.oksusu.susu.statistic.model.response
 
-import com.oksusu.susu.statistic.domain.SusuBasicStatistic
-import com.oksusu.susu.statistic.model.SusuSpecificStatisticModel
+import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
+import com.oksusu.susu.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.statistic.model.TitleValueModel
 
-data class SusuStatisticResponse(
+data class SusuEnvelopeStatisticResponse(
     /** 평균 보낸 비용 */
     val averageSent: Long?,
     /** 관계 별 평균 */
@@ -21,15 +21,15 @@ data class SusuStatisticResponse(
     val mostCategory: TitleValueModel<Long>?,
 ) {
     companion object {
-        fun of(specific: SusuSpecificStatisticModel, basic: SusuBasicStatistic): SusuStatisticResponse {
-            return SusuStatisticResponse(
+        fun of(specific: SusuSpecificEnvelopeStatisticModel, statistic: SusuEnvelopeStatistic): SusuEnvelopeStatisticResponse {
+            return SusuEnvelopeStatisticResponse(
                 averageSent = specific.averageSent,
                 averageRelationship = specific.averageRelationship,
                 averageCategory = specific.averageCategory,
-                recentSpent = basic.recentSpent,
-                mostSpentMonth = basic.mostSpentMonth,
-                mostRelationship = basic.relationship,
-                mostCategory = basic.category
+                recentSpent = statistic.recentSpent,
+                mostSpentMonth = statistic.mostSpentMonth,
+                mostRelationship = statistic.mostFrequentRelationShip,
+                mostCategory = statistic.mostFrequentCategory
             )
         }
     }
