@@ -1,14 +1,12 @@
 package com.oksusu.susu.user.application
 
-import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.User
-import com.oksusu.susu.user.domain.vo.UserState
 import com.oksusu.susu.user.infrastructure.UserRepository
+import com.oksusu.susu.user.infrastructure.model.UserAndUserStatusModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
@@ -19,7 +17,6 @@ import java.time.LocalDateTime
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val txTemplates: TransactionTemplates,
 ) {
     suspend fun validateNotRegistered(oauthInfo: OauthInfo) {
         existsByOauthInfo(oauthInfo).takeUnless { isExists -> isExists }
@@ -59,17 +56,6 @@ class UserService(
         return userRepository.findByIdOrNull(uid)
     }
 
-    suspend fun withdraw(uid: Long) {
-        val user = findByIdOrThrow(uid)
-
-        txTemplates.writer.coExecute {
-            user.apply {
-                this.userState = UserState.DELETED
-                this.oauthInfo = oauthInfo.withdrawOauthInfo()
-            }.run { saveSync(this) }
-        }
-    }
-
     suspend fun validateExist(id: Long) {
         withContext(Dispatchers.IO) {
             userRepository.existsById(id)
@@ -89,5 +75,11 @@ class UserService(
 
     suspend fun count() {
         return withContext(Dispatchers.IO) { userRepository.count() }
+    }
+
+    suspend fun getUserAndUserStatus(uid: Long): UserAndUserStatusModel {
+        return withContext(Dispatchers.IO) {
+            userRepository.getUserAndUserStatus(uid)
+        } ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 }
