@@ -39,7 +39,13 @@ class ExcelService {
 
             ws.value(r, 0, dataIdx + 1)
             sheet.titles.values.forEachIndexed { propertyIdx, name ->
-                ws.value(r, propertyIdx + 1, properties[name])
+                val value = if (properties[name] == "null") {
+                    "-"
+                } else {
+                    properties[name]
+                }
+
+                ws.value(r, propertyIdx + 1, value)
             }
 
             for (c in 0..properties.size) {
