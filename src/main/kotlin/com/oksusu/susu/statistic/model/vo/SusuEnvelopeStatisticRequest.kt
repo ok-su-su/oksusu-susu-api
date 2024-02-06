@@ -19,7 +19,5 @@ enum class AgeType(
     FIFTY(50),
     SIXTY(60),
     SEVENTY(70),
-    EIGHTY(80),
-    NINETY(90),
     ;
 }

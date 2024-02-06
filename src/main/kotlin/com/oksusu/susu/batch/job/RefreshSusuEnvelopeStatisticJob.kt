@@ -4,7 +4,7 @@ import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.extension.toAgeGroup
+import com.oksusu.susu.extension.toStatisticAgeGroup
 import com.oksusu.susu.statistic.application.EnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuEnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuSpecificEnvelopeStatisticService
@@ -86,7 +86,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
     private fun parseIntoGroup(avgAmountModels: List<CountAvgAmountPerStatisticGroupModel>): Map<String, Long> {
         /** key: age, value: list<model> */
-        val ages = avgAmountModels.groupBy { it.birth.toAgeGroup() }
+        val ages = avgAmountModels.groupBy { it.birth.toStatisticAgeGroup() }
 
         /** key: age:categoryId, value: list<model> */
         val ageCategorys = ages.flatMap { age ->
