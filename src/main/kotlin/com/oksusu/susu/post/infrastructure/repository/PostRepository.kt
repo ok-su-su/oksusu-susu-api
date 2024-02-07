@@ -37,16 +37,10 @@ interface PostCustomRepository {
     fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel>
 
     @Transactional(readOnly = true)
-    fun getVoteAndOptionsAndOptionCount(id: Long): List<PostAndVoteOptionAndOptionCountModel>
-
-    @Transactional(readOnly = true)
     fun getVoteAllInfo(id: Long): List<VoteAllInfoModel>
 
     @Transactional(readOnly = true)
     fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel>
-
-    @Transactional(readOnly = true)
-    fun getAllVotesExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteOptionAndOptionCountModel>
 }
 
 class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport(Post::class.java) {
@@ -66,19 +60,6 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             .select(QPostAndVoteOptionModel(qPost, qVoteOption))
             .from(qPost)
             .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
-            .where(
-                qPost.id.eq(id),
-                qPost.isActive.eq(true),
-                qPost.type.eq(PostType.VOTE)
-            ).fetch()
-    }
-
-    override fun getVoteAndOptionsAndOptionCount(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
-        return JPAQuery<QPost>(entityManager)
-            .select(QPostAndVoteOptionAndOptionCountModel(qPost, qVoteOption, qCount.count))
-            .from(qPost)
-            .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
-            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
             .where(
                 qPost.id.eq(id),
                 qPost.isActive.eq(true),
@@ -122,36 +103,6 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             )
             .from(qPost)
             .join(qCount).on(qCount.targetType.eq(CountTargetType.POST).and(qPost.id.eq(qCount.targetId)))
-            .where(
-                qPost.type.eq(PostType.VOTE),
-                qPost.isActive.eq(true),
-                uidFilter,
-                boardFilter,
-                postIdFilter,
-                contentFilter
-            ).orderBy(*orders)
-
-        return querydsl.executeSlice(query, spec.pageable)
-    }
-
-    override fun getAllVotesExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteOptionAndOptionCountModel> {
-        val uidFilter = spec.searchSpec.mine?.takeIf { mine -> mine }?.let {
-            qPost.uid.isEquals(spec.uid)
-        } ?: qPost.uid.isNotIn(spec.userBlockIds)
-        val boardFilter = qPost.boardId.isEquals(spec.searchSpec.boardId)
-        val contentFilter = qPost.content.isContains(spec.searchSpec.content)
-        val postIdFilter = qPost.id.isNotIn(spec.postBlockIds)
-
-        val orders = when (spec.searchSpec.sortType) {
-            VoteSortType.POPULAR -> arrayOf(qCount.count.desc())
-            VoteSortType.LATEST -> emptyArray()
-        }
-
-        val query = JPAQuery<QPost>(entityManager)
-            .select(QPostAndVoteOptionAndOptionCountModel(qPost, qVoteOption, qCount.count))
-            .from(qPost)
-            .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
-            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
             .where(
                 qPost.type.eq(PostType.VOTE),
                 qPost.isActive.eq(true),

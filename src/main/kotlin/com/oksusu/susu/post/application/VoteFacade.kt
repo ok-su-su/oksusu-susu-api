@@ -32,7 +32,6 @@ import com.oksusu.susu.user.application.BlockService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Slice
-import org.springframework.data.domain.SliceImpl
 import org.springframework.stereotype.Service
 
 @Service
@@ -96,28 +95,20 @@ class VoteFacade(
             pageable = pageRequest.toDefault()
         )
 
-        val models = voteService.getAllVotesExceptBlock(getVoteSpec)
+        val voteAndCountModels = voteService.getVoteAndCountExceptBlock(getVoteSpec)
 
-        val groupByPostId = models.content.groupBy { model -> model.post.id }
+        val options = voteOptionService.getOptionsByPostIdIn(
+            voteAndCountModels.content.map { model -> model.post.id }
+        ).map { VoteOptionModel.from(it) }.groupBy { model -> model.postId }
 
-        val votes = models.content.map { model -> model.post }.distinct()
-        val options = groupByPostId.map { group ->
-            group.key to group.value.map { model -> VoteOptionModel.from(model.voteOption) }
-        }.toMap()
-        val counts = groupByPostId.map { group ->
-            group.key to group.value.sumOf { model -> model.optionCount }
-        }.toMap()
-
-        val contents = votes.map { vote ->
+        return voteAndCountModels.map { model ->
             VoteAndOptionsWithCountResponse.of(
-                vote = vote,
-                count = counts[vote.id]!!,
-                options = options[vote.id]!!,
-                boardModel = boardService.getBoard(vote.boardId)
+                vote = model.post,
+                count = model.voteCount,
+                options = options[model.post.id]!!,
+                boardModel = boardService.getBoard(model.post.boardId)
             )
         }
-
-        return SliceImpl(contents, pageRequest.toDefault(), models.hasNext())
     }
 
     suspend fun getVote(user: AuthUser, id: Long): VoteAllInfoResponse {

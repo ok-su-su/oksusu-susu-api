@@ -19,9 +19,9 @@ class VoteService(
     private val postRepository: PostRepository,
 ) {
     val logger = KotlinLogging.logger { }
-    suspend fun getAllVotesExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteOptionAndOptionCountModel> {
+    suspend fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel> {
         return withContext(Dispatchers.IO) {
-            postRepository.getAllVotesExceptBlock(spec)
+            postRepository.getVoteAndCountExceptBlock(spec)
         }
     }
 
@@ -32,12 +32,6 @@ class VoteService(
     suspend fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
         return withContext(Dispatchers.IO) {
             postRepository.getVoteAndOptions(id)
-        }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
-    }
-
-    suspend fun getVoteAndOptionsAndOptionCount(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
-        return withContext(Dispatchers.IO) {
-            postRepository.getVoteAndOptionsAndOptionCount(id)
         }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
     }
 
