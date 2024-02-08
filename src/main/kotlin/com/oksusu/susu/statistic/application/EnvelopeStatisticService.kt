@@ -20,7 +20,7 @@ class EnvelopeStatisticService(
     private val relationshipService: RelationshipService,
 ) {
     /** 가장 많이 보낸 금액 */
-    suspend fun getMaxReceivedEnvelope(uid: Long): TitleValueModel<Long>? {
+    suspend fun getMaxSentEnvelope(uid: Long): TitleValueModel<Long>? {
         val sentMaxAmount = envelopeService.getMaxAmountEnvelopeInfoByUid(uid, EnvelopeType.SENT)
 
         return sentMaxAmount?.run {
@@ -29,7 +29,7 @@ class EnvelopeStatisticService(
     }
 
     /** 가장 많이 받은 금액 */
-    suspend fun getMaxSentEnvelope(uid: Long): TitleValueModel<Long>? {
+    suspend fun getMaxReceivedEnvelope(uid: Long): TitleValueModel<Long>? {
         val receivedMaxAmount = envelopeService.getMaxAmountEnvelopeInfoByUid(uid, EnvelopeType.RECEIVED)
 
         return receivedMaxAmount?.run {

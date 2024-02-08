@@ -179,7 +179,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .select(
                 QCountPerHandedOverAtModel(
                     qEnvelope.handedOverAt.yearMonth(),
-                    qEnvelope.id.count()
+                    qEnvelope.amount.sum()
                 )
             ).from(qEnvelope)
             .where(
@@ -199,7 +199,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .select(
                 QCountPerHandedOverAtModel(
                     qEnvelope.handedOverAt.yearMonth(),
-                    qEnvelope.id.count()
+                    qEnvelope.amount.sum()
                 )
             ).from(qEnvelope)
             .where(
