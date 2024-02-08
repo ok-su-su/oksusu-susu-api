@@ -70,6 +70,7 @@ class EnvelopeResource(
      *
      * **정렬조건**
      * - createdAt: 생성일
+     * - amount: 봉투 금액
      */
     @Operation(summary = "검색")
     @GetMapping
