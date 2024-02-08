@@ -27,13 +27,15 @@ class EnvelopeConfigService(
             { envelopeService.findTop1ByUidAndTypeOrderByAmountAsc(user.uid, EnvelopeType.RECEIVED) },
             { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.RECEIVED) },
             { envelopeService.findTop1ByUidAndTypeOrderByAmountAsc(user.uid, EnvelopeType.SENT) },
-            { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.SENT) }
-        ) { minReceivedAmount, maxReceivedAmount, minSentAmount, maxSentAmount ->
+            { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.SENT) },
+            { envelopeService.countTotalAmountByUid(user.uid) }
+        ) { minReceivedAmount, maxReceivedAmount, minSentAmount, maxSentAmount, totalAmount ->
             SearchFilterEnvelopeResponse(
                 minReceivedAmount = minReceivedAmount?.amount ?: 0L,
                 maxReceivedAmount = maxReceivedAmount?.amount ?: 0L,
                 minSentAmount = minSentAmount?.amount ?: 0L,
-                maxSentAmount = maxSentAmount?.amount ?: 0L
+                maxSentAmount = maxSentAmount?.amount ?: 0L,
+                totalAmount = totalAmount
             )
         }
     }
