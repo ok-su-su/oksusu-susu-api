@@ -155,4 +155,8 @@ class EnvelopeService(
     suspend fun count(): Long {
         return withContext(Dispatchers.IO) { envelopeRepository.count() }
     }
+
+    suspend fun countTotalAmountByUid(uid: Long): Long {
+        return withContext(Dispatchers.IO) { envelopeRepository.countTotalAmountByUid(uid) }
+    }
 }

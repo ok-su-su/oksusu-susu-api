@@ -9,4 +9,6 @@ data class SearchFilterEnvelopeResponse(
     val minSentAmount: Long,
     /** 최대 보낸 금액 */
     val maxSentAmount: Long,
+    /** 봉투 총합 */
+    val totalAmount: Long,
 )
