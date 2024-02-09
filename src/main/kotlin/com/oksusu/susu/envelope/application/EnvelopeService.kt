@@ -89,16 +89,16 @@ class EnvelopeService(
         }
     }
 
-    suspend fun countPerHandedOverAtInLast8Month(type: EnvelopeType): List<CountPerHandedOverAtModel> {
-        val from = LocalDate.now().minusMonths(7).atTime(0, 0)
+    suspend fun countPerHandedOverAtInLast1Year(type: EnvelopeType): List<CountPerHandedOverAtModel> {
+        val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
         return withContext(Dispatchers.IO) {
             envelopeRepository.countPerHandedOverAtBetween(type, from, to)
         }
     }
 
-    suspend fun countPerHandedOverAtInLast8MonthByUid(uid: Long, type: EnvelopeType): List<CountPerHandedOverAtModel> {
-        val from = LocalDate.now().minusMonths(7).atTime(0, 0)
+    suspend fun countPerHandedOverAtInLast1YearByUid(uid: Long, type: EnvelopeType): List<CountPerHandedOverAtModel> {
+        val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
         return withContext(Dispatchers.IO) {
             envelopeRepository.countPerHandedOverAtBetweenByUid(uid, type, from, to)
@@ -158,5 +158,11 @@ class EnvelopeService(
 
     suspend fun countTotalAmountByUid(uid: Long): Long {
         return withContext(Dispatchers.IO) { envelopeRepository.countTotalAmountByUid(uid) }
+    }
+
+    suspend fun getUserCountHadEnvelope(): Long {
+        return withContext(Dispatchers.IO){
+            envelopeRepository.getUserCountHadEnvelope()
+        }
     }
 }

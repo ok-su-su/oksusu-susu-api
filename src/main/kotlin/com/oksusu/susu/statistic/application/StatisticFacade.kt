@@ -4,6 +4,7 @@ import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.event.model.CacheUserEnvelopeStatisticEvent
+import com.oksusu.susu.extension.yearMonth
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.statistic.model.response.SusuEnvelopeStatisticResponse
@@ -12,6 +13,7 @@ import com.oksusu.susu.statistic.model.vo.SusuEnvelopeStatisticRequest
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class StatisticFacade(
@@ -34,7 +36,7 @@ class StatisticFacade(
         }
 
         val userEnvelopeStatistic = parZip(
-            // 최근 사용 금액
+            // 최근 사용 금액 1년
             { envelopeStatisticService.getRecentSpent(user.uid) },
             // 최다 수수 관계
             { envelopeStatisticService.getMostFrequentRelationship(user.uid) },
@@ -52,11 +54,17 @@ class StatisticFacade(
                 maxSentEnvelope,
             ->
 
-            // 경조사비 가장 많이 쓴 달
-            val mostSpentMonth = recentSpent?.maxBy { model -> model.value }?.value
+            /** 최근 사용 금액 8달 */
+            val before8Month = LocalDate.now().minusMonths(7).yearMonth()
+            val recentSpentForLast8Months = recentSpent?.filter { spent ->
+                spent.title >= before8Month
+            }
+
+            /** 경조사비 가장 많이 쓴 달 */
+            val mostSpentMonth = recentSpent?.maxBy { model -> model.value }?.title?.substring(4)?.toLong()
 
             UserEnvelopeStatistic(
-                recentSpent = recentSpent,
+                recentSpent = recentSpentForLast8Months,
                 mostSpentMonth = mostSpentMonth,
                 mostFrequentRelationShip = mostFrequentRelationShip,
                 mostFrequentCategory = mostFrequentCategory,

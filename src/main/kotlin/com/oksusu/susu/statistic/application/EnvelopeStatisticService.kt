@@ -9,6 +9,8 @@ import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.statistic.model.TitleValueModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
 @Service
@@ -93,9 +95,9 @@ class EnvelopeStatisticService(
     /** 최근 사용 금액 */
     suspend fun getRecentSpent(uid: Long?): List<TitleValueModel<Long>>? {
         val envelopHandOverAtMonthCount = if (uid == null) {
-            envelopeService.countPerHandedOverAtInLast8Month(EnvelopeType.SENT)
+            envelopeService.countPerHandedOverAtInLast1Year(EnvelopeType.SENT)
         } else {
-            envelopeService.countPerHandedOverAtInLast8MonthByUid(uid, EnvelopeType.SENT)
+            envelopeService.countPerHandedOverAtInLast1YearByUid(uid, EnvelopeType.SENT)
         }
 
         return envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
