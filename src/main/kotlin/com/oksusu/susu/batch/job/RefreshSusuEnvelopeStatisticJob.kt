@@ -30,7 +30,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
         parZip(
             /** 봉투 소유 유저 수 */
-            {envelopeService.getUserCountHadEnvelope()},
+            { envelopeService.getUserCountHadEnvelope() },
             /** 최근 사용 금액 */
             { envelopeStatisticService.getRecentSpent(null) },
             /** 최다 수수 관계 */
@@ -49,9 +49,8 @@ class RefreshSusuEnvelopeStatisticJob(
 
             /** 최근 사용 금액 8달 */
             val before8Month = LocalDate.now().minusMonths(7).yearMonth()
-            val recentSpentForLast8Months = recentSpent?.filter { spent ->
-                spent.title >= before8Month
-            }
+            val recentSpentForLast8Months = recentSpent?.filter { spent -> spent.title >= before8Month }
+                ?.map { model -> model.apply { value /= userCount } }
 
             /** 경조사비 가장 많이 쓴 달 */
             val mostSpentMonth = recentSpent?.maxBy { model -> model.value }?.title?.substring(4)?.toLong()
