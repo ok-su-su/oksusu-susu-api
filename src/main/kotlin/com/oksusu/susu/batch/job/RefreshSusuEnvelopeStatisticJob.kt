@@ -5,6 +5,7 @@ import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toStatisticAgeGroup
+import com.oksusu.susu.extension.yearMonth
 import com.oksusu.susu.statistic.application.EnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuEnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuSpecificEnvelopeStatisticService
@@ -12,6 +13,7 @@ import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 
 @Component
 class RefreshSusuEnvelopeStatisticJob(
@@ -27,6 +29,8 @@ class RefreshSusuEnvelopeStatisticJob(
         logger.info { "start refresh susu statistic" }
 
         parZip(
+            /** 봉투 소유 유저 수 */
+            {envelopeService.getUserCountHadEnvelope()},
             /** 최근 사용 금액 */
             { envelopeStatisticService.getRecentSpent(null) },
             /** 최다 수수 관계 */
@@ -36,21 +40,34 @@ class RefreshSusuEnvelopeStatisticJob(
             /** 평균 수수 */
             { envelopeService.countAvgAmountPerStatisticGroup() }
         ) {
+                userCount,
                 recentSpent,
                 mostFrequentRelationShip,
                 mostFrequentCategory,
                 avgAmountModels,
             ->
 
-            // 경조사비 가장 많이 쓴 달
-            val mostSpentMonth = recentSpent?.maxBy { model -> model.value }?.value
+            /** 최근 사용 금액 8달 */
+            val before8Month = LocalDate.now().minusMonths(7).yearMonth()
+            val recentSpentForLast8Months = recentSpent?.filter { spent ->
+                spent.title >= before8Month
+            }
+
+            /** 경조사비 가장 많이 쓴 달 */
+            val mostSpentMonth = recentSpent?.maxBy { model -> model.value }?.title?.substring(4)?.toLong()
+
+            /** 최다 수수 경조사 평균 */
+            val avgMostFrequentCategory = mostFrequentCategory?.apply { value /= userCount }
+
+            /** 최다 수수 관계 평균 */
+            val avgMostFrequentRelationship = mostFrequentRelationShip?.apply { value /= userCount }
 
             susuEnvelopeStatisticService.save(
                 SusuEnvelopeStatistic(
-                    recentSpent = recentSpent,
+                    recentSpent = recentSpentForLast8Months,
                     mostSpentMonth = mostSpentMonth,
-                    mostFrequentCategory = mostFrequentCategory,
-                    mostFrequentRelationShip = mostFrequentRelationShip
+                    mostFrequentCategory = avgMostFrequentCategory,
+                    mostFrequentRelationShip = avgMostFrequentRelationship
                 )
             )
 

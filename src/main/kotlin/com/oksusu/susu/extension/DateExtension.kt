@@ -2,6 +2,7 @@ package com.oksusu.susu.extension
 
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -27,4 +28,15 @@ fun LocalDateTime.equalsFromYearToSec(otherTime: LocalDateTime): Boolean {
 fun LocalDateTime.format(format: String): String {
     val formatter = DateTimeFormatter.ofPattern(format)
     return this.format(formatter)
+}
+
+fun LocalDate.yearMonth(): String {
+    val year = this.year
+    val month = if (this.monthValue >= 10) {
+        this.monthValue
+    } else {
+        "0${this.monthValue}"
+    }
+
+    return "$year$month"
 }

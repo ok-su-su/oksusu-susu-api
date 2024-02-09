@@ -106,6 +106,9 @@ interface EnvelopeCustomRepository {
 
     @Transactional(readOnly = true)
     fun countTotalAmountByUid(uid: Long): Long
+
+    @Transactional(readOnly = true)
+    fun getUserCountHadEnvelope(): Long
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -220,6 +223,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).from(qEnvelope)
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .where(
+                qEnvelope.ledgerId.isNull,
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             ).groupBy(qCategoryAssignment.categoryId)
             .fetch()
@@ -378,6 +382,14 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .select(qEnvelope.amount.sum())
             .from(qEnvelope)
             .where(qEnvelope.uid.eq(uid))
+            .fetchFirst()
+    }
+
+    override fun getUserCountHadEnvelope(): Long {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                qEnvelope.uid.countDistinct()
+            ).from(qEnvelope)
             .fetchFirst()
     }
 }

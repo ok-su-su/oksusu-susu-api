@@ -45,10 +45,6 @@ class UserCustomRepositoryImpl : UserCustomRepository, QuerydslRepositorySupport
         super.setEntityManager(entityManager)
     }
 
-    private val qPost = QPost.post
-    private val qVoteOption = QVoteOption.voteOption
-    private val qCount = QCount.count1
-
     private val qUser = QUser.user
     private val qUserStatus = QUserStatus.userStatus
 
