@@ -1,10 +1,6 @@
 package com.oksusu.susu.user.infrastructure
 
-import com.oksusu.susu.count.domain.QCount
 import com.oksusu.susu.extension.isEquals
-import com.oksusu.susu.post.domain.QPost
-import com.oksusu.susu.post.domain.QVoteOption
-import com.oksusu.susu.post.infrastructure.repository.model.*
 import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.QUser
 import com.oksusu.susu.user.domain.QUserStatus

@@ -161,7 +161,7 @@ class EnvelopeService(
     }
 
     suspend fun getUserCountHadEnvelope(): Long {
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             envelopeRepository.getUserCountHadEnvelope()
         }
     }
