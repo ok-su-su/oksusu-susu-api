@@ -38,7 +38,7 @@ class FriendService(
         return friendRepository.save(friend)
     }
 
-    suspend fun existsByPhoneNumber(uid: Long, phoneNumber: String): Boolean {
+    suspend fun existsByUidAndPhoneNumber(uid: Long, phoneNumber: String): Boolean {
         return withContext(Dispatchers.IO) { friendRepository.existsByUidAndPhoneNumber(uid, phoneNumber) }
     }
 

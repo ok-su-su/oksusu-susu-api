@@ -108,9 +108,7 @@ CREATE TABLE `friend`
     `modified_at`  datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='지인 정보';
-CREATE INDEX idx__uid ON friend (uid);
-ALTER TABLE friend
-    ADD CONSTRAINT unique__phone_number UNIQUE (phone_number);
+CREATE UNIQUE INDEX idx__uid__phone_number ON friend (uid, phone_number);
 
 -- 지인 관계
 CREATE TABLE `friend_relationship`

@@ -83,7 +83,7 @@ class FriendFacade(
 
     suspend fun create(user: AuthUser, request: CreateAndUpdateFriendRequest): CreateAndUpdateFriendResponse {
         if (request.phoneNumber != null) {
-            if (friendService.existsByPhoneNumber(user.uid, request.phoneNumber)) {
+            if (friendService.existsByUidAndPhoneNumber(user.uid, request.phoneNumber)) {
                 throw AlreadyException(ErrorCode.ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR)
             }
         }
@@ -97,7 +97,7 @@ class FriendFacade(
         val createdFriend = txTemplates.writer.coExecute {
             val createdFriend = Friend(
                 uid = user.uid,
-                name = request.name,
+                name = request.name.trim(),
                 phoneNumber = request.phoneNumber
             ).run { friendService.saveSync(this) }
 
@@ -122,7 +122,7 @@ class FriendFacade(
         val friendRelationship = friendRelationshipService.findByFriendIdOrThrow(friend.id)
 
         if (request.phoneNumber != null && request.phoneNumber != friend.phoneNumber) {
-            if (friendService.existsByPhoneNumber(user.uid, request.phoneNumber)) {
+            if (friendService.existsByUidAndPhoneNumber(user.uid, request.phoneNumber)) {
                 throw AlreadyException(ErrorCode.ALREADY_REGISTERED_FRIEND_PHONE_NUMBER_ERROR)
             }
         }
@@ -135,7 +135,7 @@ class FriendFacade(
 
         val createdFriend = txTemplates.writer.coExecute {
             val createdFriend = friend.apply {
-                this.name = request.name
+                this.name = request.name.trim()
                 this.phoneNumber = request.phoneNumber
             }.run { friendService.saveSync(this) }
 
