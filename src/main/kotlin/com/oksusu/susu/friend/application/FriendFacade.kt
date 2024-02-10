@@ -97,7 +97,7 @@ class FriendFacade(
         val createdFriend = txTemplates.writer.coExecute {
             val createdFriend = Friend(
                 uid = user.uid,
-                name = request.name,
+                name = request.name.trim(),
                 phoneNumber = request.phoneNumber
             ).run { friendService.saveSync(this) }
 
@@ -135,7 +135,7 @@ class FriendFacade(
 
         val createdFriend = txTemplates.writer.coExecute {
             val createdFriend = friend.apply {
-                this.name = request.name
+                this.name = request.name.trim()
                 this.phoneNumber = request.phoneNumber
             }.run { friendService.saveSync(this) }
 
