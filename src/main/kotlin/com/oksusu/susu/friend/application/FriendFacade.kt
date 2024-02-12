@@ -161,6 +161,7 @@ class FriendFacade(
                 txTemplates.writer.coExecuteOrNull {
                     friendService.deleteSync(chunkedFriendIds)
                     friendRelationshipService.deleteByFriendIdInSync(chunkedFriendIds)
+                    envelopeService.deleteAllByFriendIds(chunkedFriendIds)
                 }
             }
     }
