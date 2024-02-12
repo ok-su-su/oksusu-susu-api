@@ -165,4 +165,9 @@ class EnvelopeService(
             envelopeRepository.getUserCountHadEnvelope()
         }
     }
+
+    @Transactional
+    fun deleteAllByFriendIds(friendIds: List<Long>) {
+        envelopeRepository.deleteAllByFriendIdIn(friendIds)
+    }
 }
