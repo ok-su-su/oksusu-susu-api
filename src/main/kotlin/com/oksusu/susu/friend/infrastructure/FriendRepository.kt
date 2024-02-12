@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository {
@@ -33,6 +34,9 @@ interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository
 
     @Transactional(readOnly = true)
     fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Friend>
+
+    @Transactional(readOnly = true)
+    fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
 }
 
 interface FriendCustomRepository {

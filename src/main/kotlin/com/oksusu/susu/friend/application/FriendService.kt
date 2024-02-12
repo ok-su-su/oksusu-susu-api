@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class FriendService(
@@ -61,5 +62,9 @@ class FriendService(
     @Transactional
     fun deleteSync(ids: List<Long>) {
         friendRepository.deleteAllByIdInBatch(ids)
+    }
+
+    suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
+        return withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(startAt, endAt) }
     }
 }
