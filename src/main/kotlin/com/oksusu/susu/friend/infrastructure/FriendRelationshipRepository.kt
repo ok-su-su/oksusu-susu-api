@@ -20,6 +20,9 @@ interface FriendRelationshipRepository : JpaRepository<FriendRelationship, Long>
 
     @Transactional(readOnly = true)
     fun findByFriendId(friendId: Long): FriendRelationship?
+
+    @Transactional
+    fun deleteByFriendIdIn(friendIds: List<Long>)
 }
 
 interface FriendRelationshipCustomRepository {

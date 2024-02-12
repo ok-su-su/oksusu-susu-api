@@ -10,6 +10,7 @@ import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.exception.AlreadyException
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.extension.coExecute
+import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.domain.FriendRelationship
 import com.oksusu.susu.friend.infrastructure.model.SearchFriendSpec
@@ -148,5 +149,19 @@ class FriendFacade(
         }
 
         return CreateAndUpdateFriendResponse(createdFriend.id)
+    }
+
+    suspend fun delete(user: AuthUser, ids: Set<Long>) {
+        val friends = friendService.findAllByUidAndIdIn(user.uid, ids.toList())
+        val friendIds = friends.map { friend -> friend.id }
+
+        friendIds
+            .chunked(100)
+            .forEach { chunkedFriendIds ->
+                txTemplates.writer.coExecuteOrNull {
+                    friendService.deleteSync(chunkedFriendIds)
+                    friendRelationshipService.deleteByFriendIdInSync(chunkedFriendIds)
+                }
+            }
     }
 }

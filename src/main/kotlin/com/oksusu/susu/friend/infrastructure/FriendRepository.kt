@@ -30,6 +30,9 @@ interface FriendRepository : JpaRepository<Friend, Long>, FriendCustomRepository
 
     @Transactional(readOnly = true)
     fun findAllByIdIn(ids: List<Long>): List<Friend>
+
+    @Transactional(readOnly = true)
+    fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Friend>
 }
 
 interface FriendCustomRepository {
