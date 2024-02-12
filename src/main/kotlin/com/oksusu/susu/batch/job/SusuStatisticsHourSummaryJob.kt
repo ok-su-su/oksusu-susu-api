@@ -4,6 +4,7 @@ import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.model.SlackMessageModel
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.extension.format
+import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.log.application.SystemActionLogService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
@@ -14,6 +15,7 @@ class SusuStatisticsHourSummaryJob(
     private val slackClient: SlackClient,
     private val systemActionLogService: SystemActionLogService,
     private val envelopeService: EnvelopeService,
+    private val friendService: FriendService,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -22,21 +24,34 @@ class SusuStatisticsHourSummaryJob(
         val beforeOneHour = now.minusHours(1)
 
         val systemActionLogCount = systemActionLogService.countByCreatedAtBetween(beforeOneHour, now)
+        val envelopeCount = envelopeService.countByCreatedAtBetween(beforeOneHour, now)
+        val friendCount = friendService.countByCreatedAtBetween(beforeOneHour, now)
 
-        val summaryMessage = HourSummaryMessage(now, systemActionLogCount)
-        slackClient.send(summaryMessage.message())
+        HourSummaryMessage(
+            beforeOneHour = beforeOneHour,
+            now = now,
+            systemActionLogCount = systemActionLogCount,
+            envelopeCount = envelopeCount,
+            friendCount = friendCount
+        ).run { slackClient.send(this.message()) }
     }
 }
 
 data class HourSummaryMessage(
+    val beforeOneHour: LocalDateTime,
     val now: LocalDateTime,
     val systemActionLogCount: Long,
+    val envelopeCount: Long,
+    val friendCount: Long,
 ) {
     fun message(): SlackMessageModel {
         return SlackMessageModel(
             """
-                *시간단위 통계 알림${now.format("yyyyMMdd HH:mm:ss")}*
+                *시간단위 통계 알림 ${now.format("yyyy-MM-dd HH:mm:ss")}*
+                - ${beforeOneHour.format("yyyy-MM-dd HH:mm:ss")} ~ ${now.format("yyyy-MM-dd HH:mm:ss")}
                 - api 호출수 : $systemActionLogCount
+                - 봉투 생성수 : $envelopeCount
+                - 친구 생성수 : $friendCount
             """.trimIndent()
         )
     }
