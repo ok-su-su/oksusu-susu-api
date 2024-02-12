@@ -53,4 +53,13 @@ class FriendService(
     suspend fun findAllByIdIn(ids: List<Long>): List<Friend> {
         return withContext(Dispatchers.IO) { friendRepository.findAllByIdIn(ids) }
     }
+
+    suspend fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Friend> {
+        return withContext(Dispatchers.IO) { friendRepository.findAllByUidAndIdIn(uid, ids) }
+    }
+
+    @Transactional
+    fun deleteSync(ids: List<Long>) {
+        friendRepository.deleteAllByIdInBatch(ids)
+    }
 }

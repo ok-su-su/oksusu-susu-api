@@ -42,4 +42,9 @@ class FriendRelationshipService(
     suspend fun findByFriendIdOrNull(friendId: Long): FriendRelationship? {
         return withContext(Dispatchers.IO) { friendRelationshipRepository.findByFriendId(friendId) }
     }
+
+    @Transactional
+    fun deleteByFriendIdInSync(friendIds: List<Long>) {
+        friendRelationshipRepository.deleteByFriendIdIn(friendIds)
+    }
 }
