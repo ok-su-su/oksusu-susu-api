@@ -53,11 +53,6 @@ class VoteHistoryService(
         }
     }
 
-    suspend fun validateHistoryNotExist(postId: Long) {
-        existsByPostId(postId).takeUnless { exist -> exist }
-            ?: throw InvalidRequestException(ErrorCode.ALREADY_VOTED_POST)
-    }
-
     suspend fun findByUidAndPostId(uid: Long, postId: Long): VoteHistory? {
         return withContext(Dispatchers.IO) {
             voteHistoryRepository.findByUidAndPostId(uid, postId)

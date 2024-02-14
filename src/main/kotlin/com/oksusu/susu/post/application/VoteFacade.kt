@@ -8,6 +8,8 @@ import com.oksusu.susu.count.application.CountService
 import com.oksusu.susu.count.domain.Count
 import com.oksusu.susu.count.domain.vo.CountTargetType
 import com.oksusu.susu.event.model.DeleteVoteCountEvent
+import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
 import com.oksusu.susu.post.domain.Post
@@ -191,12 +193,11 @@ class VoteFacade(
     }
 
     suspend fun deleteVote(user: AuthUser, id: Long) {
-        postService.validateAuthority(id, user.uid)
-
         val (vote, options) = parZip(
+            { postService.validateAuthority(id, user.uid) },
             { voteService.getVote(id) },
             { voteOptionService.getVoteOptions(id) }
-        ) { vote, options -> vote to options }
+        ) { _, vote, options -> vote to options }
 
         val optionIds = options.map { option -> option.id }
 
@@ -235,13 +236,23 @@ class VoteFacade(
     /** 투표가 진행된 경우 업데이트 불가능 */
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
         return parZip(
-            { postService.validateAuthority(id, user.uid) },
-            { voteHistoryService.validateHistoryNotExist(id) },
+            { voteHistoryService.findByUidAndPostId(user.uid, id) },
             { voteService.getVoteAndOptions(id) }
-        ) { _, _, voteInfos ->
+        ) { voteHistory, voteInfos ->
             val vote = voteInfos[0].post
             val options = voteInfos.map { voteInfo ->
-                VoteOptionAndHistoryModel.of(option = voteInfo.voteOption, isVoted = false)
+                val option = voteInfo.voteOption
+
+                VoteOptionAndHistoryModel.of(
+                    option = option,
+                    isVoted = voteHistory?.takeIf { history -> history.voteOptionId == option.id }
+                        ?.let { true }
+                        ?: false
+                )
+            }
+
+            if (vote.uid != user.uid) {
+                throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
             }
 
             val updatedVote = txTemplates.writer.coExecute {
