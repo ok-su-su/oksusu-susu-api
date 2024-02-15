@@ -77,7 +77,7 @@ class VoteResource(
     ) = voteFacade.getPopularVotes(user, size).wrapOk()
 
     /** 토큰 불필요 */
-    @Operation(summary = "온보드 페이지용 투표 값 조회")
+    @Operation(summary = "온보드 페이지용 투표 값 조회", tags = [SwaggerTag.ONBOARDING_SWAGGER_TAG])
     @GetMapping("/onboarding")
     suspend fun getOnboardingVote() = voteFacade.getOnboardingVote().wrapOk()
 }

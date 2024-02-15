@@ -13,7 +13,7 @@ data class OnboardingVoteOptionCountModel(
         fun of(option: VoteOption, count: Long): OnboardingVoteOptionCountModel {
             return OnboardingVoteOptionCountModel(
                 content = option.content,
-                count = count,
+                count = count
             )
         }
     }

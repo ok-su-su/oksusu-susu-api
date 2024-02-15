@@ -10,7 +10,7 @@ import kotlin.reflect.full.declaredMemberProperties
 @EnableConfigurationProperties(
     SusuConfig.LedgerCreateFormConfig::class,
     SusuConfig.SlackWebhookConfig::class,
-    SusuConfig.OnboardingGetVoteConfig::class,
+    SusuConfig.OnboardingGetVoteConfig::class
 )
 data class SusuConfig(
     val ledgerCreateFormConfig: LedgerCreateFormConfig,

@@ -59,8 +59,8 @@ class VoteService(
     }
 
     suspend fun getVoteAndOptionsAndOptionCounts(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             postRepository.getVoteAndOptionsAndOptionCounts(id)
-        }?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
+        }
     }
 }

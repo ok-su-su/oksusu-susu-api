@@ -19,17 +19,17 @@ import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.model.GetVoteSpec
 import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
+import com.oksusu.susu.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionAndHistoryModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
-import com.oksusu.susu.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.post.model.VoteOptionModel
 import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.post.model.request.CreateVoteRequest
 import com.oksusu.susu.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.post.model.response.CreateAndUpdateVoteResponse
-import com.oksusu.susu.post.model.response.VoteAllInfoResponse
 import com.oksusu.susu.post.model.response.OnboardingVoteResponse
+import com.oksusu.susu.post.model.response.VoteAllInfoResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
@@ -285,7 +285,7 @@ class VoteFacade(
         val optionCountModels = options.map { option ->
             OnboardingVoteOptionCountModel.of(
                 option = option,
-                count = optionCounts[option.id]!!,
+                count = optionCounts[option.id]!!
             )
         }
 
