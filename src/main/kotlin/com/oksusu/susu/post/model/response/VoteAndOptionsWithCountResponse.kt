@@ -11,6 +11,8 @@ class VoteAndOptionsWithCountResponse(
     val id: Long,
     /** 투표 생성자 id */
     val uid: Long,
+    /** 본인 소유 글 여부 / 내 글 : 1, 전체 글 : 0 */
+    val isMine: Boolean,
     /** 보드 */
     val board: BoardModel,
     /** 내용 */
@@ -30,6 +32,7 @@ class VoteAndOptionsWithCountResponse(
             count: Long,
             options: List<VoteOptionModel>,
             boardModel: BoardModel,
+            isMine: Boolean,
         ): VoteAndOptionsWithCountResponse {
             return VoteAndOptionsWithCountResponse(
                 id = vote.id,
@@ -39,7 +42,8 @@ class VoteAndOptionsWithCountResponse(
                 isModified = !vote.createdAt.equalsFromYearToSec(vote.modifiedAt),
                 count = count,
                 options = options.filter { it.postId == vote.id },
-                createdAt = vote.createdAt
+                createdAt = vote.createdAt,
+                isMine = isMine
             )
         }
     }

@@ -9,11 +9,13 @@ import kotlin.reflect.full.declaredMemberProperties
 @Configuration
 @EnableConfigurationProperties(
     SusuConfig.LedgerCreateFormConfig::class,
-    SusuConfig.SlackWebhookConfig::class
+    SusuConfig.SlackWebhookConfig::class,
+    SusuConfig.OnboardingGetVoteConfig::class
 )
 data class SusuConfig(
     val ledgerCreateFormConfig: LedgerCreateFormConfig,
     val slackWebhookConfig: SlackWebhookConfig,
+    val onboardingGetVoteConfig: OnboardingGetVoteConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -31,5 +33,10 @@ data class SusuConfig(
     @ConfigurationProperties(prefix = "slack")
     class SlackWebhookConfig(
         val token: String,
+    )
+
+    @ConfigurationProperties(prefix = "susu.onboarding-config.get-vote")
+    data class OnboardingGetVoteConfig(
+        val voteId: Long,
     )
 }
