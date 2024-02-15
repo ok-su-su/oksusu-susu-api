@@ -57,4 +57,10 @@ class VoteService(
 
         return withContext(Dispatchers.IO) { postRepository.getVoteAndCountExceptBlock(spec) }.content
     }
+
+    suspend fun getVoteAndOptionsAndOptionCounts(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
+        return withContext(Dispatchers.IO) {
+            postRepository.getVoteAndOptionsAndOptionCounts(id)
+        }
+    }
 }

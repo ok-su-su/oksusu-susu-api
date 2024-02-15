@@ -55,3 +55,29 @@ INSERT INTO susu.user_status_type (status_type_info, is_active)
 VALUES (2, 1);
 INSERT INTO susu.user_status_type (status_type_info, is_active)
 VALUES (3, 1);
+
+-- post
+INSERT INTO susu.post (id, uid, board_id, type, title, content, is_active)
+VALUES (1, 1, 1, 0, null, '친구의 결혼식, 축의금은 얼마가 적당하다고 생각하시나요', 1);
+
+-- vote_option
+INSERT INTO susu.vote_option (id, post_id, content, seq)
+VALUES (1, 1, '3만원', 1);
+INSERT INTO susu.vote_option (id, post_id, content, seq)
+VALUES (2, 1, '5만원', 2);
+INSERT INTO susu.vote_option (id, post_id, content, seq)
+VALUES (3, 1, '10만원', 3);
+INSERT INTO susu.vote_option (id, post_id, content, seq)
+VALUES (4, 1, '20만원', 4);
+
+-- count
+INSERT INTO susu.count (id, target_id, target_type, count_type, count)
+VALUES (1, 1, 0, 0, 0);
+INSERT INTO susu.count (id, target_id, target_type, count_type, count)
+VALUES (2, 1, 1, 0, 0);
+INSERT INTO susu.count (id, target_id, target_type, count_type, count)
+VALUES (3, 2, 1, 0, 0);
+INSERT INTO susu.count (id, target_id, target_type, count_type, count)
+VALUES (4, 3, 1, 0, 0);
+INSERT INTO susu.count (id, target_id, target_type, count_type, count)
+VALUES (5, 4, 1, 0, 0);

@@ -3,6 +3,7 @@ package com.oksusu.susu.post.application
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.config.SusuConfig
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.count.application.CountService
 import com.oksusu.susu.count.domain.Count
@@ -18,6 +19,7 @@ import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.model.GetVoteSpec
 import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
+import com.oksusu.susu.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.post.model.VoteCountModel
 import com.oksusu.susu.post.model.VoteOptionAndHistoryModel
 import com.oksusu.susu.post.model.VoteOptionCountModel
@@ -26,6 +28,7 @@ import com.oksusu.susu.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.post.model.request.CreateVoteRequest
 import com.oksusu.susu.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.post.model.response.CreateAndUpdateVoteResponse
+import com.oksusu.susu.post.model.response.OnboardingVoteResponse
 import com.oksusu.susu.post.model.response.VoteAllInfoResponse
 import com.oksusu.susu.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.post.model.response.VoteWithCountResponse
@@ -47,6 +50,7 @@ class VoteFacade(
     private val blockService: BlockService,
     private val countService: CountService,
     private val eventPublisher: ApplicationEventPublisher,
+    private val onboardingGetVoteConfig: SusuConfig.OnboardingGetVoteConfig,
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -108,7 +112,8 @@ class VoteFacade(
                 vote = model.post,
                 count = model.voteCount,
                 options = options[model.post.id]!!,
-                boardModel = boardService.getBoard(model.post.boardId)
+                boardModel = boardService.getBoard(model.post.boardId),
+                isMine = user.uid == model.post.uid
             )
         }
     }
@@ -269,5 +274,23 @@ class VoteFacade(
                 boardModel = boardService.getBoard(request.boardId)
             )
         }
+    }
+
+    suspend fun getOnboardingVote(): OnboardingVoteResponse {
+        val voteInfos = voteService.getVoteAndOptionsAndOptionCounts(onboardingGetVoteConfig.voteId)
+
+        val options = voteInfos.map { voteInfo -> voteInfo.voteOption }
+        val optionCounts = voteInfos.associate { voteInfo -> voteInfo.voteOption.id to voteInfo.optionCount }
+
+        val optionCountModels = options.map { option ->
+            OnboardingVoteOptionCountModel.of(
+                option = option,
+                count = optionCounts[option.id]!!
+            )
+        }
+
+        return OnboardingVoteResponse(
+            options = optionCountModels
+        )
     }
 }
