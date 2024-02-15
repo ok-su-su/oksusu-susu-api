@@ -108,7 +108,8 @@ class VoteFacade(
                 vote = model.post,
                 count = model.voteCount,
                 options = options[model.post.id]!!,
-                boardModel = boardService.getBoard(model.post.boardId)
+                boardModel = boardService.getBoard(model.post.boardId),
+                isMine = user.uid == model.post.uid
             )
         }
     }
