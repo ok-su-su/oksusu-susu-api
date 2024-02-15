@@ -75,4 +75,9 @@ class VoteResource(
         user: AuthUser,
         @RequestParam(defaultValue = "5") size: Int,
     ) = voteFacade.getPopularVotes(user, size).wrapOk()
+
+    /** 토큰 불필요 */
+    @Operation(summary = "온보드 페이지용 투표 값 조회")
+    @GetMapping("/onboarding")
+    suspend fun getOnboardingVote() = voteFacade.getOnboardingVote().wrapOk()
 }

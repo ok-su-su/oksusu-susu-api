@@ -41,6 +41,9 @@ interface PostCustomRepository {
 
     @Transactional(readOnly = true)
     fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel>
+
+    @Transactional(readOnly = true)
+    fun getVoteAndOptionsAndOptionCounts(id: Long): List<PostAndVoteOptionAndOptionCountModel>
 }
 
 class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport(Post::class.java) {
@@ -113,5 +116,18 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
             ).orderBy(*orders)
 
         return querydsl.executeSlice(query, spec.pageable)
+    }
+
+    override fun getVoteAndOptionsAndOptionCounts(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
+        return JPAQuery<QPost>(entityManager)
+            .select(QPostAndVoteOptionAndOptionCountModel(qPost, qVoteOption, qCount.count))
+            .from(qPost)
+            .join(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
+            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
+            .where(
+                qPost.id.eq(id),
+                qPost.isActive.eq(true),
+                qPost.type.eq(PostType.VOTE)
+            ).fetch()
     }
 }

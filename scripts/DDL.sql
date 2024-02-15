@@ -193,7 +193,7 @@ CREATE TABLE `vote_option`
     `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
-) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='투표 선택지';
+) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='투표 선택지';
 CREATE INDEX idx__post_id ON vote_option (post_id);
 
 -- 투표 유저 매핑
@@ -312,7 +312,7 @@ CREATE TABLE `count`
     `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '카운트';
+) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '카운트';
 CREATE INDEX idx__target_type__target_id ON count (target_type, target_id);
 
 -- 유저 디바이스 정보

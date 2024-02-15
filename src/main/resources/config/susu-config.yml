@@ -8,3 +8,7 @@ susu:
         - 2
         - 4
         - 5
+
+  onboarding-config:
+    get-vote:
+      vote-id: 1
