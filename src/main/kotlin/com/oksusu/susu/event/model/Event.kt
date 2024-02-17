@@ -88,3 +88,9 @@ data class CacheUserEnvelopeStatisticEvent(
     val uid: Long,
     val statistic: UserEnvelopeStatistic,
 ) : BaseEvent()
+
+data class DeleteEnvelopeEvent(
+    val envelopeId: Long,
+    val uid: Long,
+    val friendId: Long,
+) : BaseEvent()
