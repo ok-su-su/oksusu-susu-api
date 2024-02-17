@@ -47,4 +47,9 @@ class FriendRelationshipService(
     fun deleteByFriendIdInSync(friendIds: List<Long>) {
         friendRelationshipRepository.deleteByFriendIdIn(friendIds)
     }
+
+    @Transactional
+    fun deleteByFriendIdSync(friendId: Long) {
+        friendRelationshipRepository.deleteByFriendId(friendId)
+    }
 }

@@ -9,8 +9,10 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
+@Component
 class CountEventListener(
     private val countService: CountService,
     private val txTemplates: TransactionTemplates,

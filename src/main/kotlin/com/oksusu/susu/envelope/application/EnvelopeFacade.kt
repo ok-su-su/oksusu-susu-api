@@ -22,6 +22,7 @@ import com.oksusu.susu.envelope.model.response.CreateAndUpdateEnvelopeResponse
 import com.oksusu.susu.envelope.model.response.EnvelopeDetailResponse
 import com.oksusu.susu.envelope.model.response.GetFriendStatisticsResponse
 import com.oksusu.susu.envelope.model.response.SearchEnvelopeResponse
+import com.oksusu.susu.event.model.DeleteEnvelopeEvent
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.coExecute
@@ -31,6 +32,7 @@ import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
 import com.oksusu.susu.friend.model.FriendRelationshipModel
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
@@ -44,6 +46,7 @@ class EnvelopeFacade(
     private val ledgerService: LedgerService,
     private val friendRelationshipService: FriendRelationshipService,
     private val txTemplates: TransactionTemplates,
+    private val publisher: ApplicationEventPublisher,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
         return parZip(
@@ -189,6 +192,12 @@ class EnvelopeFacade(
                 targetId = envelope.id,
                 targetType = CategoryAssignmentType.ENVELOPE
             )
+
+            DeleteEnvelopeEvent(
+                envelopeId = envelope.id,
+                uid = user.uid,
+                friendId = envelope.friendId
+            ).run { publisher.publishEvent(this) }
         }
     }
 

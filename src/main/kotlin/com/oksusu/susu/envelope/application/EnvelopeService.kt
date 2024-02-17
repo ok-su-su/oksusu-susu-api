@@ -170,4 +170,8 @@ class EnvelopeService(
     fun deleteAllByFriendIds(friendIds: List<Long>) {
         envelopeRepository.deleteAllByFriendIdIn(friendIds)
     }
+
+    suspend fun countByUidAndFriendId(uid: Long, friendId: Long): Long {
+        return withContext(Dispatchers.IO) { envelopeRepository.countByUidAndFriendId(uid, friendId) }
+    }
 }

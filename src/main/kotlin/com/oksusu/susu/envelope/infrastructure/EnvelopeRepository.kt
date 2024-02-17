@@ -52,6 +52,9 @@ interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepo
 
     @Transactional
     fun deleteAllByFriendIdIn(friendIds: List<Long>)
+
+    @Transactional(readOnly = true)
+    fun countByUidAndFriendId(uid: Long, friendId: Long): Long
 }
 
 interface EnvelopeCustomRepository {

@@ -64,6 +64,11 @@ class FriendService(
         friendRepository.deleteAllByIdInBatch(ids)
     }
 
+    @Transactional
+    fun deleteSync(id: Long) {
+        friendRepository.deleteById(id)
+    }
+
     suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
         return withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(startAt, endAt) }
     }
