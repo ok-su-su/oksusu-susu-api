@@ -1,15 +1,60 @@
 package com.oksusu.susu.post.infrastructure.repository
 
+import com.oksusu.susu.count.domain.QCount
+import com.oksusu.susu.count.domain.vo.CountTargetType
+import com.oksusu.susu.extension.executeSlice
+import com.oksusu.susu.extension.isContains
+import com.oksusu.susu.extension.isEquals
+import com.oksusu.susu.extension.isNotIn
+import com.oksusu.susu.post.domain.Post
+import com.oksusu.susu.post.domain.QPost
+import com.oksusu.susu.post.domain.QVoteOption
 import com.oksusu.susu.post.domain.VoteOption
+import com.oksusu.susu.post.domain.vo.PostType
+import com.oksusu.susu.post.infrastructure.repository.model.*
+import com.oksusu.susu.post.model.vo.VoteSortType
+import com.oksusu.susu.user.domain.QUser
+import com.querydsl.jpa.impl.JPAQuery
+import jakarta.persistence.EntityManager
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface VoteOptionRepository : JpaRepository<VoteOption, Long> {
+interface VoteOptionRepository : JpaRepository<VoteOption, Long>, VoteOptionCustomRepository {
     @Transactional(readOnly = true)
     fun findAllByPostIdInOrderBySeq(postIds: List<Long>): List<VoteOption>
 
     @Transactional(readOnly = true)
     fun findAllByPostIdOrderBySeq(postId: Long): List<VoteOption>
 }
+
+interface VoteOptionCustomRepository {
+    @Transactional(readOnly = true)
+    fun getOptionAndCount(postId: Long): List<VoteOptionAndCountModel>
+}
+
+class VoteOptionCustomRepositoryImpl : VoteOptionCustomRepository, QuerydslRepositorySupport(VoteOption::class.java) {
+    @Autowired
+    @Qualifier("susuEntityManager")
+    override fun setEntityManager(entityManager: EntityManager) {
+        super.setEntityManager(entityManager)
+    }
+
+    private val qVoteOption = QVoteOption.voteOption
+    private val qCount = QCount.count1
+    override fun getOptionAndCount(postId: Long): List<VoteOptionAndCountModel> {
+        return JPAQuery<QPost>(entityManager)
+            .select(QVoteOptionAndCountModel(qVoteOption, qCount.count))
+            .from(qVoteOption)
+            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
+            .where(
+                qVoteOption.postId.isEquals(postId)
+            ).fetch()
+    }
+}
+

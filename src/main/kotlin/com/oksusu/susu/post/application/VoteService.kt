@@ -19,6 +19,7 @@ class VoteService(
     private val postRepository: PostRepository,
 ) {
     val logger = KotlinLogging.logger { }
+
     suspend fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel> {
         return withContext(Dispatchers.IO) {
             postRepository.getVoteAndCountExceptBlock(spec)
@@ -32,12 +33,6 @@ class VoteService(
     suspend fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
         return withContext(Dispatchers.IO) {
             postRepository.getVoteAndOptions(id)
-        }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
-    }
-
-    suspend fun getVoteAllInfo(id: Long): List<VoteAllInfoModel> {
-        return withContext(Dispatchers.IO) {
-            postRepository.getVoteAllInfo(id)
         }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
     }
 
@@ -58,9 +53,7 @@ class VoteService(
         return withContext(Dispatchers.IO) { postRepository.getVoteAndCountExceptBlock(spec) }.content
     }
 
-    suspend fun getVoteAndOptionsAndOptionCounts(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
-        return withContext(Dispatchers.IO) {
-            postRepository.getVoteAndOptionsAndOptionCounts(id)
-        }
+    suspend fun getVoteAndCreator(id: Long): PostAndUserModel {
+        return postService.getPostAndCreator(id, PostType.VOTE)
     }
 }

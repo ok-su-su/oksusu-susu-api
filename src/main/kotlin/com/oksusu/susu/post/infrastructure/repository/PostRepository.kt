@@ -37,13 +37,10 @@ interface PostCustomRepository {
     fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel>
 
     @Transactional(readOnly = true)
-    fun getVoteAllInfo(id: Long): List<VoteAllInfoModel>
-
-    @Transactional(readOnly = true)
     fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel>
 
     @Transactional(readOnly = true)
-    fun getVoteAndOptionsAndOptionCounts(id: Long): List<PostAndVoteOptionAndOptionCountModel>
+    fun getPostAndCreator(id:Long, type: PostType): PostAndUserModel?
 }
 
 class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport(Post::class.java) {
@@ -62,21 +59,7 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         return JPAQuery<QPost>(entityManager)
             .select(QPostAndVoteOptionModel(qPost, qVoteOption))
             .from(qPost)
-            .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
-            .where(
-                qPost.id.eq(id),
-                qPost.isActive.eq(true),
-                qPost.type.eq(PostType.VOTE)
-            ).fetch()
-    }
-
-    override fun getVoteAllInfo(id: Long): List<VoteAllInfoModel> {
-        return JPAQuery<QPost>(entityManager)
-            .select(QVoteAllInfoModel(qPost, qVoteOption, qCount.count, qUser))
-            .from(qPost)
-            .leftJoin(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
-            .join(qUser).on(qPost.uid.eq(qUser.id))
-            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
+            .join(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
             .where(
                 qPost.id.eq(id),
                 qPost.isActive.eq(true),
@@ -118,16 +101,15 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
         return querydsl.executeSlice(query, spec.pageable)
     }
 
-    override fun getVoteAndOptionsAndOptionCounts(id: Long): List<PostAndVoteOptionAndOptionCountModel> {
+    override fun getPostAndCreator(id: Long, type: PostType): PostAndUserModel? {
         return JPAQuery<QPost>(entityManager)
-            .select(QPostAndVoteOptionAndOptionCountModel(qPost, qVoteOption, qCount.count))
+            .select(QPostAndUserModel(qPost, qUser))
             .from(qPost)
-            .join(qVoteOption).on(qPost.id.eq(qVoteOption.postId))
-            .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
+            .join(qUser).on(qPost.uid.eq(qUser.id))
             .where(
                 qPost.id.eq(id),
                 qPost.isActive.eq(true),
-                qPost.type.eq(PostType.VOTE)
-            ).fetch()
+                qPost.type.eq(type)
+            ).fetchFirst()
     }
 }
