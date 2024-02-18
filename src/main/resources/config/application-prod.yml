@@ -36,8 +36,8 @@ susu:
       username: ${MYSQL_USERNAME}
       password: ${MYSQL_PASSWORD}
       hikari:
-        minimum-idle: 10
-        maximum-pool-size: 15
+        minimum-idle: 15
+        maximum-pool-size: 25
   jpa:
     properties:
       hibernate.format_sql: true
