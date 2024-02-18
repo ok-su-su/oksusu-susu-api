@@ -1,7 +1,7 @@
 package com.oksusu.susu.auth.model
 
 /** oauth provider */
-enum class OauthProvider {
+enum class OAuthProvider {
     /** 카카오 */
     KAKAO,
     ;

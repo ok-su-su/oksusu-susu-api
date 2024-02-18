@@ -1,7 +1,7 @@
 package com.oksusu.susu.auth.presentation
 
 import com.oksusu.susu.auth.application.DevOAuthService
-import com.oksusu.susu.auth.model.OauthProvider
+import com.oksusu.susu.auth.model.OAuthProvider
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapOk
 import io.swagger.v3.oas.annotations.Operation
@@ -19,14 +19,14 @@ class DevOAuthResource(
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "dev oauth link")
     @GetMapping("/{provider}/link")
     suspend fun getDevOAuthLoginLink(
-        @PathVariable provider: OauthProvider,
-    ) = devOAuthService.getOauthLoginLinkDev(provider).wrapOk()
+        @PathVariable provider: OAuthProvider,
+    ) = devOAuthService.getOAuthLoginLinkDev(provider).wrapOk()
 
     /** oauth 토큰 받아옵니다. 개발용 */
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "dev oauth link")
     @GetMapping("/{provider}/token")
-    suspend fun getDevOauthLogin(
-        @PathVariable provider: OauthProvider,
+    suspend fun getDevOAuthLogin(
+        @PathVariable provider: OAuthProvider,
         @RequestParam code: String,
-    ) = devOAuthService.getOauthTokenDev(provider, code).wrapOk()
+    ) = devOAuthService.getOAuthTokenDev(provider, code).wrapOk()
 }

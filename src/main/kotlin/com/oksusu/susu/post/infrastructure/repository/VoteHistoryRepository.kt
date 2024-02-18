@@ -18,7 +18,4 @@ interface VoteHistoryRepository : JpaRepository<VoteHistory, Long> {
 
     @Transactional(readOnly = true)
     fun findByUidAndPostId(uid: Long, postId: Long): VoteHistory?
-
-    @Transactional(readOnly = true)
-    fun existsByPostId(postId: Long): Boolean
 }

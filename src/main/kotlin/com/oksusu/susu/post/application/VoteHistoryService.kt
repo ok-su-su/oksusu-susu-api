@@ -47,12 +47,6 @@ class VoteHistoryService(
         voteHistoryRepository.deleteByUidAndPostId(uid, postId)
     }
 
-    suspend fun existsByPostId(postId: Long): Boolean {
-        return withContext(Dispatchers.IO) {
-            voteHistoryRepository.existsByPostId(postId)
-        }
-    }
-
     suspend fun findByUidAndPostId(uid: Long, postId: Long): VoteHistory? {
         return withContext(Dispatchers.IO) {
             voteHistoryRepository.findByUidAndPostId(uid, postId)

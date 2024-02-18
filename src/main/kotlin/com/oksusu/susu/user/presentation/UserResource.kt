@@ -7,6 +7,7 @@ import com.oksusu.susu.user.application.UserFacade
 import com.oksusu.susu.user.model.request.UpdateUserInfoRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -33,6 +34,7 @@ class UserResource(
     suspend fun updateUserInfo(
         user: AuthUser,
         @PathVariable uid: Long,
-        @RequestBody request: UpdateUserInfoRequest,
+        @Valid @RequestBody
+        request: UpdateUserInfoRequest,
     ) = userFacade.updateUserInfo(uid, user, request).wrapOk()
 }

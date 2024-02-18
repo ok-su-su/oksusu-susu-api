@@ -14,6 +14,7 @@ import com.oksusu.susu.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -28,7 +29,8 @@ class VoteResource(
     @PostMapping
     suspend fun createVote(
         user: AuthUser,
-        @RequestBody request: CreateVoteRequest,
+        @Valid @RequestBody
+        request: CreateVoteRequest,
     ) = voteFacade.createVote(user, request).wrapCreated()
 
     @Operation(summary = "투표 조회")
@@ -51,7 +53,8 @@ class VoteResource(
     suspend fun castVote(
         user: AuthUser,
         @PathVariable id: Long,
-        @RequestBody request: CreateVoteHistoryRequest,
+        @Valid @RequestBody
+        request: CreateVoteHistoryRequest,
     ) = voteFacade.vote(user, id, request).wrapCreated()
 
     @Operation(summary = "투표 삭제하기")
@@ -66,7 +69,8 @@ class VoteResource(
     suspend fun update(
         user: AuthUser,
         @PathVariable id: Long,
-        @RequestBody request: UpdateVoteRequest,
+        @Valid @RequestBody
+        request: UpdateVoteRequest,
     ) = voteFacade.update(user, id, request).wrapOk()
 
     @Operation(summary = "가장 인기 있는 투표 검색")
