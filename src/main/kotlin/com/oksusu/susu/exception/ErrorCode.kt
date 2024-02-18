@@ -92,5 +92,8 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** User Status Type Error Code */
     NOT_FOUND_USER_STATUS_TYPE_ERROR(HttpStatus.NOT_FOUND, "유저 상태 타입 정보를 찾을 수 없습니다."),
+
+    /** Application Metadata Error Code */
+    NOT_FOUND_APPLICATION_METADATA_ERROR(HttpStatus.NOT_FOUND, "어플리케이션 설정 정보를 찾을 수 없습니다."),
     ;
 }
