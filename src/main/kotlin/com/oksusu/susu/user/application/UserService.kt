@@ -3,8 +3,8 @@ package com.oksusu.susu.user.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.user.domain.vo.OauthInfo
 import com.oksusu.susu.user.domain.User
+import com.oksusu.susu.user.domain.vo.OauthInfo
 import com.oksusu.susu.user.infrastructure.UserRepository
 import com.oksusu.susu.user.infrastructure.model.UserAndUserStatusModel
 import kotlinx.coroutines.Dispatchers

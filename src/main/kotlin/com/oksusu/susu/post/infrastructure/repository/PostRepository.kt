@@ -40,7 +40,7 @@ interface PostCustomRepository {
     fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel>
 
     @Transactional(readOnly = true)
-    fun getPostAndCreator(id:Long, type: PostType): PostAndUserModel?
+    fun getPostAndCreator(id: Long, type: PostType): PostAndUserModel?
 }
 
 class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport(Post::class.java) {

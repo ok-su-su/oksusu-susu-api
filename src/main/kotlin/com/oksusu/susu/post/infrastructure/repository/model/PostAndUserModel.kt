@@ -8,5 +8,5 @@ class PostAndUserModel @QueryProjection constructor(
     /** post */
     val post: Post,
     /** user */
-    val user: User
+    val user: User,
 )

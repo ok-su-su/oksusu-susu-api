@@ -10,10 +10,9 @@ import kotlin.reflect.full.declaredMemberProperties
 @EnableConfigurationProperties(
     OAuthConfig.KakaoOAuthProperties::class
 )
-class OAuthConfig (
+class OAuthConfig(
     val kakaoOAuthProperties: KakaoOAuthProperties,
-){
-
+) {
     init {
         val logger = KotlinLogging.logger { }
         OAuthConfig::class.declaredMemberProperties

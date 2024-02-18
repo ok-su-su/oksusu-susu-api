@@ -41,7 +41,7 @@ class VoteOptionService(
     }
 
     suspend fun getOptionAndCount(postId: Long): List<VoteOptionAndCountModel> {
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             voteOptionRepository.getOptionAndCount(postId)
         }
     }

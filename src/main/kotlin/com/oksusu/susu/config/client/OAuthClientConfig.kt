@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class OAuthClientConfig (
+class OAuthClientConfig(
     private val kakaoOAuthProperties: OAuthConfig.KakaoOAuthProperties,
-){
+) {
     private val logger = KotlinLogging.logger {}
 
     @Bean

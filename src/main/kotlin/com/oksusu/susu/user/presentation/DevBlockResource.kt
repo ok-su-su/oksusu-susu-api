@@ -21,6 +21,7 @@ class DevBlockResource(
     @DeleteMapping
     suspend fun deleteBlockByTargetId(
         user: AuthUser,
-        @Valid @RequestBody request: DeleteBlockRequest,
+        @Valid @RequestBody
+        request: DeleteBlockRequest,
     ) = blockFacade.deleteBlockByTargetId(user, request).wrapVoid()
 }

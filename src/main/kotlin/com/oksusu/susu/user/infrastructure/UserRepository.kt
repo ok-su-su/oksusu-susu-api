@@ -1,10 +1,10 @@
 package com.oksusu.susu.user.infrastructure
 
 import com.oksusu.susu.extension.isEquals
-import com.oksusu.susu.user.domain.vo.OauthInfo
 import com.oksusu.susu.user.domain.QUser
 import com.oksusu.susu.user.domain.QUserStatus
 import com.oksusu.susu.user.domain.User
+import com.oksusu.susu.user.domain.vo.OauthInfo
 import com.oksusu.susu.user.infrastructure.model.QUserAndUserStatusModel
 import com.oksusu.susu.user.infrastructure.model.UserAndUserStatusModel
 import com.querydsl.jpa.impl.JPAQuery
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
-import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime

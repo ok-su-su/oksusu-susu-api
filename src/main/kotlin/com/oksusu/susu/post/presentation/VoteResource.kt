@@ -29,7 +29,8 @@ class VoteResource(
     @PostMapping
     suspend fun createVote(
         user: AuthUser,
-        @Valid @RequestBody request: CreateVoteRequest,
+        @Valid @RequestBody
+        request: CreateVoteRequest,
     ) = voteFacade.createVote(user, request).wrapCreated()
 
     @Operation(summary = "투표 조회")
@@ -52,7 +53,8 @@ class VoteResource(
     suspend fun castVote(
         user: AuthUser,
         @PathVariable id: Long,
-        @Valid @RequestBody request: CreateVoteHistoryRequest,
+        @Valid @RequestBody
+        request: CreateVoteHistoryRequest,
     ) = voteFacade.vote(user, id, request).wrapCreated()
 
     @Operation(summary = "투표 삭제하기")
@@ -67,7 +69,8 @@ class VoteResource(
     suspend fun update(
         user: AuthUser,
         @PathVariable id: Long,
-        @Valid @RequestBody request: UpdateVoteRequest,
+        @Valid @RequestBody
+        request: UpdateVoteRequest,
     ) = voteFacade.update(user, id, request).wrapOk()
 
     @Operation(summary = "가장 인기 있는 투표 검색")

@@ -2,23 +2,15 @@ package com.oksusu.susu.post.infrastructure.repository
 
 import com.oksusu.susu.count.domain.QCount
 import com.oksusu.susu.count.domain.vo.CountTargetType
-import com.oksusu.susu.extension.executeSlice
-import com.oksusu.susu.extension.isContains
 import com.oksusu.susu.extension.isEquals
-import com.oksusu.susu.extension.isNotIn
-import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.QPost
 import com.oksusu.susu.post.domain.QVoteOption
 import com.oksusu.susu.post.domain.VoteOption
-import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.model.*
-import com.oksusu.susu.post.model.vo.VoteSortType
-import com.oksusu.susu.user.domain.QUser
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
@@ -57,4 +49,3 @@ class VoteOptionCustomRepositoryImpl : VoteOptionCustomRepository, QuerydslRepos
             ).fetch()
     }
 }
-

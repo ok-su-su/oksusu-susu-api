@@ -22,7 +22,8 @@ class UserBlockResource(
     @PostMapping
     suspend fun createBlock(
         user: AuthUser,
-        @Valid @RequestBody request: CreateBlockRequest,
+        @Valid @RequestBody
+        request: CreateBlockRequest,
     ) = blockFacade.createBlock(user, request).wrapCreated()
 
     @Operation(summary = "차단 해제하기")
