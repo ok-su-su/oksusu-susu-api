@@ -1,7 +1,7 @@
 package com.oksusu.susu.slack.application
 
+import com.oksusu.susu.config.SlackConfig
 import com.oksusu.susu.extension.isProd
-import com.oksusu.susu.slack.config.SlackAlarmConfig
 import com.oksusu.susu.slack.infrastructure.SlackAlarmSender
 import com.oksusu.susu.slack.model.ErrorWebhookDataModel
 import com.slack.api.model.block.LayoutBlock
@@ -17,17 +17,22 @@ class SuspendableSlackAlarmService(
     private val slackAlarmSender: SlackAlarmSender,
     private val slackBlockHelper: SlackBlockHelper,
     private val environment: Environment,
-    private val slackAlarmConfig: SlackAlarmConfig,
+    private val errorWebhookConfig: SlackConfig.ErrorWebhookConfig,
 ) {
     val logger = KotlinLogging.logger {}
 
     suspend fun sendSlackErrorAlarm(data: ErrorWebhookDataModel) {
+        /** prod 환경에서만 작동 */
+        if (!environment.isProd()) {
+            return
+        }
+
         val layoutBlocks = slackBlockHelper.getErrorBlocks(data)
 
-        return sendAlarm(slackAlarmConfig.errorWebhook, layoutBlocks)
+        return sendAlarm(errorWebhookConfig, layoutBlocks)
     }
 
-    private suspend fun sendAlarm(model: SlackAlarmConfig.SlackAlarmModel, layoutBlocks: List<LayoutBlock>) {
+    private suspend fun sendAlarm(model: SlackConfig.SlackAlarmModel, layoutBlocks: List<LayoutBlock>) {
         /** prod 환경에서만 작동 */
         if (!environment.isProd()) {
             return
