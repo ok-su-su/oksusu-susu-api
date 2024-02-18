@@ -1,69 +1,18 @@
 package com.oksusu.susu.client.oauth.kakao
 
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthTokenResponse
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthUserInfoResponse
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthWithdrawResponse
-import com.oksusu.susu.common.consts.BEARER
-import com.oksusu.susu.common.consts.KAKAO_AK
-import com.oksusu.susu.common.properties.KakaoOauthProperties
-import com.oksusu.susu.config.webClient.SusuWebClient
-import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.reactor.awaitSingle
-import org.springframework.stereotype.Component
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.reactive.function.BodyInserters
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthTokenResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthUserInfoResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthWithdrawResponse
 
-@Component
-class KakaoClient(
-    private val kakaoOauthProperties: KakaoOauthProperties,
-    private val susuWebClient: SusuWebClient,
-) {
-    private val logger = KotlinLogging.logger { }
-
-    suspend fun kakaoTokenClient(
+interface KakaoClient {
+    suspend fun getToken(
         redirectUrl: String,
         code: String,
-    ): KakaoOauthTokenResponse {
-        val url = kakaoOauthProperties.kauthUrl + String.format(
-            kakaoOauthProperties.tokenUrl,
-            kakaoOauthProperties.clientId,
-            redirectUrl,
-            code,
-            kakaoOauthProperties.clientSecret
-        )
-        return susuWebClient.webClient().post()
-            .uri(url)
-            .retrieve()
-            .bodyToMono(KakaoOauthTokenResponse::class.java)
-            .awaitSingle()
-    }
+    ): KakaoOAuthTokenResponse
 
-    suspend fun kakaoUserInfoClient(
+    suspend fun getUserInfo(
         accessToken: String,
-    ): KakaoOauthUserInfoResponse {
-        return susuWebClient.webClient().get()
-            .uri(kakaoOauthProperties.kapiUrl + kakaoOauthProperties.userInfoUrl)
-            .header("Authorization", BEARER + accessToken)
-            .retrieve()
-            .bodyToMono(KakaoOauthUserInfoResponse::class.java)
-            .awaitSingle()
-    }
+    ): KakaoOAuthUserInfoResponse
 
-    suspend fun kakaoWithdrawClient(targetId: String): KakaoOauthWithdrawResponse? {
-        val multiValueMap = LinkedMultiValueMap<String, String>().apply {
-            setAll(
-                mapOf(
-                    "target_id_type" to "user_id",
-                    "target_id" to targetId
-                )
-            )
-        }
-        return susuWebClient.webClient().post()
-            .uri(kakaoOauthProperties.kapiUrl + kakaoOauthProperties.unlinkUrl)
-            .header("Authorization", KAKAO_AK + kakaoOauthProperties.adminKey)
-            .body(BodyInserters.fromFormData(multiValueMap))
-            .retrieve()
-            .bodyToMono(KakaoOauthWithdrawResponse::class.java)
-            .awaitSingle()
-    }
+    suspend fun withdraw(targetId: String): KakaoOAuthWithdrawResponse?
 }

@@ -34,7 +34,7 @@ class AuthFacade(
     private val jwtTokenService: JwtTokenService,
     private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
-    private val oauthService: OAuthService,
+    private val oAuthService: OAuthService,
     private val postService: PostService,
     private val userStatusService: UserStatusService,
     private val eventPublisher: ApplicationEventPublisher,
@@ -98,7 +98,7 @@ class AuthFacade(
             val txDeferred = async {
                 txTemplates.writer.coExecuteOrNull {
                     user.apply {
-                        this.oauthInfo = oauthInfo.withdrawOauthInfo()
+                        this.oauthInfo = oauthInfo.withdrawOAuthInfo()
                     }.run { userService.saveSync(this) }
 
                     postService.saveAllSync(deactivatedPosts)
@@ -120,11 +120,11 @@ class AuthFacade(
                 }
             }
 
-            val oauthDeferred = async {
-                oauthService.withdraw(user.oauthInfo)
+            val oAuthDeferred = async {
+                oAuthService.withdraw(user.oauthInfo)
             }
 
-            awaitAll(txDeferred, oauthDeferred)
+            awaitAll(txDeferred, oAuthDeferred)
         }
     }
 }

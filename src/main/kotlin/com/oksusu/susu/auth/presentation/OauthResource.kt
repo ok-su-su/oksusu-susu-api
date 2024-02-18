@@ -2,9 +2,9 @@ package com.oksusu.susu.auth.presentation
 
 import com.oksusu.susu.auth.application.OAuthFacade
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.auth.model.OauthProvider
+import com.oksusu.susu.auth.model.OAuthProvider
 import com.oksusu.susu.auth.model.request.OAuthLoginRequest
-import com.oksusu.susu.auth.model.request.OauthRegisterRequest
+import com.oksusu.susu.auth.model.request.OAuthRegisterRequest
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapCreated
 import com.oksusu.susu.extension.wrapOk
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = SwaggerTag.OAUTH_SWAGGER_TAG, description = "OAuth API")
 @RestController
 @RequestMapping(value = ["/api/v1/oauth"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class OauthResource(
+class OAuthResource(
     private val oAuthFacade: OAuthFacade,
 ) {
 
@@ -25,7 +25,7 @@ class OauthResource(
     @Operation(summary = "register valid check")
     @GetMapping("/{provider}/sign-up/valid")
     suspend fun checkRegisterValid(
-        @PathVariable provider: OauthProvider,
+        @PathVariable provider: OAuthProvider,
         @RequestParam accessToken: String,
     ) = oAuthFacade.checkRegisterValid(provider, accessToken).wrapOk()
 
@@ -34,17 +34,17 @@ class OauthResource(
     @PostMapping("/{provider}/sign-up")
     suspend fun register(
         deviceContext: UserDeviceContext,
-        @PathVariable provider: OauthProvider,
-        @RequestBody oauthRegisterRequest: OauthRegisterRequest,
+        @PathVariable provider: OAuthProvider,
+        @RequestBody request: OAuthRegisterRequest,
         @RequestParam accessToken: String,
-    ) = oAuthFacade.register(provider, accessToken, oauthRegisterRequest, deviceContext).wrapCreated()
+    ) = oAuthFacade.register(provider, accessToken, request, deviceContext).wrapCreated()
 
     /** 로그인을 합니다. */
     @Operation(summary = "login")
     @PostMapping("/{provider}/login")
     suspend fun login(
         deviceContext: UserDeviceContext,
-        @PathVariable provider: OauthProvider,
+        @PathVariable provider: OAuthProvider,
         @RequestBody request: OAuthLoginRequest,
     ) = oAuthFacade.login(provider, request, deviceContext).wrapOk()
 

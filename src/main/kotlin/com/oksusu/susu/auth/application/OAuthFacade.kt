@@ -3,10 +3,10 @@ package com.oksusu.susu.auth.application
 import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.auth.model.OauthProvider
+import com.oksusu.susu.auth.model.OAuthProvider
 import com.oksusu.susu.auth.model.TokenDto
 import com.oksusu.susu.auth.model.request.OAuthLoginRequest
-import com.oksusu.susu.auth.model.request.OauthRegisterRequest
+import com.oksusu.susu.auth.model.request.OAuthRegisterRequest
 import com.oksusu.susu.auth.model.response.AbleRegisterResponse
 import com.oksusu.susu.auth.model.response.UserOAuthInfoResponse
 import com.oksusu.susu.config.database.TransactionTemplates
@@ -54,22 +54,22 @@ class OAuthFacade(
     val logger = KotlinLogging.logger {}
 
     /** 회원가입 가능 여부 체크. */
-    suspend fun checkRegisterValid(provider: OauthProvider, accessToken: String): AbleRegisterResponse {
-        val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
+    suspend fun checkRegisterValid(provider: OAuthProvider, accessToken: String): AbleRegisterResponse {
+        val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
 
-        val isExistUser = userService.existsByOauthInfo(oauthInfo)
+        val isExistUser = userService.existsByOAuthInfo(oauthInfo)
 
         return AbleRegisterResponse(!isExistUser)
     }
 
     /** 회원가입 */
     suspend fun register(
-        provider: OauthProvider,
+        provider: OAuthProvider,
         accessToken: String,
-        request: OauthRegisterRequest,
+        request: OAuthRegisterRequest,
         deviceContext: UserDeviceContext,
     ): TokenDto {
-        val oauthInfo = oAuthService.getOauthUserInfo(provider, accessToken)
+        val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
 
         coroutineScope {
             val validateNotRegistered = async(Dispatchers.IO) { userService.validateNotRegistered(oauthInfo) }
@@ -121,12 +121,12 @@ class OAuthFacade(
 
     /** 로그인 */
     suspend fun login(
-        provider: OauthProvider,
+        provider: OAuthProvider,
         request: OAuthLoginRequest,
         deviceContext: UserDeviceContext,
     ): TokenDto {
-        val oauthInfo = oAuthService.getOauthUserInfo(provider, request.accessToken)
-        val user = userService.findByOauthInfoOrThrow(oauthInfo)
+        val oauthInfo = oAuthService.getOAuthUserInfo(provider, request.accessToken)
+        val user = userService.findByOAuthInfoOrThrow(oauthInfo)
 
         txTemplates.writer.coExecuteOrNull {
             eventPublisher.publishEvent(UpdateUserDeviceEvent(UserDevice.of(deviceContext, user.id)))
@@ -150,15 +150,15 @@ class OAuthFacade(
 
     /** 회원탈퇴 callback 페이지용 oauth 토큰 받아오기 + susu token 발급해주기 */
     suspend fun loginWithCode(
-        provider: OauthProvider,
+        provider: OAuthProvider,
         code: String,
         request: ServerHttpRequest,
     ): String {
-        val oauthToken = oAuthService.getOauthToken(provider, code, request)
+        val oAuthToken = oAuthService.getOAuthToken(provider, code, request)
 
         return this.login(
-            OauthProvider.KAKAO,
-            OAuthLoginRequest(oauthToken.accessToken),
+            OAuthProvider.KAKAO,
+            OAuthLoginRequest(oAuthToken.accessToken),
             UserDeviceContextImpl.getDefault()
         ).accessToken
     }

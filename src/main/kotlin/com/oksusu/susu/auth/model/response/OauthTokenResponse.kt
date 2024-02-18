@@ -1,18 +1,18 @@
 package com.oksusu.susu.auth.model.response
 
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthTokenResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthTokenResponse
 
-class OauthTokenResponse(
+class OAuthTokenResponse(
     /** oauth access token */
     val accessToken: String,
     /** oauth refresh token */
     val refreshToken: String,
 ) {
     companion object {
-        fun fromKakao(kakaoOauthTokenResponse: KakaoOauthTokenResponse): OauthTokenResponse {
-            return OauthTokenResponse(
-                accessToken = kakaoOauthTokenResponse.accessToken,
-                refreshToken = kakaoOauthTokenResponse.refreshToken
+        fun fromKakao(kakaoOAuthTokenResponse: KakaoOAuthTokenResponse): OAuthTokenResponse {
+            return OAuthTokenResponse(
+                accessToken = kakaoOAuthTokenResponse.accessToken,
+                refreshToken = kakaoOAuthTokenResponse.refreshToken
             )
         }
     }

@@ -3,7 +3,7 @@ package com.oksusu.susu.auth.model.request
 import com.oksusu.susu.user.domain.vo.Gender
 import java.time.LocalDate
 
-class OauthRegisterRequest(
+class OAuthRegisterRequest(
     /** 유저 이름 */
     val name: String,
     /** 동의 약관 id */

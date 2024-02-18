@@ -1,8 +1,9 @@
-package com.oksusu.susu.config
+package com.oksusu.susu.config.client
 
 import com.oksusu.susu.client.WebClientFactory
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.SuspendableSlackClient
+import com.oksusu.susu.config.SusuConfig
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
