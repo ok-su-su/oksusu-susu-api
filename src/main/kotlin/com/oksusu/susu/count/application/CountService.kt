@@ -33,12 +33,6 @@ class CountService(
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_COUNT_ERROR)
     }
 
-    suspend fun findAllByTargetTypeAndTargetIdIn(targetIds: List<Long>, targetType: CountTargetType): List<Count> {
-        return withContext(Dispatchers.IO) {
-            countRepository.findByTargetTypeAndTargetIdIn(targetType, targetIds)
-        }
-    }
-
     @Transactional
     fun deleteByTargetIdAndTargetType(id: Long, type: CountTargetType) {
         countRepository.deleteByTargetIdAndTargetType(id, type)

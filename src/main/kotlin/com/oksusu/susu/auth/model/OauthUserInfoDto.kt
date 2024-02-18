@@ -1,19 +1,19 @@
 package com.oksusu.susu.auth.model
 
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOauthUserInfoResponse
-import com.oksusu.susu.user.domain.OauthInfo
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthUserInfoResponse
+import com.oksusu.susu.user.domain.vo.OauthInfo
 
 /** oauth 정보 dto */
-class OauthUserInfoDto(
+class OAuthUserInfoDto(
     /** oauth 정보 */
     val oauthInfo: OauthInfo,
 ) {
     companion object {
-        fun fromKakao(kakaoOauthUserInfoResponse: KakaoOauthUserInfoResponse): OauthUserInfoDto {
-            return OauthUserInfoDto(
+        fun fromKakao(kakaoOAuthUserInfoResponse: KakaoOAuthUserInfoResponse): OAuthUserInfoDto {
+            return OAuthUserInfoDto(
                 OauthInfo(
-                    oauthId = kakaoOauthUserInfoResponse.id,
-                    oauthProvider = OauthProvider.KAKAO
+                    oAuthId = kakaoOAuthUserInfoResponse.id,
+                    oAuthProvider = OAuthProvider.KAKAO
                 )
             )
         }

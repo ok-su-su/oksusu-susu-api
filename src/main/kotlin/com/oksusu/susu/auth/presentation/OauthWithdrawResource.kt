@@ -2,7 +2,7 @@ package com.oksusu.susu.auth.presentation
 
 import com.oksusu.susu.auth.application.OAuthFacade
 import com.oksusu.susu.auth.application.OAuthService
-import com.oksusu.susu.auth.model.OauthProvider
+import com.oksusu.susu.auth.model.OAuthProvider
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.result.view.RedirectView
 
 @Controller
 @RequestMapping
-class OauthWithdrawResource(
+class OAuthWithdrawResource(
     private val oAuthService: OAuthService,
     private val oAuthFacade: OAuthFacade,
 ) {
@@ -23,7 +23,7 @@ class OauthWithdrawResource(
         model: Model,
         request: ServerHttpRequest,
     ): String {
-        val kakaoRedirectUrl = oAuthService.getOauthLoginLink(OauthProvider.KAKAO, request.uri.toString()).link
+        val kakaoRedirectUrl = oAuthService.getOAuthLoginLink(OAuthProvider.KAKAO, request.uri.toString()).link
         model.addAttribute("kakaoRedirectUrl", kakaoRedirectUrl)
         return "withdrawLogin"
     }
@@ -35,7 +35,7 @@ class OauthWithdrawResource(
         request: ServerHttpRequest,
         @RequestParam code: String,
     ): RedirectView {
-        val susuToken = oAuthFacade.loginWithCode(OauthProvider.KAKAO, code, request)
+        val susuToken = oAuthFacade.loginWithCode(OAuthProvider.KAKAO, code, request)
         return RedirectView("/withdraw?xSusuAuthToken=$susuToken")
     }
 

@@ -31,6 +31,23 @@ class WebClientFactory {
                 .build()
         }
 
+        fun generateWithoutBaseUrl(
+            connectionTimeoutMillis: Int = 1000,
+            readTimeoutMillis: Long = 1000,
+            writeTimeoutMillis: Long = 1000,
+        ): WebClient {
+            val clientHttpConnector = createFactory(
+                connectionTimeoutMillis = connectionTimeoutMillis,
+                readTimeoutMillis = readTimeoutMillis,
+                writeTimeoutMillis = writeTimeoutMillis
+            )
+
+            return WebClient.builder()
+                .codecs { it.defaultCodecs().enableLoggingRequestDetails(true) }
+                .clientConnector(clientHttpConnector)
+                .build()
+        }
+
         private fun createFactory(
             connectionTimeoutMillis: Int,
             readTimeoutMillis: Long,

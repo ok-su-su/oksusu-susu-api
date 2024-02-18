@@ -64,15 +64,6 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** Term Error Code */
     NOT_FOUND_TERM_ERROR(HttpStatus.NOT_FOUND, "약관 정보를 찾을 수 없습니다."),
 
-    /** Vote Option Summary Error Code */
-    NOT_FOUND_VOTE_OPTION_SUMMARY_ERROR(HttpStatus.BAD_REQUEST, "투표 옵션 요약 정보를 찾을 수 없습니다."),
-
-    /** Vote Summary Error Code */
-    NOT_FOUND_VOTE_SUMMARY_ERROR(HttpStatus.BAD_REQUEST, "투표 요약 정보를 찾을 수 없습니다."),
-
-    /** Vote History Error Code */
-    ALREADY_VOTED_POST(HttpStatus.BAD_REQUEST, "이미 진행된 투표입니다."),
-
     /** Block Error Code */
     ALREADY_BLOCKED_TARGET(HttpStatus.BAD_REQUEST, "이미 차단한 대상입니다."),
     NOT_BLOCKED_TARGET(HttpStatus.BAD_REQUEST, "차단하지 않은 대상입니다."),

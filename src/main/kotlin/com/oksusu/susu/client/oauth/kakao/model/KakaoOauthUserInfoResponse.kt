@@ -1,6 +1,6 @@
 package com.oksusu.susu.client.oauth.kakao.model
 
-class KakaoOauthUserInfoResponse(
+class KakaoOAuthUserInfoResponse(
     /** 카카오 유저 id */
     val id: String,
 )

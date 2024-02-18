@@ -1,52 +1,52 @@
 package com.oksusu.susu.auth.application
 
-import com.oksusu.susu.auth.model.OauthProvider
-import com.oksusu.susu.auth.model.response.OauthLoginLinkResponse
-import com.oksusu.susu.auth.model.response.OauthTokenResponse
-import com.oksusu.susu.client.oauth.kakao.KakaoOauthService
-import com.oksusu.susu.user.domain.OauthInfo
+import com.oksusu.susu.auth.application.oauth.KakaoOAuthService
+import com.oksusu.susu.auth.model.OAuthProvider
+import com.oksusu.susu.auth.model.response.OAuthLoginLinkResponse
+import com.oksusu.susu.auth.model.response.OAuthTokenResponse
+import com.oksusu.susu.user.domain.vo.OauthInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Service
 
 @Service
 class OAuthService(
-    private val kakaoOauthService: KakaoOauthService,
+    private val kakaoOAuthService: KakaoOAuthService,
 ) {
     private val logger = KotlinLogging.logger { }
 
     /** oauth login link 가져오기 */
-    suspend fun getOauthLoginLink(provider: OauthProvider, uri: String): OauthLoginLinkResponse {
+    suspend fun getOAuthLoginLink(provider: OAuthProvider, uri: String): OAuthLoginLinkResponse {
         return when (provider) {
-            OauthProvider.KAKAO -> kakaoOauthService.getOauthLoginLink(uri)
+            OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthLoginLink(uri)
         }
     }
 
     /** oauth token 가져오기 */
-    suspend fun getOauthToken(
-        provider: OauthProvider,
+    suspend fun getOAuthToken(
+        provider: OAuthProvider,
         code: String,
         request: ServerHttpRequest,
-    ): OauthTokenResponse {
+    ): OAuthTokenResponse {
         return when (provider) {
-            OauthProvider.KAKAO -> kakaoOauthService.getOauthToken(code, request.uri.toString())
+            OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthToken(code, request.uri.toString())
         }
     }
 
     /** oauth 유저 정보 가져오기 */
-    suspend fun getOauthUserInfo(
-        provider: OauthProvider,
+    suspend fun getOAuthUserInfo(
+        provider: OAuthProvider,
         accessToken: String,
     ): OauthInfo {
         return when (provider) {
-            OauthProvider.KAKAO -> kakaoOauthService.getKakaoUserInfo(accessToken)
+            OAuthProvider.KAKAO -> kakaoOAuthService.getKakaoUserInfo(accessToken)
         }.oauthInfo
     }
 
     /** oauth 유저 회원 탈퇴하기 */
     suspend fun withdraw(oauthInfo: OauthInfo) {
-        when (oauthInfo.oauthProvider) {
-            OauthProvider.KAKAO -> kakaoOauthService.withdraw(oauthInfo.oauthId)
+        when (oauthInfo.oAuthProvider) {
+            OAuthProvider.KAKAO -> kakaoOAuthService.withdraw(oauthInfo.oAuthId)
         }
     }
 }

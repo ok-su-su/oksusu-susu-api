@@ -1,8 +1,9 @@
 package com.oksusu.susu.user.domain
 
-import com.oksusu.susu.auth.model.request.OauthRegisterRequest
+import com.oksusu.susu.auth.model.request.OAuthRegisterRequest
 import com.oksusu.susu.common.domain.BaseEntity
 import com.oksusu.susu.user.domain.vo.Gender
+import com.oksusu.susu.user.domain.vo.OauthInfo
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -34,12 +35,12 @@ class User(
     var profileImageUrl: String? = null,
 ) : BaseEntity() {
     companion object {
-        fun toEntity(oauthRegisterRequest: OauthRegisterRequest, oauthInfo: OauthInfo): User {
+        fun toEntity(request: OAuthRegisterRequest, oauthInfo: OauthInfo): User {
             return User(
                 oauthInfo = oauthInfo,
-                name = oauthRegisterRequest.name,
-                gender = oauthRegisterRequest.gender,
-                birth = oauthRegisterRequest.getBirth()
+                name = request.name,
+                gender = request.gender,
+                birth = request.getBirth()
             )
         }
     }

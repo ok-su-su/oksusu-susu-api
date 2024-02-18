@@ -1,6 +1,6 @@
-package com.oksusu.susu.user.domain
+package com.oksusu.susu.user.domain.vo
 
-import com.oksusu.susu.auth.model.OauthProvider
+import com.oksusu.susu.auth.model.OAuthProvider
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
@@ -13,17 +13,17 @@ data class OauthInfo(
     /** oauth provider */
     @Column(name = "oauth_provider")
     @Enumerated(EnumType.ORDINAL)
-    val oauthProvider: OauthProvider,
+    val oAuthProvider: OAuthProvider,
 
     /** oauth id */
     @Column(name = "oauth_id")
-    val oauthId: String,
+    val oAuthId: String,
 ) {
-    fun withdrawOauthInfo(): OauthInfo {
-        return OauthInfo(this.oauthProvider, withDrawOid())
+    fun withdrawOAuthInfo(): OauthInfo {
+        return OauthInfo(this.oAuthProvider, withDrawOid())
     }
 
     private fun withDrawOid(now: LocalDateTime = LocalDateTime.now()): String {
-        return "withdraw:$now:${this.oauthId}"
+        return "withdraw:$now:${this.oAuthId}"
     }
 }

@@ -34,6 +34,7 @@ class UserResource(
     suspend fun updateUserInfo(
         user: AuthUser,
         @PathVariable uid: Long,
-        @Valid @RequestBody request: UpdateUserInfoRequest,
+        @Valid @RequestBody
+        request: UpdateUserInfoRequest,
     ) = userFacade.updateUserInfo(uid, user, request).wrapOk()
 }

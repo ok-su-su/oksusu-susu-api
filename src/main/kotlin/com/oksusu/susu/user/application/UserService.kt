@@ -3,8 +3,8 @@ package com.oksusu.susu.user.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
-import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.User
+import com.oksusu.susu.user.domain.vo.OauthInfo
 import com.oksusu.susu.user.infrastructure.UserRepository
 import com.oksusu.susu.user.infrastructure.model.UserAndUserStatusModel
 import kotlinx.coroutines.Dispatchers
@@ -19,11 +19,11 @@ class UserService(
     private val userRepository: UserRepository,
 ) {
     suspend fun validateNotRegistered(oauthInfo: OauthInfo) {
-        existsByOauthInfo(oauthInfo).takeUnless { isExists -> isExists }
+        existsByOAuthInfo(oauthInfo).takeUnless { isExists -> isExists }
             ?: throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
     }
 
-    suspend fun existsByOauthInfo(oauthInfo: OauthInfo): Boolean {
+    suspend fun existsByOAuthInfo(oauthInfo: OauthInfo): Boolean {
         return withContext(Dispatchers.IO) { userRepository.existsByOauthInfo(oauthInfo) }
     }
 
@@ -32,11 +32,11 @@ class UserService(
         return userRepository.save(user)
     }
 
-    suspend fun findByOauthInfoOrThrow(oauthInfo: OauthInfo): User {
-        return findByOauthInfoOrNull(oauthInfo) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
+    suspend fun findByOAuthInfoOrThrow(oauthInfo: OauthInfo): User {
+        return findByOAuthInfoOrNull(oauthInfo) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 
-    suspend fun findByOauthInfoOrNull(oauthInfo: OauthInfo): User? {
+    suspend fun findByOAuthInfoOrNull(oauthInfo: OauthInfo): User? {
         return withContext(Dispatchers.IO) { userRepository.findByOauthInfo(oauthInfo) }
     }
 

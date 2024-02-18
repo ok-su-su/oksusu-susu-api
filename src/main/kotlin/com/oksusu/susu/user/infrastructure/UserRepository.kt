@@ -1,10 +1,10 @@
 package com.oksusu.susu.user.infrastructure
 
 import com.oksusu.susu.extension.isEquals
-import com.oksusu.susu.user.domain.OauthInfo
 import com.oksusu.susu.user.domain.QUser
 import com.oksusu.susu.user.domain.QUserStatus
 import com.oksusu.susu.user.domain.User
+import com.oksusu.susu.user.domain.vo.OauthInfo
 import com.oksusu.susu.user.infrastructure.model.QUserAndUserStatusModel
 import com.oksusu.susu.user.infrastructure.model.UserAndUserStatusModel
 import com.querydsl.jpa.impl.JPAQuery
