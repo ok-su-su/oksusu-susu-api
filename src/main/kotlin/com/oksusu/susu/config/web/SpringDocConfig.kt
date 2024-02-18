@@ -89,4 +89,5 @@ object SwaggerTag {
     const val DEV_BLOCK_SWAGGER_TAG = "DEV Block API"
     const val REPORT_SWAGGER_TAG = "Report API"
     const val ONBOARDING_SWAGGER_TAG = "Onboarding API"
+    const val APPLICATION_METADATA_SWAGGER_TAG = "Application Metadata API"
 }
