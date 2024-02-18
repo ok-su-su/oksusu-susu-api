@@ -59,11 +59,11 @@ CREATE INDEX idx__uid ON user_status_history (uid);
 CREATE TABLE `ledger`
 (
     `id`                     bigint                 NOT NULL AUTO_INCREMENT COMMENT '장부 id',
-    `uid`                    int                    NOT NULL COMMENT 'user id',
+    `uid`                    bigint                 NOT NULL COMMENT 'user id',
     `title`                  varchar(512)           NOT NULL COMMENT '제목',
     `description`            varchar(512) DEFAULT NULL COMMENT '상세 설명',
-    `total_sent_amounts`     int          DEFAULT 0 NOT NULL COMMENT '보낸 봉투 총합',
-    `total_received_amounts` int          DEFAULT 0 NOT NULL COMMENT '받은 봉투 총합',
+    `total_sent_amounts`     bigint       DEFAULT 0 NOT NULL COMMENT '보낸 봉투 총합',
+    `total_received_amounts` bigint       DEFAULT 0 NOT NULL COMMENT '받은 봉투 총합',
     `start_at`               datetime               NOT NULL COMMENT '시작일',
     `end_at`                 datetime               NOT NULL COMMENT '종료일',
     `created_at`             datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
@@ -145,7 +145,7 @@ CREATE TABLE `envelope`
     `type`           varchar(128) NOT NULL COMMENT 'type: SENT, RECEIVED',
     `friend_id`      int          NOT NULL COMMENT '친구 id',
     `ledger_id`      int          DEFAULT NULL COMMENT '장부 id',
-    `amount`         int          NOT NULL COMMENT '금액',
+    `amount`         bigint       NOT NULL COMMENT '금액',
     `gift`           varchar(512) DEFAULT NULL COMMENT '선물',
     `memo`           varchar(512) DEFAULT NULL COMMENT '메모',
     `has_visited`    tinyint      DEFAULT NULL COMMENT '방문 : 1, 미방문 : 0, null인 경우 미선택',
@@ -308,7 +308,7 @@ CREATE TABLE `count`
     `target_id`   bigint NOT NULL COMMENT '대상 id',
     `target_type` int    NOT NULL COMMENT '대상 type / 0:POST, 1:VOTE_OPTION',
     `count_type`  int    NOT NULL COMMENT '카운트 type / 0:VOTE',
-    `count`       int    NOT NULL COMMENT '카운트',
+    `count`       bigint NOT NULL COMMENT '카운트',
     `created_at`  datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)

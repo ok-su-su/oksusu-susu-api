@@ -2,7 +2,12 @@ package com.oksusu.susu.user.domain
 
 import com.oksusu.susu.common.domain.BaseEntity
 import com.oksusu.susu.user.model.UserDeviceContext
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 /** 유저 디바이스 정보 */
 @Entity
@@ -10,7 +15,7 @@ import jakarta.persistence.*
 class UserDevice(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long = -1,
+    val id: Long = -1,
 
     /** 유저 id */
     val uid: Long,

@@ -4,6 +4,7 @@ import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.AlreadyException
 import com.oksusu.susu.exception.ErrorCode
+import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.post.application.PostService
@@ -30,6 +31,10 @@ class ReportFacade(
 
     // TODO: 추후 수정 작업 진행
     suspend fun report(user: AuthUser, request: ReportCreateRequest): ReportCreateResponse {
+        if (user.uid == request.targetId) {
+            throw InvalidRequestException(ErrorCode.INVALID_REPORT_ERROR)
+        }
+
         val metadata = reportMetadataService.get(request.metadataId)
 
         val isExistsReportHistory = reportHistoryService.existsByUidAndTargetIdAndTargetType(

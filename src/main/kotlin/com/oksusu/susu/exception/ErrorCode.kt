@@ -82,6 +82,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** Report Error Code */
     NOT_FOUND_REPORT_METADATA_ERROR(HttpStatus.NOT_FOUND, "신고 메타데이터 정보를 찾을 수 없습니다."),
     ALREADY_EXISTS_REPORT_HISTORY_ERROR(HttpStatus.BAD_REQUEST, "이미 신고한 상태입니다."),
+    INVALID_REPORT_ERROR(HttpStatus.BAD_REQUEST, "잘못된 신고 요청입니다."),
 
     /** Statistic Error Code */
     NOT_FOUND_SUSU_STATISTIC_ERROR(HttpStatus.NOT_FOUND, "수수 통계 자료를 찾을 수 없습니다."),
