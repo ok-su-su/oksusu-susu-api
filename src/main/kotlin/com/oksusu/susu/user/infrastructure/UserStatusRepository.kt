@@ -6,7 +6,4 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface UserStatusRepository : JpaRepository<UserStatus, Long> {
-    @Transactional(readOnly = true)
-    fun findByUid(uid: Long): UserStatus?
-}
+interface UserStatusRepository : JpaRepository<UserStatus, Long>

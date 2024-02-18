@@ -8,11 +8,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Repository
 interface CountRepository : JpaRepository<Count, Long> {
-    @Transactional
+    @Transactional(readOnly = true)
     fun findByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType): Count?
-
-    @Transactional
-    fun findByTargetTypeAndTargetIdIn(targetType: CountTargetType, targetIds: List<Long>): List<Count>
 
     @Transactional
     fun deleteByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType)
