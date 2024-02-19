@@ -47,8 +47,11 @@ class EnvelopeFacade(
     private val friendRelationshipService: FriendRelationshipService,
     private val txTemplates: TransactionTemplates,
     private val publisher: ApplicationEventPublisher,
+    private val envelopeValidateService: EnvelopeValidateService,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
+        envelopeValidateService.validateEnvelopeRequest(request)
+
         return parZip(
             { friendService.findByIdAndUidOrThrow(request.friendId, user.uid) },
             { friendRelationshipService.findByFriendIdOrThrow(request.friendId) },
@@ -123,6 +126,8 @@ class EnvelopeFacade(
         id: Long,
         request: CreateAndUpdateEnvelopeRequest,
     ): CreateAndUpdateEnvelopeResponse {
+        envelopeValidateService.validateEnvelopeRequest(request)
+
         val categoryAssignmentRequest = when (request.category == null) {
             true -> CreateCategoryAssignmentRequest(5)
             false -> request.category

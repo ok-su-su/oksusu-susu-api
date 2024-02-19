@@ -32,6 +32,8 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     /** Ledger Error Code */
     LEDGER_INVALID_DUE_DATE_ERROR(HttpStatus.BAD_REQUEST, "잘못된 일정 등록 요청입니다."),
     NOT_FOUND_LEDGER_ERROR(HttpStatus.NOT_FOUND, "장부 정보가 없습니다."),
+    INVALID_LEDGER_TITLE_ERROR(HttpStatus.BAD_REQUEST, "장부 제목 정보가 잘못되었습니다."),
+    INVALID_LEDGER_DESCRIPTION_ERROR(HttpStatus.BAD_REQUEST, "장부 설명이 잘못되었습니다."),
 
     /** Category Error Code */
     NOT_FOUND_CATEGORY_ERROR(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
@@ -51,6 +53,9 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Envelope Error Code */
     NOT_FOUND_ENVELOPE_ERROR(HttpStatus.NOT_FOUND, "봉투 정보를 찾을 수 없습니다."),
+    INVALID_ENVELOPE_AMOUNT_ERROR(HttpStatus.BAD_REQUEST, "금액 입력 정보가 잘못되었습니다."),
+    INVALID_ENVELOPE_GIFT_ERROR(HttpStatus.BAD_REQUEST, "선물 정보가 잘못되었습니다."),
+    INVALID_ENVELOPE_MEMO_ERROR(HttpStatus.BAD_REQUEST, "메모 입력이 잘못되었습니다."),
 
     /** Post Error Code */
     NOT_FOUND_POST_ERROR(HttpStatus.NOT_FOUND, "게시글 정보를 찾을 수 없습니다."),
@@ -86,5 +91,8 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Application Metadata Error Code */
     NOT_FOUND_APPLICATION_METADATA_ERROR(HttpStatus.NOT_FOUND, "어플리케이션 설정 정보를 찾을 수 없습니다."),
+
+    /** Category Error Code */
+    INVALID_CUSTOM_CATEGORY_ERROR(HttpStatus.BAD_REQUEST, "커스텀 카테고리 정보가 잘못되었습니다."),
     ;
 }

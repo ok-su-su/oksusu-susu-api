@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class LedgerConfigService(
-    private val ledgerCreateFormConfig: SusuConfig.LedgerCreateFormConfig,
+    private val ledgerConfig: SusuConfig.LedgerConfig,
 ) {
     suspend fun getCreateLedgerConfig(user: AuthUser): CreateLedgerConfigResponse {
         return CreateLedgerConfigResponse(
-            onlyStartAtCategoryIds = ledgerCreateFormConfig.onlyStartAtCategoryIds
+            onlyStartAtCategoryIds = ledgerConfig.createForm.onlyStartAtCategoryIds
         )
     }
 }
