@@ -18,8 +18,6 @@ import com.oksusu.susu.envelope.model.response.CreateAndUpdateLedgerResponse
 import com.oksusu.susu.envelope.model.response.LedgerDetailResponse
 import com.oksusu.susu.envelope.model.response.SearchLedgerResponse
 import com.oksusu.susu.event.model.DeleteLedgerEvent
-import com.oksusu.susu.exception.ErrorCode
-import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
 import org.springframework.context.ApplicationEventPublisher
@@ -34,11 +32,10 @@ class LedgerFacade(
     private val categoryAssignmentService: CategoryAssignmentService,
     private val txTemplate: TransactionTemplates,
     private val publisher: ApplicationEventPublisher,
+    private val ledgerValidateService: LedgerValidateService,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateLedgerRequest): CreateAndUpdateLedgerResponse {
-        if (request.startAt.isAfter(request.endAt)) {
-            throw InvalidRequestException(ErrorCode.LEDGER_INVALID_DUE_DATE_ERROR)
-        }
+        ledgerValidateService.validateLedgerRequest(request)
 
         val category = categoryService.getCategory(request.categoryId)
 
@@ -79,9 +76,7 @@ class LedgerFacade(
         id: Long,
         request: CreateAndUpdateLedgerRequest,
     ): CreateAndUpdateLedgerResponse? {
-        if (request.startAt.isAfter(request.endAt)) {
-            throw InvalidRequestException(ErrorCode.LEDGER_INVALID_DUE_DATE_ERROR)
-        }
+        ledgerValidateService.validateLedgerRequest(request)
 
         val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.uid)
 

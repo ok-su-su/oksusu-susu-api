@@ -8,14 +8,18 @@ import kotlin.reflect.full.declaredMemberProperties
 
 @Configuration
 @EnableConfigurationProperties(
-    SusuConfig.LedgerCreateFormConfig::class,
+    SusuConfig.LedgerConfig::class,
     SusuConfig.SlackWebhookConfig::class,
-    SusuConfig.OnboardingGetVoteConfig::class
+    SusuConfig.OnboardingGetVoteConfig::class,
+    SusuConfig.EnvelopeConfig::class,
+    SusuConfig.CategoryConfig::class
 )
 data class SusuConfig(
-    val ledgerCreateFormConfig: LedgerCreateFormConfig,
+    val ledgerConfig: LedgerConfig,
     val slackWebhookConfig: SlackWebhookConfig,
     val onboardingGetVoteConfig: OnboardingGetVoteConfig,
+    val envelopeConfig: EnvelopeConfig,
+    val categoryConfig: CategoryConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -25,10 +29,17 @@ data class SusuConfig(
             }
     }
 
-    @ConfigurationProperties(prefix = "susu.ledger-config.create-form")
-    data class LedgerCreateFormConfig(
-        val onlyStartAtCategoryIds: List<Long>,
-    )
+    @ConfigurationProperties(prefix = "susu.ledger-config")
+    data class LedgerConfig(
+        val createForm: CreateForm,
+    ) {
+        data class CreateForm(
+            val onlyStartAtCategoryIds: List<Long>,
+            val minTitleLength: Int,
+            val maxTitleLength: Int,
+            val maxDescriptionLength: Int,
+        )
+    }
 
     @ConfigurationProperties(prefix = "slack")
     class SlackWebhookConfig(
@@ -39,4 +50,25 @@ data class SusuConfig(
     data class OnboardingGetVoteConfig(
         val voteId: Long,
     )
+
+    @ConfigurationProperties(prefix = "susu.envelop-config")
+    data class EnvelopeConfig(
+        val createForm: CreateForm,
+    ) {
+        data class CreateForm(
+            val minAmount: Long,
+            val maxAmount: Long,
+            val maxGiftLength: Int,
+            val maxMemoLength: Int,
+        )
+    }
+
+    @ConfigurationProperties(prefix = "susu.category-config")
+    data class CategoryConfig(
+        val createFrom: CreateForm,
+    ) {
+        data class CreateForm(
+            val maxCustomCategoryLength: Int,
+        )
+    }
 }

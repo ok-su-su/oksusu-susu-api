@@ -8,7 +8,7 @@ import kotlin.reflect.full.declaredMemberProperties
 
 @Configuration
 @EnableConfigurationProperties(
-    SlackConfig.ErrorWebhookConfig::class,
+    SlackConfig.ErrorWebhookConfig::class
 )
 class SlackConfig(
     val errorWebhookConfig: ErrorWebhookConfig,

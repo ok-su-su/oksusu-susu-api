@@ -1,6 +1,15 @@
 # Susu Config
 
 susu:
+  envelop-config:
+    create-form:
+      min-amount: 0
+      max-amount: 9900000000
+      max-gift-length: 100
+      max-memo-lenght: 200
+  category-config:
+    create-form:
+      max-custom-category-length: 100
   ledger-config:
     create-form:
       only-start-at-category-ids:
@@ -8,7 +17,9 @@ susu:
         - 2
         - 4
         - 5
-
+      min-title-length: 1
+      max-title-length: 50
+      max-description-length: 100
   onboarding-config:
     get-vote:
       vote-id: 1
