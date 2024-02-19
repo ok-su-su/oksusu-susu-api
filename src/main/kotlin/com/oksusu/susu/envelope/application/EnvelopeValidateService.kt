@@ -13,7 +13,7 @@ class EnvelopeValidateService(
 ) {
     fun validateEnvelopeRequest(request: CreateAndUpdateEnvelopeRequest) {
         val envelopeCreateForm = envelopeConfig.createForm
-        val categoryCreateForm = categoryConfig.createFrom
+        val categoryCreateForm = categoryConfig.createForm
 
         if (request.amount !in envelopeCreateForm.minAmount..envelopeCreateForm.maxAmount) {
             throw InvalidRequestException(ErrorCode.INVALID_ENVELOPE_AMOUNT_ERROR)

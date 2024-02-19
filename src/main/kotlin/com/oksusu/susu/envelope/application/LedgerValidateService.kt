@@ -17,7 +17,7 @@ class LedgerValidateService(
         }
 
         val ledgerCreateForm = ledgerConfig.createForm
-        val categoryCreateForm = categoryConfig.createFrom
+        val categoryCreateForm = categoryConfig.createForm
 
         if (request.title.length !in ledgerCreateForm.minTitleLength..ledgerCreateForm.maxTitleLength) {
             throw InvalidRequestException(ErrorCode.INVALID_LEDGER_TITLE_ERROR)
