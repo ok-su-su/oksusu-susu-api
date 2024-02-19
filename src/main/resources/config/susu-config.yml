@@ -6,7 +6,7 @@ susu:
       min-amount: 0
       max-amount: 9900000000
       max-gift-length: 100
-      max-memo-lenght: 200
+      max-memo-length: 200
   category-config:
     create-form:
       max-custom-category-length: 100

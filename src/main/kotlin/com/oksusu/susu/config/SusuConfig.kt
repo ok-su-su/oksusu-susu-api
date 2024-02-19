@@ -65,7 +65,7 @@ data class SusuConfig(
 
     @ConfigurationProperties(prefix = "susu.category-config")
     data class CategoryConfig(
-        val createFrom: CreateForm,
+        val createForm: CreateForm,
     ) {
         data class CreateForm(
             val maxCustomCategoryLength: Int,
