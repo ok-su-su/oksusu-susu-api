@@ -50,6 +50,7 @@ class OAuthFacade(
     private val eventPublisher: ApplicationEventPublisher,
     private val userStatusService: UserStatusService,
     private val userStatusTypeService: UserStatusTypeService,
+    private val authValidateService: AuthValidateService,
 ) {
     val logger = KotlinLogging.logger {}
 
@@ -69,6 +70,8 @@ class OAuthFacade(
         request: OAuthRegisterRequest,
         deviceContext: UserDeviceContext,
     ): TokenDto {
+        authValidateService.validateRegisterRequest(request)
+
         val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
 
         coroutineScope {

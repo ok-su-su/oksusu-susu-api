@@ -7,7 +7,6 @@ import com.oksusu.susu.user.application.BlockFacade
 import com.oksusu.susu.user.model.request.DeleteBlockRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
@@ -21,7 +20,6 @@ class DevBlockResource(
     @DeleteMapping
     suspend fun deleteBlockByTargetId(
         user: AuthUser,
-        @Valid @RequestBody
-        request: DeleteBlockRequest,
+        @RequestBody request: DeleteBlockRequest,
     ) = blockFacade.deleteBlockByTargetId(user, request).wrapVoid()
 }

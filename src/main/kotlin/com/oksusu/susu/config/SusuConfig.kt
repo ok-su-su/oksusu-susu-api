@@ -12,7 +12,9 @@ import kotlin.reflect.full.declaredMemberProperties
     SusuConfig.SlackWebhookConfig::class,
     SusuConfig.OnboardingGetVoteConfig::class,
     SusuConfig.EnvelopeConfig::class,
-    SusuConfig.CategoryConfig::class
+    SusuConfig.CategoryConfig::class,
+    SusuConfig.PostConfig::class,
+    SusuConfig.UserConfig::class
 )
 data class SusuConfig(
     val ledgerConfig: LedgerConfig,
@@ -20,6 +22,8 @@ data class SusuConfig(
     val onboardingGetVoteConfig: OnboardingGetVoteConfig,
     val envelopeConfig: EnvelopeConfig,
     val categoryConfig: CategoryConfig,
+    val postConfig: PostConfig,
+    val userConfig: UserConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -69,6 +73,39 @@ data class SusuConfig(
     ) {
         data class CreateForm(
             val maxCustomCategoryLength: Int,
+        )
+    }
+
+    @ConfigurationProperties(prefix = "susu.post-config")
+    data class PostConfig(
+        val createForm: CreateForm,
+        val createVoteForm: CreateVoteForm,
+        val createVoteOptionForm: CreateVoteOptionForm,
+    ) {
+        data class CreateForm(
+            val maxTitleLength: Int,
+            val minContentLength: Int,
+            val maxContentLength: Int,
+        )
+
+        data class CreateVoteForm(
+            val minOptionCount: Int,
+        )
+
+        data class CreateVoteOptionForm(
+            val minContentLength: Int,
+            val maxContentLength: Int,
+        )
+    }
+
+    @ConfigurationProperties(prefix = "susu.user-config")
+    data class UserConfig(
+        val createForm: CreateForm,
+    ) {
+        data class CreateForm(
+            val minBirthYear: Int,
+            val minNameLength: Int,
+            val maxNameLength: Int,
         )
     }
 }

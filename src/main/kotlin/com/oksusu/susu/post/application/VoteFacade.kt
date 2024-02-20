@@ -51,11 +51,12 @@ class VoteFacade(
     private val countService: CountService,
     private val eventPublisher: ApplicationEventPublisher,
     private val onboardingGetVoteConfig: SusuConfig.OnboardingGetVoteConfig,
+    private val voteValidateService: VoteValidateService,
 ) {
     private val logger = KotlinLogging.logger { }
 
     suspend fun createVote(user: AuthUser, request: CreateVoteRequest): CreateAndUpdateVoteResponse {
-        voteOptionService.validateSeq(request.options)
+        voteValidateService.validateCreateVoteRequest(request)
         boardService.validateExistBoard(request.boardId)
 
         return txTemplates.writer.coExecute {
@@ -194,10 +195,13 @@ class VoteFacade(
 
     suspend fun deleteVote(user: AuthUser, id: Long) {
         val (vote, options) = parZip(
-            { postService.validateAuthority(id, user.uid) },
             { voteService.getVote(id) },
             { voteOptionService.getVoteOptions(id) }
-        ) { _, vote, options -> vote to options }
+        ) { vote, options -> vote to options }
+
+        if (vote.uid != user.uid) {
+            throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
+        }
 
         val optionIds = options.map { option -> option.id }
 
@@ -235,6 +239,8 @@ class VoteFacade(
 
     /** 투표가 진행된 경우 업데이트 불가능 */
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
+        voteValidateService.validateUpdateVoteRequest(request)
+
         return parZip(
             { voteHistoryService.findByUidAndPostId(user.uid, id) },
             { voteService.getVoteAndOptions(id) }
