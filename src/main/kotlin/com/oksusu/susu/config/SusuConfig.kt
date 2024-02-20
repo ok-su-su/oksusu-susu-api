@@ -13,7 +13,8 @@ import kotlin.reflect.full.declaredMemberProperties
     SusuConfig.OnboardingGetVoteConfig::class,
     SusuConfig.EnvelopeConfig::class,
     SusuConfig.CategoryConfig::class,
-    SusuConfig.PostConfig::class
+    SusuConfig.PostConfig::class,
+    SusuConfig.UserConfig::class,
 )
 data class SusuConfig(
     val ledgerConfig: LedgerConfig,
@@ -22,6 +23,7 @@ data class SusuConfig(
     val envelopeConfig: EnvelopeConfig,
     val categoryConfig: CategoryConfig,
     val postConfig: PostConfig,
+    val userConfig: UserConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -93,6 +95,17 @@ data class SusuConfig(
         data class CreateVoteOptionForm(
             val minContentLength: Int,
             val maxContentLength: Int,
+        )
+    }
+
+    @ConfigurationProperties(prefix = "susu.user-config")
+    data class UserConfig(
+        val createForm: CreateForm,
+    ) {
+        data class CreateForm(
+            val minBirthYear: Int,
+            val minNameLength: Int,
+            val maxNameLength: Int,
         )
     }
 }

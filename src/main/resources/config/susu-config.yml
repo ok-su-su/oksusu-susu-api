@@ -30,6 +30,11 @@ susu:
     create-vote-option-form:
       min-content-length: 1
       max-content-length: 100
+  user-config:
+    create-form:
+      min-birth-year: 1
+      min-name-length: 1
+      max-name-length: 100
   onboarding-config:
     get-vote:
       vote-id: 1

@@ -10,7 +10,6 @@ data class UpdateUserInfoRequest(
     /** 성별 */
     val gender: Gender?,
     /** 출생년도 */
-    @field:Positive
     val birth: Int?,
 ) {
     fun getBirth(): LocalDate? {
