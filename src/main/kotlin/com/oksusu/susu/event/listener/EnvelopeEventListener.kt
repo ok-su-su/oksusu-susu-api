@@ -25,7 +25,7 @@ class EnvelopeEventListener(
             )
 
             /** 조회되는 케이스가 없는 경우, 친구정보도 삭제 */
-            if (count != 0L) {
+            if (count == 0L) {
                 friendService.deleteSync(event.friendId)
                 friendRelationshipService.deleteByFriendIdSync(event.friendId)
             }
