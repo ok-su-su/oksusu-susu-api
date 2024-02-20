@@ -81,7 +81,8 @@ class VoteFacade(
                 optionModels = options.map { option ->
                     VoteOptionAndHistoryModel.of(option = option, isVoted = false)
                 },
-                boardModel = boardService.getBoard(request.boardId)
+                boardModel = boardService.getBoard(request.boardId),
+                isMine = true
             )
         }
     }
@@ -265,7 +266,8 @@ class VoteFacade(
                 uid = user.uid,
                 post = updatedVote,
                 optionModels = options,
-                boardModel = boardService.getBoard(request.boardId)
+                boardModel = boardService.getBoard(request.boardId),
+                isMine = true
             )
         }
     }
