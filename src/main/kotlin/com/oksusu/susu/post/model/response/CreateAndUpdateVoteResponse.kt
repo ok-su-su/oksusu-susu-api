@@ -9,6 +9,8 @@ import java.time.LocalDateTime
 data class CreateAndUpdateVoteResponse(
     /** 투표 id */
     val id: Long,
+    /** 본인 소유 글 여부 / 내 글 : 1, 전체 글 : 0 */
+    val isMine: Boolean,
     /** 투표 생성자 id */
     val uid: Long,
     /** 보드 */
@@ -28,6 +30,7 @@ data class CreateAndUpdateVoteResponse(
             post: Post,
             optionModels: List<VoteOptionAndHistoryModel>,
             boardModel: BoardModel,
+            isMine: Boolean,
         ): CreateAndUpdateVoteResponse {
             return CreateAndUpdateVoteResponse(
                 id = post.id,
@@ -36,7 +39,8 @@ data class CreateAndUpdateVoteResponse(
                 content = post.content,
                 isModified = !post.createdAt.equalsFromYearToSec(post.modifiedAt),
                 options = optionModels,
-                createdAt = post.createdAt
+                createdAt = post.createdAt,
+                isMine = isMine
             )
         }
     }
