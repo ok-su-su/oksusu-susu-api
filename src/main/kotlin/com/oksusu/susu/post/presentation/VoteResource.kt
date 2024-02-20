@@ -14,7 +14,6 @@ import com.oksusu.susu.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -29,7 +28,7 @@ class VoteResource(
     @PostMapping
     suspend fun createVote(
         user: AuthUser,
-        @Valid @RequestBody
+        @RequestBody
         request: CreateVoteRequest,
     ) = voteFacade.createVote(user, request).wrapCreated()
 
@@ -53,7 +52,7 @@ class VoteResource(
     suspend fun castVote(
         user: AuthUser,
         @PathVariable id: Long,
-        @Valid @RequestBody
+        @RequestBody
         request: CreateVoteHistoryRequest,
     ) = voteFacade.vote(user, id, request).wrapCreated()
 
@@ -69,7 +68,7 @@ class VoteResource(
     suspend fun update(
         user: AuthUser,
         @PathVariable id: Long,
-        @Valid @RequestBody
+        @RequestBody
         request: UpdateVoteRequest,
     ) = voteFacade.update(user, id, request).wrapOk()
 

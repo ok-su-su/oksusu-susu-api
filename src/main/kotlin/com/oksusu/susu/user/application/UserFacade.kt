@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 class UserFacade(
     private val userService: UserService,
     private val txTemplate: TransactionTemplates,
+    private val userValidateService: UserValidateService,
 ) {
     suspend fun getUserInfo(user: AuthUser): UserInfoResponse {
         return userService.findByIdOrThrow(user.uid)
@@ -19,6 +20,7 @@ class UserFacade(
 
     suspend fun updateUserInfo(uid: Long, user: AuthUser, request: UpdateUserInfoRequest): UserInfoResponse {
         user.isNotAuthorThrow(uid)
+        userValidateService.validateUpdateUserRequest(request)
 
         val beforeChangedUser = userService.findByIdOrThrow(user.uid)
 
