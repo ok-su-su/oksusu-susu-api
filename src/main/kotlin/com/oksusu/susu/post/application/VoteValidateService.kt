@@ -12,25 +12,25 @@ import org.springframework.stereotype.Service
 class VoteValidateService(
     private val postConfig: SusuConfig.PostConfig,
 ) {
-    val logger = KotlinLogging.logger {  }
+    val logger = KotlinLogging.logger { }
 
-    fun validateCreateVoteRequest(request: CreateVoteRequest){
+    fun validateCreateVoteRequest(request: CreateVoteRequest) {
         val createPostForm = postConfig.createForm
         val createVoteForm = postConfig.createVoteForm
         val createVoteOptionForm = postConfig.createVoteOptionForm
 
         logger.info { request.content.length }
 
-        if (request.content.length !in createPostForm.minContentLength .. createPostForm.maxContentLength){
+        if (request.content.length !in createPostForm.minContentLength..createPostForm.maxContentLength) {
             throw InvalidRequestException(ErrorCode.INVALID_POST_CONTENT_ERROR)
         }
 
-        if (request.options.size < createVoteForm.minOptionCount){
+        if (request.options.size < createVoteForm.minOptionCount) {
             throw InvalidRequestException(ErrorCode.INVALID_VOTE_OPTION_ERROR)
         }
 
-        request.options.forEach {option ->
-            if (option.content.length !in createVoteOptionForm.minContentLength .. createVoteOptionForm.maxContentLength){
+        request.options.forEach { option ->
+            if (option.content.length !in createVoteOptionForm.minContentLength..createVoteOptionForm.maxContentLength) {
                 throw InvalidRequestException(ErrorCode.INVALID_VOTE_OPTION_ERROR)
             }
         }
@@ -42,10 +42,10 @@ class VoteValidateService(
         }
     }
 
-    fun validateUpdateVoteRequest(request: UpdateVoteRequest){
+    fun validateUpdateVoteRequest(request: UpdateVoteRequest) {
         val createPostForm = postConfig.createForm
 
-        if (request.content.length !in createPostForm.minContentLength .. createPostForm.maxContentLength){
+        if (request.content.length !in createPostForm.minContentLength..createPostForm.maxContentLength) {
             throw InvalidRequestException(ErrorCode.INVALID_POST_CONTENT_ERROR)
         }
     }

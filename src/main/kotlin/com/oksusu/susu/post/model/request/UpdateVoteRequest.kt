@@ -1,7 +1,5 @@
 package com.oksusu.susu.post.model.request
 
-import jakarta.validation.constraints.Positive
-
 data class UpdateVoteRequest(
     /** 보드 id */
     val boardId: Long,

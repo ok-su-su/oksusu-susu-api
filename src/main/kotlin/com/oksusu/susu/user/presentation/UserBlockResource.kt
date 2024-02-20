@@ -8,7 +8,6 @@ import com.oksusu.susu.user.application.BlockFacade
 import com.oksusu.susu.user.model.request.CreateBlockRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
@@ -22,8 +21,7 @@ class UserBlockResource(
     @PostMapping
     suspend fun createBlock(
         user: AuthUser,
-        @Valid @RequestBody
-        request: CreateBlockRequest,
+        @RequestBody request: CreateBlockRequest,
     ) = blockFacade.createBlock(user, request).wrapCreated()
 
     @Operation(summary = "차단 해제하기")

@@ -199,7 +199,7 @@ class VoteFacade(
             { voteOptionService.getVoteOptions(id) }
         ) { vote, options -> vote to options }
 
-        if (vote.uid != user.uid){
+        if (vote.uid != user.uid) {
             throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
         }
 

@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service
 class AuthValidateService(
     private val userConfig: SusuConfig.UserConfig,
 ) {
-    fun validateRegisterRequest(request: OAuthRegisterRequest){
+    fun validateRegisterRequest(request: OAuthRegisterRequest) {
         val userCreateForm = userConfig.createForm
 
-        if (request.name.length !in userCreateForm.minNameLength .. userCreateForm.maxNameLength){
+        if (request.name.length !in userCreateForm.minNameLength..userCreateForm.maxNameLength) {
             throw InvalidRequestException(ErrorCode.INVALID_USER_NAME_ERROR)
         }
 
-        if (request.birth != null && request.birth < userCreateForm.minBirthYear){
+        if (request.birth != null && request.birth < userCreateForm.minBirthYear) {
             throw InvalidRequestException(ErrorCode.INVALID_USER_BIRTH_ERROR)
         }
     }

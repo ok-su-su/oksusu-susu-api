@@ -14,7 +14,7 @@ import kotlin.reflect.full.declaredMemberProperties
     SusuConfig.EnvelopeConfig::class,
     SusuConfig.CategoryConfig::class,
     SusuConfig.PostConfig::class,
-    SusuConfig.UserConfig::class,
+    SusuConfig.UserConfig::class
 )
 data class SusuConfig(
     val ledgerConfig: LedgerConfig,
@@ -80,7 +80,7 @@ data class SusuConfig(
     data class PostConfig(
         val createForm: CreateForm,
         val createVoteForm: CreateVoteForm,
-        val createVoteOptionForm: CreateVoteOptionForm
+        val createVoteOptionForm: CreateVoteOptionForm,
     ) {
         data class CreateForm(
             val maxTitleLength: Int,
