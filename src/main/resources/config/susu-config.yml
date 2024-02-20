@@ -20,6 +20,16 @@ susu:
       min-title-length: 1
       max-title-length: 50
       max-description-length: 100
+  post-config:
+    create-form:
+      max-title-length: 250
+      min-content-length: 1
+      max-content-length: 500
+    create-vote-form:
+      min-option-count: 1
+    create-vote-option-form:
+      min-content-length: 1
+      max-content-length: 100
   onboarding-config:
     get-vote:
       vote-id: 1

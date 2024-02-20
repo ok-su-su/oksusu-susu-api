@@ -8,9 +8,7 @@ data class CreateVoteRequest(
     /** 투표 내용 */
     val content: String,
     /** 투표 옵션 */
-    @field:NotEmpty
     val options: List<VoteOptionWithoutIdModel>,
     /** 보드 id */
-    @field:Positive
     val boardId: Long,
 )

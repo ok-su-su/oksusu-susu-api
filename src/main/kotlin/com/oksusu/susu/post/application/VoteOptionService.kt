@@ -20,14 +20,6 @@ class VoteOptionService(
         return voteOptionRepository.saveAll(voteOptions)
     }
 
-    fun validateSeq(optionModels: List<VoteOptionWithoutIdModel>) {
-        optionModels.map { option -> option.seq }.toSet().count { seq -> seq > 0 }.run {
-            if (this != optionModels.size) {
-                throw InvalidRequestException(ErrorCode.INVALID_VOTE_OPTION_SEQUENCE)
-            }
-        }
-    }
-
     suspend fun getOptionsByPostIdIn(postIds: List<Long>): List<VoteOption> {
         return withContext(Dispatchers.IO) {
             voteOptionRepository.findAllByPostIdInOrderBySeq(postIds)

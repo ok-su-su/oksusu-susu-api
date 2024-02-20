@@ -59,9 +59,13 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
 
     /** Post Error Code */
     NOT_FOUND_POST_ERROR(HttpStatus.NOT_FOUND, "게시글 정보를 찾을 수 없습니다."),
-    INVALID_VOTE_OPTION_SEQUENCE(HttpStatus.BAD_REQUEST, "투표 옵션 순서가 잘못되었습니다."),
+    INVALID_POST_CONTENT_ERROR(HttpStatus.BAD_REQUEST, "게시글 내용이 잘못되었습니다."),
+
     NOT_FOUND_VOTE_ERROR(HttpStatus.NOT_FOUND, "투표 정보를 찾을 수 없습니다."),
     DUPLICATED_VOTE_ERROR(HttpStatus.NOT_FOUND, "중복 투표를 할 수 없습니다."),
+
+    INVALID_VOTE_OPTION_SEQUENCE(HttpStatus.BAD_REQUEST, "투표 옵션 순서가 잘못되었습니다."),
+    INVALID_VOTE_OPTION_ERROR(HttpStatus.BAD_REQUEST, "투표 옵션이 잘못되었습니다."),
 
     /** Board Error Code */
     NOT_FOUND_BOARD_ERROR(HttpStatus.NOT_FOUND, "보드 정보를 찾을 수 없습니다."),
