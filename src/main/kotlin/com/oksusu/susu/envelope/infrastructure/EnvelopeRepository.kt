@@ -66,7 +66,9 @@ interface EnvelopeCustomRepository {
     fun getCuttingTotalAmountPerHandedOverAtBetween(
         type: EnvelopeType,
         from: LocalDateTime,
-        to: LocalDateTime, minAmount: Long, maxAmount: Long,
+        to: LocalDateTime,
+        minAmount: Long,
+        maxAmount: Long,
     ): List<CountPerHandedOverAtModel>
 
     @Transactional(readOnly = true)
@@ -180,7 +182,9 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
     override fun getCuttingTotalAmountPerHandedOverAtBetween(
         type: EnvelopeType,
         from: LocalDateTime,
-        to: LocalDateTime, minAmount: Long, maxAmount: Long,
+        to: LocalDateTime,
+        minAmount: Long,
+        maxAmount: Long,
     ): List<CountPerHandedOverAtModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
@@ -251,7 +255,9 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override fun getCuttingTotalAmountPerStatisticGroup(minAmount: Long, maxAmount: Long
+    override fun getCuttingTotalAmountPerStatisticGroup(
+        minAmount: Long,
+        maxAmount: Long,
     ): List<CountAvgAmountPerStatisticGroupModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
@@ -409,7 +415,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .from(qEnvelope)
             .orderBy(qEnvelope.amount.asc())
             .offset(position)
-            .limit(position+1)
+            .limit(position + 1)
             .fetch()
     }
 }

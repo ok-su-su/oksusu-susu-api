@@ -6,16 +6,12 @@ import com.oksusu.susu.config.SusuConfig
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
-import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.statistic.model.TitleValueModel
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
-import kotlin.jvm.internal.Intrinsics.Kotlin
 
 @Service
 class EnvelopeStatisticService(
@@ -110,7 +106,6 @@ class EnvelopeStatisticService(
             }?.sortedBy { model -> model.title }
     }
 
-
     /** 최근 사용 금액 (절사) */
     suspend fun getCuttingRecentSpent(minAmount: Long, maxAmount: Long): List<TitleValueModel<Long>>? {
         val envelopHandOverAtMonthCount =
@@ -133,7 +128,7 @@ class EnvelopeStatisticService(
 
         return parZip(
             { envelopeService.getEnvelopeByPositionOrderByAmount(minIdx) },
-            { envelopeService.getEnvelopeByPositionOrderByAmount(maxIdx) },
+            { envelopeService.getEnvelopeByPositionOrderByAmount(maxIdx) }
         ) { min, max -> min.amount to max.amount }
     }
 }

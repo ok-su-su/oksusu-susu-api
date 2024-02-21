@@ -2,8 +2,6 @@ package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.extension.toStatisticAgeGroup
 import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificEnvelopeStatisticRepository
 import com.oksusu.susu.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.statistic.model.TitleValueModel

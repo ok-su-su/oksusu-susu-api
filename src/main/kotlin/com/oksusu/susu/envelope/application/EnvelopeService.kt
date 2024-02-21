@@ -93,7 +93,8 @@ class EnvelopeService(
 
     suspend fun getCuttingTotalAmountPerHandedOverAtInLast1Year(
         type: EnvelopeType,
-        minAmount: Long, maxAmount: Long
+        minAmount: Long,
+        maxAmount: Long,
     ): List<CountPerHandedOverAtModel> {
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
@@ -129,7 +130,8 @@ class EnvelopeService(
     }
 
     suspend fun getCuttingTotalAmountPerStatisticGroup(
-        minAmount: Long, maxAmount: Long
+        minAmount: Long,
+        maxAmount: Long,
     ): List<CountAvgAmountPerStatisticGroupModel> {
         return withContext(Dispatchers.IO) {
             envelopeRepository.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount)

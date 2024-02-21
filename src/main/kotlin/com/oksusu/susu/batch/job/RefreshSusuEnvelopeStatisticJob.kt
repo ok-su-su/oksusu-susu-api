@@ -2,7 +2,6 @@ package com.oksusu.susu.batch.job
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.config.SusuConfig
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toStatisticAgeGroup
@@ -15,7 +14,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import org.springframework.stereotype.Component
 import java.time.LocalDate
-import kotlin.math.log
 
 @Component
 class RefreshSusuEnvelopeStatisticJob(
