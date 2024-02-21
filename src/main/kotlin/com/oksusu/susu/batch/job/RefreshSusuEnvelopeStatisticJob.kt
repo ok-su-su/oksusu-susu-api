@@ -2,6 +2,7 @@ package com.oksusu.susu.batch.job
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
+import com.oksusu.susu.config.SusuConfig
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toStatisticAgeGroup
@@ -14,6 +15,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import kotlin.math.log
 
 @Component
 class RefreshSusuEnvelopeStatisticJob(
@@ -28,23 +30,25 @@ class RefreshSusuEnvelopeStatisticJob(
     suspend fun refreshSusuEnvelopeStatistic() {
         logger.info { "start refresh susu statistic" }
 
+        val (minAmount, maxAmount) = envelopeStatisticService.getLimitAmount()
+
         parZip(
             /** 봉투 소유 유저 수 */
             { envelopeService.getUserCountHadEnvelope() },
-            /** 최근 사용 금액 */
-            { envelopeStatisticService.getRecentSpent(null) },
+            /** 최근 사용 금액 (절사) */
+            { envelopeStatisticService.getCuttingRecentSpent(minAmount, maxAmount) },
             /** 최다 수수 관계 */
             { envelopeStatisticService.getMostFrequentRelationship(null) },
             /** 최다 수수 경조사 */
             { envelopeStatisticService.getMostFrequentCategory(null) },
-            /** 평균 수수 */
-            { envelopeService.countAvgAmountPerStatisticGroup() }
+            /** 통계 그룹 당 총합 수수 (절사) */
+            { envelopeService.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount) }
         ) {
                 userCount,
                 recentSpent,
                 mostFrequentRelationShip,
                 mostFrequentCategory,
-                avgAmountModels,
+                totalAmountModels,
             ->
 
             /** 최근 사용 금액 8달 */
@@ -71,7 +75,7 @@ class RefreshSusuEnvelopeStatisticJob(
             )
 
             /**  평균 수수 레디스 저장 key: age:categoryId:relationshipId, value: avg */
-            parseIntoGroup(avgAmountModels).map { model ->
+            parseIntoGroup(totalAmountModels).map { model ->
                 async {
                     susuSpecificEnvelopeStatisticService.save(
                         cacheKeyGenerateHelper.getSusuSpecificStatisticKey(model.key),
@@ -81,17 +85,23 @@ class RefreshSusuEnvelopeStatisticJob(
             }
 
             /** key: susu_category_statistic:categoryId, value: avg */
-            avgAmountModels.groupBy { it.categoryId }.map { modelsMap ->
+            totalAmountModels.groupBy { it.categoryId }.map { modelsMap ->
                 val key = cacheKeyGenerateHelper.getSusuCategoryStatisticKey(modelsMap.key)
-                val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
+
+                val totalAmounts = modelsMap.value.sumOf { value -> value.totalAmounts }
+                val totalCounts = modelsMap.value.sumOf { value -> value.counts }
+                val avgAmount = totalAmounts / totalCounts
 
                 async { susuSpecificEnvelopeStatisticService.save(key, avgAmount) }
             }
 
             /** key: susu_relationship_statistic:relationshipId, value: avg */
-            avgAmountModels.groupBy { it.relationshipId }.map { modelsMap ->
+            totalAmountModels.groupBy { it.relationshipId }.map { modelsMap ->
                 val key = cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(modelsMap.key)
-                val avgAmount = modelsMap.value.sumOf { model -> model.averageAmount } / modelsMap.value.size
+
+                val totalAmounts = modelsMap.value.sumOf { value -> value.totalAmounts }
+                val totalCounts = modelsMap.value.sumOf { value -> value.counts }
+                val avgAmount = totalAmounts / totalCounts
 
                 async { susuSpecificEnvelopeStatisticService.save(key, avgAmount) }
             }
@@ -100,13 +110,14 @@ class RefreshSusuEnvelopeStatisticJob(
         }
     }
 
-    private fun parseIntoGroup(avgAmountModels: List<CountAvgAmountPerStatisticGroupModel>): Map<String, Long> {
+    private fun parseIntoGroup(totalAmountModels: List<CountAvgAmountPerStatisticGroupModel>): Map<String, Long> {
         /** key: age, value: list<model> */
-        val ages = avgAmountModels.groupBy { it.birth.toStatisticAgeGroup() }
+        val ages = totalAmountModels.groupBy { it.birth.toStatisticAgeGroup() }
 
         /** key: age:categoryId, value: list<model> */
         val ageCategorys = ages.flatMap { age ->
             val ageCategories = age.value.groupBy { it.categoryId }
+
             ageCategories.map { ageCategory ->
                 "${age.key}:${ageCategory.key}" to ageCategory.value
             }
@@ -115,6 +126,7 @@ class RefreshSusuEnvelopeStatisticJob(
         /** key: age:categoryId:relationshipId, value: list<model> */
         val groups = ageCategorys.flatMap { ageCategory ->
             val groups = ageCategory.value.groupBy { it.relationshipId }
+
             groups.map { group ->
                 "${ageCategory.key}:${group.key}" to group.value
             }
@@ -122,7 +134,9 @@ class RefreshSusuEnvelopeStatisticJob(
 
         /** key: age:categoryId:relationshipId, value: avg */
         return groups.map { group ->
-            group.key to group.value.sumOf { value -> value.averageAmount } / group.value.size
+            val totalAmounts = group.value.sumOf { value -> value.totalAmounts }
+            val totalCounts = group.value.sumOf { value -> value.counts }
+            group.key to totalAmounts / totalCounts
         }.toMap()
     }
 }

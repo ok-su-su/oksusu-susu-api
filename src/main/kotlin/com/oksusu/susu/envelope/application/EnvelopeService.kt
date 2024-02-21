@@ -1,5 +1,6 @@
 package com.oksusu.susu.envelope.application
 
+import com.oksusu.susu.config.SusuConfig
 import com.oksusu.susu.envelope.domain.Envelope
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.EnvelopeRepository
@@ -29,6 +30,7 @@ import java.time.LocalDateTime
 @Service
 class EnvelopeService(
     private val envelopeRepository: EnvelopeRepository,
+    private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
     val logger = KotlinLogging.logger { }
 
@@ -89,19 +91,26 @@ class EnvelopeService(
         }
     }
 
-    suspend fun countPerHandedOverAtInLast1Year(type: EnvelopeType): List<CountPerHandedOverAtModel> {
+    suspend fun getCuttingTotalAmountPerHandedOverAtInLast1Year(
+        type: EnvelopeType,
+        minAmount: Long, maxAmount: Long
+    ): List<CountPerHandedOverAtModel> {
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
+
         return withContext(Dispatchers.IO) {
-            envelopeRepository.countPerHandedOverAtBetween(type, from, to)
+            envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetween(type, from, to, minAmount, maxAmount)
         }
     }
 
-    suspend fun countPerHandedOverAtInLast1YearByUid(uid: Long, type: EnvelopeType): List<CountPerHandedOverAtModel> {
+    suspend fun getTotalAmountPerHandedOverAtInLast1YearByUid(
+        uid: Long,
+        type: EnvelopeType,
+    ): List<CountPerHandedOverAtModel> {
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
         return withContext(Dispatchers.IO) {
-            envelopeRepository.countPerHandedOverAtBetweenByUid(uid, type, from, to)
+            envelopeRepository.getTotalAmountPerHandedOverAtBetweenByUid(uid, type, from, to)
         }
     }
 
@@ -119,9 +128,11 @@ class EnvelopeService(
         }
     }
 
-    suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel> {
+    suspend fun getCuttingTotalAmountPerStatisticGroup(
+        minAmount: Long, maxAmount: Long
+    ): List<CountAvgAmountPerStatisticGroupModel> {
         return withContext(Dispatchers.IO) {
-            envelopeRepository.countAvgAmountPerStatisticGroup()
+            envelopeRepository.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount)
         }
     }
 
@@ -173,5 +184,13 @@ class EnvelopeService(
 
     suspend fun countByUidAndFriendId(uid: Long, friendId: Long): Long {
         return withContext(Dispatchers.IO) { envelopeRepository.countByUidAndFriendId(uid, friendId) }
+    }
+
+    suspend fun getEnvelopeByPositionOrderByAmount(idx: Long): Envelope {
+        return withContext(Dispatchers.IO) {
+            envelopeRepository.getEnvelopeByPositionOrderByAmount(idx)
+        }.takeIf { it.isNotEmpty() }
+            ?.first()
+            ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
     }
 }

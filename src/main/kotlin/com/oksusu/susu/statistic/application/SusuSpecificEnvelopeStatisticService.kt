@@ -47,21 +47,6 @@ class SusuSpecificEnvelopeStatisticService(
         }
     }
 
-    suspend fun save(model: CountAvgAmountPerStatisticGroupModel) {
-        val key = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(
-            age = model.birth.toStatisticAgeGroup(),
-            categoryId = model.categoryId,
-            relationshipId = model.relationshipId
-        )
-
-        withContext(Dispatchers.IO) {
-            susuSpecificEnvelopeStatisticRepository.save(
-                key = key,
-                value = model.averageAmount
-            )
-        }
-    }
-
     suspend fun save(key: String, value: Long) {
         withContext(Dispatchers.IO) {
             susuSpecificEnvelopeStatisticRepository.save(key, value)

@@ -7,12 +7,7 @@ import com.oksusu.susu.envelope.domain.QEnvelope
 import com.oksusu.susu.envelope.domain.QLedger
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.*
-import com.oksusu.susu.extension.execute
-import com.oksusu.susu.extension.executeSlice
-import com.oksusu.susu.extension.isEquals
-import com.oksusu.susu.extension.isGoe
-import com.oksusu.susu.extension.isIn
-import com.oksusu.susu.extension.isLoe
+import com.oksusu.susu.extension.*
 import com.oksusu.susu.friend.domain.QFriend
 import com.oksusu.susu.friend.domain.QFriendRelationship
 import com.oksusu.susu.user.domain.QUser
@@ -68,14 +63,14 @@ interface EnvelopeCustomRepository {
     fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel?
 
     @Transactional(readOnly = true)
-    suspend fun countPerHandedOverAtBetween(
+    fun getCuttingTotalAmountPerHandedOverAtBetween(
         type: EnvelopeType,
         from: LocalDateTime,
-        to: LocalDateTime,
+        to: LocalDateTime, minAmount: Long, maxAmount: Long,
     ): List<CountPerHandedOverAtModel>
 
     @Transactional(readOnly = true)
-    suspend fun countPerHandedOverAtBetweenByUid(
+    fun getTotalAmountPerHandedOverAtBetweenByUid(
         uid: Long,
         type: EnvelopeType,
         from: LocalDateTime,
@@ -83,13 +78,13 @@ interface EnvelopeCustomRepository {
     ): List<CountPerHandedOverAtModel>
 
     @Transactional(readOnly = true)
-    suspend fun countPerCategoryId(): List<CountPerCategoryIdModel>
+    fun countPerCategoryId(): List<CountPerCategoryIdModel>
 
     @Transactional(readOnly = true)
-    suspend fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
+    fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
 
     @Transactional(readOnly = true)
-    suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel>
+    fun getCuttingTotalAmountPerStatisticGroup(min: Long, max: Long): List<CountAvgAmountPerStatisticGroupModel>
 
     @Transactional(readOnly = true)
     fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope>
@@ -115,6 +110,9 @@ interface EnvelopeCustomRepository {
 
     @Transactional(readOnly = true)
     fun getUserCountHadEnvelope(): Long
+
+    @Transactional(readOnly = true)
+    fun getEnvelopeByPositionOrderByAmount(position: Long): List<Envelope>
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -179,10 +177,10 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).fetchFirst()
     }
 
-    override suspend fun countPerHandedOverAtBetween(
+    override fun getCuttingTotalAmountPerHandedOverAtBetween(
         type: EnvelopeType,
         from: LocalDateTime,
-        to: LocalDateTime,
+        to: LocalDateTime, minAmount: Long, maxAmount: Long,
     ): List<CountPerHandedOverAtModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
@@ -193,12 +191,13 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).from(qEnvelope)
             .where(
                 qEnvelope.type.eq(type),
-                qEnvelope.handedOverAt.between(from, to)
+                qEnvelope.handedOverAt.between(from, to),
+                qEnvelope.amount.between(minAmount, maxAmount)
             ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
 
-    override suspend fun countPerHandedOverAtBetweenByUid(
+    override fun getTotalAmountPerHandedOverAtBetweenByUid(
         uid: Long,
         type: EnvelopeType,
         from: LocalDateTime,
@@ -219,7 +218,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override suspend fun countPerCategoryId(): List<CountPerCategoryIdModel> {
+    override fun countPerCategoryId(): List<CountPerCategoryIdModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
                 QCountPerCategoryIdModel(
@@ -235,7 +234,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override suspend fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel> {
+    override fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
                 QCountPerCategoryIdModel(
@@ -252,19 +251,24 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override suspend fun countAvgAmountPerStatisticGroup(): List<CountAvgAmountPerStatisticGroupModel> {
+    override fun getCuttingTotalAmountPerStatisticGroup(minAmount: Long, maxAmount: Long
+    ): List<CountAvgAmountPerStatisticGroupModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
                 QCountAvgAmountPerStatisticGroupModel(
                     qCategoryAssignment.categoryId,
                     qFriendRelationship.relationshipId,
                     qUser.birth.year().castToNum(Long::class.java),
-                    qEnvelope.amount.avg().castToNum(Long::class.java)
+                    qEnvelope.amount.sum(),
+                    qEnvelope.id.count()
                 )
             ).from(qEnvelope)
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
+            .where(
+                qEnvelope.amount.between(minAmount, maxAmount)
+            )
             .groupBy(
                 qCategoryAssignment.categoryId,
                 qFriendRelationship.relationshipId,
@@ -397,5 +401,15 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 qEnvelope.uid.countDistinct()
             ).from(qEnvelope)
             .fetchFirst()
+    }
+
+    override fun getEnvelopeByPositionOrderByAmount(position: Long): List<Envelope> {
+        return JPAQuery<Envelope>(entityManager)
+            .select(qEnvelope)
+            .from(qEnvelope)
+            .orderBy(qEnvelope.amount.asc())
+            .offset(position)
+            .limit(position+1)
+            .fetch()
     }
 }
