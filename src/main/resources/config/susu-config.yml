@@ -38,3 +38,7 @@ susu:
   onboarding-config:
     get-vote:
       vote-id: 1
+  statistic-config:
+    susu-envelope-config:
+      min-cutting-average: 0.1
+      max-cutting-average: 0.9
