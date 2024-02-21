@@ -12,6 +12,7 @@ import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.statistic.model.TitleValueModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
+import kotlin.math.roundToLong
 
 @Service
 class EnvelopeStatisticService(
@@ -96,7 +97,7 @@ class EnvelopeStatisticService(
     }
 
     /** 최근 사용 금액 */
-    suspend fun getRecentSpent(uid: Long): List<TitleValueModel<Long>>? {
+    suspend fun getRecentSpentFor1Year(uid: Long): List<TitleValueModel<Long>>? {
         val envelopHandOverAtMonthCount =
             envelopeService.getTotalAmountPerHandedOverAtInLast1YearByUid(uid, EnvelopeType.SENT)
 
@@ -107,7 +108,7 @@ class EnvelopeStatisticService(
     }
 
     /** 최근 사용 금액 (절사) */
-    suspend fun getCuttingRecentSpent(minAmount: Long, maxAmount: Long): List<TitleValueModel<Long>>? {
+    suspend fun getCuttingRecentSpentFor1Year(minAmount: Long, maxAmount: Long): List<TitleValueModel<Long>>? {
         val envelopHandOverAtMonthCount =
             envelopeService.getCuttingTotalAmountPerHandedOverAtInLast1Year(EnvelopeType.SENT, minAmount, maxAmount)
 
@@ -118,13 +119,13 @@ class EnvelopeStatisticService(
     }
 
     /** 절사 평균 limit 지점 amount 구하기 */
-    suspend fun getLimitAmount(): Pair<Long, Long> {
+    suspend fun getLimitAmountForCutting(): Pair<Long, Long> {
         val susuEnvelopeConfig = statisticConfig.susuEnvelopeConfig
 
         val count = envelopeService.count()
 
-        val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).toLong()
-        val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).toLong()
+        val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).roundToLong()
+        val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
 
         return parZip(
             { envelopeService.getEnvelopeByPositionOrderByAmount(minIdx) },

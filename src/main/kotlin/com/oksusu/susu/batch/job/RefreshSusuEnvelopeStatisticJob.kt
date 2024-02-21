@@ -28,13 +28,13 @@ class RefreshSusuEnvelopeStatisticJob(
     suspend fun refreshSusuEnvelopeStatistic() {
         logger.info { "start refresh susu statistic" }
 
-        val (minAmount, maxAmount) = envelopeStatisticService.getLimitAmount()
+        val (minAmount, maxAmount) = envelopeStatisticService.getLimitAmountForCutting()
 
         parZip(
             /** 봉투 소유 유저 수 */
             { envelopeService.getUserCountHadEnvelope() },
             /** 최근 사용 금액 (절사) */
-            { envelopeStatisticService.getCuttingRecentSpent(minAmount, maxAmount) },
+            { envelopeStatisticService.getCuttingRecentSpentFor1Year(minAmount, maxAmount) },
             /** 최다 수수 관계 */
             { envelopeStatisticService.getMostFrequentRelationship(null) },
             /** 최다 수수 경조사 */
