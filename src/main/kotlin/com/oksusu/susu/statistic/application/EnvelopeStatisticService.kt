@@ -2,6 +2,7 @@ package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.category.application.CategoryService
+import com.oksusu.susu.config.SusuConfig
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
@@ -9,7 +10,9 @@ import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.statistic.model.TitleValueModel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
+import kotlin.math.roundToLong
 
 @Service
 class EnvelopeStatisticService(
@@ -18,7 +21,10 @@ class EnvelopeStatisticService(
     private val categoryService: CategoryService,
     private val friendRelationshipService: FriendRelationshipService,
     private val relationshipService: RelationshipService,
+    private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
+    val logger = KotlinLogging.logger {}
+
     /** 가장 많이 보낸 금액 */
     suspend fun getMaxSentEnvelope(uid: Long): TitleValueModel<Long>? {
         val sentMaxAmount = envelopeService.getMaxAmountEnvelopeInfoByUid(uid, EnvelopeType.SENT)
@@ -91,16 +97,39 @@ class EnvelopeStatisticService(
     }
 
     /** 최근 사용 금액 */
-    suspend fun getRecentSpent(uid: Long?): List<TitleValueModel<Long>>? {
-        val envelopHandOverAtMonthCount = if (uid == null) {
-            envelopeService.countPerHandedOverAtInLast1Year(EnvelopeType.SENT)
-        } else {
-            envelopeService.countPerHandedOverAtInLast1YearByUid(uid, EnvelopeType.SENT)
-        }
+    suspend fun getRecentSpentFor1Year(uid: Long): List<TitleValueModel<Long>>? {
+        val envelopHandOverAtMonthCount =
+            envelopeService.getTotalAmountPerHandedOverAtInLast1YearByUid(uid, EnvelopeType.SENT)
 
         return envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
             ?.map { count ->
-                TitleValueModel(count.handedOverAtMonth.toString(), count.totalCounts)
+                TitleValueModel(count.handedOverAtMonth.toString(), count.totalAmounts)
             }?.sortedBy { model -> model.title }
+    }
+
+    /** 최근 사용 금액 (절사) */
+    suspend fun getCuttingRecentSpentFor1Year(minAmount: Long, maxAmount: Long): List<TitleValueModel<Long>>? {
+        val envelopHandOverAtMonthCount =
+            envelopeService.getCuttingTotalAmountPerHandedOverAtInLast1Year(EnvelopeType.SENT, minAmount, maxAmount)
+
+        return envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
+            ?.map { count ->
+                TitleValueModel(count.handedOverAtMonth.toString(), count.totalAmounts)
+            }?.sortedBy { model -> model.title }
+    }
+
+    /** 절사 평균 limit 지점 amount 구하기 */
+    suspend fun getLimitAmountForCutting(): Pair<Long, Long> {
+        val susuEnvelopeConfig = statisticConfig.susuEnvelopeConfig
+
+        val count = envelopeService.count()
+
+        val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).roundToLong()
+        val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
+
+        return parZip(
+            { envelopeService.getEnvelopeByPositionOrderByAmount(minIdx) },
+            { envelopeService.getEnvelopeByPositionOrderByAmount(maxIdx) }
+        ) { min, max -> min.amount to max.amount }
     }
 }

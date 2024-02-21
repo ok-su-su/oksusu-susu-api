@@ -2,8 +2,6 @@ package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.extension.toStatisticAgeGroup
 import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificEnvelopeStatisticRepository
 import com.oksusu.susu.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.statistic.model.TitleValueModel
@@ -43,21 +41,6 @@ class SusuSpecificEnvelopeStatisticService(
                     )
                 },
                 averageCategory = categoryAmount?.let { TitleValueModel(title = "temp", value = categoryAmount) }
-            )
-        }
-    }
-
-    suspend fun save(model: CountAvgAmountPerStatisticGroupModel) {
-        val key = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(
-            age = model.birth.toStatisticAgeGroup(),
-            categoryId = model.categoryId,
-            relationshipId = model.relationshipId
-        )
-
-        withContext(Dispatchers.IO) {
-            susuSpecificEnvelopeStatisticRepository.save(
-                key = key,
-                value = model.averageAmount
             )
         }
     }

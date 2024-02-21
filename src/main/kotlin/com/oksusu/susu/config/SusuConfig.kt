@@ -14,7 +14,8 @@ import kotlin.reflect.full.declaredMemberProperties
     SusuConfig.EnvelopeConfig::class,
     SusuConfig.CategoryConfig::class,
     SusuConfig.PostConfig::class,
-    SusuConfig.UserConfig::class
+    SusuConfig.UserConfig::class,
+    SusuConfig.StatisticConfig::class
 )
 data class SusuConfig(
     val ledgerConfig: LedgerConfig,
@@ -106,6 +107,16 @@ data class SusuConfig(
             val minBirthYear: Int,
             val minNameLength: Int,
             val maxNameLength: Int,
+        )
+    }
+
+    @ConfigurationProperties(prefix = "susu.statistic-config")
+    data class StatisticConfig(
+        val susuEnvelopeConfig: SusuEnvelopeConfig,
+    ) {
+        data class SusuEnvelopeConfig(
+            val minCuttingAverage: Float,
+            val maxCuttingAverage: Float,
         )
     }
 }

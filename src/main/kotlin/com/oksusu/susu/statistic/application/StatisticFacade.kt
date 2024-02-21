@@ -36,15 +36,15 @@ class StatisticFacade(
         }
 
         val userEnvelopeStatistic = parZip(
-            // 최근 사용 금액 1년
-            { envelopeStatisticService.getRecentSpent(user.uid) },
-            // 최다 수수 관계
+            /** 최근 사용 금액 1년 */
+            { envelopeStatisticService.getRecentSpentFor1Year(user.uid) },
+            /** 최다 수수 관계 */
             { envelopeStatisticService.getMostFrequentRelationship(user.uid) },
-            // 최다 수수 경조사
+            /** 최다 수수 경조사 */
             { envelopeStatisticService.getMostFrequentCategory(user.uid) },
-            // 가장 많이 받은 금액
+            /** 가장 많이 받은 금액 */
             { envelopeStatisticService.getMaxReceivedEnvelope(user.uid) },
-            // 가장 많이 보낸 금액
+            /** 가장 많이 보낸 금액 */
             { envelopeStatisticService.getMaxSentEnvelope(user.uid) }
         ) {
                 recentSpent,
