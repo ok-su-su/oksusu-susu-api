@@ -38,6 +38,15 @@
 </div>
 <br>
 
+## ✨ Code Base
+
+- springBoot v3.2.x
+- kotlin v1.9.x
+- coroutine + suspend fun
+- webflux
+- jpa
+- reactive-redis
+
 ## 🙋 Developer
 <hr>
 
