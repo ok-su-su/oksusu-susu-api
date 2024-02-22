@@ -72,8 +72,8 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
                 qLedger.title.isContains(spec.title),
                 qCategoryAssignment.categoryId.isIn(spec.categoryIds),
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER),
-                spec.fromStartAt?.let { fromStartAt -> qLedger.startAt.after(fromStartAt) },
-                spec.toStartAt?.let { toStartAt -> qLedger.startAt.before(toStartAt) }
+                spec.fromStartAt?.let { fromStartAt -> qLedger.startAt.goe(fromStartAt) },
+                spec.toStartAt?.let { toStartAt -> qLedger.startAt.loe(toStartAt) }
             )
 
         return querydsl.execute(query, pageable)
