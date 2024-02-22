@@ -30,6 +30,14 @@
 </div>
 <br>
 
+## 📚 Erd
+
+<hr>
+<div align="center">
+    <img width="600"  alt="infra_architecture" src="https://github.com/YAPP-Github/oksusu-susu-api/assets/50691225/07e58f96-c7b5-4b04-81d3-a24a418d9e86">
+</div>
+<br>
+
 ## 🙋 Developer
 <hr>
 
