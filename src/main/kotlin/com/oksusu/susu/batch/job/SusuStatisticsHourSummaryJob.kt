@@ -1,8 +1,10 @@
 package com.oksusu.susu.batch.job
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.model.SlackMessageModel
 import com.oksusu.susu.envelope.application.EnvelopeService
+import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.extension.format
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.log.application.SystemActionLogService
@@ -14,6 +16,7 @@ import java.time.LocalDateTime
 class SusuStatisticsHourSummaryJob(
     private val slackClient: SlackClient,
     private val systemActionLogService: SystemActionLogService,
+    private val ledgerService: LedgerService,
     private val envelopeService: EnvelopeService,
     private val friendService: FriendService,
 ) {
@@ -23,17 +26,21 @@ class SusuStatisticsHourSummaryJob(
         val now = LocalDateTime.now()
         val beforeOneHour = now.minusHours(1)
 
-        val systemActionLogCount = systemActionLogService.countByCreatedAtBetween(beforeOneHour, now)
-        val envelopeCount = envelopeService.countByCreatedAtBetween(beforeOneHour, now)
-        val friendCount = friendService.countByCreatedAtBetween(beforeOneHour, now)
-
-        HourSummaryMessage(
-            beforeOneHour = beforeOneHour,
-            now = now,
-            systemActionLogCount = systemActionLogCount,
-            envelopeCount = envelopeCount,
-            friendCount = friendCount
-        ).run { slackClient.send(this.message()) }
+        parZip(
+            { systemActionLogService.countByCreatedAtBetween(beforeOneHour, now) },
+            { ledgerService.countByCreatedAtBetween(beforeOneHour, now) },
+            { envelopeService.countByCreatedAtBetween(beforeOneHour, now) },
+            { friendService.countByCreatedAtBetween(beforeOneHour, now) }
+        ) { systemActionLogCount, ledgerCount, envelopeCount, friendCount ->
+            HourSummaryMessage(
+                beforeOneHour = beforeOneHour,
+                now = now,
+                systemActionLogCount = systemActionLogCount,
+                ledgerCount = ledgerCount,
+                envelopeCount = envelopeCount,
+                friendCount = friendCount
+            )
+        }.run { slackClient.send(this.message()) }
     }
 }
 
@@ -41,6 +48,7 @@ data class HourSummaryMessage(
     val beforeOneHour: LocalDateTime,
     val now: LocalDateTime,
     val systemActionLogCount: Long,
+    val ledgerCount: Long,
     val envelopeCount: Long,
     val friendCount: Long,
 ) {
@@ -50,6 +58,7 @@ data class HourSummaryMessage(
                 *시간단위 통계 알림 ${now.format("yyyy-MM-dd HH:mm:ss")}*
                 - ${beforeOneHour.format("yyyy-MM-dd HH:mm:ss")} ~ ${now.format("yyyy-MM-dd HH:mm:ss")}
                 - api 호출수 : $systemActionLogCount
+                - 장부 생성수 : $ledgerCount
                 - 봉투 생성수 : $envelopeCount
                 - 친구 생성수 : $friendCount
             """.trimIndent()
