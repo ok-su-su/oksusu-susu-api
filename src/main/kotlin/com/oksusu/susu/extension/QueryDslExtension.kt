@@ -3,6 +3,7 @@ package com.oksusu.susu.extension
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.SusuException
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.DateTimePath
 import com.querydsl.core.types.dsl.EnumPath
 import com.querydsl.core.types.dsl.NumberExpression
 import com.querydsl.core.types.dsl.NumberPath
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
 import org.springframework.data.jpa.repository.support.Querydsl
+import java.time.LocalDateTime
 
 fun <T> Querydsl?.execute(query: JPAQuery<T>, pageable: Pageable): Page<T> {
     return this.takeUnless { querydsl -> querydsl == null }
@@ -79,4 +81,12 @@ fun NumberPath<Long>.isLoe(parameter: Long?): BooleanExpression? {
 
 fun NumberPath<Long>.isNotIn(parameters: Set<Long>?): BooleanExpression? {
     return parameters.takeUnless { params -> params.isNullOrEmpty() }?.let { params -> this.notIn(params) }
+}
+
+fun DateTimePath<LocalDateTime>.isGoe(parameter: LocalDateTime?): BooleanExpression? {
+    return parameter?.let { param -> this.goe(param) }
+}
+
+fun DateTimePath<LocalDateTime>.isLoe(parameter: LocalDateTime?): BooleanExpression? {
+    return parameter?.let { param -> this.loe(param) }
 }
