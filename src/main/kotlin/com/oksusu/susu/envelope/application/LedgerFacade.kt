@@ -137,7 +137,9 @@ class LedgerFacade(
             title = request.title,
             categoryIds = request.categoryIds,
             fromStartAt = request.fromStartAt,
-            toStartAt = request.toStartAt
+
+            // TODO : request.toEndAt은 안드 대응요, 안드에서 toStartAt으로 조건 변경해야함.
+            toStartAt = request.toStartAt ?: request.toEndAt
         )
 
         val response = ledgerService.search(searchSpec, pageRequest.toDefault())
