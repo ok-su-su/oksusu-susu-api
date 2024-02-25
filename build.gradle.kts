@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.9.21"
+    val kotlinVersion = "1.9.22"
 
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -57,21 +57,21 @@ object DependencyVersion {
     const val QUERYDSL_VERSION = "5.0.0"
 
     /** arrow fx */
-    const val ARROW_FX_VERSION = "1.1.5"
+    const val ARROW_FX_VERSION = "1.2.1"
 
     /** jwt */
-    const val JWT_VERSION = "4.1.0"
+    const val JWT_VERSION = "4.4.0"
 
     /** springdoc */
-    const val SPRINGDOC_VERSION = "2.2.0"
+    const val SPRINGDOC_VERSION = "2.3.0"
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
 
     /** log */
     const val KOTLIN_LOGGING_VERSION = "6.0.3"
-    const val LOGBACK_ENCODER_VERSION = "7.3"
+    const val LOGBACK_ENCODER_VERSION = "7.4"
 
     /** fastexcel */
-    const val FASTEXCEL_VERSION = "0.16.5"
+    const val FASTEXCEL_VERSION = "0.17.0"
 
     /** aws */
     const val AWS_SDK_VERSION = "1.12.238"
@@ -79,15 +79,15 @@ object DependencyVersion {
     const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
 
     /** slack */
-    const val SLACK_API_VERSION = "1.38.0"
+    const val SLACK_API_VERSION = "1.38.1"
 
     /** sentry */
     const val SENTRY_VERSION = "7.3.0"
 
     /** test */
-    const val MOCKK_VERSION = "1.13.4"
-    const val KOTEST_VERSION = "5.7.2"
-    const val KOTEST_EXTENSION_VERSION = "1.1.2"
+    const val MOCKK_VERSION = "1.13.9"
+    const val KOTEST_VERSION = "5.8.0"
+    const val KOTEST_EXTENSION_VERSION = "4.4.3"
 }
 
 dependencies {
@@ -278,7 +278,7 @@ sonarqube {
         property(
             "sonar.exclusions",
             "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, " +
-                "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+                    "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.java.binaries", "$buildDir/classes")

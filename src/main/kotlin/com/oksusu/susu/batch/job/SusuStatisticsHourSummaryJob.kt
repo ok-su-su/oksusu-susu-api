@@ -46,20 +46,19 @@ class SusuStatisticsHourSummaryJob(
             )
         }.run { slackClient.send(this.message()) }
     }
-}
 
-data class HourSummaryMessage(
-    val beforeOneHour: LocalDateTime,
-    val now: LocalDateTime,
-    val systemActionLogCount: Long,
-    val ledgerCount: Long,
-    val envelopeCount: Long,
-    val friendCount: Long,
-    val userCount: Long,
-) {
-    fun message(): SlackMessageModel {
-        return SlackMessageModel(
-            """
+    private data class HourSummaryMessage(
+        val beforeOneHour: LocalDateTime,
+        val now: LocalDateTime,
+        val systemActionLogCount: Long,
+        val ledgerCount: Long,
+        val envelopeCount: Long,
+        val friendCount: Long,
+        val userCount: Long,
+    ) {
+        fun message(): SlackMessageModel {
+            return SlackMessageModel(
+                """
                 *시간단위 통계 알림 ${now.format("yyyy-MM-dd HH:mm:ss")}*
                 - ${beforeOneHour.format("HH:mm:ss")} ~ ${now.format("HH:mm:ss")}
                 - api 호출수 : $systemActionLogCount
@@ -67,7 +66,8 @@ data class HourSummaryMessage(
                 - 봉투 생성수 : $envelopeCount
                 - 친구 생성수 : $friendCount
                 - 유저 생성수 : $userCount
-            """.trimIndent()
-        )
+                """.trimIndent()
+            )
+        }
     }
 }
