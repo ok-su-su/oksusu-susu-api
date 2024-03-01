@@ -69,7 +69,7 @@ CREATE TABLE `user_withdraw`
     `modified_at`    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
-CREATE INDEX idx__uid ON user_status_history (uid);
+CREATE INDEX idx__uid ON user_withdraw (uid);
 
 -- 장부
 CREATE TABLE `ledger`
