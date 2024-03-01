@@ -1,5 +1,6 @@
 -- scheme
-CREATE DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE
+DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- 유저 정보
 CREATE TABLE `user`
@@ -11,6 +12,7 @@ CREATE TABLE `user`
     `gender`            int          DEFAULT NULL COMMENT 'user 성별, 남성: 0, 여성: 1',
     `birth`             date         DEFAULT NULL COMMENT 'user 출생년도',
     `profile_image_url` varchar(512) DEFAULT NULL COMMENT '프로필 이미지',
+    `role`              varchar(128) NOT NULL COMMENT '유저 권한',
     `created_at`        datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at`       datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
@@ -18,7 +20,7 @@ CREATE TABLE `user`
 CREATE UNIQUE INDEX uidx__oauth_id__oauth_provider ON user (oauth_id, oauth_provider);
 
 -- 유저 상태 정보 타입
-CREATE TABLE `user_status_type`
+CREATE TABLE `user_sratus_type`
 (
     `id`               bigint  NOT NULL AUTO_INCREMENT COMMENT '유저 상태 정보 타입 id',
     `status_type_info` int     NOT NULL COMMENT '상태 정보 타입 정보 / 활동 : 1, 탈퇴 : 2,  일시 정지 7일 : 3, 영구 정지 : 4',

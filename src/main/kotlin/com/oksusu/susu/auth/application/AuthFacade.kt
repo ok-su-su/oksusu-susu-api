@@ -3,10 +3,7 @@ package com.oksusu.susu.auth.application
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.helper.TokenGenerateHelper
-import com.oksusu.susu.auth.model.AuthUser
-import com.oksusu.susu.auth.model.AuthUserImpl
-import com.oksusu.susu.auth.model.AuthUserToken
-import com.oksusu.susu.auth.model.TokenDto
+import com.oksusu.susu.auth.model.*
 import com.oksusu.susu.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.CreateUserStatusHistoryEvent
@@ -19,6 +16,7 @@ import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserStatusService
 import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.domain.UserStatusHistory
+import com.oksusu.susu.user.domain.vo.AccountRole
 import com.oksusu.susu.user.domain.vo.UserStatusAssignmentType
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -50,6 +48,23 @@ class AuthFacade(
                 val user = userService.findByIdOrThrowSync(payload.id)
 
                 AuthUserImpl(user.id)
+            }
+    }
+
+    fun resolveAdminUser(token: Mono<AuthUserToken>): Mono<Any> {
+        return jwtTokenService.verifyTokenMono(token)
+            .map { payload ->
+                if (payload.type != "accessToken") {
+                    throw InvalidTokenException(ErrorCode.INVALID_ACCESS_TOKEN)
+                }
+
+                val user = userService.findByIdOrThrowSync(payload.id)
+
+                if (user.role != AccountRole.ADMIN) {
+                    throw NoAuthorityException(ErrorCode.NO_AUTHORITY_ERROR)
+                }
+
+                AdminUserImpl(user.id)
             }
     }
 

@@ -83,7 +83,7 @@ class OAuthFacade(
         }
 
         val user = txTemplates.writer.coExecute {
-            val createdUser = User.toEntity(request, oauthInfo)
+            val createdUser = User.toUserEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
 
             UserStatus(

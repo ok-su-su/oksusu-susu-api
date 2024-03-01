@@ -1,6 +1,7 @@
 package com.oksusu.susu.config.web
 
 import com.oksusu.susu.auth.model.AUTH_TOKEN_KEY
+import com.oksusu.susu.auth.model.AdminUser
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.user.model.UserDeviceContext
 import io.swagger.v3.oas.models.Components
@@ -33,6 +34,7 @@ class SpringDocConfig(
             .addRequestWrapperToIgnore(
                 UserDeviceContext::class.java,
                 AuthUser::class.java,
+                AdminUser::class.java,
                 WebSession::class.java,
                 RequestContext::class.java
             )
@@ -90,4 +92,6 @@ object SwaggerTag {
     const val REPORT_SWAGGER_TAG = "Report API"
     const val ONBOARDING_SWAGGER_TAG = "Onboarding API"
     const val APPLICATION_METADATA_SWAGGER_TAG = "Application Metadata API"
+    const val ADMIN_VOTE_SWAGGER_TAG = "Admin Vote API"
+    const val ADMIN_SWAGGER_TAG = "Admin API"
 }
