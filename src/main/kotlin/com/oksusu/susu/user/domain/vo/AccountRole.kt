@@ -8,6 +8,7 @@ enum class AccountRole {
      * 일반 유저
      */
     USER,
+
     /**
      * 어드민
      */

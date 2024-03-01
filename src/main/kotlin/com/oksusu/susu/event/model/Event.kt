@@ -8,6 +8,7 @@ import com.oksusu.susu.term.domain.TermAgreement
 import com.oksusu.susu.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.user.domain.UserDevice
 import com.oksusu.susu.user.domain.UserStatusHistory
+import com.oksusu.susu.user.domain.UserWithdraw
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.server.ServerWebExchange
 import java.time.LocalDateTime
@@ -93,4 +94,8 @@ data class DeleteEnvelopeEvent(
     val envelopeId: Long,
     val uid: Long,
     val friendId: Long,
+) : BaseEvent()
+
+data class CreateUserWithdrawEvent(
+    val userWithdraw: UserWithdraw,
 ) : BaseEvent()

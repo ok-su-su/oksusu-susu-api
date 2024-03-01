@@ -9,6 +9,7 @@ import com.oksusu.susu.extension.format
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.log.application.SystemActionLogService
 import com.oksusu.susu.user.application.UserService
+import com.oksusu.susu.user.application.UserWithdrawService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -21,6 +22,7 @@ class SusuStatisticsHourSummaryJob(
     private val envelopeService: EnvelopeService,
     private val friendService: FriendService,
     private val userService: UserService,
+    private val userWithdrawService: UserWithdrawService,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -33,8 +35,16 @@ class SusuStatisticsHourSummaryJob(
             { ledgerService.countByCreatedAtBetween(beforeOneHour, now) },
             { envelopeService.countByCreatedAtBetween(beforeOneHour, now) },
             { friendService.countByCreatedAtBetween(beforeOneHour, now) },
-            { userService.countByCreatedAtBetween(beforeOneHour, now) }
-        ) { systemActionLogCount, ledgerCount, envelopeCount, friendCount, userCount ->
+            { userService.countByCreatedAtBetween(beforeOneHour, now) },
+            { userWithdrawService.countByCreatedAtBetween(beforeOneHour, now) }
+        ) {
+                systemActionLogCount,
+                ledgerCount,
+                envelopeCount,
+                friendCount,
+                userCount,
+                userWithdrawCount,
+            ->
             HourSummaryMessage(
                 beforeOneHour = beforeOneHour,
                 now = now,
@@ -42,9 +52,10 @@ class SusuStatisticsHourSummaryJob(
                 ledgerCount = ledgerCount,
                 envelopeCount = envelopeCount,
                 friendCount = friendCount,
-                userCount
+                userCount = userCount,
+                userWithdrawCount = userWithdrawCount
             )
-        }.run { slackClient.send(this.message()) }
+        }.run { slackClient.sendSummary(this.message()) }
     }
 
     private data class HourSummaryMessage(
@@ -55,6 +66,7 @@ class SusuStatisticsHourSummaryJob(
         val envelopeCount: Long,
         val friendCount: Long,
         val userCount: Long,
+        val userWithdrawCount: Long,
     ) {
         fun message(): SlackMessageModel {
             return SlackMessageModel(
@@ -66,6 +78,7 @@ class SusuStatisticsHourSummaryJob(
                 - 봉투 생성수 : $envelopeCount
                 - 친구 생성수 : $friendCount
                 - 유저 생성수 : $userCount
+                - 유저 탈퇴수 : $userWithdrawCount
                 """.trimIndent()
             )
         }

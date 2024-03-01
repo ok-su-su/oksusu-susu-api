@@ -7,6 +7,7 @@ import com.oksusu.susu.auth.model.*
 import com.oksusu.susu.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.CreateUserStatusHistoryEvent
+import com.oksusu.susu.event.model.CreateUserWithdrawEvent
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidTokenException
 import com.oksusu.susu.exception.NoAuthorityException
@@ -16,6 +17,7 @@ import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserStatusService
 import com.oksusu.susu.user.application.UserStatusTypeService
 import com.oksusu.susu.user.domain.UserStatusHistory
+import com.oksusu.susu.user.domain.UserWithdraw
 import com.oksusu.susu.user.domain.vo.AccountRole
 import com.oksusu.susu.user.domain.vo.UserStatusAssignmentType
 import kotlinx.coroutines.async
@@ -112,12 +114,6 @@ class AuthFacade(
         coroutineScope {
             val txDeferred = async {
                 txTemplates.writer.coExecuteOrNull {
-                    user.apply {
-                        this.oauthInfo = oauthInfo.withdrawOAuthInfo()
-                    }.run { userService.saveSync(this) }
-
-                    postService.saveAllSync(deactivatedPosts)
-
                     eventPublisher.publishEvent(
                         CreateUserStatusHistoryEvent(
                             userStatusHistory = UserStatusHistory(
@@ -128,6 +124,18 @@ class AuthFacade(
                             )
                         )
                     )
+
+                    eventPublisher.publishEvent(
+                        CreateUserWithdrawEvent(
+                            userWithdraw = UserWithdraw.from(user)
+                        )
+                    )
+
+                    user.apply {
+                        this.oauthInfo = oauthInfo.withdrawOAuthInfo()
+                    }.run { userService.saveSync(this) }
+
+                    postService.saveAllSync(deactivatedPosts)
 
                     userStatus.apply {
                         accountStatusId = userStatusTypeService.getDeletedStatusId()

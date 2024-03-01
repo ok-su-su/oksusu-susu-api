@@ -237,7 +237,7 @@ tasks.jacocoTestReport {
         html.required.set(true)
         csv.required.set(false)
         xml.required.set(true)
-        xml.outputLocation.set(File("${project.layout.buildDirectory}/reports/jacoco.xml"))
+        xml.outputLocation.set(project.layout.buildDirectory.dir("reports/jacoco.xml").get().asFile)
     }
 
     classDirectories.setFrom(
@@ -278,7 +278,10 @@ sonarqube {
                 "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
-        property("sonar.java.binaries", "${project.layout.buildDirectory}/classes")
-        property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory}/reports/jacoco.xml")
+        property("sonar.java.binaries", project.layout.buildDirectory.dir("/classes").get().asFile.path)
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            project.layout.buildDirectory.dir("/reports/jacoco.xml").get().asFile.path
+        )
     }
 }
