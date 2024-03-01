@@ -34,8 +34,6 @@ class ReactiveUserResolver(
         } else {
             authFacade.resolveAdminUser(tokenMono)
         }
-
-
     }
 
     private fun resolveToken(request: ServerHttpRequest): Mono<AuthUserToken> {
