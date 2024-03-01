@@ -95,7 +95,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     /** kotlin */
@@ -138,7 +138,9 @@ dependencies {
     implementation("software.amazon.awssdk:sts")
 
     /** aws ssm */
-    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}"))
+    implementation(
+        platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}")
+    )
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
     /** slack */
@@ -235,7 +237,7 @@ tasks.jacocoTestReport {
         html.required.set(true)
         csv.required.set(false)
         xml.required.set(true)
-        xml.outputLocation.set(File("$buildDir/reports/jacoco.xml"))
+        xml.outputLocation.set(File("${project.layout.buildDirectory}/reports/jacoco.xml"))
     }
 
     classDirectories.setFrom(
@@ -273,10 +275,10 @@ sonarqube {
         property(
             "sonar.exclusions",
             "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, " +
-                    "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+                "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
-        property("sonar.java.binaries", "$buildDir/classes")
-        property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco.xml")
+        property("sonar.java.binaries", "${project.layout.buildDirectory}/classes")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory}/reports/jacoco.xml")
     }
 }
