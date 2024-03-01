@@ -1,5 +1,6 @@
 package com.oksusu.susu.user.domain
 
+import com.oksusu.susu.common.domain.BaseEntity
 import com.oksusu.susu.user.domain.vo.AccountRole
 import com.oksusu.susu.user.domain.vo.OauthInfo
 import jakarta.persistence.*
@@ -25,7 +26,7 @@ class UserWithdraw(
      */
     @Enumerated(EnumType.STRING)
     val role: AccountRole,
-) {
+) : BaseEntity() {
     companion object {
         fun from(user: User): UserWithdraw {
             return UserWithdraw(
