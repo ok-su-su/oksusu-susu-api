@@ -59,7 +59,7 @@ class SusuStatisticsDailySummaryJob(
                     friendCount = friendCount,
                     userWithdrawCount = userWithdrawCount
                 )
-            }.run { slackClient.send(this.message()) }
+            }.run { slackClient.sendSummary(this.message()) }
         }
     }
 

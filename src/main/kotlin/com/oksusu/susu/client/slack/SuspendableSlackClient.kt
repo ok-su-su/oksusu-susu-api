@@ -12,11 +12,11 @@ class SuspendableSlackClient(
     private val webclient: WebClient,
     private val slackWebhookConfig: SusuConfig.SlackWebhookConfig,
 ) : SlackClient {
-    override suspend fun send(message: SlackMessageModel): String {
+    override suspend fun sendSummary(message: SlackMessageModel): String {
         return withContext(Dispatchers.IO) {
             webclient
                 .post()
-                .uri("/${slackWebhookConfig.token}")
+                .uri("/${slackWebhookConfig.summaryToken}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(message)
                 .retrieve()

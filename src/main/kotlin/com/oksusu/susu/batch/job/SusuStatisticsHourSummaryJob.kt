@@ -55,7 +55,7 @@ class SusuStatisticsHourSummaryJob(
                 userCount = userCount,
                 userWithdrawCount = userWithdrawCount,
             )
-        }.run { slackClient.send(this.message()) }
+        }.run { slackClient.sendSummary(this.message()) }
     }
 
     private data class HourSummaryMessage(
