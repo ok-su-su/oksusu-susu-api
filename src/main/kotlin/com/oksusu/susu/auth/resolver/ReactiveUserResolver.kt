@@ -2,6 +2,7 @@ package com.oksusu.susu.auth.resolver
 
 import com.oksusu.susu.auth.application.AuthFacade
 import com.oksusu.susu.auth.model.AUTH_TOKEN_KEY
+import com.oksusu.susu.auth.model.AdminUser
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.auth.model.AuthUserToken
 import org.springframework.core.MethodParameter
@@ -13,12 +14,12 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
-class ReactiveAuthResolver(
+class ReactiveUserResolver(
     adapterRegistry: ReactiveAdapterRegistry,
     private val authFacade: AuthFacade,
 ) : HandlerMethodArgumentResolverSupport(adapterRegistry) {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
-        return parameter.parameterType == AuthUser::class.java
+        return parameter.parameterType == AuthUser::class.java || parameter.parameterType == AdminUser::class.java
     }
 
     override fun resolveArgument(
@@ -27,7 +28,12 @@ class ReactiveAuthResolver(
         exchange: ServerWebExchange,
     ): Mono<Any> {
         val tokenMono = resolveToken(exchange.request)
-        return authFacade.resolveAuthUser(tokenMono)
+
+        return if (parameter.parameterType == AuthUser::class.java) {
+            authFacade.resolveAuthUser(tokenMono)
+        } else {
+            authFacade.resolveAdminUser(tokenMono)
+        }
     }
 
     private fun resolveToken(request: ServerHttpRequest): Mono<AuthUserToken> {

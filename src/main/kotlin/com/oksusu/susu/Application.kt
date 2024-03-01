@@ -20,7 +20,10 @@ class Application(
     private val logger = KotlinLogging.logger { }
 
     override fun onApplicationEvent(event: ApplicationReadyEvent) {
-        logger.info { "${buildProperties.name} applicationReady, profiles = ${environment.activeProfiles.contentToString()}" }
+        val application = buildProperties.name
+        val profiles = environment.activeProfiles.contentToString()
+
+        logger.info { "$application applicationReady, profiles=$profiles" }
     }
 }
 

@@ -1,15 +1,16 @@
 package com.oksusu.susu.batch.job
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.model.SlackMessageModel
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.extension.format
+import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.log.application.SystemActionLogService
 import com.oksusu.susu.user.application.UserService
+import com.oksusu.susu.user.application.UserWithdrawService
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -20,7 +21,9 @@ class SusuStatisticsDailySummaryJob(
     private val systemActionLogService: SystemActionLogService,
     private val userService: UserService,
     private val envelopeService: EnvelopeService,
+    private val friendService: FriendService,
     private val ledgerService: LedgerService,
+    private val userWithdrawService: UserWithdrawService,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -28,51 +31,61 @@ class SusuStatisticsDailySummaryJob(
         val now = LocalDateTime.now()
         val beforeOneDay = now.minusDays(1)
 
-        val summaryMessage = coroutineScope {
-            val systemActionLogCount = async(Dispatchers.IO) {
-                systemActionLogService.countByCreatedAtBetween(beforeOneDay, now)
-            }
-            val userCount = async(Dispatchers.IO) {
-                userService.countByCreatedAtBetween(beforeOneDay, now)
-            }
-            val totalEnvelopeCount = async(Dispatchers.IO) { envelopeService.count() }
-            val dailyEnvelopeCount = async(Dispatchers.IO) {
-                envelopeService.countByCreatedAtBetween(beforeOneDay, now)
-            }
-            val dailyLedgerCount = async(Dispatchers.IO) { ledgerService.countByCreatedAtBetween(beforeOneDay, now) }
-
-            DailySummaryMessage(
-                now = now,
-                systemActionLogCount = systemActionLogCount.await(),
-                userCount = userCount.await(),
-                totalEnvelopeCount = totalEnvelopeCount.await(),
-                dailyEnvelopeCount = dailyEnvelopeCount.await(),
-                dailyLedgerCount = dailyLedgerCount.await()
-            )
+        coroutineScope {
+            parZip(
+                { systemActionLogService.countByCreatedAtBetween(beforeOneDay, now) },
+                { userService.countByCreatedAtBetween(beforeOneDay, now) },
+                { envelopeService.count() },
+                { envelopeService.countByCreatedAtBetween(beforeOneDay, now) },
+                { ledgerService.countByCreatedAtBetween(beforeOneDay, now) },
+                { friendService.countByCreatedAtBetween(beforeOneDay, now) },
+                { userWithdrawService.countByCreatedAtBetween(beforeOneDay, now) }
+            ) {
+                    systemActionLogCount,
+                    userCount,
+                    totalEnvelopeCount,
+                    dailyEnvelopeCount,
+                    dailyLedgerCount,
+                    friendCount,
+                    userWithdrawCount,
+                ->
+                DailySummaryMessage(
+                    now = now,
+                    systemActionLogCount = systemActionLogCount,
+                    userCount = userCount,
+                    totalEnvelopeCount = totalEnvelopeCount,
+                    dailyEnvelopeCount = dailyEnvelopeCount,
+                    dailyLedgerCount = dailyLedgerCount,
+                    friendCount = friendCount,
+                    userWithdrawCount = userWithdrawCount
+                )
+            }.run { slackClient.sendSummary(this.message()) }
         }
-
-        slackClient.send(summaryMessage.message())
     }
-}
 
-data class DailySummaryMessage(
-    val now: LocalDateTime,
-    val systemActionLogCount: Long,
-    val userCount: Long,
-    val totalEnvelopeCount: Long,
-    val dailyEnvelopeCount: Long,
-    val dailyLedgerCount: Long,
-) {
-    fun message(): SlackMessageModel {
-        return SlackMessageModel(
-            """
+    private data class DailySummaryMessage(
+        val now: LocalDateTime,
+        val systemActionLogCount: Long,
+        val userCount: Long,
+        val totalEnvelopeCount: Long,
+        val dailyEnvelopeCount: Long,
+        val dailyLedgerCount: Long,
+        val friendCount: Long,
+        val userWithdrawCount: Long,
+    ) {
+        fun message(): SlackMessageModel {
+            return SlackMessageModel(
+                """
                 *일단위 통계 알림${now.format("yyyyMMdd HH:mm:ss")}*
                 - 전날 종합 api 호출수 : $systemActionLogCount
                 - 전날 종합  유저 가입수 : $userCount
                 - 전날 종합 봉투 생성수 : $dailyEnvelopeCount
                 - 전체 봉투 생성수 : $totalEnvelopeCount
                 - 전날 종합 장부 생성수 : $dailyLedgerCount
-            """.trimIndent()
-        )
+                - 전날 종합 친구 생성수 : $friendCount
+                - 전날 종합 유저 탈퇴수 : $userWithdrawCount
+                """.trimIndent()
+            )
+        }
     }
 }

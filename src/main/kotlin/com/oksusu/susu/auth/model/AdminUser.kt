@@ -4,9 +4,9 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NoAuthorityException
 
 /**
- * 모든 유저가 이용 가능한 parameter 입니다.
+ * 어드민 유저용 argument 입니다.
  */
-interface AuthUser {
+interface AdminUser {
     /** user id */
     val uid: Long
 
@@ -17,9 +17,9 @@ interface AuthUser {
     fun isNotAuthorThrow(uid: Long)
 }
 
-class AuthUserImpl(
+class AdminUserImpl(
     override val uid: Long,
-) : AuthUser {
+) : AdminUser {
     override fun isAuthor(uid: Long): Boolean {
         return this.uid == uid
     }
@@ -36,29 +36,3 @@ class AuthUserImpl(
         }
     }
 }
-
-const val AUTH_TOKEN_KEY = "X-SUSU-AUTH-TOKEN"
-
-data class AuthUserToken(
-    val key: String,
-    val value: String,
-) {
-    fun isInvalid() = key.isBlank() || value.isBlank()
-
-    companion object {
-        fun from(value: String): AuthUserToken {
-            return AuthUserToken(
-                key = AUTH_TOKEN_KEY,
-                value = value
-            )
-        }
-    }
-}
-
-data class AuthUserTokenPayload(
-    val id: Long,
-    val aud: String,
-    val iss: String,
-    val exp: Long,
-    val type: String,
-)

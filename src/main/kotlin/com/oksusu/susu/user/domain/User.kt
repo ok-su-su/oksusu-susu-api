@@ -2,6 +2,7 @@ package com.oksusu.susu.user.domain
 
 import com.oksusu.susu.auth.model.request.OAuthRegisterRequest
 import com.oksusu.susu.common.domain.BaseEntity
+import com.oksusu.susu.user.domain.vo.AccountRole
 import com.oksusu.susu.user.domain.vo.Gender
 import com.oksusu.susu.user.domain.vo.OauthInfo
 import jakarta.persistence.*
@@ -33,14 +34,21 @@ class User(
     /** 프로필 이미지 */
     @Column(name = "profile_image_url")
     var profileImageUrl: String? = null,
+
+    /**
+     * 계정 권한
+     */
+    @Enumerated(EnumType.STRING)
+    val role: AccountRole,
 ) : BaseEntity() {
     companion object {
-        fun toEntity(request: OAuthRegisterRequest, oauthInfo: OauthInfo): User {
+        fun toUserEntity(request: OAuthRegisterRequest, oauthInfo: OauthInfo): User {
             return User(
                 oauthInfo = oauthInfo,
                 name = request.name,
                 gender = request.gender,
-                birth = request.getBirth()
+                birth = request.getBirth(),
+                role = AccountRole.USER
             )
         }
     }

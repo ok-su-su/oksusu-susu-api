@@ -48,7 +48,7 @@ data class SusuConfig(
 
     @ConfigurationProperties(prefix = "slack")
     class SlackWebhookConfig(
-        val token: String,
+        val summaryToken: String,
     )
 
     @ConfigurationProperties(prefix = "susu.onboarding-config.get-vote")

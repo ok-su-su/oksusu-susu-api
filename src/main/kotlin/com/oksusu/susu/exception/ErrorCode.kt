@@ -12,7 +12,6 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     INVALID_MEDIA_TYPE_ERROR(HttpStatus.BAD_REQUEST, "invalid media type"),
     QUERY_DSL_NOT_EXISTS_ERROR(HttpStatus.NOT_FOUND, "not found query dsl"),
     COROUTINE_CANCELLATION_ERROR(HttpStatus.BAD_REQUEST, "coroutine cancellation error"),
-    NO_AUTHORITY_ERROR(HttpStatus.FORBIDDEN, "수정 권한이 없습니다."),
     FAIL_TO_TRANSACTION_TEMPLATE_EXECUTE_ERROR(HttpStatus.BAD_REQUEST, "fail to tx-templates execute error"),
     FAIL_TO_REDIS_EXECUTE_ERROR(HttpStatus.BAD_REQUEST, "fail to redis execute error"),
 
@@ -21,6 +20,7 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효한 엑세스 토큰이 아닙니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효한 리프레시 토큰이 아닙니다."),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효한 토큰이 아닙니다."),
+    NO_AUTHORITY_ERROR(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     /** User Error Code */
     NOT_FOUND_USER_ERROR(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),

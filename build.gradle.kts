@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.9.21"
+    val kotlinVersion = "1.9.22"
 
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -57,53 +57,52 @@ object DependencyVersion {
     const val QUERYDSL_VERSION = "5.0.0"
 
     /** arrow fx */
-    const val ARROW_FX_VERSION = "1.1.5"
+    const val ARROW_FX_VERSION = "1.2.1"
 
     /** jwt */
-    const val JWT_VERSION = "4.1.0"
+    const val JWT_VERSION = "4.4.0"
 
     /** springdoc */
-    const val SPRINGDOC_VERSION = "2.2.0"
+    const val SPRINGDOC_VERSION = "2.3.0"
     const val JAVADOC_SCRIBE_VERSION = "0.15.0"
 
     /** log */
     const val KOTLIN_LOGGING_VERSION = "6.0.3"
-    const val LOGBACK_ENCODER_VERSION = "7.3"
+    const val LOGBACK_ENCODER_VERSION = "7.4"
 
     /** fastexcel */
-    const val FASTEXCEL_VERSION = "0.16.5"
+    const val FASTEXCEL_VERSION = "0.17.0"
 
     /** aws */
-    const val AWS_SDK_VERSION = "1.12.238"
-    const val AWS_SDK_V2_VERSION = "2.17.107"
+    const val AWS_SDK_V2_VERSION = "2.24.13"
     const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
 
     /** slack */
-    const val SLACK_API_VERSION = "1.38.0"
+    const val SLACK_API_VERSION = "1.38.2"
 
     /** sentry */
     const val SENTRY_VERSION = "7.3.0"
 
     /** test */
-    const val MOCKK_VERSION = "1.13.4"
-    const val KOTEST_VERSION = "5.7.2"
-    const val KOTEST_EXTENSION_VERSION = "1.1.2"
+    const val MOCKK_VERSION = "1.13.9"
+    const val KOTEST_VERSION = "5.8.0"
+    const val KOTEST_EXTENSION_VERSION = "1.1.3"
 }
 
 dependencies {
-    /** kotlin */
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
     /** spring starter */
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
+
+    /** kotlin */
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     /** querydsl */
     implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
@@ -134,16 +133,14 @@ dependencies {
     /** fastexcel */
     implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL_VERSION}")
 
-    /** aws v1 */
-    implementation(platform("com.amazonaws:aws-java-sdk-bom:${DependencyVersion.AWS_SDK_VERSION}"))
-    implementation("com.amazonaws:aws-java-sdk-sts")
-
     /** aws v2 */
     implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2_VERSION}"))
     implementation("software.amazon.awssdk:sts")
 
     /** aws ssm */
-    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}"))
+    implementation(
+        platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}")
+    )
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
     /** slack */
@@ -240,7 +237,7 @@ tasks.jacocoTestReport {
         html.required.set(true)
         csv.required.set(false)
         xml.required.set(true)
-        xml.outputLocation.set(File("$buildDir/reports/jacoco.xml"))
+        xml.outputLocation.set(project.layout.buildDirectory.dir("reports/jacoco.xml").get().asFile)
     }
 
     classDirectories.setFrom(
@@ -281,7 +278,10 @@ sonarqube {
                 "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
-        property("sonar.java.binaries", "$buildDir/classes")
-        property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco.xml")
+        property("sonar.java.binaries", project.layout.buildDirectory.dir("/classes").get().asFile.path)
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            project.layout.buildDirectory.dir("/reports/jacoco.xml").get().asFile.path
+        )
     }
 }

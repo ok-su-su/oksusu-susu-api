@@ -74,7 +74,8 @@ slack:
       url: ${SLACK_ALARM_ERROR_URL}
       text: ${SLACK_ALARM_ERROR_TEXT}
       user-name: ${SLACK_ALARM_ERROR_USERNAME}
-  token: ${SLACK_TOKEN}
+  summary-token: ${SLACK_SUMMARY_TOKEN}
+  warning-log-token: ${SLACK_WARNING_LOG_TOKEN}
 
 # SENTRY
 sentry:
