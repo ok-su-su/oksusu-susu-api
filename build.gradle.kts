@@ -74,12 +74,11 @@ object DependencyVersion {
     const val FASTEXCEL_VERSION = "0.17.0"
 
     /** aws */
-    const val AWS_SDK_VERSION = "1.12.238"
-    const val AWS_SDK_V2_VERSION = "2.17.107"
+    const val AWS_SDK_V2_VERSION = "2.24.13"
     const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
 
     /** slack */
-    const val SLACK_API_VERSION = "1.38.1"
+    const val SLACK_API_VERSION = "1.38.2"
 
     /** sentry */
     const val SENTRY_VERSION = "7.3.0"
@@ -91,12 +90,6 @@ object DependencyVersion {
 }
 
 dependencies {
-    /** kotlin */
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
     /** spring starter */
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -104,6 +97,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
+
+    /** kotlin */
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     /** querydsl */
     implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
@@ -133,10 +132,6 @@ dependencies {
 
     /** fastexcel */
     implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL_VERSION}")
-
-    /** aws v1 */
-    implementation(platform("com.amazonaws:aws-java-sdk-bom:${DependencyVersion.AWS_SDK_VERSION}"))
-    implementation("com.amazonaws:aws-java-sdk-sts")
 
     /** aws v2 */
     implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2_VERSION}"))
