@@ -2,7 +2,7 @@ package com.oksusu.susu.config.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.oksusu.susu.auth.application.AuthFacade
-import com.oksusu.susu.auth.resolver.ReactiveAuthResolver
+import com.oksusu.susu.auth.resolver.ReactiveUserResolver
 import com.oksusu.susu.user.resolver.ReactiveDeviceContextResolver
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -60,7 +60,7 @@ class WebFluxConfig(
 
         configurer.addCustomResolver(
             ReactiveDeviceContextResolver(registry),
-            ReactiveAuthResolver(registry, authFacade),
+            ReactiveUserResolver(registry, authFacade),
             ReactiveSortHandlerMethodArgumentResolver(),
             ReactivePageableHandlerMethodArgumentResolver()
         )

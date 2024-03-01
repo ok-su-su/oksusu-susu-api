@@ -1,5 +1,6 @@
 package com.oksusu.susu.post.presentation
 
+import com.oksusu.susu.auth.model.AdminUser
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.config.web.SwaggerTag
 import com.oksusu.susu.extension.wrapVoid
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.RestController
 class VoteAdminResource(
     private val voteAdminFacade: VoteAdminFacade,
 ) {
-    @Operation(summary = "투표 삭제하기")
+    /**
+     * 어드민 유저만 실행 가능합니다.
+     */
+    @Operation(summary = "투표 삭제하기", tags = [SwaggerTag.ADMIN_SWAGGER_TAG])
     @DeleteMapping("/{id}")
     suspend fun deleteVote(
-        user: AuthUser,
+        user: AdminUser,
         @PathVariable id: Long,
     ) = voteAdminFacade.deleteVote(user, id).wrapVoid()
 }

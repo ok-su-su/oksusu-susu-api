@@ -1,6 +1,7 @@
 package com.oksusu.susu.post.application
 
 import arrow.fx.coroutines.parZip
+import com.oksusu.susu.auth.model.AdminUser
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.DeleteVoteCountEvent
@@ -19,7 +20,7 @@ class VoteAdminFacade(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    suspend fun deleteVote(user: AuthUser, id: Long) {
+    suspend fun deleteVote(user: AdminUser, id: Long) {
         logger.info { "${user.uid} admin이 $id vote 삭제 실행 " }
 
         val (vote, options) = parZip(

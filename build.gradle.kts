@@ -86,7 +86,7 @@ object DependencyVersion {
     /** test */
     const val MOCKK_VERSION = "1.13.9"
     const val KOTEST_VERSION = "5.8.0"
-    const val KOTEST_EXTENSION_VERSION = "4.4.3"
+    const val KOTEST_EXTENSION_VERSION = "1.1.3"
 }
 
 dependencies {
