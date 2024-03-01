@@ -1,6 +1,5 @@
 package com.oksusu.susu.common.appender
 
-import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import com.oksusu.susu.client.slack.model.SlackMessageModel
@@ -17,7 +16,7 @@ class SlackAppender : AppenderBase<ILoggingEvent>() {
         val message = SlackMessageModel(
             text = """
                         $event
-                    """.trimIndent()
+            """.trimIndent()
         )
 
         WarningLogService.sendWarningLog(message, token)

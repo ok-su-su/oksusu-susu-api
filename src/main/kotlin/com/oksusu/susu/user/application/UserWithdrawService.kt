@@ -19,6 +19,5 @@ class UserWithdrawService(
 
     suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
         return withContext(Dispatchers.IO) { userWithdrawRepository.countByCreatedAtBetween(startAt, endAt) }
-
     }
 }

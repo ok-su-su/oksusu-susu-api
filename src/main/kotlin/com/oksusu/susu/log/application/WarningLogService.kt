@@ -5,7 +5,6 @@ import com.oksusu.susu.client.slack.model.SlackMessageModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.awaitBody
@@ -14,7 +13,7 @@ import org.springframework.web.reactive.function.client.awaitBody
 class WarningLogService {
     companion object {
         private const val SLACK_WEBHOOKS_DOMAIN = "https://hooks.slack.com/services"
-        private val webClient = WebClientFactory.generate(baseUrl = SLACK_WEBHOOKS_DOMAIN);
+        private val webClient = WebClientFactory.generate(baseUrl = SLACK_WEBHOOKS_DOMAIN)
 
         fun sendWarningLog(message: SlackMessageModel, token: String) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -27,5 +26,4 @@ class WarningLogService {
             }
         }
     }
-
 }

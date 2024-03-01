@@ -32,7 +32,7 @@ class UserWithdraw(
             return UserWithdraw(
                 uid = user.id,
                 oauthInfo = user.oauthInfo,
-                role = user.role,
+                role = user.role
             )
         }
     }

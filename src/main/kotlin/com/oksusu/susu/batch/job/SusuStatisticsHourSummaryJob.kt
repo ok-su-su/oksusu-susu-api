@@ -53,7 +53,7 @@ class SusuStatisticsHourSummaryJob(
                 envelopeCount = envelopeCount,
                 friendCount = friendCount,
                 userCount = userCount,
-                userWithdrawCount = userWithdrawCount,
+                userWithdrawCount = userWithdrawCount
             )
         }.run { slackClient.sendSummary(this.message()) }
     }
