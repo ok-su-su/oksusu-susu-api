@@ -100,6 +100,7 @@ dependencies {
 
     /** kotlin */
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
