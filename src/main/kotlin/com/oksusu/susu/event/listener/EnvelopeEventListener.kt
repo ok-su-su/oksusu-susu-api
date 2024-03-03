@@ -2,6 +2,7 @@ package com.oksusu.susu.event.listener
 
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.event.model.DeleteEnvelopeEvent
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.FriendService
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +19,7 @@ class EnvelopeEventListener(
 ) {
     @TransactionalEventListener
     fun handel(event: DeleteEnvelopeEvent) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
             val count = envelopeService.countByUidAndFriendId(
                 uid = event.uid,
                 friendId = event.friendId

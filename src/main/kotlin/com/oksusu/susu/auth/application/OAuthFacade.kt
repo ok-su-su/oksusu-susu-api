@@ -16,6 +16,7 @@ import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
@@ -75,14 +76,22 @@ class OAuthFacade(
         val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
 
         coroutineScope {
-            val validateNotRegistered = async(Dispatchers.IO) { userService.validateNotRegistered(oauthInfo) }
-            val validateExistTerms = async(Dispatchers.IO) { termService.validateExistTerms(request.termAgreement) }
+            val validateNotRegistered = async(Dispatchers.IO.withMDCContext()) {
+                userService.validateNotRegistered(
+                    oauthInfo
+                )
+            }
+            val validateExistTerms = async(Dispatchers.IO.withMDCContext()) {
+                termService.validateExistTerms(
+                    request.termAgreement
+                )
+            }
 
             validateNotRegistered.await()
             validateExistTerms.await()
         }
 
-        val user = txTemplates.writer.coExecute {
+        val user = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             val createdUser = User.toUserEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
 
@@ -131,7 +140,7 @@ class OAuthFacade(
         val oauthInfo = oAuthService.getOAuthUserInfo(provider, request.accessToken)
         val user = userService.findByOAuthInfoOrThrow(oauthInfo)
 
-        txTemplates.writer.coExecuteOrNull {
+        txTemplates.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
             eventPublisher.publishEvent(UpdateUserDeviceEvent(UserDevice.of(deviceContext, user.id)))
         }
 

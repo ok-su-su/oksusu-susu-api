@@ -3,6 +3,7 @@ package com.oksusu.susu.user.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
+import com.oksusu.susu.extension.withJob
 import com.oksusu.susu.user.domain.vo.UserStatusTypeInfo
 import com.oksusu.susu.user.infrastructure.UserStatusTypeRepository
 import com.oksusu.susu.user.model.UserStatusTypeModel
@@ -25,7 +26,7 @@ class UserStatusTypeService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-statuses.initial-delay:0}"
     )
     fun refreshStatuses() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withJob()).launch {
             logger.info { "start refresh statuses" }
 
             statuses = runCatching {

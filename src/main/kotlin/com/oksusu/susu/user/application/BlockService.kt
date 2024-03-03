@@ -3,6 +3,7 @@ package com.oksusu.susu.user.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.user.domain.UserBlock
 import com.oksusu.susu.user.domain.vo.UserBlockTargetType
 import com.oksusu.susu.user.infrastructure.UserBlockRepository
@@ -18,7 +19,7 @@ class BlockService(
     private val userBlockRepository: UserBlockRepository,
 ) {
     suspend fun validateNotAlreadyBlock(uid: Long, targetId: Long, targetType: UserBlockTargetType) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO.withMDCContext()) {
             userBlockRepository.existsByUidAndTargetIdAndTargetType(uid, targetId, targetType)
         }.takeUnless { isExist -> isExist } ?: throw InvalidRequestException(ErrorCode.ALREADY_BLOCKED_TARGET)
     }
@@ -29,7 +30,7 @@ class BlockService(
     }
 
     suspend fun findAllByUid(uid: Long): List<UserBlock> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             userBlockRepository.findAllByUid(uid)
         }
     }
@@ -49,7 +50,7 @@ class BlockService(
     }
 
     suspend fun findByIdOrNull(id: Long): UserBlock? {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             userBlockRepository.findByIdOrNull(id)
         }
     }
@@ -69,7 +70,7 @@ class BlockService(
     }
 
     suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: UserBlockTargetType): UserBlock {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             userBlockRepository.findByTargetIdAndTargetType(targetId, targetType)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_BLOCK_ERROR)
     }

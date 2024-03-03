@@ -4,6 +4,7 @@ import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.excel.model.ReceivedSheet
 import com.oksusu.susu.excel.model.SentSheet
 import com.oksusu.susu.excel.model.Sheet
+import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -32,7 +33,7 @@ class ExcelFacade(
     suspend fun getAllEnvelopsExcel(user: AuthUser): DefaultDataBuffer {
         val factory = DefaultDataBufferFactory()
 
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.Default.withMDCContext()) {
             val (wb, os) = excelService.initWorkbook()
 
             val sent = async { createSheet(user.uid, wb, SentSheet.getSheet(), excelDataHelper.getSentData) }
@@ -58,7 +59,7 @@ class ExcelFacade(
         do {
             val pageable = PageRequest.of(pageNum, PAGE_SIZE)
 
-            val data = withContext(Dispatchers.IO) { func(uid, pageable) }
+            val data = withContext(Dispatchers.IO.withMDCContext()) { func(uid, pageable) }
 
             excelService.insertData(
                 ws = ws,

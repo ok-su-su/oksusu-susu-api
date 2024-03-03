@@ -3,6 +3,8 @@ package com.oksusu.susu.metadata.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
+import com.oksusu.susu.extension.withJob
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.metadata.domain.ApplicationMetadata
 import com.oksusu.susu.metadata.infrastructure.ApplicationMetadataRepository
 import com.oksusu.susu.metadata.model.ApplicationMetadataModel
@@ -26,7 +28,7 @@ class ApplicationMetadataService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-application-metadata.initial-delay:0}"
     )
     fun refreshApplicationMetadata() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withJob()).launch {
             logger.info { "start refresh application metadata" }
 
             applicationMetadata = runCatching {
@@ -46,7 +48,7 @@ class ApplicationMetadataService(
     }
 
     suspend fun findTop1ByIsActiveOrderByCreatedAtDesc(isActive: Boolean): ApplicationMetadata {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             applicationMetadataRepository.findTop1ByIsActiveOrderByCreatedAtDesc(isActive)
         }
     }

@@ -7,10 +7,12 @@ import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.infrastructure.model.CountPerCategoryIdModel
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.statistic.model.TitleValueModel
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import kotlin.math.roundToLong
 
@@ -47,11 +49,13 @@ class EnvelopeStatisticService(
     suspend fun getMostFrequentCategory(uid: Long?): TitleValueModel<Long>? {
         val (envelopeCategoryCounts, ledgerCategoryCounts) = if (uid == null) {
             parZip(
+                Dispatchers.IO.withMDCContext(),
                 { envelopeService.countPerCategoryId() },
                 { ledgerService.countPerCategoryId() }
             ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
         } else {
             parZip(
+                Dispatchers.IO.withMDCContext(),
                 { envelopeService.countPerCategoryIdByUid(uid) },
                 { ledgerService.countPerCategoryIdByUid(uid) }
             ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
@@ -128,6 +132,7 @@ class EnvelopeStatisticService(
         val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
 
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             { envelopeService.getEnvelopeByPositionOrderByAmount(minIdx) },
             { envelopeService.getEnvelopeByPositionOrderByAmount(maxIdx) }
         ) { min, max -> min.amount to max.amount }

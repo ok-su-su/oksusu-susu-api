@@ -2,6 +2,7 @@ package com.oksusu.susu.auth.application
 
 import com.oksusu.susu.auth.domain.RefreshToken
 import com.oksusu.susu.auth.infrastructure.redis.RefreshTokenRepository
+import com.oksusu.susu.extension.withMDCContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -15,7 +16,7 @@ class RefreshTokenService(
     }
 
     suspend fun save(token: RefreshToken) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO.withMDCContext()) {
             refreshTokenRepository.save(token)
         }
     }

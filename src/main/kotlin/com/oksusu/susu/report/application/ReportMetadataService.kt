@@ -3,6 +3,8 @@ package com.oksusu.susu.report.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
+import com.oksusu.susu.extension.withJob
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.report.domain.ReportMetadata
 import com.oksusu.susu.report.domain.vo.ReportTargetType
 import com.oksusu.susu.report.infrastructure.ReportMetadataRepository
@@ -28,7 +30,7 @@ class ReportMetadataService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-report-metadata.initial-delay:0}"
     )
     fun refreshRelationships() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withJob()).launch {
             logger.info { "start refresh report metadata" }
 
             reportMetadata = runCatching {
@@ -44,7 +46,7 @@ class ReportMetadataService(
     }
 
     suspend fun findAll(targetType: ReportTargetType, isActive: Boolean = true): List<ReportMetadata> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             reportMetadataRepository.findAllByTargetTypeAndIsActive(targetType, isActive)
         }
     }
@@ -54,11 +56,11 @@ class ReportMetadataService(
     }
 
     suspend fun findByIdOrNull(id: Long): ReportMetadata? {
-        return withContext(Dispatchers.IO) { reportMetadataRepository.findByIdOrNull(id) }
+        return withContext(Dispatchers.IO.withMDCContext()) { reportMetadataRepository.findByIdOrNull(id) }
     }
 
     suspend fun findAllByIsActive(isActive: Boolean): List<ReportMetadata> {
-        return withContext(Dispatchers.IO) { reportMetadataRepository.findAllByIsActive(isActive) }
+        return withContext(Dispatchers.IO.withMDCContext()) { reportMetadataRepository.findAllByIsActive(isActive) }
     }
 
     suspend fun getAllTargetType(targetType: ReportTargetType): List<ReportMetadataModel> {

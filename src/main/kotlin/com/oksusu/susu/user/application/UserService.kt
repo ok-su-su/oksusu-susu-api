@@ -3,6 +3,7 @@ package com.oksusu.susu.user.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.user.domain.User
 import com.oksusu.susu.user.domain.vo.OauthInfo
 import com.oksusu.susu.user.infrastructure.UserRepository
@@ -24,7 +25,7 @@ class UserService(
     }
 
     suspend fun existsByOAuthInfo(oauthInfo: OauthInfo): Boolean {
-        return withContext(Dispatchers.IO) { userRepository.existsByOauthInfo(oauthInfo) }
+        return withContext(Dispatchers.IO.withMDCContext()) { userRepository.existsByOauthInfo(oauthInfo) }
     }
 
     @Transactional
@@ -37,7 +38,7 @@ class UserService(
     }
 
     suspend fun findByOAuthInfoOrNull(oauthInfo: OauthInfo): User? {
-        return withContext(Dispatchers.IO) { userRepository.findByOauthInfo(oauthInfo) }
+        return withContext(Dispatchers.IO.withMDCContext()) { userRepository.findByOauthInfo(oauthInfo) }
     }
 
     suspend fun findByIdOrThrow(uid: Long): User {
@@ -45,7 +46,7 @@ class UserService(
     }
 
     suspend fun findByIdOrNull(uid: Long): User? {
-        return withContext(Dispatchers.IO) { userRepository.findByIdOrNull(uid) }
+        return withContext(Dispatchers.IO.withMDCContext()) { userRepository.findByIdOrNull(uid) }
     }
 
     fun findByIdOrThrowSync(uid: Long): User {
@@ -57,28 +58,28 @@ class UserService(
     }
 
     suspend fun validateExist(id: Long) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO.withMDCContext()) {
             userRepository.existsById(id)
         }.takeIf { it } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 
     suspend fun existsById(id: Long): Boolean {
-        return withContext(Dispatchers.IO) { userRepository.existsById(id) }
+        return withContext(Dispatchers.IO.withMDCContext()) { userRepository.existsById(id) }
     }
 
     suspend fun countByCreatedAtBetween(
         startAt: LocalDateTime,
         endAt: LocalDateTime,
     ): Long {
-        return withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(startAt, endAt) }
+        return withContext(Dispatchers.IO.withMDCContext()) { userRepository.countByCreatedAtBetween(startAt, endAt) }
     }
 
     suspend fun count() {
-        return withContext(Dispatchers.IO) { userRepository.count() }
+        return withContext(Dispatchers.IO.withMDCContext()) { userRepository.count() }
     }
 
     suspend fun getUserAndUserStatus(uid: Long): UserAndUserStatusModel {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             userRepository.getUserAndUserStatus(uid)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }

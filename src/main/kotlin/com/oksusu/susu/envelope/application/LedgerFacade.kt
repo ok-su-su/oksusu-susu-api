@@ -20,6 +20,8 @@ import com.oksusu.susu.envelope.model.response.SearchLedgerResponse
 import com.oksusu.susu.event.model.DeleteLedgerEvent
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.extension.withMDCContext
+import kotlinx.coroutines.Dispatchers
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
@@ -45,7 +47,7 @@ class LedgerFacade(
             else -> null
         }
 
-        val createdLedger = txTemplate.writer.coExecute {
+        val createdLedger = txTemplate.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             val createdLedger = Ledger(
                 uid = user.uid,
                 title = request.title,
@@ -88,7 +90,7 @@ class LedgerFacade(
             else -> null
         }
 
-        val updatedLedger = txTemplate.writer.coExecute {
+        val updatedLedger = txTemplate.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             val updatedLedger = ledger.apply {
                 this.title = request.title
                 this.description = request.description
@@ -115,6 +117,7 @@ class LedgerFacade(
         val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.uid)
 
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             { categoryService.getCategory(categoryAssignment.categoryId) },
             { envelopeService.countTotalAmountAndCount(id) }
         ) { category, (_, totalAmounts, totalCounts) ->
@@ -165,7 +168,7 @@ class LedgerFacade(
         val ledgers = ledgerService.findAllByUidAndIdIn(user.uid, ids.toList())
 
         ledgers.forEach { leder ->
-            txTemplate.writer.coExecuteOrNull {
+            txTemplate.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
                 /** 장부 삭제 */
                 ledgerService.deleteSync(leder)
 

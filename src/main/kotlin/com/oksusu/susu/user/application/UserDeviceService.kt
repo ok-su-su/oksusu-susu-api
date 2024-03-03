@@ -2,6 +2,7 @@ package com.oksusu.susu.user.application
 
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.user.domain.UserDevice
 import com.oksusu.susu.user.infrastructure.UserDeviceRepository
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ class UserDeviceService(
     }
 
     suspend fun findByUid(uid: Long): UserDevice {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             userDeviceRepository.findByUid(uid)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_DEVICE_ERROR)
     }

@@ -2,6 +2,7 @@ package com.oksusu.susu.log.application
 
 import com.oksusu.susu.client.WebClientFactory
 import com.oksusu.susu.client.slack.model.SlackMessageModel
+import com.oksusu.susu.extension.withMDCContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +17,7 @@ class WarningLogService {
         private val webClient = WebClientFactory.generate(baseUrl = SLACK_WEBHOOKS_DOMAIN)
 
         fun sendWarningLog(message: SlackMessageModel, token: String) {
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
                 webClient.post()
                     .uri("/$token")
                     .contentType(MediaType.APPLICATION_JSON)

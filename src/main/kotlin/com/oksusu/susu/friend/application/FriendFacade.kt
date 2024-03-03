@@ -11,6 +11,7 @@ import com.oksusu.susu.exception.AlreadyException
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.domain.FriendRelationship
 import com.oksusu.susu.friend.infrastructure.model.SearchFriendSpec
@@ -19,6 +20,7 @@ import com.oksusu.susu.friend.model.request.SearchFriendRequest
 import com.oksusu.susu.friend.model.response.CreateAndUpdateFriendResponse
 import com.oksusu.susu.friend.model.response.RecentEnvelopeModel
 import com.oksusu.susu.friend.model.response.SearchFriendResponse
+import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
@@ -95,7 +97,7 @@ class FriendFacade(
             false -> null
         }
 
-        val createdFriend = txTemplates.writer.coExecute {
+        val createdFriend = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             val createdFriend = Friend(
                 uid = user.uid,
                 name = request.name.trim(),
@@ -134,7 +136,7 @@ class FriendFacade(
             false -> null
         }
 
-        val createdFriend = txTemplates.writer.coExecute {
+        val createdFriend = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             val createdFriend = friend.apply {
                 this.name = request.name.trim()
                 this.phoneNumber = request.phoneNumber
@@ -158,7 +160,7 @@ class FriendFacade(
         friendIds
             .chunked(100)
             .forEach { chunkedFriendIds ->
-                txTemplates.writer.coExecuteOrNull {
+                txTemplates.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
                     friendService.deleteSync(chunkedFriendIds)
                     friendRelationshipService.deleteByFriendIdInSync(chunkedFriendIds)
                     envelopeService.deleteAllByFriendIds(chunkedFriendIds)

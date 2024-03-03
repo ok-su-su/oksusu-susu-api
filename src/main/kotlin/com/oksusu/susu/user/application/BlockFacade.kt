@@ -5,12 +5,16 @@ import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.extension.coExecute
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.post.application.PostService
 import com.oksusu.susu.user.domain.UserBlock
 import com.oksusu.susu.user.domain.vo.UserBlockTargetType
 import com.oksusu.susu.user.model.request.CreateBlockRequest
 import com.oksusu.susu.user.model.request.DeleteBlockRequest
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,18 +30,26 @@ class BlockFacade(
         }
 
         coroutineScope {
-            val validateNotBlock = async {
+            val validateNotBlock = async(Dispatchers.IO.withMDCContext()) {
                 blockService.validateNotAlreadyBlock(user.uid, request.targetId, request.targetType)
             }
             val validateTargetExist = when (request.targetType) {
-                UserBlockTargetType.POST -> async { postService.validateExist(request.targetId) }
-                UserBlockTargetType.USER -> async { userService.validateExist(request.targetId) }
+                UserBlockTargetType.POST -> async(Dispatchers.IO.withMDCContext()) {
+                    postService.validateExist(
+                        request.targetId
+                    )
+                }
+                UserBlockTargetType.USER -> async(Dispatchers.IO.withMDCContext()) {
+                    userService.validateExist(
+                        request.targetId
+                    )
+                }
             }
 
             awaitAll(validateNotBlock, validateTargetExist)
         }
 
-        txTemplates.writer.coExecute {
+        txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             UserBlock(
                 uid = user.uid,
                 targetId = request.targetId,
@@ -50,7 +62,7 @@ class BlockFacade(
     suspend fun deleteBlock(user: AuthUser, id: Long) {
         blockService.validateAuthority(user.uid, id)
 
-        txTemplates.writer.coExecute {
+        txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             blockService.deleteById(id)
         }
     }
@@ -60,7 +72,7 @@ class BlockFacade(
 
         user.isNotAuthorThrow(block.uid)
 
-        txTemplates.writer.coExecute {
+        txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             blockService.deleteById(block.id)
         }
     }

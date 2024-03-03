@@ -21,7 +21,10 @@ data class SusuEnvelopeStatisticResponse(
     val mostCategory: TitleValueModel<Long>?,
 ) {
     companion object {
-        fun of(specific: SusuSpecificEnvelopeStatisticModel, statistic: SusuEnvelopeStatistic): SusuEnvelopeStatisticResponse {
+        fun of(
+            specific: SusuSpecificEnvelopeStatisticModel,
+            statistic: SusuEnvelopeStatistic,
+        ): SusuEnvelopeStatisticResponse {
             return SusuEnvelopeStatisticResponse(
                 averageSent = specific.averageSent,
                 averageRelationship = specific.averageRelationship,

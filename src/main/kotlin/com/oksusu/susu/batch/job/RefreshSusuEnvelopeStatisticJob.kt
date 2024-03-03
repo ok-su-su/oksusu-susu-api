@@ -5,12 +5,14 @@ import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.extension.toStatisticAgeGroup
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.extension.yearMonth
 import com.oksusu.susu.statistic.application.EnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuEnvelopeStatisticService
 import com.oksusu.susu.statistic.application.SusuSpecificEnvelopeStatisticService
 import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -31,6 +33,7 @@ class RefreshSusuEnvelopeStatisticJob(
         val (minAmount, maxAmount) = envelopeStatisticService.getLimitAmountForCutting()
 
         parZip(
+            Dispatchers.IO.withMDCContext(),
             /** 봉투 소유 유저 수 */
             { envelopeService.getUserCountHadEnvelope() },
             /** 최근 사용 금액 (절사) */

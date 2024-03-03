@@ -2,6 +2,7 @@ package com.oksusu.susu.friend.application
 
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.domain.FriendRelationship
 import com.oksusu.susu.friend.infrastructure.FriendRelationshipRepository
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
@@ -20,19 +21,23 @@ class FriendRelationshipService(
     }
 
     suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             friendRelationshipRepository.countPerRelationshipId()
         }
     }
 
     suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             friendRelationshipRepository.countPerRelationshipIdByUid(uid)
         }
     }
 
     suspend fun findAllByFriendIds(friendIds: List<Long>): List<FriendRelationship> {
-        return withContext(Dispatchers.IO) { friendRelationshipRepository.findAllByFriendIdIn(friendIds) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            friendRelationshipRepository.findAllByFriendIdIn(
+                friendIds
+            )
+        }
     }
 
     suspend fun findByFriendIdOrThrow(friendId: Long): FriendRelationship {
@@ -40,7 +45,7 @@ class FriendRelationshipService(
     }
 
     suspend fun findByFriendIdOrNull(friendId: Long): FriendRelationship? {
-        return withContext(Dispatchers.IO) { friendRelationshipRepository.findByFriendId(friendId) }
+        return withContext(Dispatchers.IO.withMDCContext()) { friendRelationshipRepository.findByFriendId(friendId) }
     }
 
     @Transactional

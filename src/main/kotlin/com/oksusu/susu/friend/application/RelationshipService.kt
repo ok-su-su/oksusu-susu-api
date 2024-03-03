@@ -3,6 +3,8 @@ package com.oksusu.susu.friend.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
+import com.oksusu.susu.extension.withJob
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.domain.Relationship
 import com.oksusu.susu.friend.infrastructure.RelationshipRepository
 import com.oksusu.susu.friend.model.RelationshipModel
@@ -26,7 +28,7 @@ class RelationshipService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-relationships.initial-delay:0}"
     )
     fun refreshRelationships() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withJob()).launch {
             logger.info { "start refresh relationships" }
 
             relationships = runCatching {
@@ -42,7 +44,7 @@ class RelationshipService(
     }
 
     suspend fun findAllByIsActive(isActive: Boolean): List<Relationship> {
-        return withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(isActive) }
+        return withContext(Dispatchers.IO.withMDCContext()) { relationshipRepository.findAllByIsActive(isActive) }
     }
 
     fun getRelationship(id: Long): RelationshipModel {

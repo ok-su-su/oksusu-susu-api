@@ -5,6 +5,7 @@ import com.oksusu.susu.count.application.CountService
 import com.oksusu.susu.count.domain.vo.CountTargetType
 import com.oksusu.susu.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ class CountEventListener(
 
     @TransactionalEventListener
     fun deleteCount(event: DeleteVoteCountEvent) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
             logger.info { "[${event.publishAt}] ${event.postId} post 관련 count delete 시작" }
 
             txTemplates.writer.coExecuteOrNull {

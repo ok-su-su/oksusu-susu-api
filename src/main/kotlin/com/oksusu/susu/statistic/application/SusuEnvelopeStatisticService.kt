@@ -2,6 +2,7 @@ package com.oksusu.susu.statistic.application
 
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.FailToExecuteException
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuEnvelopeStatisticRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -20,10 +21,10 @@ class SusuEnvelopeStatisticService(
     }
 
     suspend fun getStatisticOrNull(): SusuEnvelopeStatistic? {
-        return withContext(Dispatchers.IO) { susuEnvelopeStatisticRepository.getStatistic() }
+        return withContext(Dispatchers.IO.withMDCContext()) { susuEnvelopeStatisticRepository.getStatistic() }
     }
 
     suspend fun save(susuEnvelopeStatistic: SusuEnvelopeStatistic) {
-        withContext(Dispatchers.IO) { susuEnvelopeStatisticRepository.save(susuEnvelopeStatistic) }
+        withContext(Dispatchers.IO.withMDCContext()) { susuEnvelopeStatisticRepository.save(susuEnvelopeStatistic) }
     }
 }

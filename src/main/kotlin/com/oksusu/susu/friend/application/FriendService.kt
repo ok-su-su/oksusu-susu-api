@@ -2,6 +2,7 @@ package com.oksusu.susu.friend.application
 
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.domain.Friend
 import com.oksusu.susu.friend.infrastructure.FriendRepository
 import com.oksusu.susu.friend.infrastructure.model.FriendAndFriendRelationshipModel
@@ -23,7 +24,7 @@ class FriendService(
         spec: SearchFriendSpec,
         pageable: Pageable,
     ): Page<FriendAndFriendRelationshipModel> {
-        return withContext(Dispatchers.IO) { friendRepository.search(spec, pageable) }
+        return withContext(Dispatchers.IO.withMDCContext()) { friendRepository.search(spec, pageable) }
     }
 
     suspend fun findByIdAndUidOrThrow(id: Long, uid: Long): Friend {
@@ -31,7 +32,7 @@ class FriendService(
     }
 
     suspend fun findByIdAndUidOrNull(id: Long, uid: Long): Friend? {
-        return withContext(Dispatchers.IO) { friendRepository.findByIdAndUid(id, uid) }
+        return withContext(Dispatchers.IO.withMDCContext()) { friendRepository.findByIdAndUid(id, uid) }
     }
 
     @Transactional
@@ -40,7 +41,12 @@ class FriendService(
     }
 
     suspend fun existsByUidAndPhoneNumber(uid: Long, phoneNumber: String): Boolean {
-        return withContext(Dispatchers.IO) { friendRepository.existsByUidAndPhoneNumber(uid, phoneNumber) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            friendRepository.existsByUidAndPhoneNumber(
+                uid,
+                phoneNumber
+            )
+        }
     }
 
     suspend fun findByIdOrThrow(id: Long): Friend {
@@ -48,15 +54,15 @@ class FriendService(
     }
 
     suspend fun findByIdOrNull(id: Long): Friend? {
-        return withContext(Dispatchers.IO) { friendRepository.findByIdOrNull(id) }
+        return withContext(Dispatchers.IO.withMDCContext()) { friendRepository.findByIdOrNull(id) }
     }
 
     suspend fun findAllByIdIn(ids: List<Long>): List<Friend> {
-        return withContext(Dispatchers.IO) { friendRepository.findAllByIdIn(ids) }
+        return withContext(Dispatchers.IO.withMDCContext()) { friendRepository.findAllByIdIn(ids) }
     }
 
     suspend fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Friend> {
-        return withContext(Dispatchers.IO) { friendRepository.findAllByUidAndIdIn(uid, ids) }
+        return withContext(Dispatchers.IO.withMDCContext()) { friendRepository.findAllByUidAndIdIn(uid, ids) }
     }
 
     @Transactional
@@ -70,6 +76,6 @@ class FriendService(
     }
 
     suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
-        return withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(startAt, endAt) }
+        return withContext(Dispatchers.IO.withMDCContext()) { friendRepository.countByCreatedAtBetween(startAt, endAt) }
     }
 }

@@ -3,6 +3,7 @@ package com.oksusu.susu.dev
 import com.oksusu.susu.batch.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.config.web.SwaggerTag
+import com.oksusu.susu.extension.withMDCContext
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +24,7 @@ class DevBatchResource(
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "hour summary 호출")
     @GetMapping("/hour-summaries")
     suspend fun getHourSummaries() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
             susuStatisticsHourSummaryJob.runHourSummaryJob()
         }
     }
@@ -31,7 +32,7 @@ class DevBatchResource(
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "daily summary 호출")
     @GetMapping("/daily-summaries")
     suspend fun getDailySummaries() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
             susuStatisticsDailySummaryJob.runDailySummaryJob()
         }
     }

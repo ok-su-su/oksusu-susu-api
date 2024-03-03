@@ -2,6 +2,7 @@ package com.oksusu.susu.post.application
 
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.post.domain.VoteHistory
 import com.oksusu.susu.post.infrastructure.repository.VoteHistoryRepository
 import kotlinx.coroutines.Dispatchers
@@ -31,13 +32,13 @@ class VoteHistoryService(
     }
 
     suspend fun existsByUidAndPostId(uid: Long, postId: Long): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             voteHistoryRepository.existsByUidAndPostId(uid, postId)
         }
     }
 
     suspend fun existsByUidAndPostIdAndVoteOptionId(uid: Long, postId: Long, optionId: Long): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             voteHistoryRepository.existsByUidAndPostIdAndVoteOptionId(uid, postId, optionId)
         }
     }
@@ -48,7 +49,7 @@ class VoteHistoryService(
     }
 
     suspend fun findByUidAndPostId(uid: Long, postId: Long): VoteHistory? {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             voteHistoryRepository.findByUidAndPostId(uid, postId)
         }
     }

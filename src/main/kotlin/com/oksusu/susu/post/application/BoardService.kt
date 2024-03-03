@@ -3,6 +3,8 @@ package com.oksusu.susu.post.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
+import com.oksusu.susu.extension.withJob
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.post.domain.Board
 import com.oksusu.susu.post.infrastructure.repository.BoardRepository
 import com.oksusu.susu.post.model.BoardModel
@@ -26,7 +28,7 @@ class BoardService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-boards.initial-delay:0}"
     )
     fun refreshBoards() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withJob()).launch {
             logger.info { "start refresh boards" }
 
             boards = runCatching {
@@ -46,7 +48,7 @@ class BoardService(
     }
 
     suspend fun findAllByIsActive(isActive: Boolean): List<Board> {
-        return withContext(Dispatchers.IO) { boardRepository.findAllByIsActive(isActive) }
+        return withContext(Dispatchers.IO.withMDCContext()) { boardRepository.findAllByIsActive(isActive) }
     }
 
     fun getBoard(id: Long): BoardModel {

@@ -5,6 +5,7 @@ import com.oksusu.susu.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.auth.model.response.OAuthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.KakaoClient
 import com.oksusu.susu.config.OAuthConfig
+import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -57,21 +58,21 @@ class KakaoOAuthService(
     }
 
     private suspend fun getKakaoToken(redirectUrl: String, code: String): OAuthTokenResponse {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             kakaoClient.getToken(redirectUrl, code)
         }.run { OAuthTokenResponse.fromKakao(this) }
     }
 
     /** 유저 정보를 가져옵니다. */
     suspend fun getKakaoUserInfo(accessToken: String): OAuthUserInfoDto {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             kakaoClient.getUserInfo(accessToken)
         }.run { OAuthUserInfoDto.fromKakao(this) }
     }
 
     /** 회원 탈퇴합니다 */
     suspend fun withdraw(oAuthId: String) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO.withMDCContext()) {
             kakaoClient.withdraw(oAuthId)
         }
     }

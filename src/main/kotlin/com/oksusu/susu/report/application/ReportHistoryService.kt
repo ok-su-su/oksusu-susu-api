@@ -1,5 +1,6 @@
 package com.oksusu.susu.report.application
 
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.report.domain.ReportHistory
 import com.oksusu.susu.report.domain.vo.ReportTargetType
 import com.oksusu.susu.report.infrastructure.ReportHistoryRepository
@@ -17,7 +18,7 @@ class ReportHistoryService(
         targetId: Long,
         targetType: ReportTargetType,
     ): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             reportHistoryRepository.existsByUidAndTargetIdAndTargetType(
                 uid = uid,
                 targetId = targetId,

@@ -1,5 +1,6 @@
 package com.oksusu.susu.user.application
 
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.user.domain.UserWithdraw
 import com.oksusu.susu.user.infrastructure.UserWithdrawRepository
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +19,11 @@ class UserWithdrawService(
     }
 
     suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
-        return withContext(Dispatchers.IO) { userWithdrawRepository.countByCreatedAtBetween(startAt, endAt) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            userWithdrawRepository.countByCreatedAtBetween(
+                startAt,
+                endAt
+            )
+        }
     }
 }

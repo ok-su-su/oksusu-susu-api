@@ -6,11 +6,13 @@ import com.oksusu.susu.client.slack.model.SlackMessageModel
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.envelope.application.LedgerService
 import com.oksusu.susu.extension.format
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.log.application.SystemActionLogService
 import com.oksusu.susu.user.application.UserService
 import com.oksusu.susu.user.application.UserWithdrawService
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -33,6 +35,7 @@ class SusuStatisticsDailySummaryJob(
 
         coroutineScope {
             parZip(
+                Dispatchers.IO.withMDCContext(),
                 { systemActionLogService.countByCreatedAtBetween(beforeOneDay, now) },
                 { userService.countByCreatedAtBetween(beforeOneDay, now) },
                 { envelopeService.count() },

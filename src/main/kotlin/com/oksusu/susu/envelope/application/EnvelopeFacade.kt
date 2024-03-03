@@ -27,11 +27,13 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.application.FriendRelationshipService
 import com.oksusu.susu.friend.application.FriendService
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.friend.model.FriendModel
 import com.oksusu.susu.friend.model.FriendRelationshipModel
+import kotlinx.coroutines.Dispatchers
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
@@ -53,6 +55,7 @@ class EnvelopeFacade(
         envelopeValidateService.validateEnvelopeRequest(request)
 
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             { friendService.findByIdAndUidOrThrow(request.friendId, user.uid) },
             { friendRelationshipService.findByFriendIdOrThrow(request.friendId) },
             {
@@ -75,7 +78,7 @@ class EnvelopeFacade(
                 false -> null
             }
 
-            val createdEnvelope = txTemplates.writer.coExecute {
+            val createdEnvelope = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
                 val createdEnvelope = Envelope(
                     uid = user.uid,
                     type = request.type,
@@ -142,7 +145,7 @@ class EnvelopeFacade(
             else -> null
         }
 
-        val updatedEnvelope = txTemplates.writer.coExecute {
+        val updatedEnvelope = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             val updatedEnvelope = envelope.apply {
                 this.type = request.type
                 this.friendId = friend.id
@@ -188,7 +191,7 @@ class EnvelopeFacade(
     suspend fun delete(user: AuthUser, id: Long) {
         val envelope = envelopeService.findByIdOrThrow(id, user.uid)
 
-        txTemplates.writer.coExecuteOrNull {
+        txTemplates.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
             /** 봉투 삭제 */
             envelopeService.deleteSync(envelope)
 
@@ -226,6 +229,7 @@ class EnvelopeFacade(
         val envelopeIds = response.content.map { envelope -> envelope.id }
 
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             {
                 when (request.includeFriend) {
                     true -> friendService.findAllByIdIn(friendIds)

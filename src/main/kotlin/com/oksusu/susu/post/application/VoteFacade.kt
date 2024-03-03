@@ -13,6 +13,7 @@ import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.InvalidRequestException
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.VoteHistory
 import com.oksusu.susu.post.domain.VoteOption
@@ -35,6 +36,7 @@ import com.oksusu.susu.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.user.application.BlockService
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
@@ -59,7 +61,7 @@ class VoteFacade(
         voteValidateService.validateCreateVoteRequest(request)
         boardService.validateExistBoard(request.boardId)
 
-        return txTemplates.writer.coExecute {
+        return txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             val createdPost = Post(
                 uid = user.uid,
                 type = PostType.VOTE,
@@ -122,6 +124,7 @@ class VoteFacade(
 
     suspend fun getVote(user: AuthUser, voteId: Long): VoteAllInfoResponse {
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             { voteService.getVoteAndCreator(voteId) },
             { voteOptionService.getOptionAndCount(voteId) },
             { voteHistoryService.findByUidAndPostId(user.uid, voteId) }
@@ -160,12 +163,13 @@ class VoteFacade(
 
     private suspend fun castVote(uid: Long, postId: Long, optionId: Long) {
         val (voteCount, voteOptionCount) = parZip(
+            Dispatchers.IO.withMDCContext(),
             { voteHistoryService.validateVoteNotExist(uid, postId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
         ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
-        txTemplates.writer.coExecuteOrNull() {
+        txTemplates.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
                 .run { voteHistoryService.saveSync(this) }
 
@@ -178,12 +182,13 @@ class VoteFacade(
 
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
         val (voteCount, voteOptionCount) = parZip(
+            Dispatchers.IO.withMDCContext(),
             { voteHistoryService.validateVoteExist(uid, postId, optionId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
         ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
-        txTemplates.writer.coExecuteOrNull {
+        txTemplates.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
 
             val updatedVoteCount = voteCount.apply { count-- }
@@ -195,6 +200,7 @@ class VoteFacade(
 
     suspend fun deleteVote(user: AuthUser, id: Long) {
         val (vote, options) = parZip(
+            Dispatchers.IO.withMDCContext(),
             { voteService.getVote(id) },
             { voteOptionService.getVoteOptions(id) }
         ) { vote, options -> vote to options }
@@ -205,7 +211,7 @@ class VoteFacade(
 
         val optionIds = options.map { option -> option.id }
 
-        txTemplates.writer.coExecute {
+        txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
             vote.apply { isActive = false }.run {
                 postService.saveSync(this)
             }
@@ -242,6 +248,7 @@ class VoteFacade(
         voteValidateService.validateUpdateVoteRequest(request)
 
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             { voteHistoryService.findByUidAndPostId(user.uid, id) },
             { voteService.getVoteAndOptions(id) }
         ) { voteHistory, voteInfos ->
@@ -261,7 +268,7 @@ class VoteFacade(
                 throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
             }
 
-            val updatedVote = txTemplates.writer.coExecute {
+            val updatedVote = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
                 vote.apply {
                     content = request.content
                     boardId = request.boardId

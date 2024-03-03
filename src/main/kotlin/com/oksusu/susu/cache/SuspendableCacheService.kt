@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.data.domain.Range
 import org.springframework.data.redis.core.DefaultTypedTuple
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
@@ -30,7 +31,7 @@ class SuspendableCacheService(
 
     override suspend fun <VALUE_TYPE : Any> set(cache: Cache<VALUE_TYPE>, value: VALUE_TYPE) {
         coroutineScope {
-            launch(Dispatchers.IO + Job()) {
+            launch(Dispatchers.IO + Job() + MDCContext()) {
                 runCatching {
                     keyValueOps.set(
                         cache.key,
@@ -80,7 +81,7 @@ class SuspendableCacheService(
 
     override suspend fun <VALUE_TYPE : Any> zSetAll(cache: ZSetCache<VALUE_TYPE>, tuples: Map<VALUE_TYPE, Double>) {
         coroutineScope {
-            launch(Dispatchers.IO + Job()) {
+            launch(Dispatchers.IO + Job() + MDCContext()) {
                 runCatching {
                     val typedTuples = tuples.map { tuple ->
                         DefaultTypedTuple(

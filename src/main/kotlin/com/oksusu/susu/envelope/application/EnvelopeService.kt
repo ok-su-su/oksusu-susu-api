@@ -16,6 +16,7 @@ import com.oksusu.susu.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -50,15 +51,15 @@ class EnvelopeService(
     }
 
     suspend fun findAllByLedgerId(ledgerId: Long): List<Envelope> {
-        return withContext(Dispatchers.IO) { envelopeRepository.findAllByLedgerId(ledgerId) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.findAllByLedgerId(ledgerId) }
     }
 
     suspend fun countTotalAmountsAndCounts(ledgerIds: List<Long>): List<CountTotalAmountsAndCountsModel> {
-        return withContext(Dispatchers.IO) { envelopeRepository.countTotalAmountsAndCounts(ledgerIds) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.countTotalAmountsAndCounts(ledgerIds) }
     }
 
     suspend fun countTotalAmountAndCount(ledgerId: Long): CountTotalAmountsAndCountsModel {
-        return withContext(Dispatchers.IO) { envelopeRepository.countTotalAmountAndCount(ledgerId) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.countTotalAmountAndCount(ledgerId) }
     }
 
     suspend fun findByIdOrThrow(id: Long, uid: Long): Envelope {
@@ -66,11 +67,11 @@ class EnvelopeService(
     }
 
     suspend fun findByIdOrNull(id: Long, uid: Long): Envelope? {
-        return withContext(Dispatchers.IO) { envelopeRepository.findByIdAndUid(id, uid) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.findByIdAndUid(id, uid) }
     }
 
     suspend fun getDetail(id: Long, uid: Long): EnvelopeDetailModel {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.findDetailEnvelope(id, uid)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
     }
@@ -80,13 +81,13 @@ class EnvelopeService(
         envelopeType: EnvelopeType,
         pageable: Pageable,
     ): Slice<EnvelopeDetailAndLedgerModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.findAllDetailEnvelopeAndLedgerByEnvelopeType(uid, envelopeType, pageable)
         }
     }
 
     suspend fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel? {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.getMaxAmountEnvelopeInfoByUid(uid, type)
         }
     }
@@ -99,7 +100,7 @@ class EnvelopeService(
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
 
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetween(type, from, to, minAmount, maxAmount)
         }
     }
@@ -110,13 +111,13 @@ class EnvelopeService(
     ): List<CountPerHandedOverAtModel> {
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.getTotalAmountPerHandedOverAtBetweenByUid(uid, type, from, to)
         }
     }
 
     suspend fun countPerCategoryId(): List<CountPerCategoryIdModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.countPerCategoryId()
         }
     }
@@ -124,7 +125,7 @@ class EnvelopeService(
     suspend fun countPerCategoryIdByUid(
         uid: Long,
     ): List<CountPerCategoryIdModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.countPerCategoryIdByUid(uid)
         }
     }
@@ -133,48 +134,68 @@ class EnvelopeService(
         minAmount: Long,
         maxAmount: Long,
     ): List<CountAvgAmountPerStatisticGroupModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount)
         }
     }
 
     suspend fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope> {
-        return withContext(Dispatchers.IO) { envelopeRepository.search(spec, pageable) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.search(spec, pageable) }
     }
 
     suspend fun findFriendStatistics(
         searchSpec: SearchFriendStatisticsSpec,
         pageable: Pageable,
     ): Page<FriendStatisticsModel> {
-        return withContext(Dispatchers.IO) { envelopeRepository.findFriendStatistics(searchSpec, pageable) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            envelopeRepository.findFriendStatistics(
+                searchSpec,
+                pageable
+            )
+        }
     }
 
     suspend fun findLatestFriendEnvelopes(friendIds: Set<Long>): List<Envelope> {
-        return withContext(Dispatchers.IO) { envelopeRepository.findLatestFriendEnvelopes(friendIds) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.findLatestFriendEnvelopes(friendIds) }
     }
 
     suspend fun findTop1ByUidAndTypeOrderByAmountAsc(uid: Long, type: EnvelopeType): Envelope? {
-        return withContext(Dispatchers.IO) { envelopeRepository.findTop1ByUidAndTypeOrderByAmountAsc(uid, type) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            envelopeRepository.findTop1ByUidAndTypeOrderByAmountAsc(
+                uid,
+                type
+            )
+        }
     }
 
     suspend fun findTop1ByUidAndTypeOrderByAmountDesc(uid: Long, type: EnvelopeType): Envelope? {
-        return withContext(Dispatchers.IO) { envelopeRepository.findTop1ByUidAndTypeOrderByAmountDesc(uid, type) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            envelopeRepository.findTop1ByUidAndTypeOrderByAmountDesc(
+                uid,
+                type
+            )
+        }
     }
 
     suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
-        return withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(startAt, endAt) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            envelopeRepository.countByCreatedAtBetween(
+                startAt,
+                endAt
+            )
+        }
     }
 
     suspend fun count(): Long {
-        return withContext(Dispatchers.IO) { envelopeRepository.count() }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.count() }
     }
 
     suspend fun countTotalAmountByUid(uid: Long): Long {
-        return withContext(Dispatchers.IO) { envelopeRepository.countTotalAmountByUid(uid) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.countTotalAmountByUid(uid) }
     }
 
     suspend fun getUserCountHadEnvelope(): Long {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.getUserCountHadEnvelope()
         }
     }
@@ -185,11 +206,11 @@ class EnvelopeService(
     }
 
     suspend fun countByUidAndFriendId(uid: Long, friendId: Long): Long {
-        return withContext(Dispatchers.IO) { envelopeRepository.countByUidAndFriendId(uid, friendId) }
+        return withContext(Dispatchers.IO.withMDCContext()) { envelopeRepository.countByUidAndFriendId(uid, friendId) }
     }
 
     suspend fun getEnvelopeByPositionOrderByAmount(idx: Long): Envelope {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             envelopeRepository.getEnvelopeByPositionOrderByAmount(idx)
         }.takeIf { it.isNotEmpty() }
             ?.first()

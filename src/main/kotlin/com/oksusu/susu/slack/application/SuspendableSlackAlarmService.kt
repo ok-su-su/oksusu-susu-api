@@ -2,6 +2,7 @@ package com.oksusu.susu.slack.application
 
 import com.oksusu.susu.config.SlackConfig
 import com.oksusu.susu.extension.isProd
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.slack.infrastructure.SlackAlarmSender
 import com.oksusu.susu.slack.model.ErrorWebhookDataModel
 import com.slack.api.model.block.LayoutBlock
@@ -44,7 +45,7 @@ class SuspendableSlackAlarmService(
             .blocks(layoutBlocks)
             .build()
 
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO.withMDCContext()) {
             slackAlarmSender.send(model.url, payload)
         }
     }

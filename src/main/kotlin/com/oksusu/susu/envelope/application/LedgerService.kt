@@ -8,6 +8,7 @@ import com.oksusu.susu.envelope.infrastructure.model.SearchLedgerModel
 import com.oksusu.susu.envelope.infrastructure.model.SearchLedgerSpec
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.data.domain.Page
@@ -34,7 +35,7 @@ class LedgerService(
         searchSpec: SearchLedgerSpec,
         pageable: Pageable,
     ): Page<SearchLedgerModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             ledgerRepository.search(searchSpec, pageable)
         }
     }
@@ -44,11 +45,11 @@ class LedgerService(
     }
 
     suspend fun findByIdAndUidOrNull(id: Long, uid: Long): Ledger? {
-        return withContext(Dispatchers.IO) { ledgerRepository.findByIdAndUid(id, uid) }
+        return withContext(Dispatchers.IO.withMDCContext()) { ledgerRepository.findByIdAndUid(id, uid) }
     }
 
     suspend fun findAllByUidAndIdIn(uid: Long, ids: List<Long>): List<Ledger> {
-        return withContext(Dispatchers.IO) { ledgerRepository.findAllByUidAndIdIn(uid, ids) }
+        return withContext(Dispatchers.IO.withMDCContext()) { ledgerRepository.findAllByUidAndIdIn(uid, ids) }
     }
 
     suspend fun findLedgerDetailOrThrow(id: Long, uid: Long): LedgerDetailModel {
@@ -56,22 +57,22 @@ class LedgerService(
     }
 
     suspend fun findLedgerDetailOrNull(id: Long, uid: Long): LedgerDetailModel? {
-        return withContext(Dispatchers.IO) { ledgerRepository.findLedgerDetail(id, uid) }
+        return withContext(Dispatchers.IO.withMDCContext()) { ledgerRepository.findLedgerDetail(id, uid) }
     }
 
     suspend fun countPerCategoryId(): List<CountPerCategoryIdModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             ledgerRepository.countPerCategoryId()
         }
     }
 
     suspend fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             ledgerRepository.countPerCategoryIdByUid(uid)
         }
     }
 
     suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
-        return withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(startAt, endAt) }
+        return withContext(Dispatchers.IO.withMDCContext()) { ledgerRepository.countByCreatedAtBetween(startAt, endAt) }
     }
 }

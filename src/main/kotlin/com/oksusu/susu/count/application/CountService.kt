@@ -5,6 +5,7 @@ import com.oksusu.susu.count.domain.vo.CountTargetType
 import com.oksusu.susu.count.infrastructure.CountRepository
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
+import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,7 +29,7 @@ class CountService(
     }
 
     suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType): Count {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO.withMDCContext()) {
             countRepository.findByTargetIdAndTargetType(targetId, targetType)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_COUNT_ERROR)
     }

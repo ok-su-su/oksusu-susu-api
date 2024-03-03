@@ -6,7 +6,9 @@ import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.envelope.model.response.CreateEnvelopesConfigResponse
 import com.oksusu.susu.envelope.model.response.SearchFilterEnvelopeResponse
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.friend.application.RelationshipService
+import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 
 @Service
@@ -24,6 +26,7 @@ class EnvelopeConfigService(
 
     suspend fun getSearchFilter(user: AuthUser): SearchFilterEnvelopeResponse {
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             { envelopeService.findTop1ByUidAndTypeOrderByAmountAsc(user.uid, EnvelopeType.RECEIVED) },
             { envelopeService.findTop1ByUidAndTypeOrderByAmountDesc(user.uid, EnvelopeType.RECEIVED) },
             { envelopeService.findTop1ByUidAndTypeOrderByAmountAsc(user.uid, EnvelopeType.SENT) },

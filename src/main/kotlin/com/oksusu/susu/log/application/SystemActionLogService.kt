@@ -1,5 +1,6 @@
 package com.oksusu.susu.log.application
 
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.log.domain.SystemActionLog
 import com.oksusu.susu.log.infrastructure.SystemActionLogRepository
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,11 @@ class SystemActionLogService(
         startAt: LocalDateTime,
         endAt: LocalDateTime,
     ): Long {
-        return withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(startAt, endAt) }
+        return withContext(Dispatchers.IO.withMDCContext()) {
+            systemActionLogRepository.countByCreatedAtBetween(
+                startAt,
+                endAt
+            )
+        }
     }
 }

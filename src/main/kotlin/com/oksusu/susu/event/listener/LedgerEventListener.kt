@@ -6,6 +6,7 @@ import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.envelope.application.EnvelopeService
 import com.oksusu.susu.event.model.DeleteLedgerEvent
 import com.oksusu.susu.extension.coExecuteOrNull
+import com.oksusu.susu.extension.withMDCContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ class LedgerEventListener(
 ) {
     @TransactionalEventListener
     fun handel(event: DeleteLedgerEvent) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
             val envelopes = envelopeService.findAllByLedgerId(event.ledger.id)
             val envelopeIds = envelopes.map { envelope -> envelope.id }
 

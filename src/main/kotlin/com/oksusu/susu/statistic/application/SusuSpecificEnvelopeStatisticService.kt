@@ -2,6 +2,7 @@ package com.oksusu.susu.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
+import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.statistic.infrastructure.redis.SusuSpecificEnvelopeStatisticRepository
 import com.oksusu.susu.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.statistic.model.TitleValueModel
@@ -28,6 +29,7 @@ class SusuSpecificEnvelopeStatisticService(
         val relationshipKey = cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)
 
         return parZip(
+            Dispatchers.IO.withMDCContext(),
             { findByKey(ageCategoryRelationshipKey) },
             { findByKey(categoryKey) },
             { findByKey(relationshipKey) }
@@ -46,12 +48,12 @@ class SusuSpecificEnvelopeStatisticService(
     }
 
     suspend fun save(key: String, value: Long) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO.withMDCContext()) {
             susuSpecificEnvelopeStatisticRepository.save(key, value)
         }
     }
 
     suspend fun findByKey(key: String): Long? {
-        return withContext(Dispatchers.IO) { susuSpecificEnvelopeStatisticRepository.findByKey(key) }
+        return withContext(Dispatchers.IO.withMDCContext()) { susuSpecificEnvelopeStatisticRepository.findByKey(key) }
     }
 }
