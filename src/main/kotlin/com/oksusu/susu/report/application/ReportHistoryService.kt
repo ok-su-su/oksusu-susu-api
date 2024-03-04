@@ -5,7 +5,6 @@ import com.oksusu.susu.report.domain.ReportHistory
 import com.oksusu.susu.report.domain.vo.ReportTargetType
 import com.oksusu.susu.report.infrastructure.ReportHistoryRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,7 +17,7 @@ class ReportHistoryService(
         targetId: Long,
         targetType: ReportTargetType,
     ): Boolean {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             reportHistoryRepository.existsByUidAndTargetIdAndTargetType(
                 uid = uid,
                 targetId = targetId,

@@ -4,7 +4,6 @@ import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.UserEnvelopeStatisticRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,7 +11,7 @@ class UserEnvelopeStatisticService(
     private val userEnvelopeStatisticRepository: UserEnvelopeStatisticRepository,
 ) {
     suspend fun save(uid: Long, userEnvelopeStatistic: UserEnvelopeStatistic) {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             userEnvelopeStatisticRepository.save(
                 uid,
                 userEnvelopeStatistic
@@ -21,6 +20,6 @@ class UserEnvelopeStatisticService(
     }
 
     suspend fun getStatisticOrNull(uid: Long): UserEnvelopeStatistic? {
-        return withContext(Dispatchers.IO.withMDCContext()) { userEnvelopeStatisticRepository.getStatistic(uid) }
+        return withMDCContext(Dispatchers.IO) { userEnvelopeStatisticRepository.getStatistic(uid) }
     }
 }

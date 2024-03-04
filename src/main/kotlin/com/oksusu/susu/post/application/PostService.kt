@@ -9,7 +9,6 @@ import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
 import com.oksusu.susu.post.infrastructure.repository.model.PostAndUserModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,39 +32,39 @@ class PostService(
     }
 
     suspend fun findByIdOrNull(id: Long): Post? {
-        return withContext(Dispatchers.IO.withMDCContext()) { postRepository.findByIdOrNull(id) }
+        return withMDCContext(Dispatchers.IO) { postRepository.findByIdOrNull(id) }
     }
 
     suspend fun findByIdAndIsActiveAndTypeOrThrow(id: Long, isActive: Boolean, type: PostType): Post {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             postRepository.findByIdAndIsActiveAndType(id, true, PostType.VOTE)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
 
     suspend fun validateExist(id: Long) {
-        withContext(Dispatchers.IO.withMDCContext()) {
+        withMDCContext(Dispatchers.IO) {
             postRepository.existsById(id)
         }.takeIf { isExist -> isExist } ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_POST_ERROR)
     }
 
     suspend fun validateAuthority(id: Long, uid: Long) {
-        withContext(Dispatchers.IO.withMDCContext()) {
+        withMDCContext(Dispatchers.IO) {
             findByIdOrThrow(id)
         }.takeIf { post -> post.uid == uid } ?: throw InvalidRequestException(ErrorCode.NO_AUTHORITY_ERROR)
     }
 
     suspend fun existsById(id: Long): Boolean {
-        return withContext(Dispatchers.IO.withMDCContext()) { postRepository.existsById(id) }
+        return withMDCContext(Dispatchers.IO) { postRepository.existsById(id) }
     }
 
     suspend fun findAllByUid(uid: Long): List<Post> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             postRepository.findAllByUid(uid)
         }
     }
 
     suspend fun getPostAndCreator(id: Long, type: PostType): PostAndUserModel {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             postRepository.getPostAndCreator(id, type)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_POST_ERROR)
     }

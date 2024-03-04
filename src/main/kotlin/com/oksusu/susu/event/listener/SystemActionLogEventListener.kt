@@ -1,11 +1,11 @@
 package com.oksusu.susu.event.listener
 
 import com.oksusu.susu.event.model.SystemActionLogEvent
-import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.log.application.SystemActionLogService
 import com.oksusu.susu.log.domain.SystemActionLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
@@ -16,7 +16,7 @@ class SystemActionLogEventListener(
 ) {
     @EventListener
     fun subscribe(event: SystemActionLogEvent) {
-        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
+        CoroutineScope(Dispatchers.IO + Job()).launch {
             SystemActionLog(
                 ipAddress = event.ipAddress,
                 path = event.path,

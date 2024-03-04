@@ -9,7 +9,6 @@ import com.slack.api.model.block.LayoutBlock
 import com.slack.api.webhook.Payload
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
@@ -45,7 +44,7 @@ class SuspendableSlackAlarmService(
             .blocks(layoutBlocks)
             .build()
 
-        withContext(Dispatchers.IO.withMDCContext()) {
+        withMDCContext(Dispatchers.IO) {
             slackAlarmSender.send(model.url, payload)
         }
     }

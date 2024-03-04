@@ -9,7 +9,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.coroutineScope
 import org.dhatim.fastexcel.Workbook
 import org.springframework.core.io.buffer.DefaultDataBuffer
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
@@ -33,7 +33,7 @@ class ExcelFacade(
     suspend fun getAllEnvelopsExcel(user: AuthUser): DefaultDataBuffer {
         val factory = DefaultDataBufferFactory()
 
-        return withContext(Dispatchers.Default.withMDCContext()) {
+        return coroutineScope {
             val (wb, os) = excelService.initWorkbook()
 
             val sent = async { createSheet(user.uid, wb, SentSheet.getSheet(), excelDataHelper.getSentData) }
@@ -59,7 +59,7 @@ class ExcelFacade(
         do {
             val pageable = PageRequest.of(pageNum, PAGE_SIZE)
 
-            val data = withContext(Dispatchers.IO.withMDCContext()) { func(uid, pageable) }
+            val data = withMDCContext(Dispatchers.IO) { func(uid, pageable) }
 
             excelService.insertData(
                 ws = ws,

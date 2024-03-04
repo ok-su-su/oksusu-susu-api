@@ -6,13 +6,12 @@ import com.oksusu.susu.category.model.CategoryModel
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
-import com.oksusu.susu.extension.withJob
 import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
@@ -28,7 +27,7 @@ class CategoryService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-categories.initial-delay:0}"
     )
     fun refreshCategories() {
-        CoroutineScope(Dispatchers.IO.withJob()).launch {
+        CoroutineScope(Dispatchers.IO + Job()).launch {
             logger.info { "start refresh categories" }
 
             categories = runCatching {
@@ -48,7 +47,7 @@ class CategoryService(
     }
 
     suspend fun findAllByIsActive(isActive: Boolean): List<Category> {
-        return withContext(Dispatchers.IO.withMDCContext()) { categoryRepository.findAllByIsActive(isActive) }
+        return withMDCContext { categoryRepository.findAllByIsActive(isActive) }
     }
 
     fun getCategory(id: Long): CategoryModel {

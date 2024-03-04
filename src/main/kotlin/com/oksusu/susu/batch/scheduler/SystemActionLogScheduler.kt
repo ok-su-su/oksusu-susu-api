@@ -1,7 +1,6 @@
 package com.oksusu.susu.batch.scheduler
 
 import com.oksusu.susu.batch.job.SystemActionLogDeleteJob
-import com.oksusu.susu.extension.withJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +17,7 @@ class SystemActionLogScheduler(
         initialDelayString = "\${oksusu.scheduled-tasks.delete-system-action-log.initial-delay:100}"
     )
     fun runDeleteJob() {
-        CoroutineScope(Dispatchers.IO.withJob()).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             systemActionLogDeleteJob.runDeleteJob()
         }
     }

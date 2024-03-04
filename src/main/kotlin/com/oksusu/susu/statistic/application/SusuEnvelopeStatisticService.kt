@@ -7,7 +7,6 @@ import com.oksusu.susu.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.statistic.infrastructure.redis.SusuEnvelopeStatisticRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,10 +20,10 @@ class SusuEnvelopeStatisticService(
     }
 
     suspend fun getStatisticOrNull(): SusuEnvelopeStatistic? {
-        return withContext(Dispatchers.IO.withMDCContext()) { susuEnvelopeStatisticRepository.getStatistic() }
+        return withMDCContext(Dispatchers.IO) { susuEnvelopeStatisticRepository.getStatistic() }
     }
 
     suspend fun save(susuEnvelopeStatistic: SusuEnvelopeStatistic) {
-        withContext(Dispatchers.IO.withMDCContext()) { susuEnvelopeStatisticRepository.save(susuEnvelopeStatistic) }
+        withMDCContext(Dispatchers.IO) { susuEnvelopeStatisticRepository.save(susuEnvelopeStatistic) }
     }
 }

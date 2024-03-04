@@ -7,7 +7,6 @@ import com.oksusu.susu.friend.domain.FriendRelationship
 import com.oksusu.susu.friend.infrastructure.FriendRelationshipRepository
 import com.oksusu.susu.friend.infrastructure.model.CountPerRelationshipIdModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,23 +20,15 @@ class FriendRelationshipService(
     }
 
     suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
-            friendRelationshipRepository.countPerRelationshipId()
-        }
+        return withMDCContext(Dispatchers.IO) { friendRelationshipRepository.countPerRelationshipId() }
     }
 
     suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
-            friendRelationshipRepository.countPerRelationshipIdByUid(uid)
-        }
+        return withMDCContext(Dispatchers.IO) { friendRelationshipRepository.countPerRelationshipIdByUid(uid) }
     }
 
     suspend fun findAllByFriendIds(friendIds: List<Long>): List<FriendRelationship> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
-            friendRelationshipRepository.findAllByFriendIdIn(
-                friendIds
-            )
-        }
+        return withMDCContext(Dispatchers.IO) { friendRelationshipRepository.findAllByFriendIdIn(friendIds) }
     }
 
     suspend fun findByFriendIdOrThrow(friendId: Long): FriendRelationship {
@@ -45,7 +36,7 @@ class FriendRelationshipService(
     }
 
     suspend fun findByFriendIdOrNull(friendId: Long): FriendRelationship? {
-        return withContext(Dispatchers.IO.withMDCContext()) { friendRelationshipRepository.findByFriendId(friendId) }
+        return withMDCContext(Dispatchers.IO) { friendRelationshipRepository.findByFriendId(friendId) }
     }
 
     @Transactional

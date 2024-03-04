@@ -9,7 +9,6 @@ import com.oksusu.susu.user.domain.vo.UserBlockTargetType
 import com.oksusu.susu.user.infrastructure.UserBlockRepository
 import com.oksusu.susu.user.model.UserAndPostBlockIdModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,7 +18,7 @@ class BlockService(
     private val userBlockRepository: UserBlockRepository,
 ) {
     suspend fun validateNotAlreadyBlock(uid: Long, targetId: Long, targetType: UserBlockTargetType) {
-        withContext(Dispatchers.IO.withMDCContext()) {
+        withMDCContext(Dispatchers.IO) {
             userBlockRepository.existsByUidAndTargetIdAndTargetType(uid, targetId, targetType)
         }.takeUnless { isExist -> isExist } ?: throw InvalidRequestException(ErrorCode.ALREADY_BLOCKED_TARGET)
     }
@@ -30,7 +29,7 @@ class BlockService(
     }
 
     suspend fun findAllByUid(uid: Long): List<UserBlock> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             userBlockRepository.findAllByUid(uid)
         }
     }
@@ -50,7 +49,7 @@ class BlockService(
     }
 
     suspend fun findByIdOrNull(id: Long): UserBlock? {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             userBlockRepository.findByIdOrNull(id)
         }
     }
@@ -70,7 +69,7 @@ class BlockService(
     }
 
     suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: UserBlockTargetType): UserBlock {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             userBlockRepository.findByTargetIdAndTargetType(targetId, targetType)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_BLOCK_ERROR)
     }

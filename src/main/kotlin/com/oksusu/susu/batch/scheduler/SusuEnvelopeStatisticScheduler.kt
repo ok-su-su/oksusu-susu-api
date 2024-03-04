@@ -1,7 +1,6 @@
 package com.oksusu.susu.batch.scheduler
 
 import com.oksusu.susu.batch.job.RefreshSusuEnvelopeStatisticJob
-import com.oksusu.susu.extension.withJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +16,7 @@ class SusuEnvelopeStatisticScheduler(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-susu-envelope-statistic.initial-delay:100}"
     )
     fun refreshSusuEnvelopeStatistic() {
-        CoroutineScope(Dispatchers.IO.withJob()).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             refreshSusuEnvelopeStatisticJob.refreshSusuEnvelopeStatistic()
         }
     }

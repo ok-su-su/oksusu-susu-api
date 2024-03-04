@@ -4,11 +4,11 @@ import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.extension.coExecuteOrNull
-import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.user.application.UserDeviceService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
@@ -22,7 +22,7 @@ class UserDeviceEventListener(
 
     @TransactionalEventListener
     fun createUserDevice(event: CreateUserDeviceEvent) {
-        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
+        CoroutineScope(Dispatchers.IO + Job()).launch {
             logger.info { "${event.publishAt}에 발행된 ${event.userDevice.uid} 유저 디바이스 정보 저장 실행 시작" }
 
             txTemplates.writer.coExecuteOrNull {
@@ -35,12 +35,12 @@ class UserDeviceEventListener(
 
     @TransactionalEventListener
     fun updateUserDevice(event: UpdateUserDeviceEvent) {
-        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
+        CoroutineScope(Dispatchers.IO + Job()).launch {
             logger.info { "${event.publishAt}에 발행된 ${event.userDevice.uid} 유저 디바이스 정보 업데이트 실행 시작" }
 
             val userDevice = userDeviceService.findByUid(event.userDevice.uid)
 
-            txTemplates.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
+            txTemplates.writer.coExecuteOrNull(Dispatchers.IO) {
                 userDevice.apply {
                     applicationVersion = event.userDevice.applicationVersion
                     deviceId = event.userDevice.deviceId

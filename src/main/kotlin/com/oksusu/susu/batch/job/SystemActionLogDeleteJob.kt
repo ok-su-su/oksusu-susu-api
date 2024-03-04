@@ -2,10 +2,10 @@ package com.oksusu.susu.batch.job
 
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.extension.coExecute
-import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.log.application.SystemActionLogService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -24,7 +24,7 @@ class SystemActionLogDeleteJob(
     suspend fun runDeleteJob() {
         val targetDate = LocalDateTime.now().minusDays(DELETE_BEFORE_DAYS)
 
-        val targetLog = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
+        val targetLog = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
             systemActionLogService.findAllByCreatedAtBefore(targetDate)
         }.takeIf { logs -> logs.isNotEmpty() } ?: return
 

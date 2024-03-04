@@ -2,11 +2,11 @@ package com.oksusu.susu.event.listener
 
 import com.oksusu.susu.event.model.SlackErrorAlarmEvent
 import com.oksusu.susu.extension.isProd
-import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.slack.application.SuspendableSlackAlarmService
 import com.oksusu.susu.slack.model.ErrorWebhookDataModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.context.event.EventListener
 import org.springframework.core.env.Environment
@@ -24,7 +24,7 @@ class SlackErrorAlarmEventListener(
             return
         }
 
-        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
+        CoroutineScope(Dispatchers.IO + Job()).launch {
             suspendableSlackAlarmService.sendSlackErrorAlarm(
                 ErrorWebhookDataModel(
                     request = event.request,

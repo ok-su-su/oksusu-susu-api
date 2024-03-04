@@ -4,7 +4,6 @@ import arrow.fx.coroutines.parZip
 import com.oksusu.susu.auth.model.AuthUser
 import com.oksusu.susu.category.application.CategoryService
 import com.oksusu.susu.event.model.CacheUserEnvelopeStatisticEvent
-import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.extension.yearMonth
 import com.oksusu.susu.friend.application.RelationshipService
 import com.oksusu.susu.statistic.domain.UserEnvelopeStatistic
@@ -12,7 +11,6 @@ import com.oksusu.susu.statistic.model.response.SusuEnvelopeStatisticResponse
 import com.oksusu.susu.statistic.model.response.UserEnvelopeStatisticResponse
 import com.oksusu.susu.statistic.model.vo.SusuEnvelopeStatisticRequest
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -38,7 +36,6 @@ class StatisticFacade(
         }
 
         val userEnvelopeStatistic = parZip(
-            Dispatchers.IO.withMDCContext(),
             /** 최근 사용 금액 1년 */
             { envelopeStatisticService.getRecentSpentFor1Year(user.uid) },
             /** 최다 수수 관계 */
@@ -89,7 +86,6 @@ class StatisticFacade(
 
     suspend fun getSusuEnvelopeStatistic(requestParam: SusuEnvelopeStatisticRequest): SusuEnvelopeStatisticResponse {
         return parZip(
-            Dispatchers.IO.withMDCContext(),
             { susuSpecificEnvelopeStatisticService.getStatistic(requestParam) },
             { susuEnvelopeStatisticService.getStatisticOrThrow() }
         ) { tempSpecific, statistic ->

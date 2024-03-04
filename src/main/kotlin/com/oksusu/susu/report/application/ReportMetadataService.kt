@@ -3,7 +3,6 @@ package com.oksusu.susu.report.application
 import com.oksusu.susu.exception.ErrorCode
 import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.resolveCancellation
-import com.oksusu.susu.extension.withJob
 import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.report.domain.ReportMetadata
 import com.oksusu.susu.report.domain.vo.ReportTargetType
@@ -13,7 +12,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -30,7 +28,7 @@ class ReportMetadataService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-report-metadata.initial-delay:0}"
     )
     fun refreshRelationships() {
-        CoroutineScope(Dispatchers.IO.withJob()).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             logger.info { "start refresh report metadata" }
 
             reportMetadata = runCatching {
@@ -46,7 +44,7 @@ class ReportMetadataService(
     }
 
     suspend fun findAll(targetType: ReportTargetType, isActive: Boolean = true): List<ReportMetadata> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             reportMetadataRepository.findAllByTargetTypeAndIsActive(targetType, isActive)
         }
     }
@@ -56,11 +54,11 @@ class ReportMetadataService(
     }
 
     suspend fun findByIdOrNull(id: Long): ReportMetadata? {
-        return withContext(Dispatchers.IO.withMDCContext()) { reportMetadataRepository.findByIdOrNull(id) }
+        return withMDCContext(Dispatchers.IO) { reportMetadataRepository.findByIdOrNull(id) }
     }
 
     suspend fun findAllByIsActive(isActive: Boolean): List<ReportMetadata> {
-        return withContext(Dispatchers.IO.withMDCContext()) { reportMetadataRepository.findAllByIsActive(isActive) }
+        return withMDCContext(Dispatchers.IO) { reportMetadataRepository.findAllByIsActive(isActive) }
     }
 
     suspend fun getAllTargetType(targetType: ReportTargetType): List<ReportMetadataModel> {

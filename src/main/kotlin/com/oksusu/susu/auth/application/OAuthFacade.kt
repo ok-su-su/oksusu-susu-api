@@ -16,7 +16,6 @@ import com.oksusu.susu.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.extension.coExecute
 import com.oksusu.susu.extension.coExecuteOrNull
-import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.term.application.TermAgreementService
 import com.oksusu.susu.term.application.TermService
 import com.oksusu.susu.term.domain.TermAgreement
@@ -35,6 +34,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Service
@@ -76,12 +76,12 @@ class OAuthFacade(
         val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
 
         coroutineScope {
-            val validateNotRegistered = async(Dispatchers.IO.withMDCContext()) {
+            val validateNotRegistered = async(Dispatchers.IO) {
                 userService.validateNotRegistered(
                     oauthInfo
                 )
             }
-            val validateExistTerms = async(Dispatchers.IO.withMDCContext()) {
+            val validateExistTerms = async(Dispatchers.IO) {
                 termService.validateExistTerms(
                     request.termAgreement
                 )
@@ -91,7 +91,7 @@ class OAuthFacade(
             validateExistTerms.await()
         }
 
-        val user = txTemplates.writer.coExecute(Dispatchers.IO.withMDCContext()) {
+        val user = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
             val createdUser = User.toUserEntity(request, oauthInfo)
                 .run { userService.saveSync(this) }
 
@@ -140,7 +140,7 @@ class OAuthFacade(
         val oauthInfo = oAuthService.getOAuthUserInfo(provider, request.accessToken)
         val user = userService.findByOAuthInfoOrThrow(oauthInfo)
 
-        txTemplates.writer.coExecuteOrNull(Dispatchers.IO.withMDCContext()) {
+        txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
             eventPublisher.publishEvent(UpdateUserDeviceEvent(UserDevice.of(deviceContext, user.id)))
         }
 

@@ -6,7 +6,6 @@ import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.user.domain.UserDevice
 import com.oksusu.susu.user.infrastructure.UserDeviceRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,7 +19,7 @@ class UserDeviceService(
     }
 
     suspend fun findByUid(uid: Long): UserDevice {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             userDeviceRepository.findByUid(uid)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_DEVICE_ERROR)
     }

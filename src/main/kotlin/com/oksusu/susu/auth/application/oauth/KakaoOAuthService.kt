@@ -8,7 +8,6 @@ import com.oksusu.susu.config.OAuthConfig
 import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
@@ -58,21 +57,21 @@ class KakaoOAuthService(
     }
 
     private suspend fun getKakaoToken(redirectUrl: String, code: String): OAuthTokenResponse {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             kakaoClient.getToken(redirectUrl, code)
         }.run { OAuthTokenResponse.fromKakao(this) }
     }
 
     /** 유저 정보를 가져옵니다. */
     suspend fun getKakaoUserInfo(accessToken: String): OAuthUserInfoDto {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             kakaoClient.getUserInfo(accessToken)
         }.run { OAuthUserInfoDto.fromKakao(this) }
     }
 
     /** 회원 탈퇴합니다 */
     suspend fun withdraw(oAuthId: String) {
-        withContext(Dispatchers.IO.withMDCContext()) {
+        withMDCContext(Dispatchers.IO) {
             kakaoClient.withdraw(oAuthId)
         }
     }

@@ -3,7 +3,6 @@ package com.oksusu.susu.batch.scheduler
 import com.oksusu.susu.batch.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.config.environment.EnvironmentType
-import com.oksusu.susu.extension.withJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,14 +18,14 @@ class SusuStatisticsSummaryScheduler(
 ) {
     @Scheduled(cron = "0 0 0/1 * * *")
     fun runHourSummary() {
-        CoroutineScope(Dispatchers.IO.withJob()).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             hourSummaryJob.runHourSummaryJob()
         }
     }
 
     @Scheduled(cron = "0 0 9 * * *")
     fun runDailySummary() {
-        CoroutineScope(Dispatchers.IO.withJob()).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             dailySummaryJob.runDailySummaryJob()
         }
     }

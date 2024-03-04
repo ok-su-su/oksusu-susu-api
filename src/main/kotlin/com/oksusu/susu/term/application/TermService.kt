@@ -6,7 +6,6 @@ import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.term.domain.Term
 import com.oksusu.susu.term.infrastructure.TermRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -19,19 +18,19 @@ class TermService(
     }
 
     suspend fun findByIdOrNull(id: Long): Term? {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             termRepository.findByIdOrNull(id)
         }
     }
 
     suspend fun getAllActiveTerms(): List<Term> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             termRepository.findAllByIsActiveOrderByIsEssentialDesc(true)
         }
     }
 
     suspend fun validateExistTerms(ids: List<Long>) {
-        withContext(Dispatchers.IO.withMDCContext()) {
+        withMDCContext(Dispatchers.IO) {
             termRepository.countAllByIdIn(ids)
         }.takeIf { count -> count == ids.size.toLong() }
             ?: throw InvalidRequestException(ErrorCode.NOT_FOUND_TERM_ERROR)

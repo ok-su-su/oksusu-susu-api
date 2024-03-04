@@ -4,7 +4,6 @@ import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.log.domain.SystemActionLog
 import com.oksusu.susu.log.infrastructure.SystemActionLogRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -31,7 +30,7 @@ class SystemActionLogService(
         startAt: LocalDateTime,
         endAt: LocalDateTime,
     ): Long {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             systemActionLogRepository.countByCreatedAtBetween(
                 startAt,
                 endAt

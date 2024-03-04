@@ -5,7 +5,6 @@ import com.oksusu.susu.post.domain.VoteOption
 import com.oksusu.susu.post.infrastructure.repository.VoteOptionRepository
 import com.oksusu.susu.post.infrastructure.repository.model.VoteOptionAndCountModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,19 +18,19 @@ class VoteOptionService(
     }
 
     suspend fun getOptionsByPostIdIn(postIds: List<Long>): List<VoteOption> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             voteOptionRepository.findAllByPostIdInOrderBySeq(postIds)
         }
     }
 
     suspend fun getVoteOptions(postId: Long): List<VoteOption> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             voteOptionRepository.findAllByPostIdOrderBySeq(postId)
         }
     }
 
     suspend fun getOptionAndCount(postId: Long): List<VoteOptionAndCountModel> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             voteOptionRepository.getOptionAndCount(postId)
         }
     }

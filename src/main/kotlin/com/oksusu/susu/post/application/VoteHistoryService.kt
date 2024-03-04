@@ -6,7 +6,6 @@ import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.post.domain.VoteHistory
 import com.oksusu.susu.post.infrastructure.repository.VoteHistoryRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -32,13 +31,13 @@ class VoteHistoryService(
     }
 
     suspend fun existsByUidAndPostId(uid: Long, postId: Long): Boolean {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             voteHistoryRepository.existsByUidAndPostId(uid, postId)
         }
     }
 
     suspend fun existsByUidAndPostIdAndVoteOptionId(uid: Long, postId: Long, optionId: Long): Boolean {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             voteHistoryRepository.existsByUidAndPostIdAndVoteOptionId(uid, postId, optionId)
         }
     }
@@ -49,7 +48,7 @@ class VoteHistoryService(
     }
 
     suspend fun findByUidAndPostId(uid: Long, postId: Long): VoteHistory? {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             voteHistoryRepository.findByUidAndPostId(uid, postId)
         }
     }

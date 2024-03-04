@@ -6,10 +6,13 @@ import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.post.domain.Post
 import com.oksusu.susu.post.domain.vo.PostType
 import com.oksusu.susu.post.infrastructure.repository.PostRepository
-import com.oksusu.susu.post.infrastructure.repository.model.*
+import com.oksusu.susu.post.infrastructure.repository.model.GetVoteSpec
+import com.oksusu.susu.post.infrastructure.repository.model.PostAndUserModel
+import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteCountModel
+import com.oksusu.susu.post.infrastructure.repository.model.PostAndVoteOptionModel
+import com.oksusu.susu.post.infrastructure.repository.model.SearchVoteSpec
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
@@ -22,7 +25,7 @@ class VoteService(
     val logger = KotlinLogging.logger { }
 
     suspend fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             postRepository.getVoteAndCountExceptBlock(spec)
         }
     }
@@ -32,7 +35,7 @@ class VoteService(
     }
 
     suspend fun getVoteAndOptions(id: Long): List<PostAndVoteOptionModel> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             postRepository.getVoteAndOptions(id)
         }.takeUnless { it.isEmpty() } ?: throw NotFoundException(ErrorCode.NOT_FOUND_VOTE_ERROR)
     }
@@ -51,7 +54,7 @@ class VoteService(
             pageable = PageRequest.of(0, size)
         )
 
-        return withContext(Dispatchers.IO.withMDCContext()) { postRepository.getVoteAndCountExceptBlock(spec) }.content
+        return withMDCContext(Dispatchers.IO) { postRepository.getVoteAndCountExceptBlock(spec) }.content
     }
 
     suspend fun getVoteAndCreator(id: Long): PostAndUserModel {

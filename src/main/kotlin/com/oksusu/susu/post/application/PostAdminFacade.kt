@@ -5,10 +5,8 @@ import com.oksusu.susu.auth.model.AdminUser
 import com.oksusu.susu.config.database.TransactionTemplates
 import com.oksusu.susu.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.extension.coExecute
-import com.oksusu.susu.extension.withMDCContext
 import com.oksusu.susu.post.domain.vo.PostType
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
@@ -32,7 +30,6 @@ class PostAdminFacade(
 
     private suspend fun deleteVote(id: Long) {
         val (vote, options) = parZip(
-            Dispatchers.IO.withMDCContext(),
             { voteService.getVote(id) },
             { voteOptionService.getVoteOptions(id) }
         ) { vote, options -> vote to options }

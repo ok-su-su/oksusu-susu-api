@@ -3,11 +3,11 @@ package com.oksusu.susu.event.listener
 import com.oksusu.susu.event.model.SentryCaptureExceptionEvent
 import com.oksusu.susu.extension.isProd
 import com.oksusu.susu.extension.remoteIp
-import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.context.event.EventListener
@@ -29,7 +29,7 @@ class SentryCaptureExceptionEventListener(
             return
         }
 
-        CoroutineScope(Dispatchers.IO.withMDCContext()).launch {
+        CoroutineScope(Dispatchers.IO + Job()).launch {
             val throwable = event.exception
             val request = event.request
 

@@ -9,7 +9,6 @@ import com.oksusu.susu.statistic.model.TitleValueModel
 import com.oksusu.susu.statistic.model.vo.SusuEnvelopeStatisticRequest
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
 @Service
@@ -29,7 +28,6 @@ class SusuSpecificEnvelopeStatisticService(
         val relationshipKey = cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)
 
         return parZip(
-            Dispatchers.IO.withMDCContext(),
             { findByKey(ageCategoryRelationshipKey) },
             { findByKey(categoryKey) },
             { findByKey(relationshipKey) }
@@ -48,12 +46,12 @@ class SusuSpecificEnvelopeStatisticService(
     }
 
     suspend fun save(key: String, value: Long) {
-        withContext(Dispatchers.IO.withMDCContext()) {
+        withMDCContext(Dispatchers.IO) {
             susuSpecificEnvelopeStatisticRepository.save(key, value)
         }
     }
 
     suspend fun findByKey(key: String): Long? {
-        return withContext(Dispatchers.IO.withMDCContext()) { susuSpecificEnvelopeStatisticRepository.findByKey(key) }
+        return withMDCContext(Dispatchers.IO) { susuSpecificEnvelopeStatisticRepository.findByKey(key) }
     }
 }

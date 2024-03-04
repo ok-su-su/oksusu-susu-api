@@ -5,7 +5,6 @@ import com.oksusu.susu.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.category.infrastructure.CategoryAssignmentRepository
 import com.oksusu.susu.extension.withMDCContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -29,7 +28,7 @@ class CategoryAssignmentService(
     }
 
     suspend fun findByIdAndTypeOrNull(targetId: Long, targetType: CategoryAssignmentType): CategoryAssignment? {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             categoryAssignmentRepository.findByTargetIdAndTargetType(targetId, targetType)
         }
     }
@@ -38,7 +37,7 @@ class CategoryAssignmentService(
         targetType: CategoryAssignmentType,
         targetIds: List<Long>,
     ): List<CategoryAssignment> {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             categoryAssignmentRepository.findAllByTargetTypeAndTargetIdIn(targetType, targetIds)
         }
     }

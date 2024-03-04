@@ -8,7 +8,6 @@ import com.oksusu.susu.exception.NotFoundException
 import com.oksusu.susu.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -29,7 +28,7 @@ class CountService(
     }
 
     suspend fun findByTargetIdAndTargetType(targetId: Long, targetType: CountTargetType): Count {
-        return withContext(Dispatchers.IO.withMDCContext()) {
+        return withMDCContext(Dispatchers.IO) {
             countRepository.findByTargetIdAndTargetType(targetId, targetType)
         } ?: throw NotFoundException(ErrorCode.NOT_FOUND_COUNT_ERROR)
     }
