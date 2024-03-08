@@ -54,39 +54,39 @@ springBoot.buildInfo { properties { } }
 
 object DependencyVersion {
     /** querydsl */
-    const val QUERYDSL_VERSION = "5.0.0"
+    const val QUERYDSL = "5.0.0"
 
     /** arrow fx */
-    const val ARROW_FX_VERSION = "1.2.1"
+    const val ARROW_FX = "1.2.1"
 
     /** jwt */
-    const val JWT_VERSION = "4.4.0"
+    const val JWT = "4.4.0"
 
     /** springdoc */
-    const val SPRINGDOC_VERSION = "2.3.0"
-    const val JAVADOC_SCRIBE_VERSION = "0.15.0"
+    const val SPRINGDOC = "2.3.0"
+    const val JAVADOC_SCRIBE = "0.15.0"
 
     /** log */
-    const val KOTLIN_LOGGING_VERSION = "6.0.3"
-    const val LOGBACK_ENCODER_VERSION = "7.4"
+    const val KOTLIN_LOGGING = "6.0.3"
+    const val LOGBACK_ENCODER = "7.4"
 
     /** fastexcel */
-    const val FASTEXCEL_VERSION = "0.17.0"
+    const val FASTEXCEL = "0.17.0"
 
     /** aws */
-    const val AWS_SDK_V2_VERSION = "2.24.13"
-    const val SPRING_CLOUD_AWS_VERSION = "3.1.0"
+    const val AWS_SDK_V2 = "2.24.13"
+    const val SPRING_CLOUD_AWS = "3.1.0"
 
     /** slack */
-    const val SLACK_API_VERSION = "1.38.2"
+    const val SLACK_API = "1.38.2"
 
     /** sentry */
-    const val SENTRY_VERSION = "7.3.0"
+    const val SENTRY = "7.3.0"
 
     /** test */
-    const val MOCKK_VERSION = "1.13.9"
-    const val KOTEST_VERSION = "5.8.0"
-    const val KOTEST_EXTENSION_VERSION = "1.1.3"
+    const val MOCKK = "1.13.9"
+    const val KOTEST = "5.8.0"
+    const val KOTEST_EXTENSION = "1.1.3"
 }
 
 dependencies {
@@ -106,49 +106,49 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     /** querydsl */
-    implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
-    kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL_VERSION}:jakarta")
+    implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL}:jakarta")
+    kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL}:jakarta")
 
     /** arrow-kt */
-    implementation("io.arrow-kt:arrow-fx-coroutines:${DependencyVersion.ARROW_FX_VERSION}")
-    implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX_VERSION}")
+    implementation("io.arrow-kt:arrow-fx-coroutines:${DependencyVersion.ARROW_FX}")
+    implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX}")
 
     /** jwt */
-    implementation("com.auth0:java-jwt:${DependencyVersion.JWT_VERSION}")
+    implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
 
     /** swagger */
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC_VERSION}")
-    runtimeOnly("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE_VERSION}")
-    kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE_VERSION}")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC}")
+    runtimeOnly("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
+    kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
 
     /** database */
     runtimeOnly("com.mysql:mysql-connector-j")
 
     /** logger */
-    implementation("io.github.oshai:kotlin-logging-jvm:${DependencyVersion.KOTLIN_LOGGING_VERSION}")
-    implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER_VERSION}")
+    implementation("io.github.oshai:kotlin-logging-jvm:${DependencyVersion.KOTLIN_LOGGING}")
+    implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER}")
 
     /** thymeleaf */
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     /** fastexcel */
-    implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL_VERSION}")
+    implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL}")
 
     /** aws v2 */
-    implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2_VERSION}"))
+    implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2}"))
     implementation("software.amazon.awssdk:sts")
 
     /** aws ssm */
     implementation(
-        platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS_VERSION}")
+        platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}")
     )
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
     /** slack */
-    implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API_VERSION}")
+    implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API}")
 
     /** sentry */
-    implementation(platform("io.sentry:sentry-bom:${DependencyVersion.SENTRY_VERSION}"))
+    implementation(platform("io.sentry:sentry-bom:${DependencyVersion.SENTRY}"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 
@@ -157,12 +157,12 @@ dependencies {
 
     /** test **/
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK_VERSION}")
+    testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK}")
 
     /** kotest */
-    testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST_VERSION}")
-    testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
+    testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST}")
+    testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST}")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION}")
 }
 
 defaultTasks("bootRun")
@@ -276,7 +276,7 @@ sonarqube {
         property(
             "sonar.exclusions",
             "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, " +
-                "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+                    "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.java.binaries", project.layout.buildDirectory.dir("/classes").get().asFile.path)
