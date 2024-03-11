@@ -1,7 +1,8 @@
 package com.oksusu.susu.api.auth.model
 
-import com.oksusu.susu.api.client.oauth.kakao.model.KakaoOAuthUserInfoResponse
-import com.oksusu.susu.api.user.domain.vo.OauthInfo
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthUserInfoResponse
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
+import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 
 /** oauth 정보 dto */
 class OAuthUserInfoDto(

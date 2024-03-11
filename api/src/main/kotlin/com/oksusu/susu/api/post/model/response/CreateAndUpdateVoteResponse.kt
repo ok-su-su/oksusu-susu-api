@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.post.model.response
 
-import com.oksusu.susu.api.extension.equalsFromYearToSec
-import com.oksusu.susu.api.post.domain.Post
+import com.oksusu.susu.common.extension.equalsFromYearToSec
+import com.oksusu.susu.domain.post.domain.Post
 import com.oksusu.susu.api.post.model.BoardModel
 import com.oksusu.susu.api.post.model.VoteOptionAndHistoryModel
 import java.time.LocalDateTime

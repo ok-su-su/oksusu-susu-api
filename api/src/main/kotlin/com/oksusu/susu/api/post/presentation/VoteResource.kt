@@ -1,12 +1,12 @@
 package com.oksusu.susu.api.post.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.api.dto.SusuPageRequest
+import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.api.extension.wrapCreated
-import com.oksusu.susu.api.extension.wrapOk
-import com.oksusu.susu.api.extension.wrapSlice
-import com.oksusu.susu.api.extension.wrapVoid
+import com.oksusu.susu.common.extension.wrapCreated
+import com.oksusu.susu.common.extension.wrapOk
+import com.oksusu.susu.common.extension.wrapSlice
+import com.oksusu.susu.common.extension.wrapVoid
 import com.oksusu.susu.api.post.application.VoteFacade
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest

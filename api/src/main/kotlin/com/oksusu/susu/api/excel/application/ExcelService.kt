@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.excel.application
 
 import com.oksusu.susu.api.excel.model.Sheet
-import com.oksusu.susu.api.extension.getPropertyValues
+import com.oksusu.susu.common.extension.getPropertyValues
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.dhatim.fastexcel.BorderStyle
 import org.dhatim.fastexcel.Workbook

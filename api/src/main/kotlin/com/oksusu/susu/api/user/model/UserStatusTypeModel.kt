@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.user.model
 
-import com.oksusu.susu.api.user.domain.UserStatusType
-import com.oksusu.susu.api.user.domain.vo.UserStatusTypeInfo
+import com.oksusu.susu.domain.user.domain.UserStatusType
+import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
 
 /** 유저 상태 정보 타입 */
 class UserStatusTypeModel(

@@ -2,7 +2,7 @@ package com.oksusu.susu.api.batch.scheduler
 
 import com.oksusu.susu.api.batch.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.api.batch.job.SusuStatisticsHourSummaryJob
-import com.oksusu.susu.api.config.environment.EnvironmentType
+import com.oksusu.susu.common.config.environment.EnvironmentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
-@Profile(EnvironmentType.PROFILE_PROD)
+@Profile(com.oksusu.susu.common.config.environment.EnvironmentType.PROFILE_PROD)
 @Component
 class SusuStatisticsSummaryScheduler(
     private val hourSummaryJob: SusuStatisticsHourSummaryJob,

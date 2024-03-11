@@ -1,14 +1,14 @@
 package com.oksusu.susu.api.event.model
 
-import com.oksusu.susu.api.envelope.domain.Ledger
-import com.oksusu.susu.api.extension.mapper
-import com.oksusu.susu.api.extension.remoteIp
-import com.oksusu.susu.api.statistic.domain.UserEnvelopeStatistic
-import com.oksusu.susu.api.term.domain.TermAgreement
-import com.oksusu.susu.api.term.domain.vo.TermAgreementChangeType
-import com.oksusu.susu.api.user.domain.UserDevice
-import com.oksusu.susu.api.user.domain.UserStatusHistory
-import com.oksusu.susu.api.user.domain.UserWithdraw
+import com.oksusu.susu.domain.envelope.domain.Ledger
+import com.oksusu.susu.common.extension.mapper
+import com.oksusu.susu.common.extension.remoteIp
+import com.oksusu.susu.domain.statistic.domain.UserEnvelopeStatistic
+import com.oksusu.susu.domain.term.domain.TermAgreement
+import com.oksusu.susu.domain.term.domain.vo.TermAgreementChangeType
+import com.oksusu.susu.domain.user.domain.UserDevice
+import com.oksusu.susu.domain.user.domain.UserStatusHistory
+import com.oksusu.susu.domain.user.domain.UserWithdraw
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.server.ServerWebExchange
 import java.time.LocalDateTime

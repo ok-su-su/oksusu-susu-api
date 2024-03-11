@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.user.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.user.domain.UserDevice
-import com.oksusu.susu.api.user.infrastructure.UserDeviceRepository
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.user.domain.UserDevice
+import com.oksusu.susu.domain.user.infrastructure.UserDeviceRepository
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

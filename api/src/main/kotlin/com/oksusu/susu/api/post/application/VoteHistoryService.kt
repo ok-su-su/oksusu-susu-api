@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.InvalidRequestException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.post.domain.VoteHistory
-import com.oksusu.susu.api.post.infrastructure.repository.VoteHistoryRepository
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.post.domain.VoteHistory
+import com.oksusu.susu.domain.post.infrastructure.repository.VoteHistoryRepository
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

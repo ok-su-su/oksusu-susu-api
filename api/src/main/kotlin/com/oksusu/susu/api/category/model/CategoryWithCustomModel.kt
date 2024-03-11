@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.category.model
 
-import com.oksusu.susu.api.category.domain.CategoryAssignment
+import com.oksusu.susu.domain.category.domain.CategoryAssignment
 
 /** 커스텀 카테고리 정보를 포함 모델 */
 data class CategoryWithCustomModel(

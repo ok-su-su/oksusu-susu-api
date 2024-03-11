@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.statistic.application
 
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.statistic.domain.UserEnvelopeStatistic
-import com.oksusu.susu.api.statistic.infrastructure.redis.UserEnvelopeStatisticRepository
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.statistic.domain.UserEnvelopeStatistic
+import com.oksusu.susu.domain.statistic.infrastructure.redis.UserEnvelopeStatisticRepository
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 

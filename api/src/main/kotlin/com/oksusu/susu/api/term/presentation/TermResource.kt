@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.term.presentation
 
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.api.extension.wrapOk
+import com.oksusu.susu.common.extension.wrapOk
 import com.oksusu.susu.api.term.application.TermFacade
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

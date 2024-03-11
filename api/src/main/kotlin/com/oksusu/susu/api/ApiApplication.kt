@@ -1,6 +1,6 @@
 package com.oksusu.susu.api
 
-import com.oksusu.susu.api.extension.Zone
+import com.oksusu.susu.common.extension.Zone
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent

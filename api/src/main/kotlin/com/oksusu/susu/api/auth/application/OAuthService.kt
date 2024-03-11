@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.auth.application
 
 import com.oksusu.susu.api.auth.application.oauth.KakaoOAuthService
-import com.oksusu.susu.api.auth.model.OAuthProvider
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
-import com.oksusu.susu.api.user.domain.vo.OauthInfo
+import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Service

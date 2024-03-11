@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.user.application
 
-import com.oksusu.susu.api.user.domain.UserStatus
-import com.oksusu.susu.api.user.infrastructure.UserStatusRepository
+import com.oksusu.susu.domain.user.domain.UserStatus
+import com.oksusu.susu.domain.user.infrastructure.UserStatusRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

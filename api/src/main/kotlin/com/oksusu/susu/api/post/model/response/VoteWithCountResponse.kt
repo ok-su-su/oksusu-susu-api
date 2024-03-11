@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.post.model.response
 
-import com.oksusu.susu.api.extension.equalsFromYearToSec
-import com.oksusu.susu.api.post.infrastructure.repository.model.PostAndVoteCountModel
+import com.oksusu.susu.common.extension.equalsFromYearToSec
+import com.oksusu.susu.domain.post.infrastructure.repository.model.PostAndVoteCountModel
 import com.oksusu.susu.api.post.model.BoardModel
 
 data class VoteWithCountResponse(

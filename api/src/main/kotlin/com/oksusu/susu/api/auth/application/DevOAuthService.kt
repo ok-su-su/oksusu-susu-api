@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.auth.application
 
 import com.oksusu.susu.api.auth.application.oauth.KakaoOAuthService
-import com.oksusu.susu.api.auth.model.OAuthProvider
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
 import io.github.oshai.kotlinlogging.KotlinLogging

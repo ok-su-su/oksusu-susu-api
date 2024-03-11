@@ -1,11 +1,11 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.resolveCancellation
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.post.domain.Board
-import com.oksusu.susu.api.post.infrastructure.repository.BoardRepository
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.resolveCancellation
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.post.domain.Board
+import com.oksusu.susu.domain.post.infrastructure.repository.BoardRepository
 import com.oksusu.susu.api.post.model.BoardModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope

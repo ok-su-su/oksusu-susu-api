@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.user.model.request
 
-import com.oksusu.susu.api.user.domain.vo.Gender
+import com.oksusu.susu.domain.user.domain.vo.Gender
 import java.time.LocalDate
 
 data class UpdateUserInfoRequest(

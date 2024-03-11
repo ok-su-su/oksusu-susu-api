@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.report.model.request
 
-import com.oksusu.susu.api.report.domain.vo.ReportTargetType
+import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
 
 data class ReportCreateRequest(
     val metadataId: Long,

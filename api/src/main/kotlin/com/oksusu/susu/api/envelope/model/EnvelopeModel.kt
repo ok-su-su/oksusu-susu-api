@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.envelope.model
 
-import com.oksusu.susu.api.envelope.domain.Envelope
-import com.oksusu.susu.api.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.domain.envelope.domain.Envelope
+import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import java.time.LocalDateTime
 
 data class EnvelopeModel(

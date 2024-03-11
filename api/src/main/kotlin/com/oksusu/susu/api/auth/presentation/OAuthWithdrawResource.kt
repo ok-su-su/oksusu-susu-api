@@ -2,7 +2,7 @@ package com.oksusu.susu.api.auth.presentation
 
 import com.oksusu.susu.api.auth.application.OAuthFacade
 import com.oksusu.susu.api.auth.application.OAuthService
-import com.oksusu.susu.api.auth.model.OAuthProvider
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model

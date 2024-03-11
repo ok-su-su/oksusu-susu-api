@@ -1,12 +1,12 @@
 package com.oksusu.susu.api.friend.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.api.dto.SusuPageRequest
+import com.oksusu.susu.common.dto.SusuPageRequest
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.api.extension.wrapCreated
-import com.oksusu.susu.api.extension.wrapOk
-import com.oksusu.susu.api.extension.wrapPage
-import com.oksusu.susu.api.extension.wrapVoid
+import com.oksusu.susu.common.extension.wrapCreated
+import com.oksusu.susu.common.extension.wrapOk
+import com.oksusu.susu.common.extension.wrapPage
+import com.oksusu.susu.common.extension.wrapVoid
 import com.oksusu.susu.api.friend.application.FriendFacade
 import com.oksusu.susu.api.friend.model.request.CreateAndUpdateFriendRequest
 import com.oksusu.susu.api.friend.model.request.SearchFriendRequest

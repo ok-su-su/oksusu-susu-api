@@ -1,9 +1,9 @@
 package com.oksusu.susu.api.report.application
 
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.report.domain.ReportHistory
-import com.oksusu.susu.api.report.domain.vo.ReportTargetType
-import com.oksusu.susu.api.report.infrastructure.ReportHistoryRepository
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.report.domain.ReportHistory
+import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
+import com.oksusu.susu.domain.report.infrastructure.ReportHistoryRepository
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

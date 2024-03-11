@@ -2,7 +2,7 @@ package com.oksusu.susu.api.user.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.api.extension.wrapOk
+import com.oksusu.susu.common.extension.wrapOk
 import com.oksusu.susu.api.user.application.UserFacade
 import com.oksusu.susu.api.user.model.request.UpdateUserInfoRequest
 import io.swagger.v3.oas.annotations.Operation

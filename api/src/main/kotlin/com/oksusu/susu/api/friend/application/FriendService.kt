@@ -1,12 +1,12 @@
 package com.oksusu.susu.api.friend.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.friend.domain.Friend
-import com.oksusu.susu.api.friend.infrastructure.FriendRepository
-import com.oksusu.susu.api.friend.infrastructure.model.FriendAndFriendRelationshipModel
-import com.oksusu.susu.api.friend.infrastructure.model.SearchFriendSpec
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.friend.domain.Friend
+import com.oksusu.susu.domain.friend.infrastructure.FriendRepository
+import com.oksusu.susu.domain.friend.infrastructure.model.FriendAndFriendRelationshipModel
+import com.oksusu.susu.domain.friend.infrastructure.model.SearchFriendSpec
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

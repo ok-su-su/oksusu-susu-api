@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.envelope.model
 
-import com.oksusu.susu.api.envelope.domain.Ledger
+import com.oksusu.susu.domain.envelope.domain.Ledger
 import java.time.LocalDateTime
 
 /** 장부 공통 모델 */

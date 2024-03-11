@@ -1,33 +1,34 @@
 package com.oksusu.susu.api.auth.application
 
-import com.oksusu.susu.api.auth.domain.RefreshToken
+import com.oksusu.susu.domain.auth.domain.RefreshToken
 import com.oksusu.susu.api.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.api.auth.model.OAuthProvider
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import com.oksusu.susu.api.auth.model.TokenDto
 import com.oksusu.susu.api.auth.model.request.OAuthLoginRequest
 import com.oksusu.susu.api.auth.model.request.OAuthRegisterRequest
 import com.oksusu.susu.api.auth.model.response.AbleRegisterResponse
 import com.oksusu.susu.api.auth.model.response.UserOAuthInfoResponse
-import com.oksusu.susu.api.config.database.TransactionTemplates
+import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.api.event.model.CreateUserStatusHistoryEvent
 import com.oksusu.susu.api.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.api.event.model.UpdateUserDeviceEvent
-import com.oksusu.susu.api.extension.coExecute
-import com.oksusu.susu.api.extension.coExecuteOrNull
+import com.oksusu.susu.common.extension.coExecute
+import com.oksusu.susu.common.extension.coExecuteOrNull
 import com.oksusu.susu.api.term.application.TermAgreementService
 import com.oksusu.susu.api.term.application.TermService
-import com.oksusu.susu.api.term.domain.TermAgreement
-import com.oksusu.susu.api.term.domain.vo.TermAgreementChangeType
+import com.oksusu.susu.domain.term.domain.TermAgreement
+import com.oksusu.susu.domain.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.api.user.application.UserService
 import com.oksusu.susu.api.user.application.UserStatusService
 import com.oksusu.susu.api.user.application.UserStatusTypeService
-import com.oksusu.susu.api.user.domain.User
-import com.oksusu.susu.api.user.domain.UserDevice
-import com.oksusu.susu.api.user.domain.UserStatus
-import com.oksusu.susu.api.user.domain.UserStatusHistory
-import com.oksusu.susu.api.user.domain.vo.UserStatusAssignmentType
+import com.oksusu.susu.domain.user.domain.User
+import com.oksusu.susu.domain.user.domain.UserDevice
+import com.oksusu.susu.domain.user.domain.UserStatus
+import com.oksusu.susu.domain.user.domain.UserStatusHistory
+import com.oksusu.susu.domain.user.domain.vo.AccountRole
+import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import com.oksusu.susu.api.user.model.UserDeviceContext
 import com.oksusu.susu.api.user.model.UserDeviceContextImpl
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -92,8 +93,13 @@ class OAuthFacade(
         }
 
         val user = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
-            val createdUser = User.toUserEntity(request, oauthInfo)
-                .run { userService.saveSync(this) }
+            val createdUser = User(
+                oauthInfo = oauthInfo,
+                name = request.name,
+                gender = request.gender,
+                birth = request.getBirth(),
+                role = AccountRole.USER
+            ).run { userService.saveSync(this) }
 
             UserStatus(
                 uid = createdUser.id,
@@ -105,6 +111,21 @@ class OAuthFacade(
                 .map { TermAgreement(uid = createdUser.id, termId = it) }
                 .run { termAgreementService.saveAllSync(this) }
 
+            val userDevice = UserDevice(
+                uid = createdUser.id,
+                applicationVersion = deviceContext.applicationVersion,
+                deviceId = deviceContext.deviceId,
+                deviceSoftwareVersion = deviceContext.deviceSoftwareVersion,
+                lineNumber = deviceContext.lineNumber,
+                networkCountryIso = deviceContext.networkCountryIso,
+                networkOperator = deviceContext.networkOperator,
+                networkOperatorName = deviceContext.networkOperatorName,
+                networkType = deviceContext.networkType,
+                phoneType = deviceContext.phoneType,
+                simSerialNumber = deviceContext.simSerialNumber,
+                simState = deviceContext.simState
+            )
+
             eventPublisher.publishEvent(
                 TermAgreementHistoryCreateEvent(
                     termAgreements = termAgreements,
@@ -112,7 +133,7 @@ class OAuthFacade(
                 )
             )
             eventPublisher.publishEvent(
-                CreateUserDeviceEvent(UserDevice.of(deviceContext, createdUser.id))
+                CreateUserDeviceEvent(userDevice)
             )
             eventPublisher.publishEvent(
                 CreateUserStatusHistoryEvent(
@@ -140,8 +161,23 @@ class OAuthFacade(
         val oauthInfo = oAuthService.getOAuthUserInfo(provider, request.accessToken)
         val user = userService.findByOAuthInfoOrThrow(oauthInfo)
 
+        val userDevice = UserDevice(
+            uid = user.id,
+            applicationVersion = deviceContext.applicationVersion,
+            deviceId = deviceContext.deviceId,
+            deviceSoftwareVersion = deviceContext.deviceSoftwareVersion,
+            lineNumber = deviceContext.lineNumber,
+            networkCountryIso = deviceContext.networkCountryIso,
+            networkOperator = deviceContext.networkOperator,
+            networkOperatorName = deviceContext.networkOperatorName,
+            networkType = deviceContext.networkType,
+            phoneType = deviceContext.phoneType,
+            simSerialNumber = deviceContext.simSerialNumber,
+            simState = deviceContext.simState
+        )
+
         txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
-            eventPublisher.publishEvent(UpdateUserDeviceEvent(UserDevice.of(deviceContext, user.id)))
+            eventPublisher.publishEvent(UpdateUserDeviceEvent(userDevice))
         }
 
         return generateTokenDto(user.id)

@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.count.model
 
-import com.oksusu.susu.api.count.domain.vo.CountTargetType
-import com.oksusu.susu.api.count.domain.vo.CountType
+import com.oksusu.susu.domain.count.domain.vo.CountTargetType
+import com.oksusu.susu.domain.count.domain.vo.CountType
 
 /** 카운트 모델 */
 class CountModel(

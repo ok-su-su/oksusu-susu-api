@@ -1,11 +1,11 @@
 package com.oksusu.susu.api.metadata.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.resolveCancellation
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.metadata.domain.ApplicationMetadata
-import com.oksusu.susu.api.metadata.infrastructure.ApplicationMetadataRepository
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.resolveCancellation
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.metadata.domain.ApplicationMetadata
+import com.oksusu.susu.domain.metadata.infrastructure.ApplicationMetadataRepository
 import com.oksusu.susu.api.metadata.model.ApplicationMetadataModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope

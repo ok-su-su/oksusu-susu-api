@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.post.model
 
-import com.oksusu.susu.api.post.domain.Post
+import com.oksusu.susu.domain.post.domain.Post
 import java.time.LocalDateTime
 
 /** 투표 + 투표수 모델 */

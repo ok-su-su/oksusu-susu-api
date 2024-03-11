@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.user.model
 
-import com.oksusu.susu.api.user.domain.vo.UserBlockTargetType
+import com.oksusu.susu.domain.user.domain.vo.UserBlockTargetType
 
 /** 차단 모델 */
 class BlockModel(

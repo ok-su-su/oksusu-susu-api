@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.post.model
 
-import com.oksusu.susu.api.post.domain.VoteOption
+import com.oksusu.susu.domain.post.domain.VoteOption
 
 /** 온보딩용 투표 옵션 + 투표 수 모델 */
 data class OnboardingVoteOptionCountModel(

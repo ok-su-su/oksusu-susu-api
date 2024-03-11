@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.log.application
 
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.log.domain.SystemActionLog
-import com.oksusu.susu.api.log.infrastructure.SystemActionLogRepository
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.log.domain.SystemActionLog
+import com.oksusu.susu.domain.log.infrastructure.SystemActionLogRepository
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

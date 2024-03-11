@@ -2,23 +2,23 @@ package com.oksusu.susu.api.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.api.dto.SusuPageRequest
-import com.oksusu.susu.api.config.SusuConfig
-import com.oksusu.susu.api.config.database.TransactionTemplates
+import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.common.config.SusuConfig
+import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.count.application.CountService
-import com.oksusu.susu.api.count.domain.Count
-import com.oksusu.susu.api.count.domain.vo.CountTargetType
+import com.oksusu.susu.domain.count.domain.Count
+import com.oksusu.susu.domain.count.domain.vo.CountTargetType
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.InvalidRequestException
-import com.oksusu.susu.api.extension.coExecute
-import com.oksusu.susu.api.extension.coExecuteOrNull
-import com.oksusu.susu.api.post.domain.Post
-import com.oksusu.susu.api.post.domain.VoteHistory
-import com.oksusu.susu.api.post.domain.VoteOption
-import com.oksusu.susu.api.post.domain.vo.PostType
-import com.oksusu.susu.api.post.infrastructure.repository.model.GetVoteSpec
-import com.oksusu.susu.api.post.infrastructure.repository.model.SearchVoteSpec
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.extension.coExecute
+import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.post.domain.Post
+import com.oksusu.susu.domain.post.domain.VoteHistory
+import com.oksusu.susu.domain.post.domain.VoteOption
+import com.oksusu.susu.domain.post.domain.vo.PostType
+import com.oksusu.susu.domain.post.infrastructure.repository.model.GetVoteSpec
+import com.oksusu.susu.domain.post.infrastructure.repository.model.SearchVoteSpec
 import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteCountModel
 import com.oksusu.susu.api.post.model.VoteOptionAndHistoryModel
@@ -34,6 +34,7 @@ import com.oksusu.susu.api.post.model.response.VoteAndOptionsWithCountResponse
 import com.oksusu.susu.api.post.model.response.VoteWithCountResponse
 import com.oksusu.susu.api.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.api.user.application.BlockService
+import com.oksusu.susu.domain.post.infrastructure.repository.model.VoteSortType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.slf4j.MDCContext
@@ -70,7 +71,11 @@ class VoteFacade(
             ).run { postService.saveSync(this) }
 
             val options = request.options.map { option ->
-                VoteOption.of(option, createdPost.id)
+                VoteOption(
+                    postId = createdPost.id,
+                    content = option.content,
+                    seq = option.seq
+                )
             }.run { voteOptionService.saveAllSync(this) }
 
             val voteCount = Count.toVoteLike(createdPost)
@@ -97,9 +102,16 @@ class VoteFacade(
     ): Slice<VoteAndOptionsWithCountResponse> {
         val userAndPostBlockIdModel = blockService.getUserAndPostBlockTargetIds(user.uid)
 
+        val searchVoteSpec = SearchVoteSpec(
+            content = searchRequest.content,
+            mine = searchRequest.mine,
+            sortType = searchRequest.sortType ?: VoteSortType.LATEST,
+            boardId = searchRequest.boardId
+        )
+
         val getVoteSpec = GetVoteSpec(
             uid = user.uid,
-            searchSpec = SearchVoteSpec.from(searchRequest),
+            searchSpec = searchVoteSpec,
             userBlockIds = userAndPostBlockIdModel.userBlockIds,
             postBlockIds = userAndPostBlockIdModel.postBlockIds,
             pageable = pageRequest.toDefault()

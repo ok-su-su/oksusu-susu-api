@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.post.model
 
-import com.oksusu.susu.api.post.domain.vo.PostType
+import com.oksusu.susu.domain.post.domain.vo.PostType
 
 /** 게시글 모델 */
 data class PostModel(

@@ -1,15 +1,15 @@
 package com.oksusu.susu.api.batch.job
 
 import arrow.fx.coroutines.parZip
-import com.oksusu.susu.api.cache.helper.CacheKeyGenerateHelper
+import com.oksusu.susu.domain.cache.helper.CacheKeyGenerateHelper
 import com.oksusu.susu.api.envelope.application.EnvelopeService
-import com.oksusu.susu.api.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.api.extension.toStatisticAgeGroup
-import com.oksusu.susu.api.extension.yearMonth
+import com.oksusu.susu.domain.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
+import com.oksusu.susu.common.extension.toStatisticAgeGroup
+import com.oksusu.susu.common.extension.yearMonth
 import com.oksusu.susu.api.statistic.application.EnvelopeStatisticService
 import com.oksusu.susu.api.statistic.application.SusuEnvelopeStatisticService
 import com.oksusu.susu.api.statistic.application.SusuSpecificEnvelopeStatisticService
-import com.oksusu.susu.api.statistic.domain.SusuEnvelopeStatistic
+import com.oksusu.susu.domain.statistic.domain.SusuEnvelopeStatistic
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

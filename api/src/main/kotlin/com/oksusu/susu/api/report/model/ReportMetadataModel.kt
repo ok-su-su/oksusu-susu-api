@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.report.model
 
-import com.oksusu.susu.api.report.domain.ReportMetadata
-import com.oksusu.susu.api.report.domain.vo.ReportTargetType
+import com.oksusu.susu.domain.report.domain.ReportMetadata
+import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
 
 data class ReportMetadataModel(
     /** 메타데이터 id */

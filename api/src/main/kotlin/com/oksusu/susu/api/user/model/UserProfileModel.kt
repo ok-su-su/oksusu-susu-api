@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.user.model
 
-import com.oksusu.susu.api.user.domain.User
+import com.oksusu.susu.domain.user.domain.User
 
 /** 유저 profile */
 data class UserProfileModel(

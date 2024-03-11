@@ -2,7 +2,7 @@ package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.event.model.SystemActionLogEvent
 import com.oksusu.susu.api.log.application.SystemActionLogService
-import com.oksusu.susu.api.log.domain.SystemActionLog
+import com.oksusu.susu.domain.log.domain.SystemActionLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

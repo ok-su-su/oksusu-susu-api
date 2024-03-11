@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.term.model.response
 
-import com.oksusu.susu.api.term.domain.Term
+import com.oksusu.susu.domain.term.domain.Term
 
 data class GetTermResponse(
     /** 약관 정보 id */

@@ -2,7 +2,7 @@ package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.api.term.application.TermAgreementHistoryService
-import com.oksusu.susu.api.term.domain.TermAgreementHistory
+import com.oksusu.susu.domain.term.domain.TermAgreementHistory
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

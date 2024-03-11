@@ -1,11 +1,11 @@
 package com.oksusu.susu.api.friend.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.friend.domain.FriendRelationship
-import com.oksusu.susu.api.friend.infrastructure.FriendRelationshipRepository
-import com.oksusu.susu.api.friend.infrastructure.model.CountPerRelationshipIdModel
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.friend.domain.FriendRelationship
+import com.oksusu.susu.domain.friend.infrastructure.FriendRelationshipRepository
+import com.oksusu.susu.domain.friend.infrastructure.model.CountPerRelationshipIdModel
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

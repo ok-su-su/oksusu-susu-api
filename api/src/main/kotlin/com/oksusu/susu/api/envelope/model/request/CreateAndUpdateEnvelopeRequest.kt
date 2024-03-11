@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.envelope.model.request
 
 import com.oksusu.susu.api.category.model.request.CreateCategoryAssignmentRequest
-import com.oksusu.susu.api.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import java.time.LocalDateTime
 
 data class CreateAndUpdateEnvelopeRequest(

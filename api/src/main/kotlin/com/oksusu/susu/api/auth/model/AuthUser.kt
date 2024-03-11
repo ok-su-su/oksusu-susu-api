@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.auth.model
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.NoAuthorityException
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NoAuthorityException
 
 /**
  * 모든 유저가 이용 가능한 parameter 입니다.

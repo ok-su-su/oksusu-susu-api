@@ -1,5 +1,7 @@
 package com.oksusu.susu.api.statistic.model
 
+import com.oksusu.susu.domain.statistic.domain.vo.TitleValueModel
+
 data class SusuSpecificEnvelopeStatisticModel(
     /** 평균 보낸 비용 */
     val averageSent: Long?,

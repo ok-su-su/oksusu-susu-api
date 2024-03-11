@@ -1,15 +1,15 @@
 package com.oksusu.susu.api.report.application
 
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.api.config.database.TransactionTemplates
-import com.oksusu.susu.api.exception.AlreadyException
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.InvalidRequestException
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.coExecute
+import com.oksusu.susu.domain.config.database.TransactionTemplates
+import com.oksusu.susu.common.exception.AlreadyException
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.coExecute
 import com.oksusu.susu.api.post.application.PostService
-import com.oksusu.susu.api.report.domain.ReportHistory
-import com.oksusu.susu.api.report.domain.vo.ReportTargetType
+import com.oksusu.susu.domain.report.domain.ReportHistory
+import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
 import com.oksusu.susu.api.report.model.request.ReportCreateRequest
 import com.oksusu.susu.api.report.model.response.ReportCreateResponse
 import com.oksusu.susu.api.report.model.response.ReportMetadataResponse

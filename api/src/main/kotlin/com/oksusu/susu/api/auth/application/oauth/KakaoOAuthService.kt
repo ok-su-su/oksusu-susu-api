@@ -3,9 +3,9 @@ package com.oksusu.susu.api.auth.application.oauth
 import com.oksusu.susu.api.auth.model.OAuthUserInfoDto
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
-import com.oksusu.susu.api.client.oauth.kakao.KakaoClient
-import com.oksusu.susu.api.config.OAuthConfig
-import com.oksusu.susu.api.extension.withMDCContext
+import com.oksusu.susu.client.oauth.kakao.KakaoClient
+import com.oksusu.susu.common.config.OAuthConfig
+import com.oksusu.susu.common.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.beans.factory.annotation.Value

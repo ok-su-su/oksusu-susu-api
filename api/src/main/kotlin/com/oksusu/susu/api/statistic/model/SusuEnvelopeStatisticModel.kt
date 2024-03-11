@@ -1,5 +1,7 @@
 package com.oksusu.susu.api.statistic.model
 
+import com.oksusu.susu.domain.statistic.domain.vo.TitleValueModel
+
 class SusuEnvelopeStatisticModel(
     /** 최근 사용 금액 */
     val recentSpent: List<TitleValueModel<Long>>?,

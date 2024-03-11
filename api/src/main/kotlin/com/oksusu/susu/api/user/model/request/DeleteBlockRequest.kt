@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.user.model.request
 
-import com.oksusu.susu.api.user.domain.vo.UserBlockTargetType
+import com.oksusu.susu.domain.user.domain.vo.UserBlockTargetType
 
 class DeleteBlockRequest(
     /** 차단 타겟 id */

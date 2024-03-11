@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.envelope.model.request
 
-import com.oksusu.susu.api.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 
 data class SearchEnvelopeRequest(
     /** 지인 id */

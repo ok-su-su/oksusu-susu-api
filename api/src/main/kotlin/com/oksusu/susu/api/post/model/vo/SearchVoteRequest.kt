@@ -1,5 +1,7 @@
 package com.oksusu.susu.api.post.model.vo
 
+import com.oksusu.susu.domain.post.infrastructure.repository.model.VoteSortType
+
 /** vote 조회 조건 */
 data class SearchVoteRequest(
     /** 제목 */
@@ -11,12 +13,3 @@ data class SearchVoteRequest(
     /** 보드 id */
     val boardId: Long?,
 )
-
-enum class VoteSortType {
-    /** 최신 작성 순 */
-    LATEST,
-
-    /** 투표 많은 순 */
-    POPULAR,
-    ;
-}

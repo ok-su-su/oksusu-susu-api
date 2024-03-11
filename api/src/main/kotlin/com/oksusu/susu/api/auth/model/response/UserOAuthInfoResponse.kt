@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.auth.model.response
 
-import com.oksusu.susu.api.auth.model.OAuthProvider
-import com.oksusu.susu.api.user.domain.User
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
+import com.oksusu.susu.domain.user.domain.User
 
 class UserOAuthInfoResponse(
     /** 유저 id */

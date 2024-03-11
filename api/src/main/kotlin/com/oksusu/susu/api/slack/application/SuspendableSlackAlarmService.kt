@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.slack.application
 
-import com.oksusu.susu.api.config.SlackConfig
-import com.oksusu.susu.api.extension.isProd
-import com.oksusu.susu.api.extension.withMDCContext
+import com.oksusu.susu.client.config.SlackConfig
+import com.oksusu.susu.common.extension.isProd
+import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.api.slack.infrastructure.SlackAlarmSender
 import com.oksusu.susu.api.slack.model.ErrorWebhookDataModel
 import com.slack.api.model.block.LayoutBlock

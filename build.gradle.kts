@@ -214,6 +214,10 @@ subprojects {
         enabled = true
     }
 
+    tasks.getByName("bootJar") {
+        enabled = false
+    }
+
     configurations.all {
         resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }

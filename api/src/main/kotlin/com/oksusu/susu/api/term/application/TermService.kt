@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.term.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.InvalidRequestException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.term.domain.Term
-import com.oksusu.susu.api.term.infrastructure.TermRepository
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.term.domain.Term
+import com.oksusu.susu.domain.term.infrastructure.TermRepository
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

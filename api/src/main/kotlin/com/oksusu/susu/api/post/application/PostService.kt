@@ -1,13 +1,13 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.InvalidRequestException
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.post.domain.Post
-import com.oksusu.susu.api.post.domain.vo.PostType
-import com.oksusu.susu.api.post.infrastructure.repository.PostRepository
-import com.oksusu.susu.api.post.infrastructure.repository.model.PostAndUserModel
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.post.domain.Post
+import com.oksusu.susu.domain.post.domain.vo.PostType
+import com.oksusu.susu.domain.post.infrastructure.repository.PostRepository
+import com.oksusu.susu.domain.post.infrastructure.repository.model.PostAndUserModel
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

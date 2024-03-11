@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.post.model
 
-import com.oksusu.susu.api.post.domain.Board
+import com.oksusu.susu.domain.post.domain.Board
 
 /** 보드 모델 */
 data class BoardModel(

@@ -1,16 +1,12 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.post.domain.Post
-import com.oksusu.susu.api.post.domain.vo.PostType
-import com.oksusu.susu.api.post.infrastructure.repository.PostRepository
-import com.oksusu.susu.api.post.infrastructure.repository.model.GetVoteSpec
-import com.oksusu.susu.api.post.infrastructure.repository.model.PostAndUserModel
-import com.oksusu.susu.api.post.infrastructure.repository.model.PostAndVoteCountModel
-import com.oksusu.susu.api.post.infrastructure.repository.model.PostAndVoteOptionModel
-import com.oksusu.susu.api.post.infrastructure.repository.model.SearchVoteSpec
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.post.domain.Post
+import com.oksusu.susu.domain.post.domain.vo.PostType
+import com.oksusu.susu.domain.post.infrastructure.repository.PostRepository
+import com.oksusu.susu.domain.post.infrastructure.repository.model.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.PageRequest
@@ -46,9 +42,16 @@ class VoteService(
         postBlockIds: Set<Long>,
         size: Int,
     ): List<PostAndVoteCountModel> {
+        val searchSpec = SearchVoteSpec(
+            content = null,
+            mine = null,
+            sortType = VoteSortType.POPULAR,
+            boardId = null
+        )
+
         val spec = GetVoteSpec(
             uid = uid,
-            searchSpec = SearchVoteSpec.defaultPopularSpec(),
+            searchSpec = searchSpec,
             userBlockIds = userBlockIds,
             postBlockIds = postBlockIds,
             pageable = PageRequest.of(0, size)

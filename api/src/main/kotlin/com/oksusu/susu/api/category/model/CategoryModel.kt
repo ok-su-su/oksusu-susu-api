@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.category.model
 
-import com.oksusu.susu.api.category.domain.Category
+import com.oksusu.susu.domain.category.domain.Category
 
 data class CategoryModel(
     /** category id */

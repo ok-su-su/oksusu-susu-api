@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.friend.model
 
-import com.oksusu.susu.api.friend.domain.Relationship
+import com.oksusu.susu.domain.friend.domain.Relationship
 
 data class RelationshipModel(
     /** 관계 id */

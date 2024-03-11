@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.user.application
 
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.user.domain.UserWithdraw
-import com.oksusu.susu.api.user.infrastructure.UserWithdrawRepository
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.user.domain.UserWithdraw
+import com.oksusu.susu.domain.user.infrastructure.UserWithdrawRepository
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

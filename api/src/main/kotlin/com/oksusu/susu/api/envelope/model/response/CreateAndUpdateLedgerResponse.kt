@@ -2,7 +2,7 @@ package com.oksusu.susu.api.envelope.model.response
 
 import com.oksusu.susu.api.category.model.CategoryModel
 import com.oksusu.susu.api.category.model.CategoryWithCustomModel
-import com.oksusu.susu.api.envelope.domain.Ledger
+import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.api.envelope.model.LedgerModel
 
 data class CreateAndUpdateLedgerResponse(

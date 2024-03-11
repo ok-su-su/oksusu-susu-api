@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.auth.model.response
 
-import com.oksusu.susu.api.client.oauth.kakao.model.KakaoOAuthTokenResponse
+import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthTokenResponse
 
 class OAuthTokenResponse(
     /** oauth access token */

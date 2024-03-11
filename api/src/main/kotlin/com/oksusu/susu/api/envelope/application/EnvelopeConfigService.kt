@@ -3,7 +3,7 @@ package com.oksusu.susu.api.envelope.application
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.category.application.CategoryService
-import com.oksusu.susu.api.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.api.envelope.model.response.CreateEnvelopesConfigResponse
 import com.oksusu.susu.api.envelope.model.response.SearchFilterEnvelopeResponse
 import com.oksusu.susu.api.friend.application.RelationshipService

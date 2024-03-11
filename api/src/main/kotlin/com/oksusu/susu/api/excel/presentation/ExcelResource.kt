@@ -3,7 +3,7 @@ package com.oksusu.susu.api.excel.presentation
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.config.web.SwaggerTag
 import com.oksusu.susu.api.excel.application.ExcelFacade
-import com.oksusu.susu.api.extension.encodeURL
+import com.oksusu.susu.common.extension.encodeURL
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.core.io.buffer.DefaultDataBuffer

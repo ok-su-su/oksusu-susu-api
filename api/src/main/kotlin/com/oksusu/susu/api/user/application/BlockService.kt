@@ -1,12 +1,12 @@
 package com.oksusu.susu.api.user.application
 
-import com.oksusu.susu.api.exception.ErrorCode
-import com.oksusu.susu.api.exception.InvalidRequestException
-import com.oksusu.susu.api.exception.NotFoundException
-import com.oksusu.susu.api.extension.withMDCContext
-import com.oksusu.susu.api.user.domain.UserBlock
-import com.oksusu.susu.api.user.domain.vo.UserBlockTargetType
-import com.oksusu.susu.api.user.infrastructure.UserBlockRepository
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.user.domain.UserBlock
+import com.oksusu.susu.domain.user.domain.vo.UserBlockTargetType
+import com.oksusu.susu.domain.user.infrastructure.UserBlockRepository
 import com.oksusu.susu.api.user.model.UserAndPostBlockIdModel
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.repository.findByIdOrNull

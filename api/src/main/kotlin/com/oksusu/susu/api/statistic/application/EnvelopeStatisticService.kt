@@ -2,14 +2,14 @@ package com.oksusu.susu.api.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.category.application.CategoryService
-import com.oksusu.susu.api.config.SusuConfig
+import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.envelope.application.LedgerService
-import com.oksusu.susu.api.envelope.domain.vo.EnvelopeType
-import com.oksusu.susu.api.envelope.infrastructure.model.CountPerCategoryIdModel
+import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
+import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.RelationshipService
-import com.oksusu.susu.api.statistic.model.TitleValueModel
+import com.oksusu.susu.domain.statistic.domain.vo.TitleValueModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import kotlin.math.roundToLong

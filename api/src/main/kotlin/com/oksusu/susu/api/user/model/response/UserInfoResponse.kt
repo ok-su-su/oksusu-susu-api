@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.user.model.response
 
-import com.oksusu.susu.api.user.domain.User
-import com.oksusu.susu.api.user.domain.vo.Gender
+import com.oksusu.susu.domain.user.domain.User
+import com.oksusu.susu.domain.user.domain.vo.Gender
 
 class UserInfoResponse(
     /** 유저 id */
