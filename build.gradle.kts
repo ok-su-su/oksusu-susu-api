@@ -1,56 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-plugins {
-    val kotlinVersion = "1.9.22"
-
-    id("org.springframework.boot") version "3.2.3"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version kotlinVersion
-    kotlin("plugin.spring") version kotlinVersion
-    kotlin("plugin.jpa") version kotlinVersion
-    kotlin("plugin.allopen") version kotlinVersion
-    kotlin("kapt") version kotlinVersion
-    idea
-
-    /** ktlint **/
-    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
-
-    /** jacoco **/
-    id("jacoco")
-
-    /** sonarqube **/
-    id("org.sonarqube") version "4.3.1.3277"
-}
-
-group = "com.oksusu"
-java.sourceCompatibility = JavaVersion.VERSION_17
-
-repositories {
-    mavenCentral()
-}
-
-idea {
-    module {
-        val kaptMain = file("build/generated/source/kapt/main")
-        sourceDirs.add(kaptMain)
-        generatedSourceDirs.add(kaptMain)
-    }
-}
-
-/**
- * https://kotlinlang.org/docs/reference/compiler-plugins.html#spring-support
- * automatically supported annotation
- * @Component, @Async, @Transactional, @Cacheable, @SpringBootTest,
- * @Configuration, @Controller, @RestController, @Service, @Repository.
- * jpa meta-annotations not automatically opened through the default settings of the plugin.spring
- */
-allOpen {
-    annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("jakarta.persistence.Embeddable")
-}
-
-springBoot.buildInfo { properties { } }
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 object DependencyVersion {
     /** querydsl */
@@ -89,144 +38,216 @@ object DependencyVersion {
     const val KOTEST_EXTENSION = "1.1.3"
 }
 
-dependencies {
-    /** spring starter */
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
+plugins {
+    val kotlinVersion = "1.9.22"
 
-    /** kotlin */
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    id("org.springframework.boot") version "3.2.3"
+    id("io.spring.dependency-management") version "1.1.4"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
+    kotlin("plugin.allopen") version kotlinVersion
+    kotlin("kapt") version kotlinVersion
+    idea
 
-    /** querydsl */
-    implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL}:jakarta")
-    kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL}:jakarta")
+    /** ktlint **/
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 
-    /** arrow-kt */
-    implementation("io.arrow-kt:arrow-fx-coroutines:${DependencyVersion.ARROW_FX}")
-    implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX}")
+    /** jacoco **/
+    id("jacoco")
 
-    /** jwt */
-    implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
-
-    /** swagger */
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC}")
-    runtimeOnly("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
-    kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
-
-    /** database */
-    runtimeOnly("com.mysql:mysql-connector-j")
-
-    /** logger */
-    implementation("io.github.oshai:kotlin-logging-jvm:${DependencyVersion.KOTLIN_LOGGING}")
-    implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER}")
-
-    /** thymeleaf */
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-
-    /** fastexcel */
-    implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL}")
-
-    /** aws v2 */
-    implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2}"))
-    implementation("software.amazon.awssdk:sts")
-
-    /** aws ssm */
-    implementation(
-        platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}")
-    )
-    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
-
-    /** slack */
-    implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API}")
-
-    /** sentry */
-    implementation(platform("io.sentry:sentry-bom:${DependencyVersion.SENTRY}"))
-    implementation("io.sentry:sentry-spring-boot-starter-jakarta")
-    implementation("io.sentry:sentry-logback")
-
-    /** etc */
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-
-    /** test **/
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK}")
-
-    /** kotest */
-    testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST}")
-    testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST}")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION}")
+    /** sonarqube **/
+    id("org.sonarqube") version "4.3.1.3277"
 }
 
-defaultTasks("bootRun")
+java.sourceCompatibility = JavaVersion.VERSION_17
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
-}
-
-tasks.getByName<Jar>("jar") {
-    enabled = false
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+idea {
+    module {
+        val kaptMain = file("build/generated/source/kapt/main")
+        sourceDirs.add(kaptMain)
+        generatedSourceDirs.add(kaptMain)
     }
 }
 
-tasks.withType<Wrapper> {
-    gradleVersion = "8.5"
+
+allprojects {
+    group = "com.oksusu"
+
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+    apply(plugin = "idea")
+
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "17"
+        }
+    }
+
+    tasks.withType<Wrapper> {
+        gradleVersion = "8.5"
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    /** build시 ktlint 미적용 */
+    gradle.taskGraph.whenReady {
+        if (hasTask(":build")) {
+            allTasks.forEach { task ->
+                if (task.name.contains("ktlint") || task.name.contains("Ktlint")) {
+                    task.enabled = false
+                }
+            }
+        }
+    }
 }
+
+tasks.getByName("bootJar") {
+    enabled = false
+}
+
+subprojects {
+    apply(plugin = "org.springframework.boot")
+    apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+    apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
+    apply(plugin = "org.jetbrains.kotlin.kapt")
+    apply(plugin = "jacoco")
+
+    /**
+     * https://kotlinlang.org/docs/reference/compiler-plugins.html#spring-support
+     * automatically supported annotation
+     * @Component, @Async, @Transactional, @Cacheable, @SpringBootTest,
+     * @Configuration, @Controller, @RestController, @Service, @Repository.
+     * jpa meta-annotations not automatically opened through the default settings of the plugin.spring
+     */
+    allOpen {
+        annotation("jakarta.persistence.Entity")
+        annotation("jakarta.persistence.MappedSuperclass")
+        annotation("jakarta.persistence.Embeddable")
+    }
+
+    dependencies {
+        /** spring starter */
+        implementation("org.springframework.boot:spring-boot-starter-webflux")
+        implementation("org.springframework.boot:spring-boot-starter-actuator")
+        implementation("org.springframework.boot:spring-boot-starter-validation")
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+        implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+        kapt("org.springframework.boot:spring-boot-configuration-processor")
+
+        /** kotlin */
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+        implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+        implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+        /** querydsl */
+        implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL}:jakarta")
+        kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL}:jakarta")
+
+        /** arrow-kt */
+        implementation("io.arrow-kt:arrow-fx-coroutines:${DependencyVersion.ARROW_FX}")
+        implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX}")
+
+        /** jwt */
+        implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
+
+        /** swagger */
+        implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC}")
+        runtimeOnly("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
+        kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
+
+        /** database */
+        runtimeOnly("com.mysql:mysql-connector-j")
+
+        /** logger */
+        implementation("io.github.oshai:kotlin-logging-jvm:${DependencyVersion.KOTLIN_LOGGING}")
+        implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER}")
+
+        /** thymeleaf */
+        implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+        /** fastexcel */
+        implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL}")
+
+        /** aws v2 */
+        implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2}"))
+        implementation("software.amazon.awssdk:sts")
+
+        /** aws ssm */
+        implementation(
+            platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}")
+        )
+        implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+
+        /** slack */
+        implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API}")
+
+        /** sentry */
+        implementation(platform("io.sentry:sentry-bom:${DependencyVersion.SENTRY}"))
+        implementation("io.sentry:sentry-spring-boot-starter-jakarta")
+        implementation("io.sentry:sentry-logback")
+
+        /** etc */
+        developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+        /** test **/
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK}")
+
+        /** kotest */
+        testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST}")
+        testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST}")
+        testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION}")
+    }
+
+    tasks.getByName("jar") {
+        enabled = true
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+    }
+
+    defaultTasks("bootRun")
+}
+
 
 when {
     project.hasProperty("prod") -> {
         println("Profile: prod")
         apply {
-            from("profile_prod.gradle")
+            from(rootProject.file("/profile_prod.gradle").path)
         }
     }
 
     project.hasProperty("staging") -> {
         println("Profile: staging")
         apply {
-            from("profile_staging.gradle")
+            from(rootProject.file("profile_staging.gradle").path)
         }
     }
 
     else -> {
         println("Profile: dev")
         apply {
-            from("profile_dev.gradle")
+            from(rootProject.file("profile_dev.gradle").path)
         }
     }
 }
 
 val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
 
-/** build시 ktlint 미적용 */
-gradle.taskGraph.whenReady {
-    if (hasTask(":build")) {
-        allTasks.forEach { task ->
-            if (task.name.contains("ktlint") || task.name.contains("Ktlint")) {
-                task.enabled = false
-            }
-        }
-    }
-}
-
 /** jacoco **/
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
 tasks.test {
     /** when finished test-all */
     finalizedBy(tasks.jacocoTestReport)
