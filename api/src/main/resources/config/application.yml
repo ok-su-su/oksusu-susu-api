@@ -28,9 +28,8 @@ spring:
         enabled: false
   profiles:
     group:
-      default: common, domain, client
-      dev: default, common-dev, domain-dev, client-dev
-      prod: default, common-prod, domain-prod, client-prod
+      dev: common, domain, client
+      prod: common, domain, client
 
 # DOCS
 springdoc:
