@@ -1,15 +1,15 @@
-package com.oksusu.susu.api.batch.job
+package com.oksusu.susu.batch.job
 
 import arrow.fx.coroutines.parZip
-import com.oksusu.susu.api.envelope.application.EnvelopeService
-import com.oksusu.susu.api.envelope.application.LedgerService
-import com.oksusu.susu.api.friend.application.FriendService
 import com.oksusu.susu.common.extension.format
-import com.oksusu.susu.api.log.application.SystemActionLogService
-import com.oksusu.susu.api.user.application.UserService
-import com.oksusu.susu.api.user.application.UserWithdrawService
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.model.SlackMessageModel
+import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
+import com.oksusu.susu.domain.envelope.infrastructure.LedgerRepository
+import com.oksusu.susu.domain.friend.infrastructure.FriendRepository
+import com.oksusu.susu.domain.log.infrastructure.SystemActionLogRepository
+import com.oksusu.susu.domain.user.infrastructure.UserRepository
+import com.oksusu.susu.domain.user.infrastructure.UserWithdrawRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.slf4j.MDCContext
@@ -19,12 +19,12 @@ import java.time.LocalDateTime
 @Component
 class SusuStatisticsHourSummaryJob(
     private val slackClient: SlackClient,
-    private val systemActionLogService: SystemActionLogService,
-    private val ledgerService: LedgerService,
-    private val envelopeService: EnvelopeService,
-    private val friendService: FriendService,
-    private val userService: UserService,
-    private val userWithdrawService: UserWithdrawService,
+    private val systemActionLogRepository: SystemActionLogRepository,
+    private val userRepository: UserRepository,
+    private val envelopeRepository: EnvelopeRepository,
+    private val ledgerRepository: LedgerRepository,
+    private val friendRepository: FriendRepository,
+    private val userWithdrawRepository: UserWithdrawRepository,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -34,12 +34,12 @@ class SusuStatisticsHourSummaryJob(
 
         parZip(
             Dispatchers.IO + MDCContext(),
-            { systemActionLogService.countByCreatedAtBetween(beforeOneHour, now) },
-            { ledgerService.countByCreatedAtBetween(beforeOneHour, now) },
-            { envelopeService.countByCreatedAtBetween(beforeOneHour, now) },
-            { friendService.countByCreatedAtBetween(beforeOneHour, now) },
-            { userService.countByCreatedAtBetween(beforeOneHour, now) },
-            { userWithdrawService.countByCreatedAtBetween(beforeOneHour, now) }
+            { systemActionLogRepository.countByCreatedAtBetween(beforeOneHour, now) },
+            { ledgerRepository.countByCreatedAtBetween(beforeOneHour, now) },
+            { envelopeRepository.countByCreatedAtBetween(beforeOneHour, now) },
+            { friendRepository.countByCreatedAtBetween(beforeOneHour, now) },
+            { userRepository.countByCreatedAtBetween(beforeOneHour, now) },
+            { userWithdrawRepository.countByCreatedAtBetween(beforeOneHour, now) }
         ) {
                 systemActionLogCount,
                 ledgerCount,

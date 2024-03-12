@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.user.application
 
-import com.oksusu.susu.api.config.SusuApiConfig
+import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.api.user.model.request.UpdateUserInfoRequest
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserValidateService(
-    private val userConfig: SusuApiConfig.UserConfig,
+    private val userConfig: SusuConfig.UserConfig,
 ) {
     fun validateUpdateUserRequest(request: UpdateUserInfoRequest) {
         val userCreateForm = userConfig.createForm

@@ -2,7 +2,7 @@ package com.oksusu.susu.api.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.api.config.SusuApiConfig
+import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.domain.common.dto.SusuPageRequest
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.count.application.CountService
@@ -53,7 +53,7 @@ class VoteFacade(
     private val blockService: BlockService,
     private val countService: CountService,
     private val eventPublisher: ApplicationEventPublisher,
-    private val onboardingGetVoteConfig: SusuApiConfig.OnboardingGetVoteConfig,
+    private val onboardingGetVoteConfig: SusuConfig.OnboardingGetVoteConfig,
     private val voteValidateService: VoteValidateService,
 ) {
     private val logger = KotlinLogging.logger { }

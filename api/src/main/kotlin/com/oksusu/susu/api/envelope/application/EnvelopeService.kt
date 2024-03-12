@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.envelope.application
 
-import com.oksusu.susu.api.config.SusuApiConfig
+import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 @Service
 class EnvelopeService(
     private val envelopeRepository: EnvelopeRepository,
-    private val statisticConfig: SusuApiConfig.StatisticConfig,
+    private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
     val logger = KotlinLogging.logger { }
 

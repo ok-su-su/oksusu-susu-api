@@ -1,6 +1,6 @@
-package com.oksusu.susu.api.batch.scheduler
+package com.oksusu.susu.batch.scheduler
 
-import com.oksusu.susu.api.batch.job.SystemActionLogDeleteJob
+import com.oksusu.susu.batch.job.SystemActionLogDeleteJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

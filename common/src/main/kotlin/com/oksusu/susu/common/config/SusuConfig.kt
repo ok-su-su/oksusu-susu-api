@@ -1,4 +1,4 @@
-package com.oksusu.susu.api.config
+package com.oksusu.susu.common.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -8,15 +8,15 @@ import kotlin.reflect.full.declaredMemberProperties
 
 @Configuration
 @EnableConfigurationProperties(
-    SusuApiConfig.LedgerConfig::class,
-    SusuApiConfig.OnboardingGetVoteConfig::class,
-    SusuApiConfig.EnvelopeConfig::class,
-    SusuApiConfig.CategoryConfig::class,
-    SusuApiConfig.PostConfig::class,
-    SusuApiConfig.UserConfig::class,
-    SusuApiConfig.StatisticConfig::class
+    SusuConfig.LedgerConfig::class,
+    SusuConfig.OnboardingGetVoteConfig::class,
+    SusuConfig.EnvelopeConfig::class,
+    SusuConfig.CategoryConfig::class,
+    SusuConfig.PostConfig::class,
+    SusuConfig.UserConfig::class,
+    SusuConfig.StatisticConfig::class
 )
-data class SusuApiConfig(
+data class SusuConfig(
     val ledgerConfig: LedgerConfig,
     val onboardingGetVoteConfig: OnboardingGetVoteConfig,
     val envelopeConfig: EnvelopeConfig,
@@ -26,7 +26,7 @@ data class SusuApiConfig(
 ) {
     init {
         val logger = KotlinLogging.logger { }
-        SusuApiConfig::class.declaredMemberProperties
+        SusuConfig::class.declaredMemberProperties
             .forEach { config ->
                 logger.info { config.get(this).toString() }
             }

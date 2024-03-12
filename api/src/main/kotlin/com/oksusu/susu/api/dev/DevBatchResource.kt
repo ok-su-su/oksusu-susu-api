@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.dev
 
-import com.oksusu.susu.api.batch.job.SusuStatisticsDailySummaryJob
-import com.oksusu.susu.api.batch.job.SusuStatisticsHourSummaryJob
+import com.oksusu.susu.batch.job.SusuStatisticsDailySummaryJob
+import com.oksusu.susu.batch.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.api.config.web.SwaggerTag
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

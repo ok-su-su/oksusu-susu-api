@@ -2,7 +2,7 @@ package com.oksusu.susu.api.statistic.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.category.application.CategoryService
-import com.oksusu.susu.api.config.SusuApiConfig
+import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.envelope.application.LedgerService
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
@@ -21,7 +21,7 @@ class EnvelopeStatisticService(
     private val categoryService: CategoryService,
     private val friendRelationshipService: FriendRelationshipService,
     private val relationshipService: RelationshipService,
-    private val statisticConfig: SusuApiConfig.StatisticConfig,
+    private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
     val logger = KotlinLogging.logger {}
 

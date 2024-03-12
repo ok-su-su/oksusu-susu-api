@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.envelope.application
 
-import com.oksusu.susu.api.config.SusuApiConfig
+import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.api.envelope.model.request.CreateAndUpdateLedgerRequest
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class LedgerValidateService(
-    private val ledgerConfig: SusuApiConfig.LedgerConfig,
-    private val categoryConfig: SusuApiConfig.CategoryConfig,
+    private val ledgerConfig: SusuConfig.LedgerConfig,
+    private val categoryConfig: SusuConfig.CategoryConfig,
 ) {
     fun validateLedgerRequest(request: CreateAndUpdateLedgerRequest) {
         if (request.startAt.isAfter(request.endAt)) {

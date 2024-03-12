@@ -1,8 +1,8 @@
-package com.oksusu.susu.api.batch.job
+package com.oksusu.susu.batch.job
 
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.common.extension.coExecute
-import com.oksusu.susu.api.log.application.SystemActionLogService
+import com.oksusu.susu.domain.log.infrastructure.SystemActionLogRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.slf4j.MDCContext
@@ -11,8 +11,8 @@ import java.time.LocalDateTime
 
 @Component
 class SystemActionLogDeleteJob(
-    private val systemActionLogService: SystemActionLogService,
     private val txTemplates: TransactionTemplates,
+    private val systemActionLogRepository: SystemActionLogRepository,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -25,13 +25,13 @@ class SystemActionLogDeleteJob(
         val targetDate = LocalDateTime.now().minusDays(DELETE_BEFORE_DAYS)
 
         val targetLog = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
-            systemActionLogService.findAllByCreatedAtBefore(targetDate)
+            systemActionLogRepository.findAllByCreatedAtBefore(targetDate)
         }.takeIf { logs -> logs.isNotEmpty() } ?: return
 
         targetLog
             .chunked(DELETE_CHUNK)
             .forEach { logs ->
-                systemActionLogService.deleteAllBy(logs)
+                systemActionLogRepository.deleteAllInBatch(logs)
             }
 
         logger.info { "delete system action log counts: ${targetLog.size}" }
