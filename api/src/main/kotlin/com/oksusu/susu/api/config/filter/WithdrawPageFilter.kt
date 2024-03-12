@@ -41,6 +41,10 @@ class WithdrawPageFilter : WebFilter {
             throw NoSuchElementException()
         }
 
+        if (host in withdrawPageHost && path !in withdrawPagePath){
+            throw NoSuchElementException()
+        }
+
         return chain.filter(exchange)
     }
 }
