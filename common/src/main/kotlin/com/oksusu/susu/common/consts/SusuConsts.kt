@@ -14,3 +14,5 @@ const val USER_STATISTIC_TTL: Long = 60 * 3
 
 const val VOTE_OPTION_SUMMARY_KEY = "vote_option_summary"
 const val VOTE_SUMMARY_KEY = "vote_summary"
+
+const val FAIL_TO_VALIDATE_MESSAGE = "fail to validate"

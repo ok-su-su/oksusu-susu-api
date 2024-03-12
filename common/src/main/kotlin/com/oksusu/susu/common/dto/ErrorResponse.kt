@@ -1,9 +1,9 @@
 package com.oksusu.susu.common.dto
 
+import com.oksusu.susu.common.consts.FAIL_TO_VALIDATE_MESSAGE
 import com.oksusu.susu.common.exception.ErrorCode
 import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.CancellationException
-import org.hibernate.TypeMismatchException
 import org.springframework.core.codec.DecodingException
 import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ServerWebInputException
@@ -14,8 +14,6 @@ data class ErrorResponse(
     val extra: Map<String, Any>? = null,
 ) {
     companion object {
-        private const val FAIL_TO_VALIDATE_MESSAGE = "fail to validate"
-
         fun of(e: WebExchangeBindException): ErrorResponse {
             return ErrorResponse(
                 errorCode = ErrorCode.BAD_REQUEST_ERROR.name,
@@ -45,13 +43,6 @@ data class ErrorResponse(
             return ErrorResponse(
                 errorCode = ErrorCode.BAD_REQUEST_ERROR.name,
                 reason = e.reason ?: FAIL_TO_VALIDATE_MESSAGE
-            )
-        }
-
-        fun of(e: TypeMismatchException): ErrorResponse {
-            return ErrorResponse(
-                errorCode = ErrorCode.BAD_REQUEST_ERROR.name,
-                reason = e.message ?: FAIL_TO_VALIDATE_MESSAGE
             )
         }
 

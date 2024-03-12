@@ -2,8 +2,8 @@ package com.oksusu.susu.api.user.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.common.extension.wrapCreated
-import com.oksusu.susu.common.extension.wrapVoid
+import com.oksusu.susu.domain.common.extension.wrapCreated
+import com.oksusu.susu.domain.common.extension.wrapVoid
 import com.oksusu.susu.api.user.application.BlockFacade
 import com.oksusu.susu.api.user.model.request.CreateBlockRequest
 import io.swagger.v3.oas.annotations.Operation

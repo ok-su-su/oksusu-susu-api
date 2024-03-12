@@ -7,7 +7,7 @@ import com.oksusu.susu.api.category.application.CategoryService
 import com.oksusu.susu.domain.category.domain.CategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.api.category.model.CategoryWithCustomModel
-import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.domain.common.dto.SusuPageRequest
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.domain.envelope.infrastructure.model.SearchLedgerSpec
@@ -18,8 +18,8 @@ import com.oksusu.susu.api.envelope.model.response.CreateAndUpdateLedgerResponse
 import com.oksusu.susu.api.envelope.model.response.LedgerDetailResponse
 import com.oksusu.susu.api.envelope.model.response.SearchLedgerResponse
 import com.oksusu.susu.api.event.model.DeleteLedgerEvent
-import com.oksusu.susu.common.extension.coExecute
-import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.context.ApplicationEventPublisher

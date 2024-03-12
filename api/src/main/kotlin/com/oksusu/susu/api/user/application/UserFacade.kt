@@ -2,7 +2,7 @@ package com.oksusu.susu.api.user.application
 
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.domain.config.database.TransactionTemplates
-import com.oksusu.susu.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.api.user.model.request.UpdateUserInfoRequest
 import com.oksusu.susu.api.user.model.response.UserInfoResponse
 import kotlinx.coroutines.Dispatchers

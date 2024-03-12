@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.config.jwt
+package com.oksusu.susu.api.config.jwt
 
 import jakarta.validation.constraints.NotBlank
 import org.springframework.boot.context.properties.ConfigurationProperties

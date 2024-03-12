@@ -8,7 +8,7 @@ import com.oksusu.susu.domain.category.domain.CategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.api.category.model.CategoryWithCustomModel
 import com.oksusu.susu.api.category.model.request.CreateCategoryAssignmentRequest
-import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.domain.common.dto.SusuPageRequest
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
@@ -25,8 +25,8 @@ import com.oksusu.susu.api.envelope.model.response.SearchEnvelopeResponse
 import com.oksusu.susu.api.event.model.DeleteEnvelopeEvent
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
-import com.oksusu.susu.common.extension.coExecute
-import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.FriendService
 import com.oksusu.susu.api.friend.application.RelationshipService

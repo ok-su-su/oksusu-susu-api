@@ -2,7 +2,7 @@ package com.oksusu.susu.api.post.presentation
 
 import com.oksusu.susu.api.auth.model.AdminUser
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.common.extension.wrapVoid
+import com.oksusu.susu.domain.common.extension.wrapVoid
 import com.oksusu.susu.api.post.application.PostAdminFacade
 import com.oksusu.susu.domain.post.domain.vo.PostType
 import io.swagger.v3.oas.annotations.Operation

@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.dto
+package com.oksusu.susu.domain.common.dto
 
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.Sort

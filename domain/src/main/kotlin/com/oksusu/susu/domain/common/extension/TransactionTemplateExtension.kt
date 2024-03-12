@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.extension
+package com.oksusu.susu.domain.common.extension
 
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.FailToExecuteException

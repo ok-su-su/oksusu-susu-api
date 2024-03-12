@@ -1,4 +1,4 @@
-package com.oksusu.susu.api.appender
+package com.oksusu.susu.client.appender
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase

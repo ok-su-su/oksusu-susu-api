@@ -11,7 +11,7 @@ import com.oksusu.susu.api.event.model.CreateUserWithdrawEvent
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidTokenException
 import com.oksusu.susu.common.exception.NoAuthorityException
-import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.api.post.application.PostService
 import com.oksusu.susu.api.user.application.UserService
 import com.oksusu.susu.api.user.application.UserStatusService
@@ -31,10 +31,10 @@ import reactor.core.publisher.Mono
 @Service
 class AuthFacade(
     private val userService: UserService,
-    private val jwtTokenService: com.oksusu.susu.api.auth.application.JwtTokenService,
-    private val refreshTokenService: com.oksusu.susu.api.auth.application.RefreshTokenService,
+    private val jwtTokenService: JwtTokenService,
+    private val refreshTokenService: RefreshTokenService,
     private val tokenGenerateHelper: TokenGenerateHelper,
-    private val oAuthService: com.oksusu.susu.api.auth.application.OAuthService,
+    private val oAuthService: OAuthService,
     private val postService: PostService,
     private val userStatusService: UserStatusService,
     private val eventPublisher: ApplicationEventPublisher,

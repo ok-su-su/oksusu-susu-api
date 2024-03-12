@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.oksusu.susu.api.auth.model.AuthUserToken
 import com.oksusu.susu.api.auth.model.AuthUserTokenPayload
-import com.oksusu.susu.common.config.jwt.JwtConfig
+import com.oksusu.susu.api.config.jwt.JwtConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidTokenException
 import com.oksusu.susu.common.extension.decodeBase64

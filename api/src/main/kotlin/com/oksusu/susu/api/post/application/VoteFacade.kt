@@ -2,8 +2,8 @@ package com.oksusu.susu.api.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.api.config.SusuConfig
-import com.oksusu.susu.common.dto.SusuPageRequest
+import com.oksusu.susu.api.config.SusuApiConfig
+import com.oksusu.susu.domain.common.dto.SusuPageRequest
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.domain.count.domain.Count
@@ -11,8 +11,8 @@ import com.oksusu.susu.domain.count.domain.vo.CountTargetType
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
-import com.oksusu.susu.common.extension.coExecute
-import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.post.domain.Post
 import com.oksusu.susu.domain.post.domain.VoteHistory
 import com.oksusu.susu.domain.post.domain.VoteOption
@@ -53,7 +53,7 @@ class VoteFacade(
     private val blockService: BlockService,
     private val countService: CountService,
     private val eventPublisher: ApplicationEventPublisher,
-    private val onboardingGetVoteConfig: SusuConfig.OnboardingGetVoteConfig,
+    private val onboardingGetVoteConfig: SusuApiConfig.OnboardingGetVoteConfig,
     private val voteValidateService: VoteValidateService,
 ) {
     private val logger = KotlinLogging.logger { }

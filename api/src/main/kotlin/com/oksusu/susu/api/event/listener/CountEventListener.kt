@@ -4,7 +4,7 @@ import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.domain.count.domain.vo.CountTargetType
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
-import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

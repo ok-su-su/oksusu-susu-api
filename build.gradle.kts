@@ -2,35 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 object DependencyVersion {
-    /** querydsl */
-    const val QUERYDSL = "5.0.0"
-
     /** arrow fx */
     const val ARROW_FX = "1.2.1"
-
-    /** jwt */
-    const val JWT = "4.4.0"
-
-    /** springdoc */
-    const val SPRINGDOC = "2.3.0"
-    const val JAVADOC_SCRIBE = "0.15.0"
 
     /** log */
     const val KOTLIN_LOGGING = "6.0.3"
     const val LOGBACK_ENCODER = "7.4"
-
-    /** fastexcel */
-    const val FASTEXCEL = "0.17.0"
-
-    /** aws */
-    const val AWS_SDK_V2 = "2.24.13"
-    const val SPRING_CLOUD_AWS = "3.1.0"
-
-    /** slack */
-    const val SLACK_API = "1.38.2"
-
-    /** sentry */
-    const val SENTRY = "7.3.0"
 
     /** test */
     const val MOCKK = "1.13.9"
@@ -137,10 +114,7 @@ subprojects {
     dependencies {
         /** spring starter */
         implementation("org.springframework.boot:spring-boot-starter-webflux")
-        implementation("org.springframework.boot:spring-boot-starter-actuator")
         implementation("org.springframework.boot:spring-boot-starter-validation")
-        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-        implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
         kapt("org.springframework.boot:spring-boot-configuration-processor")
 
         /** kotlin */
@@ -150,52 +124,13 @@ subprojects {
         implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-        /** querydsl */
-        implementation("com.querydsl:querydsl-jpa:${DependencyVersion.QUERYDSL}:jakarta")
-        kapt("com.querydsl:querydsl-apt:${DependencyVersion.QUERYDSL}:jakarta")
-
         /** arrow-kt */
         implementation("io.arrow-kt:arrow-fx-coroutines:${DependencyVersion.ARROW_FX}")
         implementation("io.arrow-kt:arrow-fx-stm:${DependencyVersion.ARROW_FX}")
 
-        /** jwt */
-        implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
-
-        /** swagger */
-        implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC}")
-        runtimeOnly("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
-        kapt("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
-
-        /** database */
-        runtimeOnly("com.mysql:mysql-connector-j")
-
         /** logger */
         implementation("io.github.oshai:kotlin-logging-jvm:${DependencyVersion.KOTLIN_LOGGING}")
         implementation("net.logstash.logback:logstash-logback-encoder:${DependencyVersion.LOGBACK_ENCODER}")
-
-        /** thymeleaf */
-        implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-
-        /** fastexcel */
-        implementation("org.dhatim:fastexcel:${DependencyVersion.FASTEXCEL}")
-
-        /** aws v2 */
-        implementation(platform("software.amazon.awssdk:bom:${DependencyVersion.AWS_SDK_V2}"))
-        implementation("software.amazon.awssdk:sts")
-
-        /** aws ssm */
-        implementation(
-            platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}")
-        )
-        implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
-
-        /** slack */
-        implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API}")
-
-        /** sentry */
-        implementation(platform("io.sentry:sentry-bom:${DependencyVersion.SENTRY}"))
-        implementation("io.sentry:sentry-spring-boot-starter-jakarta")
-        implementation("io.sentry:sentry-logback")
 
         /** etc */
         developmentOnly("org.springframework.boot:spring-boot-devtools")

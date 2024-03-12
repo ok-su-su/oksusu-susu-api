@@ -4,7 +4,7 @@ import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
-import com.oksusu.susu.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.api.post.application.PostService
 import com.oksusu.susu.domain.user.domain.UserBlock
 import com.oksusu.susu.domain.user.domain.vo.UserBlockTargetType

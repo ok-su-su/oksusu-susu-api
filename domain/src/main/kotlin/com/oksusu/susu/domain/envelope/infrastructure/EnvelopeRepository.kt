@@ -11,6 +11,7 @@ import com.oksusu.susu.domain.friend.domain.QFriend
 import com.oksusu.susu.domain.friend.domain.QFriendRelationship
 import com.oksusu.susu.domain.user.domain.QUser
 import com.oksusu.susu.common.extension.*
+import com.oksusu.susu.domain.common.extension.*
 import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager

@@ -6,7 +6,7 @@ import com.oksusu.susu.common.exception.AlreadyException
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.NotFoundException
-import com.oksusu.susu.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.api.post.application.PostService
 import com.oksusu.susu.domain.report.domain.ReportHistory
 import com.oksusu.susu.domain.report.domain.vo.ReportTargetType

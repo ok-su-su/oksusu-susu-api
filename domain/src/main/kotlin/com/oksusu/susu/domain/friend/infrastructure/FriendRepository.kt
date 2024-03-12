@@ -1,8 +1,8 @@
 package com.oksusu.susu.domain.friend.infrastructure
 
-import com.oksusu.susu.common.extension.execute
-import com.oksusu.susu.common.extension.isContains
-import com.oksusu.susu.common.extension.isEquals
+import com.oksusu.susu.domain.common.extension.execute
+import com.oksusu.susu.domain.common.extension.isContains
+import com.oksusu.susu.domain.common.extension.isEquals
 import com.oksusu.susu.domain.friend.domain.Friend
 import com.oksusu.susu.domain.friend.domain.QFriend
 import com.oksusu.susu.domain.friend.domain.QFriendRelationship

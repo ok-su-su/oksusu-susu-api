@@ -28,60 +28,60 @@ class ExceptionHandler(
     protected fun handleWebExchangeBindException(
         e: WebExchangeBindException,
         exchange: ServerWebExchange,
-    ): ResponseEntity<com.oksusu.susu.common.dto.ErrorResponse> {
+    ): ResponseEntity<ErrorResponse> {
         logger.warn { "WebExchangeBindException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(com.oksusu.susu.common.dto.ErrorResponse.of(e))
+            .body(ErrorResponse.of(e))
     }
 
     @ExceptionHandler(DecodingException::class)
     protected fun handleDecodingException(
         e: DecodingException,
         exchange: ServerWebExchange,
-    ): ResponseEntity<com.oksusu.susu.common.dto.ErrorResponse> {
+    ): ResponseEntity<ErrorResponse> {
         logger.warn { "DecodingException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(com.oksusu.susu.common.dto.ErrorResponse.of(e))
+            .body(ErrorResponse.of(e))
     }
 
     @ExceptionHandler(ConstraintViolationException::class)
     protected fun handleConstraintViolationException(
         e: ConstraintViolationException,
         exchange: ServerWebExchange,
-    ): ResponseEntity<com.oksusu.susu.common.dto.ErrorResponse> {
+    ): ResponseEntity<ErrorResponse> {
         logger.warn { "ConstraintViolationException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(com.oksusu.susu.common.dto.ErrorResponse.of(e))
+            .body(ErrorResponse.of(e))
     }
 
     @ExceptionHandler(ServerWebInputException::class)
     protected fun handleServerWebInputException(
         e: ServerWebInputException,
         exchange: ServerWebExchange,
-    ): ResponseEntity<com.oksusu.susu.common.dto.ErrorResponse> {
+    ): ResponseEntity<ErrorResponse> {
         logger.warn { "ServerWebInputException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(com.oksusu.susu.common.dto.ErrorResponse.of(e))
+            .body(ErrorResponse.of(e))
     }
 
     @ExceptionHandler(TypeMismatchException::class)
     protected fun handleTypeMismatchException(
         e: TypeMismatchException,
         exchange: ServerWebExchange,
-    ): ResponseEntity<com.oksusu.susu.common.dto.ErrorResponse> {
+    ): ResponseEntity<ErrorResponse> {
         logger.warn { "TypeMismatchException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(com.oksusu.susu.common.dto.ErrorResponse.of(e))
+            .body(ErrorResponse.of(e))
     }
 
     /**
@@ -92,19 +92,19 @@ class ExceptionHandler(
     protected fun handleCancellationException(
         e: CancellationException,
         exchange: ServerWebExchange,
-    ): ResponseEntity<com.oksusu.susu.common.dto.ErrorResponse> {
+    ): ResponseEntity<ErrorResponse> {
         logger.warn { "CancellationException ${e.message}, requestUri=${exchange.request.uri}" }
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(com.oksusu.susu.common.dto.ErrorResponse.of(e))
+            .body(ErrorResponse.of(e))
     }
 
     @ExceptionHandler(Exception::class)
     protected fun handleException(
         e: Exception,
         exchange: ServerWebExchange,
-    ): ResponseEntity<com.oksusu.susu.common.dto.ErrorResponse> {
+    ): ResponseEntity<ErrorResponse> {
         eventPublisher.publishEvent(
             SlackErrorAlarmEvent(
                 request = exchange.request,
@@ -121,6 +121,6 @@ class ExceptionHandler(
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(com.oksusu.susu.common.dto.ErrorResponse.of(e))
+            .body(ErrorResponse.of(e))
     }
 }

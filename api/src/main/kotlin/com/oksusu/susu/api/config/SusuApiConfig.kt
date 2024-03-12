@@ -8,15 +8,15 @@ import kotlin.reflect.full.declaredMemberProperties
 
 @Configuration
 @EnableConfigurationProperties(
-    SusuConfig.LedgerConfig::class,
-    SusuConfig.OnboardingGetVoteConfig::class,
-    SusuConfig.EnvelopeConfig::class,
-    SusuConfig.CategoryConfig::class,
-    SusuConfig.PostConfig::class,
-    SusuConfig.UserConfig::class,
-    SusuConfig.StatisticConfig::class
+    SusuApiConfig.LedgerConfig::class,
+    SusuApiConfig.OnboardingGetVoteConfig::class,
+    SusuApiConfig.EnvelopeConfig::class,
+    SusuApiConfig.CategoryConfig::class,
+    SusuApiConfig.PostConfig::class,
+    SusuApiConfig.UserConfig::class,
+    SusuApiConfig.StatisticConfig::class
 )
-data class SusuConfig(
+data class SusuApiConfig(
     val ledgerConfig: LedgerConfig,
     val onboardingGetVoteConfig: OnboardingGetVoteConfig,
     val envelopeConfig: EnvelopeConfig,
@@ -26,7 +26,7 @@ data class SusuConfig(
 ) {
     init {
         val logger = KotlinLogging.logger { }
-        SusuConfig::class.declaredMemberProperties
+        SusuApiConfig::class.declaredMemberProperties
             .forEach { config ->
                 logger.info { config.get(this).toString() }
             }

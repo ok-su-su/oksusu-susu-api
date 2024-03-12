@@ -19,7 +19,7 @@
         </encoder>
     </appender>
 
-    <appender name="SLACK_WARNING_LOG" class="com.oksusu.susu.api.appender.SlackAppender">
+    <appender name="SLACK_WARNING_LOG" class="com.oksusu.susu.client.appender.SlackAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>

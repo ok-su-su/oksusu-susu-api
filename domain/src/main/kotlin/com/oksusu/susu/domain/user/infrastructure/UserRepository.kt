@@ -1,6 +1,6 @@
 package com.oksusu.susu.domain.user.infrastructure
 
-import com.oksusu.susu.common.extension.isEquals
+import com.oksusu.susu.domain.common.extension.isEquals
 import com.oksusu.susu.domain.user.domain.QUser
 import com.oksusu.susu.domain.user.domain.QUserStatus
 import com.oksusu.susu.domain.user.domain.User

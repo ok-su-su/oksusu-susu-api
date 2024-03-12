@@ -5,10 +5,12 @@ import com.oksusu.susu.domain.auth.infrastructure.redis.RefreshTokenRepository
 import com.oksusu.susu.common.extension.withMDCContext
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
+import com.oksusu.susu.api.config.jwt.JwtConfig
 
 @Service
 class RefreshTokenService(
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val jwtConfig: JwtConfig,
 ) {
     suspend fun deleteByKey(key: String) {
         refreshTokenRepository.deleteByKey(key)
@@ -16,7 +18,7 @@ class RefreshTokenService(
 
     suspend fun save(token: RefreshToken) {
         withMDCContext(Dispatchers.IO) {
-            refreshTokenRepository.save(token)
+            refreshTokenRepository.save(token, jwtConfig.refreshExp.toLong())
         }
     }
 }

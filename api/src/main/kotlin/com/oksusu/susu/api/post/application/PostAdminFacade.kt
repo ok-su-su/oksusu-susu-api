@@ -4,7 +4,7 @@ import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AdminUser
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
-import com.oksusu.susu.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.post.domain.vo.PostType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher

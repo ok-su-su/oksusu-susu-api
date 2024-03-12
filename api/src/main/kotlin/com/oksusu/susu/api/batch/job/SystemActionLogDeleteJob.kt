@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.batch.job
 
 import com.oksusu.susu.domain.config.database.TransactionTemplates
-import com.oksusu.susu.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.api.log.application.SystemActionLogService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers

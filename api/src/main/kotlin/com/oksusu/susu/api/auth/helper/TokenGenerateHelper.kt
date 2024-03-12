@@ -2,14 +2,14 @@ package com.oksusu.susu.api.auth.helper
 
 import com.oksusu.susu.api.auth.application.JwtTokenService
 import com.oksusu.susu.api.auth.model.TokenDto
-import com.oksusu.susu.common.config.jwt.JwtConfig
+import com.oksusu.susu.api.config.jwt.JwtConfig
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 @Component
 class TokenGenerateHelper(
     private val jwtTokenService: JwtTokenService,
-    private val jwtConfig: com.oksusu.susu.common.config.jwt.JwtConfig,
+    private val jwtConfig: JwtConfig,
 ) {
     fun generateAccessAndRefreshToken(uid: Long): TokenDto {
         val issuedAt = LocalDateTime.now()

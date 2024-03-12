@@ -1,14 +1,14 @@
 package com.oksusu.susu.api.auth.application
 
 import com.oksusu.susu.api.auth.model.request.OAuthRegisterRequest
-import com.oksusu.susu.api.config.SusuConfig
+import com.oksusu.susu.api.config.SusuApiConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
 import org.springframework.stereotype.Service
 
 @Service
 class AuthValidateService(
-    private val userConfig: SusuConfig.UserConfig,
+    private val userConfig: SusuApiConfig.UserConfig,
 ) {
     fun validateRegisterRequest(request: OAuthRegisterRequest) {
         val userCreateForm = userConfig.createForm

@@ -14,8 +14,8 @@ import com.oksusu.susu.api.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.api.event.model.CreateUserStatusHistoryEvent
 import com.oksusu.susu.api.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.api.event.model.UpdateUserDeviceEvent
-import com.oksusu.susu.common.extension.coExecute
-import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.common.extension.coExecute
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.api.term.application.TermAgreementService
 import com.oksusu.susu.api.term.application.TermService
 import com.oksusu.susu.domain.term.domain.TermAgreement

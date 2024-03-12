@@ -5,7 +5,7 @@ import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.event.model.DeleteLedgerEvent
-import com.oksusu.susu.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
