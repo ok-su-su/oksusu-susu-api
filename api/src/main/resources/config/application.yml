@@ -26,6 +26,11 @@ spring:
     redis:
       repositories:
         enabled: false
+  profiles:
+    group:
+      default: common, domain, client
+      dev: default, common-dev, domain-dev, client-dev
+      prod: default, common-prod, domain-prod, client-prod
 
 # DOCS
 springdoc:
@@ -33,28 +38,3 @@ springdoc:
     operations-sorter: alpha
   model-and-view-allowed: true
   packages-to-scan: com.oksusu.susu.api
-
-# DATABASE
-susu:
-  master:
-    datasource:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/susu?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
-      username: susu
-      password: susu
-      hikari:
-        minimum-idle: 2
-        maximum-pool-size: 2
-  jpa:
-    properties:
-      hibernate.default_batch_fetch_size: 10
-      hibernate.cache.use_second_level_cache: false
-      hibernate.cache.use_query_cache: false
-      hibernate.order_inserts: true
-      hibernate.order_updates: true
-      hibrenate.jdbc.batch_size: 50
-      hibernate.jdbc.batch_versioned_data: true
-      hibernate.jdbc.time_zone: Asia/Seoul
-      hibernate.hbm2ddl.auto: none
-    show-sql: false
-    database: mysql

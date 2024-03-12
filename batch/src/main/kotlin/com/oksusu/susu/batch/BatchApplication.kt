@@ -1,4 +1,4 @@
-package com.oksusu.susu.api
+package com.oksusu.susu.batch
 
 import com.oksusu.susu.common.extension.Zone
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -11,14 +11,9 @@ import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.EnableScheduling
 import java.util.TimeZone
 
-
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = [
-    "com.oksusu.susu.client",
-    "com.oksusu.susu.domain",
-    "com.oksusu.susu.common"
-])
-class ApiApplication(
+@SpringBootApplication
+class BatchApplication(
     private val buildProperties: BuildProperties,
     private val environment: Environment,
 ) : ApplicationListener<ApplicationReadyEvent> {
@@ -35,7 +30,7 @@ class ApiApplication(
 fun main(args: Array<String>) {
     /** Initialize jvm level configuration */
     init()
-    runApplication<ApiApplication>(*args)
+    runApplication<BatchApplication>(*args)
 }
 
 fun init() {

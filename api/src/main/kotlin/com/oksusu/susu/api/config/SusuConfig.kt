@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.config
+package com.oksusu.susu.api.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -9,7 +9,6 @@ import kotlin.reflect.full.declaredMemberProperties
 @Configuration
 @EnableConfigurationProperties(
     SusuConfig.LedgerConfig::class,
-    SusuConfig.SlackWebhookConfig::class,
     SusuConfig.OnboardingGetVoteConfig::class,
     SusuConfig.EnvelopeConfig::class,
     SusuConfig.CategoryConfig::class,
@@ -19,7 +18,6 @@ import kotlin.reflect.full.declaredMemberProperties
 )
 data class SusuConfig(
     val ledgerConfig: LedgerConfig,
-    val slackWebhookConfig: SlackWebhookConfig,
     val onboardingGetVoteConfig: OnboardingGetVoteConfig,
     val envelopeConfig: EnvelopeConfig,
     val categoryConfig: CategoryConfig,
@@ -45,11 +43,6 @@ data class SusuConfig(
             val maxDescriptionLength: Int,
         )
     }
-
-    @ConfigurationProperties(prefix = "slack")
-    class SlackWebhookConfig(
-        val summaryToken: String,
-    )
 
     @ConfigurationProperties(prefix = "susu.onboarding-config.get-vote")
     data class OnboardingGetVoteConfig(

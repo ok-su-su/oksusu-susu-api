@@ -2,8 +2,8 @@ package com.oksusu.susu.api.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
+import com.oksusu.susu.api.config.SusuConfig
 import com.oksusu.susu.common.dto.SusuPageRequest
-import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.domain.count.domain.Count

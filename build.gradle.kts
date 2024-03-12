@@ -210,12 +210,13 @@ subprojects {
         testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION}")
     }
 
-    tasks.getByName("jar") {
-        enabled = true
-    }
-
     tasks.getByName("bootJar") {
         enabled = false
+    }
+
+
+    tasks.getByName("jar") {
+        enabled = true
     }
 
     configurations.all {

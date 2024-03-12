@@ -8,10 +8,12 @@ import kotlin.reflect.full.declaredMemberProperties
 
 @Configuration
 @EnableConfigurationProperties(
-    SlackConfig.ErrorWebhookConfig::class
+    SlackConfig.SlackErrorWebhookConfig::class,
+    SlackConfig.SlackWebhookConfig::class,
 )
 class SlackConfig(
-    val errorWebhookConfig: ErrorWebhookConfig,
+    val slackErrorWebhookConfig: SlackErrorWebhookConfig,
+    val slcakWebhookConfig: SlackWebhookConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -27,8 +29,13 @@ class SlackConfig(
         open val userName: String,
     )
 
-    @ConfigurationProperties(prefix = "slack.alarm.error-webhook")
-    data class ErrorWebhookConfig(
+    @ConfigurationProperties(prefix = "slack.webhook")
+    class SlackWebhookConfig(
+        val summaryToken: String,
+    )
+
+    @ConfigurationProperties(prefix = "slack.webhook.error")
+    data class SlackErrorWebhookConfig(
         override val url: String,
         override val text: String,
         override val userName: String,

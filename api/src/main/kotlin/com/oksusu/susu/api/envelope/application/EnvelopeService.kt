@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.envelope.application
 
-import com.oksusu.susu.common.config.SusuConfig
+import com.oksusu.susu.api.config.SusuConfig
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository

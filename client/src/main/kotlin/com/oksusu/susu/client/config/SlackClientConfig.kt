@@ -3,14 +3,13 @@ package com.oksusu.susu.client.config
 import com.oksusu.susu.client.WebClientFactory
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.SuspendableSlackClient
-import com.oksusu.susu.common.config.SusuConfig
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class SlackClientConfig(
-    private val webhookConfig: SusuConfig.SlackWebhookConfig,
+    private val webhookConfig: SlackConfig.SlackWebhookConfig,
 ) {
     private val logger = KotlinLogging.logger {}
 

@@ -17,7 +17,7 @@ class SuspendableSlackAlarmService(
     private val slackAlarmSender: SlackAlarmSender,
     private val slackBlockHelper: SlackBlockHelper,
     private val environment: Environment,
-    private val errorWebhookConfig: SlackConfig.ErrorWebhookConfig,
+    private val slackErrorWebhookConfig: SlackConfig.SlackErrorWebhookConfig
 ) {
     val logger = KotlinLogging.logger {}
 
@@ -29,7 +29,7 @@ class SuspendableSlackAlarmService(
 
         val layoutBlocks = slackBlockHelper.getErrorBlocks(data)
 
-        return sendAlarm(errorWebhookConfig, layoutBlocks)
+        return sendAlarm(slackErrorWebhookConfig, layoutBlocks)
     }
 
     private suspend fun sendAlarm(model: SlackConfig.SlackAlarmModel, layoutBlocks: List<LayoutBlock>) {
