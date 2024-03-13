@@ -160,6 +160,41 @@ subprojects {
     }
 
     defaultTasks("bootRun")
+
+    /** jacoco **/
+    tasks.test {
+        /** when finished test-all */
+        finalizedBy(tasks.jacocoTestReport)
+    }
+
+    tasks.jacocoTestReport {
+        dependsOn(tasks.test)
+        reports {
+            html.required.set(true)
+            csv.required.set(false)
+            xml.required.set(true)
+            xml.outputLocation.set(project.layout.buildDirectory.dir("reports/jacoco.xml").get().asFile)
+        }
+
+        classDirectories.setFrom(
+            files(
+                classDirectories.files.map {
+                    fileTree(it) {
+                        exclude(
+                            "**/*Application*",
+                            "**/*Config*",
+                            "**/*Dto*",
+                            "**/*Request*",
+                            "**/*Response*",
+                            "**/*Interceptor*",
+                            "**/*Exception*",
+                            "**/Q*.class"
+                        )
+                    }
+                }
+            )
+        )
+    }
 }
 
 
@@ -187,41 +222,6 @@ when {
 }
 
 val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
-
-/** jacoco **/
-tasks.test {
-    /** when finished test-all */
-    finalizedBy(tasks.jacocoTestReport)
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        html.required.set(true)
-        csv.required.set(false)
-        xml.required.set(true)
-        xml.outputLocation.set(project.layout.buildDirectory.dir("reports/jacoco.xml").get().asFile)
-    }
-
-    classDirectories.setFrom(
-        files(
-            classDirectories.files.map {
-                fileTree(it) {
-                    exclude(
-                        "**/*Application*",
-                        "**/*Config*",
-                        "**/*Dto*",
-                        "**/*Request*",
-                        "**/*Response*",
-                        "**/*Interceptor*",
-                        "**/*Exception*",
-                        "**/Q*.class"
-                    )
-                }
-            }
-        )
-    )
-}
 
 /** sonarqube **/
 sonarqube {
