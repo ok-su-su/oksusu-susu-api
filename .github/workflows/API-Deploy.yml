@@ -1,8 +1,10 @@
-name: Deploy
+name: API Deploy
 
 on:
   push:
     branches: ['main']
+#    tags:
+#      - v*.*.*
 
 env:
   ACTIVE_PROFILE: "prod"
@@ -18,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kotlin-version: [ "1.8.22" ]
+        kotlin-version: [ "1.9.22" ]
         java-version: [ "17" ]
 
     steps:
@@ -36,7 +38,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: ./gradlew :api:build --no-daemon
 
       - name: Make image tag
         run: echo "IMAGE_TAG=$ACTIVE_PROFILE-${GITHUB_SHA::7}" >> $GITHUB_ENV # activeProfile-커밋 hash 값

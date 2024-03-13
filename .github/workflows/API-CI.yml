@@ -1,4 +1,4 @@
-name: CI
+name: API CI
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kotlin-version: [ "1.8.22" ]
+        kotlin-version: [ "1.9.22" ]
         java-version: [ "17" ]
 
     steps:
@@ -48,7 +48,7 @@ jobs:
 
       # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
-        run: ./gradlew clean build --no-daemon
+        run: ./gradlew clean :api:build --no-daemon
 
       # 컨테이너 실행
       - name: Start containers  # test 돌릴때 mysql 필요
