@@ -1,9 +1,9 @@
 package com.oksusu.susu.batch.job
 
 import arrow.fx.coroutines.parZip
-import com.oksusu.susu.common.extension.format
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.model.SlackMessageModel
+import com.oksusu.susu.common.extension.format
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
 import com.oksusu.susu.domain.envelope.infrastructure.LedgerRepository
 import com.oksusu.susu.domain.friend.infrastructure.FriendRepository

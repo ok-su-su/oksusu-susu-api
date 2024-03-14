@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.envelope.application
 
-import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.api.envelope.model.request.CreateAndUpdateEnvelopeRequest
+import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
 import org.springframework.stereotype.Service

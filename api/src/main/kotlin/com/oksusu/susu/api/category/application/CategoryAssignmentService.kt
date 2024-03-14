@@ -1,9 +1,9 @@
 package com.oksusu.susu.api.category.application
 
+import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.category.domain.CategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.domain.category.infrastructure.CategoryAssignmentRepository
-import com.oksusu.susu.common.extension.withMDCContext
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

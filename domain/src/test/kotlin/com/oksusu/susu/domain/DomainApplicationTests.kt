@@ -1,5 +1,3 @@
 package com.oksusu.susu.domain
 
-class DomainApplicationTests {
-
-}
+class DomainApplicationTests

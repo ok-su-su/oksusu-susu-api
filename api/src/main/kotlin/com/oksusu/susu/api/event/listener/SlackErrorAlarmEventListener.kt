@@ -1,9 +1,9 @@
 package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.event.model.SlackErrorAlarmEvent
-import com.oksusu.susu.common.extension.isProd
 import com.oksusu.susu.api.slack.application.SuspendableSlackAlarmService
 import com.oksusu.susu.api.slack.model.ErrorWebhookDataModel
+import com.oksusu.susu.common.extension.isProd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

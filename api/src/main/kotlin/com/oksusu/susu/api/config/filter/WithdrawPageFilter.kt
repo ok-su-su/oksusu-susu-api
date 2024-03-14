@@ -1,7 +1,5 @@
 package com.oksusu.susu.api.config.filter
 
-import com.oksusu.susu.api.event.model.SystemActionLogEvent
-import com.oksusu.susu.common.exception.NotFoundException
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
@@ -23,11 +21,11 @@ class WithdrawPageFilter : WebFilter {
             "/susufavicon_16_16.png",
             "/susufavicon_32_32.png",
             "/susufavicon_192_192.png",
-            "/kakaoLogin.png",
+            "/kakaoLogin.png"
         )
         val withdrawPageHost = listOf(
             "oksusu.site",
-            "localhost:8080",
+            "localhost:8080"
         )
     }
 
@@ -37,11 +35,11 @@ class WithdrawPageFilter : WebFilter {
         val host = request.headers["Host"].toString().removePrefix("[").removeSuffix("]")
         val path = request.uri.path
 
-        if (path in withdrawPagePath && host !in withdrawPageHost){
+        if (path in withdrawPagePath && host !in withdrawPageHost) {
             throw NoSuchElementException()
         }
 
-        if (host in withdrawPageHost && path !in withdrawPagePath){
+        if (host in withdrawPageHost && path !in withdrawPagePath) {
             throw NoSuchElementException()
         }
 

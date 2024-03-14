@@ -1,15 +1,15 @@
 package com.oksusu.susu.api.user.application
 
 import com.oksusu.susu.api.auth.model.AuthUser
-import com.oksusu.susu.domain.config.database.TransactionTemplates
+import com.oksusu.susu.api.post.application.PostService
+import com.oksusu.susu.api.user.model.request.CreateBlockRequest
+import com.oksusu.susu.api.user.model.request.DeleteBlockRequest
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.domain.common.extension.coExecute
-import com.oksusu.susu.api.post.application.PostService
+import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.user.domain.UserBlock
 import com.oksusu.susu.domain.user.domain.vo.UserBlockTargetType
-import com.oksusu.susu.api.user.model.request.CreateBlockRequest
-import com.oksusu.susu.api.user.model.request.DeleteBlockRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

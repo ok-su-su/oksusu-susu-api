@@ -11,15 +11,16 @@ import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.EnableScheduling
 import java.util.TimeZone
 
-
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = [
-    "com.oksusu.susu.client",
-    "com.oksusu.susu.domain",
-    "com.oksusu.susu.common",
-    "com.oksusu.susu.batch",
-    "com.oksusu.susu.api"
-])
+@SpringBootApplication(
+    scanBasePackages = [
+        "com.oksusu.susu.client",
+        "com.oksusu.susu.domain",
+        "com.oksusu.susu.common",
+        "com.oksusu.susu.batch",
+        "com.oksusu.susu.api"
+    ]
+)
 class ApiApplication(
     private val buildProperties: BuildProperties,
     private val environment: Environment,

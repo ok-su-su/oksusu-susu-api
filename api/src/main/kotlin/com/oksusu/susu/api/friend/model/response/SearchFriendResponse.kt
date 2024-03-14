@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.friend.model.response
 
-import com.oksusu.susu.domain.friend.domain.Friend
-import com.oksusu.susu.domain.friend.domain.FriendRelationship
 import com.oksusu.susu.api.friend.model.FriendModel
 import com.oksusu.susu.api.friend.model.RelationshipInfoModel
 import com.oksusu.susu.api.friend.model.RelationshipModel
+import com.oksusu.susu.domain.friend.domain.Friend
+import com.oksusu.susu.domain.friend.domain.FriendRelationship
 import java.time.LocalDateTime
 
 data class SearchFriendResponse(

@@ -1,7 +1,9 @@
 package com.oksusu.susu.domain.envelope.infrastructure
 
+import com.oksusu.susu.common.extension.*
 import com.oksusu.susu.domain.category.domain.QCategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
+import com.oksusu.susu.domain.common.extension.*
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.QEnvelope
 import com.oksusu.susu.domain.envelope.domain.QLedger
@@ -10,8 +12,6 @@ import com.oksusu.susu.domain.envelope.infrastructure.model.*
 import com.oksusu.susu.domain.friend.domain.QFriend
 import com.oksusu.susu.domain.friend.domain.QFriendRelationship
 import com.oksusu.susu.domain.user.domain.QUser
-import com.oksusu.susu.common.extension.*
-import com.oksusu.susu.domain.common.extension.*
 import com.querydsl.core.types.dsl.CaseBuilder
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager

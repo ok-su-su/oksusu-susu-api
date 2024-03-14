@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.report.application
 
+import com.oksusu.susu.api.report.model.ReportMetadataModel
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.resolveCancellation
@@ -7,7 +8,6 @@ import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.report.domain.ReportMetadata
 import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
 import com.oksusu.susu.domain.report.infrastructure.ReportMetadataRepository
-import com.oksusu.susu.api.report.model.ReportMetadataModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

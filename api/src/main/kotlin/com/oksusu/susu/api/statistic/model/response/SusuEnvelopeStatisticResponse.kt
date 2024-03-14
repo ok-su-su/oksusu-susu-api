@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.statistic.model.response
 
-import com.oksusu.susu.domain.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.api.statistic.model.SusuSpecificEnvelopeStatisticModel
+import com.oksusu.susu.domain.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.domain.statistic.domain.vo.TitleValueModel
 
 data class SusuEnvelopeStatisticResponse(

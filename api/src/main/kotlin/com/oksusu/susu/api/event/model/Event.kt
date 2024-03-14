@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.event.model
 
-import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.common.extension.mapper
 import com.oksusu.susu.common.extension.remoteIp
+import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.domain.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.domain.term.domain.TermAgreement
 import com.oksusu.susu.domain.term.domain.vo.TermAgreementChangeType

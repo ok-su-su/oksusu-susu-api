@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.metadata.presentation
 
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.domain.common.extension.wrapOk
 import com.oksusu.susu.api.metadata.application.ApplicationMetadataFacade
+import com.oksusu.susu.domain.common.extension.wrapOk
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType

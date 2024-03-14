@@ -1,12 +1,12 @@
 package com.oksusu.susu.api.envelope.model.response
 
-import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.api.envelope.model.EnvelopeModel
-import com.oksusu.susu.domain.friend.domain.Friend
-import com.oksusu.susu.domain.friend.domain.FriendRelationship
 import com.oksusu.susu.api.friend.model.FriendModel
 import com.oksusu.susu.api.friend.model.FriendRelationshipModel
 import com.oksusu.susu.api.friend.model.RelationshipModel
+import com.oksusu.susu.domain.envelope.domain.Envelope
+import com.oksusu.susu.domain.friend.domain.Friend
+import com.oksusu.susu.domain.friend.domain.FriendRelationship
 
 data class CreateAndUpdateEnvelopeResponse(
     /** 봉투 */

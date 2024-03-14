@@ -1,11 +1,11 @@
 package com.oksusu.susu.api.user.application
 
+import com.oksusu.susu.api.user.model.UserStatusTypeModel
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.resolveCancellation
 import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
 import com.oksusu.susu.domain.user.infrastructure.UserStatusTypeRepository
-import com.oksusu.susu.api.user.model.UserStatusTypeModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

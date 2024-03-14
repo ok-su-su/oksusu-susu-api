@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.event.listener
 
-import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.api.event.model.UpdateUserDeviceEvent
-import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.api.user.application.UserDeviceService
+import com.oksusu.susu.domain.common.extension.coExecuteOrNull
+import com.oksusu.susu.domain.config.database.TransactionTemplates
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,19 +1,19 @@
 package com.oksusu.susu.batch.job
 
 import arrow.fx.coroutines.parZip
-import com.oksusu.susu.domain.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.common.extension.toStatisticAgeGroup
-import com.oksusu.susu.common.extension.yearMonth
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.toStatisticAgeGroup
 import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.common.extension.yearMonth
+import com.oksusu.susu.domain.cache.helper.CacheKeyGenerateHelper
 import com.oksusu.susu.domain.category.domain.Category
 import com.oksusu.susu.domain.category.infrastructure.CategoryRepository
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
 import com.oksusu.susu.domain.envelope.infrastructure.LedgerRepository
+import com.oksusu.susu.domain.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.domain.friend.domain.Relationship
 import com.oksusu.susu.domain.friend.infrastructure.FriendRelationshipRepository
@@ -72,7 +72,7 @@ class RefreshSusuEnvelopeStatisticJob(
             { relationshipRepository.findAllByIsActive(true) },
             { categoryRepository.findAllByIsActive(true) }
         ) {
-            /** 봉투 소유 유저 수 */
+                /** 봉투 소유 유저 수 */
                 userCount,
                 envelopHandOverAtMonthCount,
                 relationShipConuts,

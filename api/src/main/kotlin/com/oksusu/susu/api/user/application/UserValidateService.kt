@@ -1,9 +1,9 @@
 package com.oksusu.susu.api.user.application
 
+import com.oksusu.susu.api.user.model.request.UpdateUserInfoRequest
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
-import com.oksusu.susu.api.user.model.request.UpdateUserInfoRequest
 import org.springframework.stereotype.Service
 
 @Service

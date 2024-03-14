@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 object DependencyVersion {
     /** arrow fx */
@@ -46,7 +45,6 @@ idea {
         generatedSourceDirs.add(kaptMain)
     }
 }
-
 
 allprojects {
     group = "com.oksusu"
@@ -97,6 +95,7 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
     apply(plugin = "org.jetbrains.kotlin.kapt")
     apply(plugin = "jacoco")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     /**
      * https://kotlinlang.org/docs/reference/compiler-plugins.html#spring-support
@@ -150,7 +149,6 @@ subprojects {
         enabled = false
     }
 
-
     tasks.getByName("jar") {
         enabled = true
     }
@@ -197,7 +195,6 @@ subprojects {
     }
 }
 
-
 when {
     project.hasProperty("prod") -> {
         println("Profile: prod")
@@ -238,7 +235,7 @@ sonarqube {
         property(
             "sonar.exclusions",
             "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, " +
-                    "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+                "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.java.binaries", project.layout.buildDirectory.dir("/classes").get().asFile.path)

@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.slack.application
 
+import com.oksusu.susu.api.slack.infrastructure.SlackAlarmSender
+import com.oksusu.susu.api.slack.model.ErrorWebhookDataModel
 import com.oksusu.susu.client.config.SlackConfig
 import com.oksusu.susu.common.extension.isProd
 import com.oksusu.susu.common.extension.withMDCContext
-import com.oksusu.susu.api.slack.infrastructure.SlackAlarmSender
-import com.oksusu.susu.api.slack.model.ErrorWebhookDataModel
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.webhook.Payload
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -17,7 +17,7 @@ class SuspendableSlackAlarmService(
     private val slackAlarmSender: SlackAlarmSender,
     private val slackBlockHelper: SlackBlockHelper,
     private val environment: Environment,
-    private val slackErrorWebhookConfig: SlackConfig.SlackErrorWebhookConfig
+    private val slackErrorWebhookConfig: SlackConfig.SlackErrorWebhookConfig,
 ) {
     val logger = KotlinLogging.logger {}
 

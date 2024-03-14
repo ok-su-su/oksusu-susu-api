@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.metadata.application
 
-import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.api.metadata.model.response.ApplicationVersionMetadataResponse
+import com.oksusu.susu.domain.config.database.TransactionTemplates
 import org.springframework.stereotype.Service
 
 @Service

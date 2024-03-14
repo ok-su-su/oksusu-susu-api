@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.exception.advice
 
-import com.oksusu.susu.common.dto.ErrorResponse
 import com.oksusu.susu.api.event.model.SentryCaptureExceptionEvent
 import com.oksusu.susu.api.event.model.SlackErrorAlarmEvent
+import com.oksusu.susu.common.dto.ErrorResponse
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.CancellationException

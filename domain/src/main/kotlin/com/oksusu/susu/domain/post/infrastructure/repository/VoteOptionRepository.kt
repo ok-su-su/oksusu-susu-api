@@ -1,13 +1,13 @@
 package com.oksusu.susu.domain.post.infrastructure.repository
 
+import com.oksusu.susu.domain.common.extension.isEquals
 import com.oksusu.susu.domain.count.domain.QCount
 import com.oksusu.susu.domain.count.domain.vo.CountTargetType
-import com.oksusu.susu.domain.common.extension.isEquals
 import com.oksusu.susu.domain.post.domain.QPost
 import com.oksusu.susu.domain.post.domain.QVoteOption
 import com.oksusu.susu.domain.post.domain.VoteOption
-import com.oksusu.susu.domain.post.infrastructure.repository.model.VoteOptionAndCountModel
 import com.oksusu.susu.domain.post.infrastructure.repository.model.*
+import com.oksusu.susu.domain.post.infrastructure.repository.model.VoteOptionAndCountModel
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired

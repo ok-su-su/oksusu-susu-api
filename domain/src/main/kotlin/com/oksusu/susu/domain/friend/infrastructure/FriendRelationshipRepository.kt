@@ -2,10 +2,10 @@ package com.oksusu.susu.domain.friend.infrastructure
 
 import com.oksusu.susu.domain.envelope.domain.QEnvelope
 import com.oksusu.susu.domain.friend.domain.*
-import com.oksusu.susu.domain.friend.infrastructure.model.CountPerRelationshipIdModel
-import com.oksusu.susu.domain.friend.infrastructure.model.QCountPerRelationshipIdModel
 import com.oksusu.susu.domain.friend.domain.Friend
 import com.oksusu.susu.domain.friend.domain.FriendRelationship
+import com.oksusu.susu.domain.friend.infrastructure.model.CountPerRelationshipIdModel
+import com.oksusu.susu.domain.friend.infrastructure.model.QCountPerRelationshipIdModel
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
