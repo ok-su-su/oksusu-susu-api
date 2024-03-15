@@ -1,0 +1,39 @@
+# ===================================================================
+# Spring Boot Configuration for the default profile
+# ===================================================================
+
+# SERVER
+server:
+  port: 8080
+  http2:
+    enabled: true
+  shutdown: graceful # timeout configuration property : spring.lifecycle.timeout-per-shutdown-phase
+
+logging:
+  level:
+    root: INFO
+
+# SPRING
+spring:
+  config:
+    import:
+      - classpath:/config/susu-config.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 5s # format : https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion-duration
+  application:
+    name: oksusu-susu-api
+  data:
+    redis:
+      repositories:
+        enabled: false
+  profiles:
+    group:
+      dev: common, domain, client
+      prod: common, domain, client
+
+# DOCS
+springdoc:
+  swagger-ui:
+    operations-sorter: alpha
+  model-and-view-allowed: true
+  packages-to-scan: com.oksusu.susu.api

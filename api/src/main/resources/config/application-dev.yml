@@ -1,0 +1,43 @@
+# ===================================================================
+# Spring Boot Configuration for the dev profile
+# ===================================================================
+
+# SERVER
+server:
+  domain-name: http://localhost:8080
+  error:
+    include-exception: true # Include the "exception" attribute.
+    include-stacktrace: always # When to include a "stacktrace" attribute.
+    whitelabel.enabled: true
+
+# LOGGING
+logging:
+  level:
+    root: INFO
+    com.oksusu: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: DEBUG
+    reactor.netty.http.client: DEBUG
+
+# SPRING
+spring:
+  config:
+    import:
+      - 'aws-parameterstore:/susu/api-server_dev/'
+  jackson:
+    serialization:
+      indent_output: true
+      write-null-map-values: true
+
+# SENTRY
+sentry:
+  dsn: ${SENTRY_DSN}
+  traces-sample-rate: 1.0
+  enable-tracing: true
+  environment: dev
+  serverName: api-server
+  send-default-pii: true
