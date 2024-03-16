@@ -1,4 +1,4 @@
-package com.oksusu.susu.batch.job
+package com.oksusu.susu.batch.envelope.job
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.common.config.SusuConfig

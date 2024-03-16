@@ -1,6 +1,6 @@
-package com.oksusu.susu.batch.scheduler
+package com.oksusu.susu.batch.envelope.scheduler
 
-import com.oksusu.susu.batch.job.RefreshSusuEnvelopeStatisticJob
+import com.oksusu.susu.batch.envelope.job.RefreshSusuEnvelopeStatisticJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -1,7 +1,7 @@
-package com.oksusu.susu.batch.scheduler
+package com.oksusu.susu.batch.summary.scheduler
 
-import com.oksusu.susu.batch.job.SusuStatisticsDailySummaryJob
-import com.oksusu.susu.batch.job.SusuStatisticsHourSummaryJob
+import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
+import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.common.config.environment.EnvironmentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

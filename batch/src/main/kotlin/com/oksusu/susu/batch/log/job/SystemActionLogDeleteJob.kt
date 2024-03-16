@@ -1,4 +1,4 @@
-package com.oksusu.susu.batch.job
+package com.oksusu.susu.batch.log.job
 
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.config.database.TransactionTemplates

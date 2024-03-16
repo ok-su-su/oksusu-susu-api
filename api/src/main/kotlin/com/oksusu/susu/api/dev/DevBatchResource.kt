@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.dev
 
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.batch.job.SusuStatisticsDailySummaryJob
-import com.oksusu.susu.batch.job.SusuStatisticsHourSummaryJob
+import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
+import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.CoroutineScope
