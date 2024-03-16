@@ -12,8 +12,8 @@ import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import com.oksusu.susu.domain.user.infrastructure.UserWithdrawRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.slf4j.MDCContext
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -33,37 +33,35 @@ class SusuStatisticsDailySummaryJob(
         val now = LocalDateTime.now()
         val beforeOneDay = now.minusDays(1)
 
-        coroutineScope {
-            parZip(
-                Dispatchers.IO + MDCContext(),
-                { systemActionLogRepository.countByCreatedAtBetween(beforeOneDay, now) },
-                { userRepository.countByCreatedAtBetween(beforeOneDay, now) },
-                { envelopeRepository.count() },
-                { envelopeRepository.countByCreatedAtBetween(beforeOneDay, now) },
-                { ledgerRepository.countByCreatedAtBetween(beforeOneDay, now) },
-                { friendRepository.countByCreatedAtBetween(beforeOneDay, now) },
-                { userWithdrawRepository.countByCreatedAtBetween(beforeOneDay, now) }
-            ) {
-                    systemActionLogCount,
-                    userCount,
-                    totalEnvelopeCount,
-                    dailyEnvelopeCount,
-                    dailyLedgerCount,
-                    friendCount,
-                    userWithdrawCount,
-                ->
-                DailySummaryMessage(
-                    now = now,
-                    systemActionLogCount = systemActionLogCount,
-                    userCount = userCount,
-                    totalEnvelopeCount = totalEnvelopeCount,
-                    dailyEnvelopeCount = dailyEnvelopeCount,
-                    dailyLedgerCount = dailyLedgerCount,
-                    friendCount = friendCount,
-                    userWithdrawCount = userWithdrawCount
-                )
-            }.run { slackClient.sendSummary(this.message()) }
-        }
+        parZip(
+            Dispatchers.IO + MDCContext(),
+            { withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { envelopeRepository.count() },
+            { withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { withContext(Dispatchers.IO) { userWithdrawRepository.countByCreatedAtBetween(beforeOneDay, now) } }
+        ) {
+                systemActionLogCount,
+                userCount,
+                totalEnvelopeCount,
+                dailyEnvelopeCount,
+                dailyLedgerCount,
+                friendCount,
+                userWithdrawCount,
+            ->
+            DailySummaryMessage(
+                now = now,
+                systemActionLogCount = systemActionLogCount,
+                userCount = userCount,
+                totalEnvelopeCount = totalEnvelopeCount,
+                dailyEnvelopeCount = dailyEnvelopeCount,
+                dailyLedgerCount = dailyLedgerCount,
+                friendCount = friendCount,
+                userWithdrawCount = userWithdrawCount
+            )
+        }.run { slackClient.sendSummary(this.message()) }
     }
 
     private data class DailySummaryMessage(

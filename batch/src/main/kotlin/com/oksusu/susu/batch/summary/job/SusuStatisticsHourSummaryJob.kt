@@ -13,6 +13,7 @@ import com.oksusu.susu.domain.user.infrastructure.UserWithdrawRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.slf4j.MDCContext
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -34,12 +35,12 @@ class SusuStatisticsHourSummaryJob(
 
         parZip(
             Dispatchers.IO + MDCContext(),
-            { systemActionLogRepository.countByCreatedAtBetween(beforeOneHour, now) },
-            { ledgerRepository.countByCreatedAtBetween(beforeOneHour, now) },
-            { envelopeRepository.countByCreatedAtBetween(beforeOneHour, now) },
-            { friendRepository.countByCreatedAtBetween(beforeOneHour, now) },
-            { userRepository.countByCreatedAtBetween(beforeOneHour, now) },
-            { userWithdrawRepository.countByCreatedAtBetween(beforeOneHour, now) }
+            { withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(beforeOneHour, now) } },
+            { withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(beforeOneHour, now) } },
+            { withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(beforeOneHour, now) } },
+            { withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(beforeOneHour, now) } },
+            { withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(beforeOneHour, now) } },
+            { withContext(Dispatchers.IO) { userWithdrawRepository.countByCreatedAtBetween(beforeOneHour, now) } }
         ) {
                 systemActionLogCount,
                 ledgerCount,

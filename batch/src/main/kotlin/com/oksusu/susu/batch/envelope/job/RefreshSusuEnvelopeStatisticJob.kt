@@ -27,6 +27,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.slf4j.MDCContext
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import kotlin.math.roundToLong
@@ -52,27 +53,32 @@ class RefreshSusuEnvelopeStatisticJob(
 
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
-
         parZip(
             Dispatchers.IO + MDCContext(),
-            { envelopeRepository.getUserCountHadEnvelope() },
+            { withContext(Dispatchers.IO) { envelopeRepository.getUserCountHadEnvelope() } },
             {
-                envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetween(
-                    EnvelopeType.SENT,
-                    from,
-                    to,
-                    minAmount,
-                    maxAmount
-                )
+                withContext(Dispatchers.IO) {
+                    envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetween(
+                        type = EnvelopeType.SENT,
+                        from = from,
+                        to = to,
+                        minAmount = minAmount,
+                        maxAmount = maxAmount
+                    )
+                }
             },
-            { friendRelationshipRepository.countPerRelationshipId() },
-            { envelopeRepository.countPerCategoryId() },
-            { ledgerRepository.countPerCategoryId() },
-            { envelopeRepository.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount) },
-            { relationshipRepository.findAllByIsActive(true) },
-            { categoryRepository.findAllByIsActive(true) }
+            { withContext(Dispatchers.IO) { friendRelationshipRepository.countPerRelationshipId() } },
+            { withContext(Dispatchers.IO) { envelopeRepository.countPerCategoryId() } },
+            { withContext(Dispatchers.IO) { ledgerRepository.countPerCategoryId() } },
+            {
+                withContext(Dispatchers.IO) {
+                    envelopeRepository.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount)
+                }
+            },
+            { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
+            { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } }
         ) {
-                /** 봉투 소유 유저 수 */
+            /** 봉투 소유 유저 수 */
                 userCount,
                 envelopHandOverAtMonthCount,
                 relationShipConuts,
@@ -163,6 +169,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
             logger.info { "finish refresh susu statistic" }
         }
+
     }
 
     private suspend fun getMaxAndMinAmount(): Pair<Long, Long> {
