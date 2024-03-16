@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.exception.advice
 
-import com.oksusu.susu.common.dto.ErrorResponse
+import com.oksusu.susu.api.common.dto.ErrorResponse
 import com.oksusu.susu.common.exception.SusuException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.core.Ordered

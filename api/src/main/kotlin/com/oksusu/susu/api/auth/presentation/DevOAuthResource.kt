@@ -2,7 +2,7 @@ package com.oksusu.susu.api.auth.presentation
 
 import com.oksusu.susu.api.auth.application.DevOAuthService
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.domain.common.extension.wrapOk
+import com.oksusu.susu.api.extension.wrapOk
 import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

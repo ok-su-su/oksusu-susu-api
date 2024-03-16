@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.dto
+package com.oksusu.susu.api.common.dto
 
 import com.oksusu.susu.common.consts.FAIL_TO_VALIDATE_MESSAGE
 import com.oksusu.susu.common.exception.ErrorCode

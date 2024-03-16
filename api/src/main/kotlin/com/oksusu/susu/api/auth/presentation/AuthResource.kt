@@ -4,8 +4,8 @@ import com.oksusu.susu.api.auth.application.AuthFacade
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.api.config.web.SwaggerTag
-import com.oksusu.susu.domain.common.extension.wrapOk
-import com.oksusu.susu.domain.common.extension.wrapVoid
+import com.oksusu.susu.api.extension.wrapOk
+import com.oksusu.susu.api.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType

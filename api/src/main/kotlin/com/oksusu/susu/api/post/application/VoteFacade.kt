@@ -2,6 +2,7 @@ package com.oksusu.susu.api.post.application
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
+import com.oksusu.susu.api.common.dto.SusuPageRequest
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
@@ -22,7 +23,6 @@ import com.oksusu.susu.api.user.application.BlockService
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
-import com.oksusu.susu.domain.common.dto.SusuPageRequest
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates

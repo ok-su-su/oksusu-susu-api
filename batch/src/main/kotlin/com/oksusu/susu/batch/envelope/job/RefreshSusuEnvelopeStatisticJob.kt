@@ -78,7 +78,7 @@ class RefreshSusuEnvelopeStatisticJob(
             { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } }
         ) {
-            /** 봉투 소유 유저 수 */
+                /** 봉투 소유 유저 수 */
                 userCount,
                 envelopHandOverAtMonthCount,
                 relationShipConuts,
@@ -169,7 +169,6 @@ class RefreshSusuEnvelopeStatisticJob(
 
             logger.info { "finish refresh susu statistic" }
         }
-
     }
 
     private suspend fun getMaxAndMinAmount(): Pair<Long, Long> {

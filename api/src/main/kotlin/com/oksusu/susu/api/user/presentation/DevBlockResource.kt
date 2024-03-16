@@ -2,9 +2,9 @@ package com.oksusu.susu.api.user.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.config.web.SwaggerTag
+import com.oksusu.susu.api.extension.wrapVoid
 import com.oksusu.susu.api.user.application.BlockFacade
 import com.oksusu.susu.api.user.model.request.DeleteBlockRequest
-import com.oksusu.susu.domain.common.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType

@@ -1,17 +1,17 @@
 package com.oksusu.susu.api.post.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
+import com.oksusu.susu.api.common.dto.SusuPageRequest
 import com.oksusu.susu.api.config.web.SwaggerTag
+import com.oksusu.susu.api.extension.wrapCreated
+import com.oksusu.susu.api.extension.wrapOk
+import com.oksusu.susu.api.extension.wrapSlice
+import com.oksusu.susu.api.extension.wrapVoid
 import com.oksusu.susu.api.post.application.VoteFacade
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
 import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.api.post.model.vo.SearchVoteRequest
-import com.oksusu.susu.domain.common.dto.SusuPageRequest
-import com.oksusu.susu.domain.common.extension.wrapCreated
-import com.oksusu.susu.domain.common.extension.wrapOk
-import com.oksusu.susu.domain.common.extension.wrapSlice
-import com.oksusu.susu.domain.common.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springdoc.core.annotations.ParameterObject

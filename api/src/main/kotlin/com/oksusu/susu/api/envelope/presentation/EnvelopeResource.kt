@@ -1,16 +1,16 @@
 package com.oksusu.susu.api.envelope.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
+import com.oksusu.susu.api.common.dto.SusuPageRequest
 import com.oksusu.susu.api.config.web.SwaggerTag
 import com.oksusu.susu.api.envelope.application.EnvelopeFacade
 import com.oksusu.susu.api.envelope.model.request.CreateAndUpdateEnvelopeRequest
 import com.oksusu.susu.api.envelope.model.request.SearchEnvelopeRequest
 import com.oksusu.susu.api.envelope.model.request.SearchFriendStatisticsRequest
-import com.oksusu.susu.domain.common.dto.SusuPageRequest
-import com.oksusu.susu.domain.common.extension.wrapCreated
-import com.oksusu.susu.domain.common.extension.wrapOk
-import com.oksusu.susu.domain.common.extension.wrapPage
-import com.oksusu.susu.domain.common.extension.wrapVoid
+import com.oksusu.susu.api.extension.wrapCreated
+import com.oksusu.susu.api.extension.wrapOk
+import com.oksusu.susu.api.extension.wrapPage
+import com.oksusu.susu.api.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springdoc.core.annotations.ParameterObject

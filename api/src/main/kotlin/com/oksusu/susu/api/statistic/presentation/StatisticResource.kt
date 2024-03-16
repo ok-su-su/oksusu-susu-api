@@ -2,9 +2,9 @@ package com.oksusu.susu.api.statistic.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.config.web.SwaggerTag
+import com.oksusu.susu.api.extension.wrapOk
 import com.oksusu.susu.api.statistic.application.StatisticFacade
 import com.oksusu.susu.api.statistic.model.vo.SusuEnvelopeStatisticRequest
-import com.oksusu.susu.domain.common.extension.wrapOk
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springdoc.core.annotations.ParameterObject

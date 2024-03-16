@@ -1,7 +1,7 @@
-package com.oksusu.susu.domain.common.extension
+package com.oksusu.susu.api.extension
 
-import com.oksusu.susu.domain.common.dto.PageResponseDto
-import com.oksusu.susu.domain.common.dto.SliceResponseDto
+import com.oksusu.susu.api.common.dto.PageResponseDto
+import com.oksusu.susu.api.common.dto.SliceResponseDto
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Slice
 import org.springframework.http.HttpStatus

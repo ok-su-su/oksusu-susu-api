@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.common.dto
+package com.oksusu.susu.api.common.dto
 
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable

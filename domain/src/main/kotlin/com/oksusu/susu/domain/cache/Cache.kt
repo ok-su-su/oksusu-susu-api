@@ -18,7 +18,7 @@ class Cache<VALUE_TYPE>(
         fun getSusuEnvelopeStatisticCache(): Cache<SusuEnvelopeStatistic> {
             return Cache(
                 key = SUSU_ENVELOPE_STATISTIC_KEY,
-                type = toTypeReference<SusuEnvelopeStatistic>(),
+                type = toTypeReference(),
                 duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
@@ -29,7 +29,7 @@ class Cache<VALUE_TYPE>(
         fun getSusuSpecificStatisticCache(key: String): Cache<Long> {
             return Cache(
                 key = key,
-                type = toTypeReference<Long>(),
+                type = toTypeReference(),
                 duration = Duration.ofSeconds(SUSU_STATISTIC_TTL)
             )
         }
@@ -37,7 +37,7 @@ class Cache<VALUE_TYPE>(
         fun getUserEnvelopeStatisticCache(key: String): Cache<UserEnvelopeStatistic> {
             return Cache(
                 key = key,
-                type = toTypeReference<UserEnvelopeStatistic>(),
+                type = toTypeReference(),
                 duration = Duration.ofSeconds(USER_STATISTIC_TTL)
             )
         }
@@ -45,7 +45,7 @@ class Cache<VALUE_TYPE>(
         fun getRefreshTokenCache(key: String, ttl: Long): Cache<String> {
             return Cache(
                 key = key,
-                type = toTypeReference<String>(),
+                type = toTypeReference(),
                 duration = Duration.ofSeconds(ttl)
             )
         }

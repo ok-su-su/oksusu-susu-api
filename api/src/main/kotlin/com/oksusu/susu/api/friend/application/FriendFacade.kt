@@ -3,6 +3,7 @@ package com.oksusu.susu.api.friend.application
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.category.application.CategoryAssignmentService
 import com.oksusu.susu.api.category.application.CategoryService
+import com.oksusu.susu.api.common.dto.SusuPageRequest
 import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.friend.model.request.CreateAndUpdateFriendRequest
 import com.oksusu.susu.api.friend.model.request.SearchFriendRequest
@@ -12,7 +13,6 @@ import com.oksusu.susu.api.friend.model.response.SearchFriendResponse
 import com.oksusu.susu.common.exception.AlreadyException
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
-import com.oksusu.susu.domain.common.dto.SusuPageRequest
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates

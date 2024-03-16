@@ -6,6 +6,7 @@ import com.oksusu.susu.api.category.application.CategoryAssignmentService
 import com.oksusu.susu.api.category.application.CategoryService
 import com.oksusu.susu.api.category.model.CategoryWithCustomModel
 import com.oksusu.susu.api.category.model.request.CreateCategoryAssignmentRequest
+import com.oksusu.susu.api.common.dto.SusuPageRequest
 import com.oksusu.susu.api.envelope.model.EnvelopeModel
 import com.oksusu.susu.api.envelope.model.request.CreateAndUpdateEnvelopeRequest
 import com.oksusu.susu.api.envelope.model.request.SearchEnvelopeRequest
@@ -24,7 +25,6 @@ import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.domain.category.domain.CategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
-import com.oksusu.susu.domain.common.dto.SusuPageRequest
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates

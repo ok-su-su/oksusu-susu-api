@@ -2,9 +2,9 @@ package com.oksusu.susu.api.report.presentation
 
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.config.web.SwaggerTag
+import com.oksusu.susu.api.extension.wrapCreated
 import com.oksusu.susu.api.report.application.ReportFacade
 import com.oksusu.susu.api.report.model.request.ReportCreateRequest
-import com.oksusu.susu.domain.common.extension.wrapCreated
 import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
