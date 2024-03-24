@@ -37,7 +37,7 @@ class SusuStatisticsDailySummaryJob(
             Dispatchers.IO + MDCContext(),
             { withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(beforeOneDay, now) } },
-            { envelopeRepository.count() },
+            { withContext(Dispatchers.IO) { envelopeRepository.count() } },
             { withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(beforeOneDay, now) } },

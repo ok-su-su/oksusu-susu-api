@@ -78,7 +78,7 @@ class RefreshSusuEnvelopeStatisticJob(
             { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } }
         ) {
-                /** 봉투 소유 유저 수 */
+            /** 봉투 소유 유저 수 */
                 userCount,
                 envelopHandOverAtMonthCount,
                 relationShipConuts,
@@ -182,8 +182,8 @@ class RefreshSusuEnvelopeStatisticJob(
         val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
 
         return parZip(
-            { envelopeRepository.getEnvelopeByPositionOrderByAmount(minIdx) },
-            { envelopeRepository.getEnvelopeByPositionOrderByAmount(maxIdx) }
+            { withContext(Dispatchers.IO) { envelopeRepository.getEnvelopeByPositionOrderByAmount(minIdx) } },
+            { withContext(Dispatchers.IO) { envelopeRepository.getEnvelopeByPositionOrderByAmount(maxIdx) } }
         ) { min, max ->
             val minAmount = min.takeIf { it.isNotEmpty() }
                 ?.first()?.amount

@@ -12,8 +12,3 @@ dependencies {
     /** database */
     runtimeOnly("com.mysql:mysql-connector-j")
 }
-
-object DependencyVersion {
-    /** querydsl */
-    const val QUERYDSL = "5.0.0"
-}

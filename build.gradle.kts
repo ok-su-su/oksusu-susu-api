@@ -1,19 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-object DependencyVersion {
-    /** arrow fx */
-    const val ARROW_FX = "1.2.1"
-
-    /** log */
-    const val KOTLIN_LOGGING = "6.0.3"
-    const val LOGBACK_ENCODER = "7.4"
-
-    /** test */
-    const val MOCKK = "1.13.9"
-    const val KOTEST = "5.8.0"
-    const val KOTEST_EXTENSION = "1.1.3"
-}
-
 plugins {
     val kotlinVersion = "1.9.22"
 
@@ -218,8 +204,6 @@ when {
     }
 }
 
-val Project.isSnapshotVersion: Boolean get() = version.toString().endsWith("SNAPSHOT")
-
 /** sonarqube **/
 sonarqube {
     properties {
@@ -235,7 +219,7 @@ sonarqube {
         property(
             "sonar.exclusions",
             "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, " +
-                "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
+                    "**/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt"
         )
         property("sonar.java.coveragePlugin", "jacoco")
         property("sonar.java.binaries", project.layout.buildDirectory.dir("/classes").get().asFile.path)

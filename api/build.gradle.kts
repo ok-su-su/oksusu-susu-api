@@ -46,25 +46,3 @@ tasks.getByName("jar") {
 }
 
 springBoot.buildInfo { properties { } }
-
-object DependencyVersion {
-    /** jwt */
-    const val JWT = "4.4.0"
-
-    /** springdoc */
-    const val SPRINGDOC = "2.3.0"
-    const val JAVADOC_SCRIBE = "0.15.0"
-
-    /** fastexcel */
-    const val FASTEXCEL = "0.17.0"
-
-    /** aws */
-    const val AWS_SDK_V2 = "2.24.13"
-    const val SPRING_CLOUD_AWS = "3.1.0"
-
-    /** slack */
-    const val SLACK_API = "1.38.2"
-
-    /** sentry */
-    const val SENTRY = "7.3.0"
-}
