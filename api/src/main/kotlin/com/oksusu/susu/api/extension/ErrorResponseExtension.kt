@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.common.extension
+package com.oksusu.susu.api.extension
 
 import com.oksusu.susu.api.common.dto.ErrorResponse
 import com.oksusu.susu.common.consts.FAIL_TO_VALIDATE_MESSAGE

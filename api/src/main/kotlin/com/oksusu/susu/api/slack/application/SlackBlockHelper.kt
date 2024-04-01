@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.slack.application
 
+import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.api.slack.model.ErrorWebhookDataModel
-import com.oksusu.susu.common.extension.remoteIp
 import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.HeaderBlock
 import com.slack.api.model.block.LayoutBlock

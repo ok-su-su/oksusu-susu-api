@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.extension
+package com.oksusu.susu.api.extension
 
 import org.springframework.http.server.reactive.ServerHttpRequest
 
