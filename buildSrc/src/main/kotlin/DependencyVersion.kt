@@ -7,6 +7,7 @@ object DependencyVersion {
 
     /** jwt */
     const val JWT = "4.4.0"
+    const val BOUNCY_CASTLE = "1.70"
 
     /** springdoc */
     const val SPRINGDOC = "2.3.0"

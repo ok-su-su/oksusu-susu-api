@@ -1,9 +1,9 @@
 package com.oksusu.susu.client.oauth.kakao
 
+import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthUserInfoResponse
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthWithdrawResponse
-import com.oksusu.susu.common.config.OAuthConfig
 import com.oksusu.susu.common.consts.BEARER
 import com.oksusu.susu.common.consts.KAKAO_AK
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -14,20 +14,22 @@ import org.springframework.web.reactive.function.client.WebClient
 
 class SuspendableKakaoClient(
     private val webClient: WebClient,
-    private val kakaoOAuthProperties: OAuthConfig.KakaoOAuthProperties,
+    private val kakaoOAuthUrlConfig: OAuthUrlConfig.KakaoOAuthUrlConfig,
 ) : KakaoClient {
     private val logger = KotlinLogging.logger { }
 
     override suspend fun getToken(
         redirectUrl: String,
         code: String,
+        clientId: String,
+        clientSecret: String,
     ): KakaoOAuthTokenResponse {
-        val url = kakaoOAuthProperties.kauthUrl + String.format(
-            kakaoOAuthProperties.tokenUrl,
-            kakaoOAuthProperties.clientId,
+        val url = kakaoOAuthUrlConfig.kauthUrl + String.format(
+            kakaoOAuthUrlConfig.tokenUrl,
+            clientId,
             redirectUrl,
             code,
-            kakaoOAuthProperties.clientSecret
+            clientSecret
         )
         return webClient.post()
             .uri(url)
@@ -40,14 +42,14 @@ class SuspendableKakaoClient(
         accessToken: String,
     ): KakaoOAuthUserInfoResponse {
         return webClient.get()
-            .uri(kakaoOAuthProperties.kapiUrl + kakaoOAuthProperties.userInfoUrl)
-            .header("Authorization", com.oksusu.susu.common.consts.BEARER + accessToken)
+            .uri(kakaoOAuthUrlConfig.kapiUrl + kakaoOAuthUrlConfig.userInfoUrl)
+            .header("Authorization", BEARER + accessToken)
             .retrieve()
             .bodyToMono(KakaoOAuthUserInfoResponse::class.java)
             .awaitSingle()
     }
 
-    override suspend fun withdraw(targetId: String): KakaoOAuthWithdrawResponse? {
+    override suspend fun withdraw(targetId: String, adminKey: String): KakaoOAuthWithdrawResponse? {
         val multiValueMap = LinkedMultiValueMap<String, String>().apply {
             setAll(
                 mapOf(
@@ -57,8 +59,8 @@ class SuspendableKakaoClient(
             )
         }
         return webClient.post()
-            .uri(kakaoOAuthProperties.kapiUrl + kakaoOAuthProperties.unlinkUrl)
-            .header("Authorization", com.oksusu.susu.common.consts.KAKAO_AK + kakaoOAuthProperties.adminKey)
+            .uri(kakaoOAuthUrlConfig.kapiUrl + kakaoOAuthUrlConfig.unlinkUrl)
+            .header("Authorization", KAKAO_AK + adminKey)
             .body(BodyInserters.fromFormData(multiValueMap))
             .retrieve()
             .bodyToMono(KakaoOAuthWithdrawResponse::class.java)

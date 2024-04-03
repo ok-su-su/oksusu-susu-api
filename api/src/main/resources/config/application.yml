@@ -37,3 +37,27 @@ springdoc:
     operations-sorter: alpha
   model-and-view-allowed: true
   packages-to-scan: com.oksusu.susu.api
+
+# AUTH
+auth:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-exp: ${JWT_ACCESS_EXP}
+    refresh-exp: ${JWT_REFRESH_EXP}
+
+# OAUTH
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    admin-key: ${KAKAO_ADMIN_KEY}
+
+  apple:
+    baseUrl: ${APPLE_BASE_URL}
+    clientId: ${APPLE_CLIENT_ID}
+    webClientId: ${APPLE_WEB_CLIENT_ID}
+    keyId: ${APPLE_KEY_ID}
+    redirectUrl: ${APPLE_REDIRECT}
+    teamId: ${APPLE_TEAM_ID}
+    webCallbackUrl: ${APPLE_WEB_CALLBACK}
+    authKey: ${APPLE_AUTH_KEY}

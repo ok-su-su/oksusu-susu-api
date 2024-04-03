@@ -23,7 +23,7 @@ class OAuthWithdrawResource(
         model: Model,
         request: ServerHttpRequest,
     ): String {
-        val kakaoRedirectUrl = oAuthService.getOAuthLoginLink(OAuthProvider.KAKAO, request.uri.toString()).link
+        val kakaoRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.KAKAO, request.uri.toString()).link
         model.addAttribute("kakaoRedirectUrl", kakaoRedirectUrl)
         return "withdrawLogin"
     }
@@ -35,7 +35,7 @@ class OAuthWithdrawResource(
         request: ServerHttpRequest,
         @RequestParam code: String,
     ): RedirectView {
-        val susuToken = oAuthFacade.loginWithCode(OAuthProvider.KAKAO, code, request)
+        val susuToken = oAuthFacade.loginWithCodeInWithdraw(OAuthProvider.KAKAO, code, request)
         return RedirectView("/withdraw?xSusuAuthToken=$susuToken")
     }
 

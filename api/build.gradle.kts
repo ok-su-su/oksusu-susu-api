@@ -35,6 +35,7 @@ dependencies {
 
     /** jwt */
     implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
+    implementation("org.bouncycastle:bcpkix-jdk15on:${DependencyVersion.BOUNCY_CASTLE}")
 }
 
 tasks.getByName("bootJar") {

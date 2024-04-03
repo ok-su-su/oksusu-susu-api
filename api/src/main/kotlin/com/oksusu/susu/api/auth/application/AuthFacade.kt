@@ -1,7 +1,6 @@
 package com.oksusu.susu.api.auth.application
 
 import arrow.fx.coroutines.parZip
-import com.oksusu.susu.api.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.api.auth.model.*
 import com.oksusu.susu.api.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.api.event.model.CreateUserStatusHistoryEvent
@@ -33,7 +32,6 @@ class AuthFacade(
     private val userService: UserService,
     private val jwtTokenService: JwtTokenService,
     private val refreshTokenService: RefreshTokenService,
-    private val tokenGenerateHelper: TokenGenerateHelper,
     private val oAuthService: OAuthService,
     private val postService: PostService,
     private val userStatusService: UserStatusService,
@@ -86,7 +84,7 @@ class AuthFacade(
 
         return parZip(
             { refreshTokenService.deleteByKey(refreshPayload.id.toString()) },
-            { tokenGenerateHelper.generateAccessAndRefreshToken(refreshPayload.id) }
+            { jwtTokenService.generateAccessAndRefreshToken(refreshPayload.id) }
         ) { _, tokenDto ->
             RefreshToken(
                 uid = refreshPayload.id,

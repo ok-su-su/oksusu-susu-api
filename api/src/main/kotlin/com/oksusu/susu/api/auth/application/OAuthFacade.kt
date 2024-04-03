@@ -1,6 +1,5 @@
 package com.oksusu.susu.api.auth.application
 
-import com.oksusu.susu.api.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.auth.model.TokenDto
 import com.oksusu.susu.api.auth.model.request.OAuthLoginRequest
@@ -44,7 +43,6 @@ import org.springframework.stereotype.Service
 class OAuthFacade(
     private val userService: UserService,
     private val refreshTokenService: RefreshTokenService,
-    private val tokenGenerateHelper: TokenGenerateHelper,
     private val oAuthService: OAuthService,
     private val txTemplates: TransactionTemplates,
     private val termService: TermService,
@@ -53,6 +51,7 @@ class OAuthFacade(
     private val userStatusService: UserStatusService,
     private val userStatusTypeService: UserStatusTypeService,
     private val authValidateService: AuthValidateService,
+    private val jwtTokenService: JwtTokenService,
 ) {
     val logger = KotlinLogging.logger {}
 
@@ -184,7 +183,7 @@ class OAuthFacade(
     }
 
     private suspend fun generateTokenDto(uid: Long): TokenDto {
-        val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(uid)
+        val tokenDto = jwtTokenService.generateAccessAndRefreshToken(uid)
 
         val refreshToken = RefreshToken(
             uid = uid,
@@ -197,12 +196,12 @@ class OAuthFacade(
     }
 
     /** 회원탈퇴 callback 페이지용 oauth 토큰 받아오기 + susu token 발급해주기 */
-    suspend fun loginWithCode(
+    suspend fun loginWithCodeInWithdraw(
         provider: OAuthProvider,
         code: String,
         request: ServerHttpRequest,
     ): String {
-        val oAuthToken = oAuthService.getOAuthToken(provider, code, request)
+        val oAuthToken = oAuthService.getOAuthWithdrawToken(provider, code, request)
 
         return this.login(
             OAuthProvider.KAKAO,
