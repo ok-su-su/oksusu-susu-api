@@ -1,7 +1,7 @@
 package com.oksusu.susu.api.statistic.model.response
 
 import com.oksusu.susu.domain.statistic.domain.UserEnvelopeStatistic
-import com.oksusu.susu.domain.statistic.domain.vo.TitleValueModel
+import com.oksusu.susu.common.model.TitleValueModel
 
 class UserEnvelopeStatisticResponse(
     /** 최근 사용 금액 */

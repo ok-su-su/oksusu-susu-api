@@ -1,6 +1,7 @@
 package com.oksusu.susu.api.event.model
 
 import com.oksusu.susu.api.extension.remoteIp
+import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.common.extension.mapper
 import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.domain.statistic.domain.UserEnvelopeStatistic
@@ -98,4 +99,8 @@ data class DeleteEnvelopeEvent(
 
 data class CreateUserWithdrawEvent(
     val userWithdraw: UserWithdraw,
+) : BaseEvent()
+
+data class CacheAppleOidcPublicKeysEvent(
+    val keys: OidcPublicKeysCacheModel
 ) : BaseEvent()

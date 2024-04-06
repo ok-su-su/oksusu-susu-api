@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.config.redis
+package com.oksusu.susu.cache.config
 
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties

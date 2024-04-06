@@ -18,7 +18,8 @@ import java.util.TimeZone
         "com.oksusu.susu.domain",
         "com.oksusu.susu.common",
         "com.oksusu.susu.batch",
-        "com.oksusu.susu.api"
+        "com.oksusu.susu.api",
+        "com.oksusu.susu.cache",
     ]
 )
 class ApiApplication(

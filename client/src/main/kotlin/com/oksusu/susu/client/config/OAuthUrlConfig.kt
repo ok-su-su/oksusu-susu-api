@@ -45,5 +45,9 @@ class OAuthUrlConfig(
         // /auth/authorize?client_id=%s&redirect_uri=%s&response_type=code
         val tokenUrl: String,
         // /auth/token?grant_type=authorization_code&client_id=%s&redirect_uri=%s&code=%s&client_secret=%s
+        val oidcKeyUrl: String,
+        // /auth/keys
+        val withdrawUrl: String,
+        // /auth/revoke
     )
 }

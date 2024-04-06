@@ -3,6 +3,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":client"))
     implementation(project(":batch"))
+    implementation(project(":cache"))
 
     /** swagger */
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC}")

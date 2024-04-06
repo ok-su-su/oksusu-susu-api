@@ -33,6 +33,7 @@ import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.context.ApplicationEventPublisher
@@ -57,7 +58,7 @@ class OAuthFacade(
 
     /** 회원가입 가능 여부 체크. */
     suspend fun checkRegisterValid(provider: OAuthProvider, accessToken: String): AbleRegisterResponse {
-        val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
+        val oauthInfo = oAuthService.getOAuthInfo(provider, accessToken)
 
         val isExistUser = userService.existsByOAuthInfo(oauthInfo)
 
@@ -73,7 +74,7 @@ class OAuthFacade(
     ): TokenDto {
         authValidateService.validateRegisterRequest(request)
 
-        val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
+        val oauthInfo = oAuthService.getOAuthInfo(provider, accessToken)
 
         coroutineScope {
             val validateNotRegistered = async(Dispatchers.IO) {
@@ -87,8 +88,7 @@ class OAuthFacade(
                 )
             }
 
-            validateNotRegistered.await()
-            validateExistTerms.await()
+            awaitAll(validateNotRegistered, validateExistTerms)
         }
 
         val user = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
@@ -157,7 +157,7 @@ class OAuthFacade(
         request: OAuthLoginRequest,
         deviceContext: UserDeviceContext,
     ): TokenDto {
-        val oauthInfo = oAuthService.getOAuthUserInfo(provider, request.accessToken)
+        val oauthInfo = oAuthService.getOAuthInfo(provider, request.accessToken)
         val user = userService.findByOAuthInfoOrThrow(oauthInfo)
 
         val userDevice = UserDevice(
@@ -201,7 +201,7 @@ class OAuthFacade(
         code: String,
         request: ServerHttpRequest,
     ): String {
-        val oAuthToken = oAuthService.getOAuthWithdrawToken(provider, code, request)
+        val oAuthToken = oAuthService.getOAuthWithdrawToken(provider, code)
 
         return this.login(
             OAuthProvider.KAKAO,

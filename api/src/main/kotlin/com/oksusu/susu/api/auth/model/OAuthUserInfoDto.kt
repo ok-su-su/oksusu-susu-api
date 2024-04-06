@@ -18,5 +18,14 @@ class OAuthUserInfoDto(
                 )
             )
         }
+
+        fun fromApple(oAuthId: String): OAuthUserInfoDto {
+            return OAuthUserInfoDto(
+                OauthInfo(
+                    oAuthProvider = OAuthProvider.APPLE,
+                    oAuthId = oAuthId
+                )
+            )
+        }
     }
 }

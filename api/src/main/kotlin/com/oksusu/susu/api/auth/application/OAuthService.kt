@@ -4,6 +4,9 @@ import com.oksusu.susu.api.auth.application.oauth.AppleOAuthService
 import com.oksusu.susu.api.auth.application.oauth.KakaoOAuthService
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.exception.InvalidTokenException
 import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -21,7 +24,6 @@ class OAuthService(
     suspend fun getOAuthWithdrawLoginLink(provider: OAuthProvider, uri: String): OAuthLoginLinkResponse {
         return when (provider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthWithdrawLoginLink(uri)
-            OAuthProvider.GOOGLE -> kakaoOAuthService.getOAuthWithdrawLoginLink(uri)
             OAuthProvider.APPLE -> appleOAuthService.getOAuthWithdrawLoginLink(uri)
         }
     }
@@ -30,24 +32,21 @@ class OAuthService(
     suspend fun getOAuthWithdrawToken(
         provider: OAuthProvider,
         code: String,
-        request: ServerHttpRequest,
     ): OAuthTokenResponse {
         return when (provider) {
-            OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthWithdrawToken(code, request.uri.toString())
-            OAuthProvider.GOOGLE -> kakaoOAuthService.getOAuthWithdrawToken(code, request.uri.toString())
-            OAuthProvider.APPLE -> appleOAuthService.getOAuthWithdrawToken(code, request.uri.toString())
+            OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthWithdrawToken(code)
+            OAuthProvider.APPLE -> appleOAuthService.getOAuthWithdrawToken(code)
         }
     }
 
-    /** oauth 유저 정보 가져오기 */
-    suspend fun getOAuthUserInfo(
+    /** oauth info 가져오기 */
+    suspend fun getOAuthInfo(
         provider: OAuthProvider,
         accessToken: String,
     ): OauthInfo {
         return when (provider) {
-            OAuthProvider.KAKAO -> kakaoOAuthService.getKakaoUserInfo(accessToken)
-            OAuthProvider.GOOGLE -> kakaoOAuthService.getKakaoUserInfo(accessToken)
-            OAuthProvider.APPLE -> appleOAuthService.getKakaoUserInfo(accessToken)
+            OAuthProvider.KAKAO -> kakaoOAuthService.getKakaoOAuthInfo(accessToken)
+            OAuthProvider.APPLE -> appleOAuthService.getAppleOAuthInfo(accessToken)
         }.oauthInfo
     }
 
@@ -55,7 +54,6 @@ class OAuthService(
     suspend fun withdraw(oauthInfo: OauthInfo) {
         when (oauthInfo.oAuthProvider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.withdraw(oauthInfo.oAuthId)
-            OAuthProvider.GOOGLE -> kakaoOAuthService.withdraw(oauthInfo.oAuthId)
             OAuthProvider.APPLE -> appleOAuthService.withdraw(oauthInfo.oAuthId)
         }
     }

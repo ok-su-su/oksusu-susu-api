@@ -19,7 +19,6 @@ class DevOAuthService(
     suspend fun getOAuthLoginLinkDev(provider: OAuthProvider): OAuthLoginLinkResponse {
         return when (provider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthLoginLinkDev()
-            OAuthProvider.GOOGLE -> appleOAuthService.getOAuthLoginLinkDev()
             OAuthProvider.APPLE -> appleOAuthService.getOAuthLoginLinkDev()
         }
     }
@@ -28,7 +27,6 @@ class DevOAuthService(
     suspend fun getOAuthTokenDev(provider: OAuthProvider, code: String): OAuthTokenResponse {
         return when (provider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthTokenDev(code)
-            OAuthProvider.GOOGLE -> appleOAuthService.getOAuthTokenDev(code)
             OAuthProvider.APPLE -> appleOAuthService.getOAuthTokenDev(code)
         }
     }

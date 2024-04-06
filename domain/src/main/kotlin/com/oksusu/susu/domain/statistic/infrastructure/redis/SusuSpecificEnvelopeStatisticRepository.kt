@@ -1,7 +1,7 @@
 package com.oksusu.susu.domain.statistic.infrastructure.redis
 
-import com.oksusu.susu.domain.cache.Cache
-import com.oksusu.susu.domain.cache.CacheService
+import com.oksusu.susu.cache.Cache
+import com.oksusu.susu.cache.CacheService
 import org.springframework.stereotype.Repository
 
 @Repository

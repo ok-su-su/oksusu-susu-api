@@ -53,7 +53,7 @@ class KakaoOAuthService(
         return getKakaoToken(redirectUrl, code)
     }
 
-    suspend fun getOAuthWithdrawToken(code: String, uri: String): OAuthTokenResponse {
+    suspend fun getOAuthWithdrawToken(code: String): OAuthTokenResponse {
         val redirectUrl = domainName + kakaoOAuthUrlConfig.withdrawCallbackUrl
         return getKakaoToken(redirectUrl, code)
     }
@@ -70,7 +70,7 @@ class KakaoOAuthService(
     }
 
     /** 유저 정보를 가져옵니다. */
-    suspend fun getKakaoUserInfo(accessToken: String): OAuthUserInfoDto {
+    suspend fun getKakaoOAuthInfo(accessToken: String): OAuthUserInfoDto {
         return withMDCContext(Dispatchers.IO) {
             kakaoClient.getUserInfo(accessToken)
         }.run { OAuthUserInfoDto.fromKakao(this) }

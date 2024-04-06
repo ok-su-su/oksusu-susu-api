@@ -29,6 +29,8 @@ oauth-url:
     withdraw-callback-url: ${APPLE_WITHDRAW_CALLBACK_URL}
     authorize-url: ${APPLE_AUTHORIZE_URL}
     token-url: ${APPLE_TOKEN_URL}
+    oidc-key-url: ${APPLE_OIDC_KEY_URL}
+    withdraw-url: ${APPLE_WITHDRAW_URL}
 
 ---
 # ===================================================================
