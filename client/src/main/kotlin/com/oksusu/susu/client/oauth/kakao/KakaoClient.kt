@@ -8,11 +8,11 @@ interface KakaoClient {
     suspend fun getToken(
         redirectUrl: String,
         code: String,
+        clientId: String,
+        clientSecret: String,
     ): KakaoOAuthTokenResponse
 
-    suspend fun getUserInfo(
-        accessToken: String,
-    ): KakaoOAuthUserInfoResponse
+    suspend fun getUserInfo(accessToken: String): KakaoOAuthUserInfoResponse
 
-    suspend fun withdraw(targetId: String): KakaoOAuthWithdrawResponse?
+    suspend fun withdraw(targetId: String, adminKey: String): KakaoOAuthWithdrawResponse?
 }

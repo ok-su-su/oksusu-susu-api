@@ -10,6 +10,28 @@ slack:
     summary-token: ${SLACK_SUMMARY_TOKEN}
     warning-log-token: ${SLACK_WARNING_LOG_TOKEN}
 
+# OAUTH
+oauth-url:
+  kakao:
+    withdraw-callback-url: ${KAKAO_WITHDRAW_CALLBACK_URL}
+    unlink-url: ${KAKAO_UNLINK_URL}
+    user-info-url: ${KAKAO_USER_INFO_URL}
+    authorize-url: ${KAKAO_AUTHORIZE_URL}
+    token-url: ${KAKAO_TOKEN_URL}
+    kauth-url: ${KAKAO_KAUTH_URL}
+    kapi-url: ${KAKAO_KAPI_URL}
+    redirect-url: ${KAKAO_REDIRECT_URL}
+
+  apple:
+    appleIdUrl: ${APPLE_APPLEID_URL}
+    redirectUrl: ${APPLE_REDIRECT}
+    web-callback-url: ${APPLE_WEB_CALLBACK}
+    withdraw-callback-url: ${APPLE_WITHDRAW_CALLBACK_URL}
+    authorize-url: ${APPLE_AUTHORIZE_URL}
+    token-url: ${APPLE_TOKEN_URL}
+    oidc-key-url: ${APPLE_OIDC_KEY_URL}
+    withdraw-url: ${APPLE_WITHDRAW_URL}
+
 ---
 # ===================================================================
 # Spring Boot Configuration for the dev profile

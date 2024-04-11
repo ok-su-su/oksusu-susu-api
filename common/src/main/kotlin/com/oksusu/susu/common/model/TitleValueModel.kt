@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.statistic.domain.vo
+package com.oksusu.susu.common.model
 
 data class TitleValueModel<VALUE_TYPE>(
     var title: String,

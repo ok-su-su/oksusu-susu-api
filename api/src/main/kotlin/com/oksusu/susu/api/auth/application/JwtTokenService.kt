@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.oksusu.susu.api.auth.model.AuthUserToken
 import com.oksusu.susu.api.auth.model.AuthUserTokenPayload
+import com.oksusu.susu.api.auth.model.TokenDto
 import com.oksusu.susu.api.config.jwt.JwtConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidTokenException
@@ -98,5 +99,21 @@ class JwtTokenService(
             .getOrNull() ?: throw InvalidTokenException(ErrorCode.INVALID_REFRESH_TOKEN)
 
         return mapper.readValue(payload)
+    }
+
+    fun generateAccessAndRefreshToken(uid: Long): TokenDto {
+        val issuedAt = LocalDateTime.now()
+        val accessTokenExpiresIn = issuedAt.plusSeconds(jwtConfig.accessExp.toLong())
+        val accessToken = createToken(uid, accessTokenExpiresIn)
+
+        val refreshTokenExpiresIn = issuedAt.plusSeconds(jwtConfig.refreshExp.toLong())
+        val refreshToken = createRefreshToken(uid, refreshTokenExpiresIn)
+
+        return TokenDto(
+            accessToken = accessToken,
+            accessTokenExp = accessTokenExpiresIn,
+            refreshToken = refreshToken,
+            refreshTokenExp = refreshTokenExpiresIn
+        )
     }
 }

@@ -3,8 +3,9 @@ package com.oksusu.susu.api.auth.application.oauth
 import com.oksusu.susu.api.auth.model.OAuthUserInfoDto
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
+import com.oksusu.susu.api.config.OAuthSecretConfig
+import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.kakao.KakaoClient
-import com.oksusu.susu.common.config.OAuthConfig
 import com.oksusu.susu.common.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class KakaoOAuthService(
-    val kakaoOAuthProperties: OAuthConfig.KakaoOAuthProperties,
+    val kakaoOAuthSecretConfig: OAuthSecretConfig.KakaoOAuthSecretConfig,
+    val kakaoOAuthUrlConfig: OAuthUrlConfig.KakaoOAuthUrlConfig,
     val kakaoClient: KakaoClient,
     @Value("\${server.domain-name}")
     private val domainName: String,
@@ -22,24 +24,24 @@ class KakaoOAuthService(
 
     /** link */
     suspend fun getOAuthLoginLinkDev(): OAuthLoginLinkResponse {
-        val redirectUrl = domainName + kakaoOAuthProperties.redirectUrl
+        val redirectUrl = domainName + kakaoOAuthUrlConfig.redirectUrl
         return OAuthLoginLinkResponse(
-            kakaoOAuthProperties.kauthUrl +
+            kakaoOAuthUrlConfig.kauthUrl +
                 String.format(
-                    kakaoOAuthProperties.authorizeUrl,
-                    kakaoOAuthProperties.clientId,
+                    kakaoOAuthUrlConfig.authorizeUrl,
+                    kakaoOAuthSecretConfig.clientId,
                     redirectUrl
                 )
         )
     }
 
-    suspend fun getOAuthLoginLink(uri: String): OAuthLoginLinkResponse {
-        val redirectUrl = domainName + kakaoOAuthProperties.withdrawCallbackUrl
+    suspend fun getOAuthWithdrawLoginLink(uri: String): OAuthLoginLinkResponse {
+        val redirectUrl = domainName + kakaoOAuthUrlConfig.withdrawCallbackUrl
         return OAuthLoginLinkResponse(
-            kakaoOAuthProperties.kauthUrl +
+            kakaoOAuthUrlConfig.kauthUrl +
                 String.format(
-                    kakaoOAuthProperties.authorizeUrl,
-                    kakaoOAuthProperties.clientId,
+                    kakaoOAuthUrlConfig.authorizeUrl,
+                    kakaoOAuthSecretConfig.clientId,
                     redirectUrl
                 )
         )
@@ -47,23 +49,28 @@ class KakaoOAuthService(
 
     /** oauth token 받아오기 */
     suspend fun getOAuthTokenDev(code: String): OAuthTokenResponse {
-        val redirectUrl = domainName + kakaoOAuthProperties.redirectUrl
+        val redirectUrl = domainName + kakaoOAuthUrlConfig.redirectUrl
         return getKakaoToken(redirectUrl, code)
     }
 
-    suspend fun getOAuthToken(code: String, uri: String): OAuthTokenResponse {
-        val redirectUrl = domainName + kakaoOAuthProperties.withdrawCallbackUrl
+    suspend fun getOAuthWithdrawToken(code: String): OAuthTokenResponse {
+        val redirectUrl = domainName + kakaoOAuthUrlConfig.withdrawCallbackUrl
         return getKakaoToken(redirectUrl, code)
     }
 
     private suspend fun getKakaoToken(redirectUrl: String, code: String): OAuthTokenResponse {
         return withMDCContext(Dispatchers.IO) {
-            kakaoClient.getToken(redirectUrl, code)
+            kakaoClient.getToken(
+                redirectUrl = redirectUrl,
+                code = code,
+                clientId = kakaoOAuthSecretConfig.clientId,
+                clientSecret = kakaoOAuthSecretConfig.clientSecret
+            )
         }.run { OAuthTokenResponse.fromKakao(this) }
     }
 
     /** 유저 정보를 가져옵니다. */
-    suspend fun getKakaoUserInfo(accessToken: String): OAuthUserInfoDto {
+    suspend fun getKakaoOAuthInfo(accessToken: String): OAuthUserInfoDto {
         return withMDCContext(Dispatchers.IO) {
             kakaoClient.getUserInfo(accessToken)
         }.run { OAuthUserInfoDto.fromKakao(this) }
@@ -72,7 +79,7 @@ class KakaoOAuthService(
     /** 회원 탈퇴합니다 */
     suspend fun withdraw(oAuthId: String) {
         withMDCContext(Dispatchers.IO) {
-            kakaoClient.withdraw(oAuthId)
+            kakaoClient.withdraw(targetId = oAuthId, adminKey = kakaoOAuthSecretConfig.adminKey)
         }
     }
 }

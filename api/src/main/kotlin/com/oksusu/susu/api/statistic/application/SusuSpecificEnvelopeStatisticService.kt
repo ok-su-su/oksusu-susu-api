@@ -3,9 +3,9 @@ package com.oksusu.susu.api.statistic.application
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.api.statistic.model.vo.SusuEnvelopeStatisticRequest
+import com.oksusu.susu.cache.helper.CacheKeyGenerateHelper
 import com.oksusu.susu.common.extension.withMDCContext
-import com.oksusu.susu.domain.cache.helper.CacheKeyGenerateHelper
-import com.oksusu.susu.domain.statistic.domain.vo.TitleValueModel
+import com.oksusu.susu.common.model.TitleValueModel
 import com.oksusu.susu.domain.statistic.infrastructure.redis.SusuSpecificEnvelopeStatisticRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers

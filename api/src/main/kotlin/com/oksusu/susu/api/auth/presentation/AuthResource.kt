@@ -9,10 +9,7 @@ import com.oksusu.susu.api.extension.wrapVoid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @Tag(name = SwaggerTag.AUTH_SWAGGER_TAG, description = "Auth API")
 @RestController
@@ -39,5 +36,6 @@ class AuthResource(
     @PostMapping("/withdraw")
     suspend fun tokenRefresh(
         authUser: AuthUser,
-    ) = authFacade.withdraw(authUser).wrapVoid()
+        @RequestParam code: String?,
+    ) = authFacade.withdraw(authUser, code).wrapVoid()
 }

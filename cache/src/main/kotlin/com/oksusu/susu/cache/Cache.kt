@@ -1,12 +1,14 @@
-package com.oksusu.susu.domain.cache
+package com.oksusu.susu.cache
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
+import com.oksusu.susu.cache.model.SusuEnvelopeStatisticCacheModel
+import com.oksusu.susu.cache.model.UserEnvelopeStatisticCacheModel
+import com.oksusu.susu.common.consts.APPLE_OIDC_PUBLIC_KEY_KEY
 import com.oksusu.susu.common.consts.SUSU_ENVELOPE_STATISTIC_KEY
 import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
 import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
 import com.oksusu.susu.common.util.toTypeReference
-import com.oksusu.susu.domain.statistic.domain.SusuEnvelopeStatistic
-import com.oksusu.susu.domain.statistic.domain.UserEnvelopeStatistic
 import java.time.Duration
 
 class Cache<VALUE_TYPE>(
@@ -15,7 +17,7 @@ class Cache<VALUE_TYPE>(
     val duration: Duration,
 ) {
     companion object Factory {
-        fun getSusuEnvelopeStatisticCache(): Cache<SusuEnvelopeStatistic> {
+        fun getSusuEnvelopeStatisticCache(): Cache<SusuEnvelopeStatisticCacheModel> {
             return Cache(
                 key = SUSU_ENVELOPE_STATISTIC_KEY,
                 type = toTypeReference(),
@@ -23,7 +25,7 @@ class Cache<VALUE_TYPE>(
             )
         }
 
-        val getSusuEnvelopeStatisticCache: Factory.() -> Cache<SusuEnvelopeStatistic> =
+        val getSusuEnvelopeStatisticCache: Factory.() -> Cache<SusuEnvelopeStatisticCacheModel> =
             { getSusuEnvelopeStatisticCache() }
 
         fun getSusuSpecificStatisticCache(key: String): Cache<Long> {
@@ -34,7 +36,7 @@ class Cache<VALUE_TYPE>(
             )
         }
 
-        fun getUserEnvelopeStatisticCache(key: String): Cache<UserEnvelopeStatistic> {
+        fun getUserEnvelopeStatisticCache(key: String): Cache<UserEnvelopeStatisticCacheModel> {
             return Cache(
                 key = key,
                 type = toTypeReference(),
@@ -47,6 +49,14 @@ class Cache<VALUE_TYPE>(
                 key = key,
                 type = toTypeReference(),
                 duration = Duration.ofSeconds(ttl)
+            )
+        }
+
+        fun getAppleOidcPublicKeyCache(): Cache<OidcPublicKeysCacheModel> {
+            return Cache(
+                key = APPLE_OIDC_PUBLIC_KEY_KEY,
+                type = toTypeReference(),
+                duration = Duration.ofDays(7)
             )
         }
     }

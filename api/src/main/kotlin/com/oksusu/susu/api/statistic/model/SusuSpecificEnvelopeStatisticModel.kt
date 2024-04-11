@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.statistic.model
 
-import com.oksusu.susu.domain.statistic.domain.vo.TitleValueModel
+import com.oksusu.susu.common.model.TitleValueModel
 
 data class SusuSpecificEnvelopeStatisticModel(
     /** 평균 보낸 비용 */

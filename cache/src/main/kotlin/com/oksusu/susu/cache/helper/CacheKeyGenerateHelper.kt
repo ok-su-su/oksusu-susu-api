@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.cache.helper
+package com.oksusu.susu.cache.helper
 
 import com.oksusu.susu.common.consts.SUSU_CATEGORY_ENVELOPE_STATISTIC_KEY_PREFIX
 import com.oksusu.susu.common.consts.SUSU_RELATIONSHIP_ENVELOPE_STATISTIC_KEY_PREFIX

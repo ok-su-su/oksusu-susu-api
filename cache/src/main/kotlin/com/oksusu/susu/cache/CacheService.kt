@@ -1,6 +1,6 @@
-package com.oksusu.susu.domain.cache
+package com.oksusu.susu.cache
 
-import com.oksusu.susu.domain.cache.model.ZSetModel
+import com.oksusu.susu.cache.model.ZSetModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.Job

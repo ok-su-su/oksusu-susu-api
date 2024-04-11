@@ -5,5 +5,6 @@ include(
     "client",
     "batch",
     "domain",
+    "cache",
     "common"
 )

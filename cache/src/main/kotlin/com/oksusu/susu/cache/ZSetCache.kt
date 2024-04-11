@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.cache
+package com.oksusu.susu.cache
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.oksusu.susu.common.consts.VOTE_OPTION_SUMMARY_KEY

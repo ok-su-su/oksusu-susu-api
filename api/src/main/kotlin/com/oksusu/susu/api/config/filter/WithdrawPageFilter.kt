@@ -24,8 +24,7 @@ class WithdrawPageFilter : WebFilter {
             "/kakaoLogin.png"
         )
         val withdrawPageHost = listOf(
-            "oksusu.site",
-            "localhost:8080"
+            "oksusu.site"
         )
     }
 

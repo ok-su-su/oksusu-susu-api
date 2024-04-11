@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.cache.model
+package com.oksusu.susu.cache.model
 
 class ZSetModel<VALUE_TYPE>(
     val key: String?,

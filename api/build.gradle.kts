@@ -3,6 +3,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":client"))
     implementation(project(":batch"))
+    implementation(project(":cache"))
 
     /** swagger */
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC}")
@@ -35,6 +36,7 @@ dependencies {
 
     /** jwt */
     implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
+    implementation("org.bouncycastle:bcpkix-jdk15on:${DependencyVersion.BOUNCY_CASTLE}")
 }
 
 tasks.getByName("bootJar") {

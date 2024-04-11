@@ -1,6 +1,5 @@
 package com.oksusu.susu.api.auth.application
 
-import com.oksusu.susu.api.auth.helper.TokenGenerateHelper
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.auth.model.TokenDto
 import com.oksusu.susu.api.auth.model.request.OAuthLoginRequest
@@ -34,6 +33,7 @@ import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.context.ApplicationEventPublisher
@@ -44,7 +44,6 @@ import org.springframework.stereotype.Service
 class OAuthFacade(
     private val userService: UserService,
     private val refreshTokenService: RefreshTokenService,
-    private val tokenGenerateHelper: TokenGenerateHelper,
     private val oAuthService: OAuthService,
     private val txTemplates: TransactionTemplates,
     private val termService: TermService,
@@ -53,12 +52,13 @@ class OAuthFacade(
     private val userStatusService: UserStatusService,
     private val userStatusTypeService: UserStatusTypeService,
     private val authValidateService: AuthValidateService,
+    private val jwtTokenService: JwtTokenService,
 ) {
     val logger = KotlinLogging.logger {}
 
     /** 회원가입 가능 여부 체크. */
     suspend fun checkRegisterValid(provider: OAuthProvider, accessToken: String): AbleRegisterResponse {
-        val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
+        val oauthInfo = oAuthService.getOAuthInfo(provider, accessToken)
 
         val isExistUser = userService.existsByOAuthInfo(oauthInfo)
 
@@ -74,7 +74,7 @@ class OAuthFacade(
     ): TokenDto {
         authValidateService.validateRegisterRequest(request)
 
-        val oauthInfo = oAuthService.getOAuthUserInfo(provider, accessToken)
+        val oauthInfo = oAuthService.getOAuthInfo(provider, accessToken)
 
         coroutineScope {
             val validateNotRegistered = async(Dispatchers.IO) {
@@ -88,8 +88,7 @@ class OAuthFacade(
                 )
             }
 
-            validateNotRegistered.await()
-            validateExistTerms.await()
+            awaitAll(validateNotRegistered, validateExistTerms)
         }
 
         val user = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
@@ -158,7 +157,7 @@ class OAuthFacade(
         request: OAuthLoginRequest,
         deviceContext: UserDeviceContext,
     ): TokenDto {
-        val oauthInfo = oAuthService.getOAuthUserInfo(provider, request.accessToken)
+        val oauthInfo = oAuthService.getOAuthInfo(provider, request.accessToken)
         val user = userService.findByOAuthInfoOrThrow(oauthInfo)
 
         val userDevice = UserDevice(
@@ -184,7 +183,7 @@ class OAuthFacade(
     }
 
     private suspend fun generateTokenDto(uid: Long): TokenDto {
-        val tokenDto = tokenGenerateHelper.generateAccessAndRefreshToken(uid)
+        val tokenDto = jwtTokenService.generateAccessAndRefreshToken(uid)
 
         val refreshToken = RefreshToken(
             uid = uid,
@@ -197,12 +196,12 @@ class OAuthFacade(
     }
 
     /** 회원탈퇴 callback 페이지용 oauth 토큰 받아오기 + susu token 발급해주기 */
-    suspend fun loginWithCode(
+    suspend fun loginWithCodeInWithdraw(
         provider: OAuthProvider,
         code: String,
         request: ServerHttpRequest,
     ): String {
-        val oAuthToken = oAuthService.getOAuthToken(provider, code, request)
+        val oAuthToken = oAuthService.getOAuthWithdrawToken(provider, code)
 
         return this.login(
             OAuthProvider.KAKAO,

@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.auth.application
 
+import com.oksusu.susu.api.auth.application.oauth.AppleOAuthService
 import com.oksusu.susu.api.auth.application.oauth.KakaoOAuthService
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class DevOAuthService(
     private val kakaoOAuthService: KakaoOAuthService,
+    private val appleOAuthService: AppleOAuthService,
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -17,6 +19,7 @@ class DevOAuthService(
     suspend fun getOAuthLoginLinkDev(provider: OAuthProvider): OAuthLoginLinkResponse {
         return when (provider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthLoginLinkDev()
+            OAuthProvider.APPLE -> appleOAuthService.getOAuthLoginLinkDev()
         }
     }
 
@@ -24,6 +27,7 @@ class DevOAuthService(
     suspend fun getOAuthTokenDev(provider: OAuthProvider, code: String): OAuthTokenResponse {
         return when (provider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthTokenDev(code)
+            OAuthProvider.APPLE -> appleOAuthService.getOAuthTokenDev(code)
         }
     }
 }
