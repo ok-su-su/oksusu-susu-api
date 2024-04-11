@@ -51,10 +51,10 @@ class OAuthService(
     }
 
     /** oauth 유저 회원 탈퇴하기 */
-    suspend fun withdraw(oauthInfo: OauthInfo) {
+    suspend fun withdraw(oauthInfo: OauthInfo, code: String?) {
         when (oauthInfo.oAuthProvider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.withdraw(oauthInfo.oAuthId)
-            OAuthProvider.APPLE -> appleOAuthService.withdraw(oauthInfo.oAuthId)
+            OAuthProvider.APPLE -> appleOAuthService.withdraw(code!!)
         }
     }
 }
