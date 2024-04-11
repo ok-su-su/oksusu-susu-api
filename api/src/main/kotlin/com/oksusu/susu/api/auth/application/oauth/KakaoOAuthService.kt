@@ -27,11 +27,11 @@ class KakaoOAuthService(
         val redirectUrl = domainName + kakaoOAuthUrlConfig.redirectUrl
         return OAuthLoginLinkResponse(
             kakaoOAuthUrlConfig.kauthUrl +
-                    String.format(
-                        kakaoOAuthUrlConfig.authorizeUrl,
-                        kakaoOAuthSecretConfig.clientId,
-                        redirectUrl
-                    )
+                String.format(
+                    kakaoOAuthUrlConfig.authorizeUrl,
+                    kakaoOAuthSecretConfig.clientId,
+                    redirectUrl
+                )
         )
     }
 
@@ -39,11 +39,11 @@ class KakaoOAuthService(
         val redirectUrl = domainName + kakaoOAuthUrlConfig.withdrawCallbackUrl
         return OAuthLoginLinkResponse(
             kakaoOAuthUrlConfig.kauthUrl +
-                    String.format(
-                        kakaoOAuthUrlConfig.authorizeUrl,
-                        kakaoOAuthSecretConfig.clientId,
-                        redirectUrl
-                    )
+                String.format(
+                    kakaoOAuthUrlConfig.authorizeUrl,
+                    kakaoOAuthSecretConfig.clientId,
+                    redirectUrl
+                )
         )
     }
 

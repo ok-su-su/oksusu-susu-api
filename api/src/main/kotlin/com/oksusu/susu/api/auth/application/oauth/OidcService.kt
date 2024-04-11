@@ -12,7 +12,6 @@ import com.oksusu.susu.cache.model.vo.OidcPublicKeyCacheModel
 import com.oksusu.susu.client.oauth.apple.AppleClient
 import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeyModel
 import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeysResponse
-import com.oksusu.susu.common.consts.KID
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidTokenException
 import com.oksusu.susu.common.extension.withMDCContext
@@ -27,8 +26,6 @@ import java.security.interfaces.RSAPublicKey
 import java.security.spec.RSAPublicKeySpec
 import java.util.Base64
 import java.util.Date
-import kotlin.math.E
-
 
 @Component
 class OidcService(
@@ -53,7 +50,7 @@ class OidcService(
                     alg = key.alg,
                     use = key.use,
                     n = key.n,
-                    e = key.e,
+                    e = key.e
                 )
             }
 
@@ -69,7 +66,7 @@ class OidcService(
                     alg = key.alg,
                     use = key.use,
                     n = key.n,
-                    e = key.e,
+                    e = key.e
                 )
             }
 
@@ -85,7 +82,10 @@ class OidcService(
     }
 
     fun getPayloadFromIdToken(
-        token: String, iss: String, aud: String, oidcPublicKeysResponse: OidcPublicKeysResponse,
+        token: String,
+        iss: String,
+        aud: String,
+        oidcPublicKeysResponse: OidcPublicKeysResponse,
     ): OidcDecodePayload {
         val jwt = decodeIdToken(token, oidcPublicKeysResponse.keys)
             ?: throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
@@ -114,7 +114,8 @@ class OidcService(
             try {
                 return JWT.require(
                     Algorithm.RSA256(
-                        publicKey, null
+                        publicKey,
+                        null
                     )
                 ).build().verify(token)
             } catch (e: Exception) {

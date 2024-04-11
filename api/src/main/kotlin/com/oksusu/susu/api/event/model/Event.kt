@@ -102,5 +102,5 @@ data class CreateUserWithdrawEvent(
 ) : BaseEvent()
 
 data class CacheAppleOidcPublicKeysEvent(
-    val keys: OidcPublicKeysCacheModel
+    val keys: OidcPublicKeysCacheModel,
 ) : BaseEvent()

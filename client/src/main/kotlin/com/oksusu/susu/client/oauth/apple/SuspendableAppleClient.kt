@@ -54,6 +54,5 @@ class SuspendableAppleClient(
             .retrieve()
             .bodyToMono(Unit::class.java)
             .awaitSingle()
-
     }
 }

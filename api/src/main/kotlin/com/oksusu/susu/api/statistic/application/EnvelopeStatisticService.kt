@@ -7,9 +7,9 @@ import com.oksusu.susu.api.envelope.application.LedgerService
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.RelationshipService
 import com.oksusu.susu.common.config.SusuConfig
+import com.oksusu.susu.common.model.TitleValueModel
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
-import com.oksusu.susu.common.model.TitleValueModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import kotlin.math.roundToLong

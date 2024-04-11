@@ -21,10 +21,10 @@ class WithdrawPageFilter : WebFilter {
             "/susufavicon_16_16.png",
             "/susufavicon_32_32.png",
             "/susufavicon_192_192.png",
-            "/kakaoLogin.png",
+            "/kakaoLogin.png"
         )
         val withdrawPageHost = listOf(
-            "oksusu.site",
+            "oksusu.site"
         )
     }
 

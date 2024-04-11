@@ -21,7 +21,7 @@ class UserEnvelopeStatisticRepository(
             mostFrequentRelationShip = value.mostFrequentRelationShip,
             mostFrequentCategory = value.mostFrequentCategory,
             maxReceivedEnvelope = value.maxReceivedEnvelope,
-            maxSentEnvelope = value.maxSentEnvelope,
+            maxSentEnvelope = value.maxSentEnvelope
         )
 
         cacheService.set(Cache.getUserEnvelopeStatisticCache(key), cacheModel)
@@ -39,7 +39,7 @@ class UserEnvelopeStatisticRepository(
                 mostFrequentRelationShip = this.mostFrequentRelationShip,
                 mostFrequentCategory = this.mostFrequentCategory,
                 maxReceivedEnvelope = this.maxReceivedEnvelope,
-                maxSentEnvelope = this.maxSentEnvelope,
+                maxSentEnvelope = this.maxSentEnvelope
             )
         }
     }

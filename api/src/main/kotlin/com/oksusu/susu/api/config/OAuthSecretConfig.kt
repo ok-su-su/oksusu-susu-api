@@ -9,7 +9,7 @@ import kotlin.reflect.full.declaredMemberProperties
 @Configuration
 @EnableConfigurationProperties(
     OAuthSecretConfig.KakaoOAuthSecretConfig::class,
-    OAuthSecretConfig.AppleOAuthSecretConfig::class,
+    OAuthSecretConfig.AppleOAuthSecretConfig::class
 )
 class OAuthSecretConfig(
     val kakaoOAuthSecretConfig: KakaoOAuthSecretConfig,

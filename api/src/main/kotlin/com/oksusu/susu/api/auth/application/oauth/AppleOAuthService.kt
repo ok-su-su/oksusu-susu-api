@@ -12,7 +12,6 @@ import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.apple.AppleClient
 import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
-import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.bouncycastle.util.io.pem.PemReader
@@ -26,7 +25,6 @@ import java.security.interfaces.ECPublicKey
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.PKCS8EncodedKeySpec
 import java.util.Date
-
 
 @Service
 class AppleOAuthService(
@@ -43,24 +41,24 @@ class AppleOAuthService(
     suspend fun getOAuthLoginLinkDev(): OAuthLoginLinkResponse {
         val redirectUrl = domainName + appleOAuthUrlConfig.webCallbackUrl
         return OAuthLoginLinkResponse(
-            appleOAuthUrlConfig.appleIdUrl
-                    + String.format(
-                appleOAuthUrlConfig.authorizeUrl,
-                appleOAuthSecretConfig.webClientId,
-                redirectUrl
-            )
+            appleOAuthUrlConfig.appleIdUrl +
+                String.format(
+                    appleOAuthUrlConfig.authorizeUrl,
+                    appleOAuthSecretConfig.webClientId,
+                    redirectUrl
+                )
         )
     }
 
     suspend fun getOAuthWithdrawLoginLink(uri: String): OAuthLoginLinkResponse {
         val redirectUrl = domainName + appleOAuthUrlConfig.withdrawCallbackUrl
         return OAuthLoginLinkResponse(
-            appleOAuthUrlConfig.appleIdUrl
-                    + String.format(
-                appleOAuthUrlConfig.authorizeUrl,
-                appleOAuthSecretConfig.clientId,
-                redirectUrl
-            )
+            appleOAuthUrlConfig.appleIdUrl +
+                String.format(
+                    appleOAuthUrlConfig.authorizeUrl,
+                    appleOAuthSecretConfig.clientId,
+                    redirectUrl
+                )
         )
     }
 
@@ -89,7 +87,6 @@ class AppleOAuthService(
 
         return OAuthTokenResponse.fromApple(tokens)
     }
-
 
     /**
      * idtoken 분석
@@ -135,7 +132,8 @@ class AppleOAuthService(
             appleClient.withdraw(
                 appleOAuthSecretConfig.clientId,
                 tokens.accessToken,
-                getClientSecret());
+                getClientSecret()
+            )
         }
     }
 
@@ -185,8 +183,8 @@ class KeyProvider(
         val authKey = appleOAuthSecretConfig.authKey
         val byteAuthKey = authKey.replace("((()))", "\n").toByteArray()
 
-        val keyInputStream = ByteArrayInputStream(byteAuthKey);
-        val keyReader = InputStreamReader(keyInputStream);
+        val keyInputStream = ByteArrayInputStream(byteAuthKey)
+        val keyReader = InputStreamReader(keyInputStream)
 
         val content = PemReader(keyReader).readPemObject().content
 
