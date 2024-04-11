@@ -60,7 +60,7 @@ allprojects {
 
     /** build시 ktlint 미적용 */
     gradle.taskGraph.whenReady {
-        if (hasTask(":build")) {
+        if (hasTask(":build") || hasTask(":api:build")) {
             allTasks.forEach { task ->
                 if (task.name.contains("ktlint") || task.name.contains("Ktlint")) {
                     task.enabled = false
