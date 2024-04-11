@@ -34,4 +34,6 @@ object DependencyVersion {
     const val MOCKK = "1.13.9"
     const val KOTEST = "5.8.0"
     const val KOTEST_EXTENSION = "1.1.3"
+    const val FIXTURE_MONKEY = "1.0.15"
+    const val COROUTINE_TEST = "1.8.0"
 }
