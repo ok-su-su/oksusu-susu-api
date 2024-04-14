@@ -1,7 +1,11 @@
 package com.oksusu.susu.api.auth.application
 
 import arrow.fx.coroutines.parZip
-import com.oksusu.susu.api.auth.model.*
+import com.oksusu.susu.api.auth.model.AdminUserImpl
+import com.oksusu.susu.api.auth.model.AuthUser
+import com.oksusu.susu.api.auth.model.AuthUserImpl
+import com.oksusu.susu.api.auth.model.AuthUserToken
+import com.oksusu.susu.api.auth.model.TokenDto
 import com.oksusu.susu.api.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.api.event.model.CreateUserStatusHistoryEvent
 import com.oksusu.susu.api.event.model.CreateUserWithdrawEvent
@@ -47,7 +51,11 @@ class AuthFacade(
                 }
                 val user = userService.findByIdOrThrowSync(payload.id)
 
-                AuthUserImpl(user.id)
+                AuthUserImpl(
+                    uid = user.id,
+                    name = user.name,
+                    role = user.role
+                )
             }
     }
 

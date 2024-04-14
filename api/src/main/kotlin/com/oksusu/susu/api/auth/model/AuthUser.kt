@@ -2,6 +2,7 @@ package com.oksusu.susu.api.auth.model
 
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NoAuthorityException
+import com.oksusu.susu.domain.user.domain.vo.AccountRole
 
 /**
  * 모든 유저가 이용 가능한 parameter 입니다.
@@ -9,6 +10,12 @@ import com.oksusu.susu.common.exception.NoAuthorityException
 interface AuthUser {
     /** user id */
     val uid: Long
+
+    /** 이름 */
+    val name: String
+
+    /** 계정 권한 */
+    val role: AccountRole
 
     fun isAuthor(uid: Long): Boolean
 
@@ -19,6 +26,8 @@ interface AuthUser {
 
 class AuthUserImpl(
     override val uid: Long,
+    override val name: String,
+    override val role: AccountRole,
 ) : AuthUser {
     override fun isAuthor(uid: Long): Boolean {
         return this.uid == uid
