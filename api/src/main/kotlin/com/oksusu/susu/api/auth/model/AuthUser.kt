@@ -11,11 +11,8 @@ interface AuthUser {
     /** user id */
     val uid: Long
 
-    /** 이름 */
-    val name: String
-
-    /** 계정 권한 */
-    val role: AccountRole
+    /** user context */
+    val context: AuthContext
 
     fun isAuthor(uid: Long): Boolean
 
@@ -26,8 +23,7 @@ interface AuthUser {
 
 class AuthUserImpl(
     override val uid: Long,
-    override val name: String,
-    override val role: AccountRole,
+    override val context: AuthContext,
 ) : AuthUser {
     override fun isAuthor(uid: Long): Boolean {
         return this.uid == uid
@@ -45,6 +41,23 @@ class AuthUserImpl(
         }
     }
 }
+
+interface AuthContext {
+    /** 이름 */
+    val name: String
+
+    /** 계정 권한 */
+    val role: AccountRole
+
+    /** imageUrl */
+    val profileImageUrl: String?
+}
+
+class AuthContextImpl(
+    override val name: String,
+    override val role: AccountRole,
+    override val profileImageUrl: String?,
+) : AuthContext
 
 const val AUTH_TOKEN_KEY = "X-SUSU-AUTH-TOKEN"
 

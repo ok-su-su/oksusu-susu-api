@@ -6,6 +6,7 @@ import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.auth.model.AuthUserImpl
 import com.oksusu.susu.api.auth.model.AuthUserToken
 import com.oksusu.susu.api.auth.model.TokenDto
+import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.response.TokenRefreshRequest
 import com.oksusu.susu.api.event.model.CreateUserStatusHistoryEvent
 import com.oksusu.susu.api.event.model.CreateUserWithdrawEvent
@@ -53,8 +54,11 @@ class AuthFacade(
 
                 AuthUserImpl(
                     uid = user.id,
-                    name = user.name,
-                    role = user.role
+                    context = AuthContextImpl(
+                        name = user.name,
+                        role = user.role,
+                        profileImageUrl = user.profileImageUrl
+                    )
                 )
             }
     }
