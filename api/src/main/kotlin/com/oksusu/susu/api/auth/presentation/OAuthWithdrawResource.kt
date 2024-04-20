@@ -29,7 +29,7 @@ class OAuthWithdrawResource(
     }
 
     /** oauth callback용 url, 로그인 완료되면 /withdraw로 redirect */
-    @GetMapping("kakao/callback")
+    @GetMapping("/kakao/callback")
     suspend fun getKakaoCallbackPage(
         model: Model,
         request: ServerHttpRequest,

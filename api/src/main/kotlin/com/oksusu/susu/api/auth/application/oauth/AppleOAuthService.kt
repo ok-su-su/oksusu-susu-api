@@ -91,7 +91,7 @@ class AppleOAuthService(
     /**
      * idtoken 분석
      */
-    suspend fun getAppleOAuthInfo(idToken: String): OAuthUserInfoDto {
+    suspend fun getOAuthInfo(idToken: String): OAuthUserInfoDto {
         val oidcDecodePayload = getOIDCDecodePayload(idToken)
         return OAuthUserInfoDto.fromApple(oidcDecodePayload.sub)
     }
