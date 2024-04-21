@@ -1,0 +1,69 @@
+name: API CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - develop
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kotlin-version: [ "1.9.22" ]
+        java-version: [ "17" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Kotlin
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java-version }}
+          kotlin-version: ${{ matrix.kotlin-version }}
+          distribution: 'corretto'
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      # 빌드, ktlint check도 진행됨
+      - name: Gradle Clean & Build
+        run: ./gradlew clean :api:build --no-daemon
+
+      # 컨테이너 실행
+      - name: Start containers  # test 돌릴때 mysql 필요
+        run: docker-compose up -d
+
+      # jacoco, sonarcube
+      - name: test and analyze
+        run: ./gradlew test sonar --stacktrace --no-daemon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: docker stop and remove mysqldata
+        run: |
+          sudo docker stop $(sudo docker ps -a -q)
+          sudo docker rm $(sudo docker ps -a -q)
+          sudo docker rmi $(sudo docker images -q)
+          sudo rm -rf mysqldata

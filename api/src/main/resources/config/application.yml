@@ -1,0 +1,63 @@
+# ===================================================================
+# Spring Boot Configuration for the default profile
+# ===================================================================
+
+# SERVER
+server:
+  port: 8080
+  http2:
+    enabled: true
+  shutdown: graceful # timeout configuration property : spring.lifecycle.timeout-per-shutdown-phase
+
+logging:
+  level:
+    root: INFO
+
+# SPRING
+spring:
+  config:
+    import:
+      - classpath:/config/susu-config.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 5s # format : https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion-duration
+  application:
+    name: oksusu-susu-api
+  data:
+    redis:
+      repositories:
+        enabled: false
+  profiles:
+    group:
+      dev: common, domain, client, cache
+      prod: common, domain, client, cache
+
+# DOCS
+springdoc:
+  swagger-ui:
+    operations-sorter: alpha
+  model-and-view-allowed: true
+  packages-to-scan: com.oksusu.susu.api
+
+# AUTH
+auth:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    access-exp: ${JWT_ACCESS_EXP}
+    refresh-exp: ${JWT_REFRESH_EXP}
+
+# OAUTH
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    admin-key: ${KAKAO_ADMIN_KEY}
+
+  apple:
+    baseUrl: ${APPLE_BASE_URL}
+    clientId: ${APPLE_CLIENT_ID}
+    webClientId: ${APPLE_WEB_CLIENT_ID}
+    keyId: ${APPLE_KEY_ID}
+    redirectUrl: ${APPLE_REDIRECT}
+    teamId: ${APPLE_TEAM_ID}
+    webCallbackUrl: ${APPLE_WEB_CALLBACK}
+    authKey: ${APPLE_AUTH_KEY}

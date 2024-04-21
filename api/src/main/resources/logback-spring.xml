@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <springProperty scope="context" name="logLevel" source="logging.level.root" defaultValue="INFO"/>
+    <springProperty scope="context" name="warningLogToken" source="slack.warning-log-token" defaultValue=""/>
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <jmxConfigurator/>
+
+    <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
+        <minimumEventLevel>WARN</minimumEventLevel>
+        <minimumBreadcrumbLevel>WARN</minimumBreadcrumbLevel>
+        <encoder>
+            <pattern>%d{yyyy.MM.dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SLACK_WARNING_LOG" class="com.oksusu.susu.client.appender.SlackAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <token>${warningLogToken}</token>
+    </appender>
+
+    <springProfile name="default, dev">
+        <root level="${logLevel}">
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="${logLevel}">
+            <appender-ref ref="SLACK_WARNING_LOG"/>
+            <!--            <appender-ref ref="SENTRY"/>-->
+        </root>
+    </springProfile>
+</configuration>
