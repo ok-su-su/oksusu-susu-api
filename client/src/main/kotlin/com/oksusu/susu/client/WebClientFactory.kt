@@ -1,11 +1,13 @@
 package com.oksusu.susu.client
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.ChannelOption
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import org.springframework.http.client.reactive.ClientHttpConnector
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.*
+import reactor.core.publisher.Mono
 import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
 import java.util.concurrent.TimeUnit
@@ -45,6 +47,7 @@ class WebClientFactory {
             return WebClient.builder()
                 .codecs { it.defaultCodecs().enableLoggingRequestDetails(true) }
                 .clientConnector(clientHttpConnector)
+//                .filter(ResponseLoggingFilter())
                 .build()
         }
 
@@ -78,5 +81,23 @@ class WebClientFactory {
                     this.compress(true)
                 }
         }
+    }
+}
+
+/**
+ * webclient 결과값 디버깅용
+ * response body 로깅 필터
+ */
+class ResponseLoggingFilter : ExchangeFilterFunction {
+    val logger = KotlinLogging.logger { }
+
+    override fun filter(request: ClientRequest, next: ExchangeFunction): Mono<ClientResponse> {
+        return next.exchange(request)
+            .flatMap { response ->
+                response.bodyToMono(String::class.java).flatMap { body ->
+                    logger.info("[${response.statusCode()}] $body")
+                    Mono.just(response)
+                }
+            }
     }
 }

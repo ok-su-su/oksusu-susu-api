@@ -1,8 +1,8 @@
 package com.oksusu.susu.cache.auth.infrastructure
 
+import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.cache.key.Cache
 import com.oksusu.susu.cache.service.CacheService
-import com.oksusu.susu.cache.auth.domain.RefreshToken
 import org.springframework.stereotype.Repository
 
 @Repository

@@ -9,11 +9,13 @@ import kotlin.reflect.full.declaredMemberProperties
 @Configuration
 @EnableConfigurationProperties(
     OAuthSecretConfig.KakaoOAuthSecretConfig::class,
-    OAuthSecretConfig.AppleOAuthSecretConfig::class
+    OAuthSecretConfig.AppleOAuthSecretConfig::class,
+    OAuthSecretConfig.GoogleOAuthSecretConfig::class
 )
 class OAuthSecretConfig(
     val kakaoOAuthSecretConfig: KakaoOAuthSecretConfig,
     val appleOAuthSecretConfig: AppleOAuthSecretConfig,
+    val googleOAuthSecretConfig: GoogleOAuthSecretConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -37,5 +39,11 @@ class OAuthSecretConfig(
         val keyId: String,
         val teamId: String,
         val authKey: String,
+    )
+
+    @ConfigurationProperties(prefix = "oauth.google")
+    class GoogleOAuthSecretConfig(
+        val clientId: String,
+        val clientSecret: String,
     )
 }

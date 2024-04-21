@@ -5,10 +5,10 @@ enum class OAuthProvider {
     /** 카카오 */
     KAKAO,
 
-//    /**
-//     * 구글
-//     */
-//    GOOGLE,
+    /**
+     * 구글
+     */
+    GOOGLE,
 
     /**
      * 애플

@@ -1,6 +1,7 @@
 package com.oksusu.susu.api.auth.model.response
 
 import com.oksusu.susu.client.oauth.apple.model.AppleOAuthTokenResponse
+import com.oksusu.susu.client.oauth.google.model.GoogleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthTokenResponse
 
 class OAuthTokenResponse(
@@ -21,6 +22,13 @@ class OAuthTokenResponse(
             return OAuthTokenResponse(
                 accessToken = appleOAuthTokenResponse.accessToken,
                 refreshToken = appleOAuthTokenResponse.refreshToken
+            )
+        }
+
+        fun fromGoogle(googleOAuthTokenResponse: GoogleOAuthTokenResponse): OAuthTokenResponse {
+            return OAuthTokenResponse(
+                accessToken = googleOAuthTokenResponse.accessToken,
+                refreshToken = googleOAuthTokenResponse.refreshToken
             )
         }
     }

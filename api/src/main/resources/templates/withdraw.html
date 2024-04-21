@@ -15,9 +15,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        function withdrawUser(xSusuAuthToken) {
+        function withdrawUser(xSusuAuthToken, googleAccessToken) {
             $.ajax({
-                url: `/api/v1/auth/withdraw`,
+                url: `/api/v1/auth/withdraw?accessToken=` + googleAccessToken,
                 type: 'post',
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'application/json',
@@ -48,8 +48,8 @@
                 탈퇴 시 작성했던 데이터를 복구할 수 없어요
             </p>
             <div class="withdrawButton"
-                 th:attr="xSusuAuthToken=${xSusuAuthToken}"
-                 th:onclick="withdrawUser(this.getAttribute('xSusuAuthToken'))" />
+                 th:attr="xSusuAuthToken=${xSusuAuthToken}, googleAccessToken=${googleAccessToken}"
+                 th:onclick="withdrawUser(this.getAttribute('xSusuAuthToken'), this.getAttribute('googleAccessToken'))" />
                 <p>탈퇴</p>
             </div>
         </div>
