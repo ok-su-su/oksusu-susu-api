@@ -2,7 +2,7 @@ name: API Deploy
 
 on:
   push:
-    branches: ['main', 'fix/deploy']
+    branches: ['main']
 #    tags:
 #      - v*.*.*
 
@@ -49,47 +49,47 @@ jobs:
           docker build -t $DOCKERHUB_USERNAME/$DOCKERHUB_API_SERVER_IMAGE_NAME:${{env.IMAGE_TAG}} .
           docker push $DOCKERHUB_USERNAME/$DOCKERHUB_API_SERVER_IMAGE_NAME:${{env.IMAGE_TAG}}
 
-#      - name: Get Public IP
-#        id: publicip
-#        run: |
-#          response=$(curl -s canhazip.com)
-#          echo "ip='$response'" >> $GITHUB_OUTPUT
-#
-#      - name: Configure AWS Credentials
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: ${{ secrets.AWS_REGION }}
-#
-#      - name: Add GitHub IP to AWS
-#        run: |
-#          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port ${{ secrets.EC2_SSH_PORT }} --cidr ${{ steps.publicip.outputs.ip  }}/32
-#
-#      - name: Deploy
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.EC2_HOST }}
-#          username: ${{ secrets.EC2_USERNAME }}
-#          key: ${{ secrets.EC2_KEY }}
-#          port: ${{ secrets.EC2_SSH_PORT }}
-#          timeout: 60s
-#          script: |
-#            cd susu
-#
-#            sudo echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
-#
-#            sudo docker stop $(sudo docker ps -a -q)
-#            sudo docker rm $(sudo docker ps -a -q)
-#            sudo docker rmi $(sudo docker images -q)
-#            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_API_SERVER_IMAGE_NAME }}:${{env.IMAGE_TAG}}
-#            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_NGINX_IMAGE_NAME }}:${{ secrets.DOCKERHUB_NGINX_IMAGE_TAG }}
-#            sudo docker-compose -f ~/susu/docker-compose.yml --env-file ~/susu/.env up --build -d
-#
-#            sudo docker system prune --all -f
-#
-#            rm -rf .env
-#
-#      - name: Remove IP FROM security group
-#        run: |
-#          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port ${{ secrets.EC2_SSH_PORT }} --cidr ${{ steps.publicip.outputs.ip  }}/32
+      - name: Get Public IP
+        id: publicip
+        run: |
+          response=$(curl -s canhazip.com)
+          echo "ip='$response'" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Add GitHub IP to AWS
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port ${{ secrets.EC2_SSH_PORT }} --cidr ${{ steps.publicip.outputs.ip  }}/32
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          timeout: 60s
+          script: |
+            cd susu
+
+            sudo echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
+
+            sudo docker stop $(sudo docker ps -a -q)
+            sudo docker rm $(sudo docker ps -a -q)
+            sudo docker rmi $(sudo docker images -q)
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_API_SERVER_IMAGE_NAME }}:${{env.IMAGE_TAG}}
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_NGINX_IMAGE_NAME }}:${{ secrets.DOCKERHUB_NGINX_IMAGE_TAG }}
+            sudo docker-compose -f ~/susu/docker-compose.yml --env-file ~/susu/.env up --build -d
+
+            sudo docker system prune --all -f
+
+            rm -rf .env
+
+      - name: Remove IP FROM security group
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port ${{ secrets.EC2_SSH_PORT }} --cidr ${{ steps.publicip.outputs.ip  }}/32
