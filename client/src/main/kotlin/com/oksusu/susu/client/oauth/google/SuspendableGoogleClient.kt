@@ -3,7 +3,6 @@ package com.oksusu.susu.client.oauth.google
 import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthUserInfoResponse
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthWithdrawResponse
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.MediaType
@@ -12,8 +11,8 @@ import org.springframework.web.reactive.function.client.WebClient
 class SuspendableGoogleClient(
     private val webClient: WebClient,
     private val googleOAuthUrlConfig: OAuthUrlConfig.GoogleOAuthUrlConfig,
-): GoogleClient {
-    val logger = KotlinLogging.logger {  }
+) : GoogleClient {
+    val logger = KotlinLogging.logger { }
 
     override suspend fun getToken(
         redirectUrl: String,
@@ -32,7 +31,6 @@ class SuspendableGoogleClient(
             .retrieve()
             .bodyToMono(GoogleOAuthTokenResponse::class.java)
             .awaitSingle()
-
     }
 
     override suspend fun getUserInfo(accessToken: String): GoogleOAuthUserInfoResponse {
@@ -60,5 +58,4 @@ class SuspendableGoogleClient(
             .bodyToMono(String::class.java)
             .awaitSingle()
     }
-
 }

@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.statistic.model.response
 
 import com.oksusu.susu.api.statistic.model.SusuSpecificEnvelopeStatisticModel
-import com.oksusu.susu.common.model.TitleValueModel
 import com.oksusu.susu.cache.statistic.domain.SusuEnvelopeStatistic
+import com.oksusu.susu.common.model.TitleValueModel
 
 data class SusuEnvelopeStatisticResponse(
     /** 평균 보낸 비용 */

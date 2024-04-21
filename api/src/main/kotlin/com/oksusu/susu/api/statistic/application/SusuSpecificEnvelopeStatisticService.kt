@@ -4,9 +4,9 @@ import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.api.statistic.model.vo.SusuEnvelopeStatisticRequest
 import com.oksusu.susu.cache.key.CacheKeyGenerateHelper
+import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatisticRepository
 import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.common.model.TitleValueModel
-import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatisticRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service

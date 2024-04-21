@@ -1,10 +1,7 @@
 package com.oksusu.susu.client.oauth.google
 
-import com.oksusu.susu.client.oauth.apple.model.AppleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthUserInfoResponse
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthUserInfoResponse
-import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthWithdrawResponse
 
 interface GoogleClient {
     suspend fun getToken(

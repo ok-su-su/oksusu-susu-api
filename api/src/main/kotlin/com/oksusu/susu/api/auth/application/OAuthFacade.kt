@@ -16,7 +16,6 @@ import com.oksusu.susu.api.user.application.UserService
 import com.oksusu.susu.api.user.application.UserStatusService
 import com.oksusu.susu.api.user.application.UserStatusTypeService
 import com.oksusu.susu.api.user.model.UserDeviceContext
-import com.oksusu.susu.api.user.model.UserDeviceContextImpl
 import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
@@ -37,7 +36,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Service
 
 @Service

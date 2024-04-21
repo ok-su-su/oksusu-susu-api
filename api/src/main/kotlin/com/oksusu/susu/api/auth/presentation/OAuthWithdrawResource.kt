@@ -57,7 +57,7 @@ class OAuthWithdrawResource(
         request: ServerHttpRequest,
         @RequestParam code: String,
     ): RedirectView {
-        val googleAccessToken= oAuthService.getOAuthWithdrawToken(OAuthProvider.GOOGLE, code).accessToken
+        val googleAccessToken = oAuthService.getOAuthWithdrawToken(OAuthProvider.GOOGLE, code).accessToken
         val susuToken = oAuthFacade.login(
             OAuthProvider.GOOGLE,
             OAuthLoginRequest(googleAccessToken),
@@ -66,7 +66,6 @@ class OAuthWithdrawResource(
 
         return RedirectView("/withdraw?xSusuAuthToken=$susuToken&googleAccessToken=$googleAccessToken")
     }
-
 
     /** 회원 탈퇴 페이지 */
     @GetMapping("/withdraw")

@@ -10,7 +10,7 @@ import kotlin.reflect.full.declaredMemberProperties
 @EnableConfigurationProperties(
     OAuthUrlConfig.KakaoOAuthUrlConfig::class,
     OAuthUrlConfig.AppleOAuthUrlConfig::class,
-    OAuthUrlConfig.GoogleOAuthUrlConfig::class,
+    OAuthUrlConfig.GoogleOAuthUrlConfig::class
 )
 class OAuthUrlConfig(
     val kakaoOAuthUrlConfig: KakaoOAuthUrlConfig,

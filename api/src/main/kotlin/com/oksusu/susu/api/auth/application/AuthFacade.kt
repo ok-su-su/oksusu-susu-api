@@ -14,10 +14,10 @@ import com.oksusu.susu.api.post.application.PostService
 import com.oksusu.susu.api.user.application.UserService
 import com.oksusu.susu.api.user.application.UserStatusService
 import com.oksusu.susu.api.user.application.UserStatusTypeService
+import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidTokenException
 import com.oksusu.susu.common.exception.NoAuthorityException
-import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.user.domain.UserStatusHistory

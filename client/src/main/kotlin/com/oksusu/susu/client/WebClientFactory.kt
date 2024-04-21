@@ -12,7 +12,6 @@ import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
 import java.util.concurrent.TimeUnit
 
-
 class WebClientFactory {
     companion object {
         fun generate(

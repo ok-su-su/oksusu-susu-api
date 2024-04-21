@@ -6,7 +6,6 @@ import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
 import com.oksusu.susu.api.config.OAuthSecretConfig
 import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.google.GoogleClient
-import com.oksusu.susu.client.oauth.kakao.KakaoClient
 import com.oksusu.susu.common.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
@@ -40,11 +39,11 @@ class GoogleOAuthService(
         val redirectUrl = domainName + googleOAuthUrlConfig.withdrawCallbackUrl
         return OAuthLoginLinkResponse(
             googleOAuthUrlConfig.accountGoogleUrl +
-                    String.format(
-                        googleOAuthUrlConfig.authorizeUrl,
-                        googleOAuthSecretConfig.clientId,
-                        redirectUrl
-                    )
+                String.format(
+                    googleOAuthUrlConfig.authorizeUrl,
+                    googleOAuthSecretConfig.clientId,
+                    redirectUrl
+                )
         )
     }
 
