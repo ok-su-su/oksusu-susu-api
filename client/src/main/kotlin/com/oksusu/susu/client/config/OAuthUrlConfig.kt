@@ -55,15 +55,14 @@ class OAuthUrlConfig(
 
     @ConfigurationProperties(prefix = "oauth-url.google")
     class GoogleOAuthUrlConfig(
-        val withdrawCallbackUrl: String, // /GOOGLE/callback
-        val revokeUrl: String, // /revoke?access_token=%s
-        val userInfoUrl: String, // /userinfo/v2/me?access_token=%s
-        val authorizeUrl: String, // /o/oauth2/v2/auth?access_type=offline&client_id=%s&response_type=code&redirect_uri=%s&scope=https://www.googleapis.com/auth/userinfo.profile
-        val tokenUrl: String, // /token
-        // ?code=%s&clientid=%s&clientsecret=%s&redirect_uri=%s&grant_type=authorization_code
-        val accountGoogleUrl: String, // https://accounts.google.com
-        val oauth2GoogleApiUrl: String, // https://oauth2.googleapis.com
-        val googleApiUrl: String, // https://www.googleapis.com
-        val redirectUrl: String, // /api/v1/dev/oauth/GOOGLE/token
+        val withdrawCallbackUrl: String,
+        val revokeUrl: String,
+        val userInfoUrl: String,
+        val authorizeUrl: String,
+        val tokenUrl: String,
+        val accountGoogleUrl: String,
+        val oauth2GoogleApiUrl: String,
+        val googleApiUrl: String,
+        val redirectUrl: String,
     )
 }
