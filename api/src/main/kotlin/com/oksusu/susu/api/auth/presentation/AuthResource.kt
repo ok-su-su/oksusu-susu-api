@@ -37,5 +37,6 @@ class AuthResource(
     suspend fun tokenRefresh(
         authUser: AuthUser,
         @RequestParam code: String?,
-    ) = authFacade.withdraw(authUser, code).wrapVoid()
+        @RequestParam accessToken: String?
+    ) = authFacade.withdraw(authUser, code, accessToken).wrapVoid()
 }

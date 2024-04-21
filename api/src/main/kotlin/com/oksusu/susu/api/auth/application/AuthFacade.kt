@@ -108,7 +108,7 @@ class AuthFacade(
     }
 
     @Transactional
-    suspend fun withdraw(authUser: AuthUser, code: String?) {
+    suspend fun withdraw(authUser: AuthUser, code: String?, accessToken: String?) {
         val (deactivatedPosts, userAndUserStatusModel) = parZip(
             { postService.findAllByUid(authUser.uid) },
             { userService.getUserAndUserStatus(authUser.uid) }
@@ -160,7 +160,7 @@ class AuthFacade(
             }
 
             val oAuthDeferred = async {
-                oAuthService.withdraw(user.oauthInfo, code)
+                oAuthService.withdraw(user.oauthInfo, code, accessToken)
             }
 
             awaitAll(txDeferred, oAuthDeferred)

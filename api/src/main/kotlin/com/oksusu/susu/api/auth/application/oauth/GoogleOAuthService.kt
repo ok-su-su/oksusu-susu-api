@@ -26,7 +26,6 @@ class GoogleOAuthService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    // https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=http://localhost:8080/api/v1/dev/oauth/GOOGLE/token&client_id=160906391437-e7pt62v3qj9rdpr20k7qpab6p3gj64m5.apps.googleusercontent.com&scope=https://www.googleapis.com/auth/userinfo.profile
     /** link */
     suspend fun getOAuthLoginLinkDev(): OAuthLoginLinkResponse {
         val redirectUrl = domainName + googleOAuthUrlConfig.redirectUrl
@@ -83,9 +82,9 @@ class GoogleOAuthService(
     }
 
     /** 회원 탈퇴합니다 */
-    suspend fun withdraw(oAuthId: String) {
+    suspend fun withdraw(accessToken: String) {
         withMDCContext(Dispatchers.IO) {
-            kakaoClient.withdraw(targetId = oAuthId, adminKey = kakaoOAuthSecretConfig.adminKey)
+            googleClient.withdraw(accessToken = accessToken)
         }
     }
 }
