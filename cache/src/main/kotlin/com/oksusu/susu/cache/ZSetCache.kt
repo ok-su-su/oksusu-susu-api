@@ -17,8 +17,8 @@ class ZSetCache<VALUE_TYPE>(
             )
         }
 
-        val getVoteOptionSummaryCache: Factory.() -> ZSetCache<Long> =
-            { getVoteOptionSummaryCache() }
+        val getVoteOptionSummaryCache: Factory.() -> ZSetCache<Long>
+            get() = { getVoteOptionSummaryCache() }
 
         fun getVoteSummaryCache(): ZSetCache<Long> {
             return ZSetCache(
@@ -27,7 +27,7 @@ class ZSetCache<VALUE_TYPE>(
             )
         }
 
-        val getVoteSummaryCache: Factory.() -> ZSetCache<Long> =
-            { getVoteSummaryCache() }
+        val getVoteSummaryCache: Factory.() -> ZSetCache<Long>
+            get() = { getVoteSummaryCache() }
     }
 }

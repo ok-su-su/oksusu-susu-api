@@ -2,7 +2,7 @@ package com.oksusu.susu.domain.statistic.domain
 
 import com.oksusu.susu.common.model.TitleValueModel
 
-class SusuEnvelopeStatistic(
+data class SusuEnvelopeStatistic(
     /** 최근 사용 금액 */
     val recentSpent: List<TitleValueModel<Long>>?,
     /** 경조사비를 가장 많이 쓴 달 */

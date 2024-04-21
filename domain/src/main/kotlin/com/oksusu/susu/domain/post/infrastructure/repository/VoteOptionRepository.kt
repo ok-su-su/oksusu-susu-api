@@ -40,13 +40,13 @@ class VoteOptionCustomRepositoryImpl : VoteOptionCustomRepository, QuerydslRepos
 
     private val qVoteOption = QVoteOption.voteOption
     private val qCount = QCount.count1
+
     override fun getOptionAndCount(postId: Long): List<VoteOptionAndCountModel> {
         return JPAQuery<QPost>(entityManager)
             .select(QVoteOptionAndCountModel(qVoteOption, qCount.count))
             .from(qVoteOption)
             .join(qCount).on(qCount.targetType.eq(CountTargetType.VOTE_OPTION).and(qVoteOption.id.eq(qCount.targetId)))
-            .where(
-                qVoteOption.postId.isEquals(postId)
-            ).fetch()
+            .where(qVoteOption.postId.isEquals(postId))
+            .fetch()
     }
 }
