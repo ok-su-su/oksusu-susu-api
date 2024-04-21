@@ -195,21 +195,6 @@ class OAuthFacade(
         return tokenDto
     }
 
-    /** 회원탈퇴 callback 페이지용 oauth 토큰 받아오기 + susu token 발급해주기 */
-    suspend fun loginWithCodeInWithdraw(
-        provider: OAuthProvider,
-        code: String,
-        request: ServerHttpRequest,
-    ): String {
-        val oAuthToken = oAuthService.getOAuthWithdrawToken(provider, code)
-
-        return this.login(
-            OAuthProvider.KAKAO,
-            OAuthLoginRequest(oAuthToken.accessToken),
-            UserDeviceContextImpl.getDefault()
-        ).accessToken
-    }
-
     suspend fun getOAuthInfo(user: AuthUser): UserOAuthInfoResponse {
         return userService.findByIdOrThrow(user.uid).run { UserOAuthInfoResponse.from(this) }
     }

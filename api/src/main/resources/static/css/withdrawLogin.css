@@ -63,7 +63,7 @@ body {
     padding-bottom: 10px;
 }
 
-.kakaoButton {
+.oauthButton {
     margin-top: 10px;
     width: 100%;
     display: flex;
@@ -71,12 +71,12 @@ body {
     justify-content: center;
 }
 
-.kakaoButton a {
+.oauthButton a {
     max-height: 54px;
     max-width: 360px;
 }
 
-.kakaoButton a img {
+.oauthButton a img {
     max-height: 54px;
     max-width: 360px;
 }

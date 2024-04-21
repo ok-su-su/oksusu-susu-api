@@ -15,11 +15,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class GoogleOAuthService(
-    val kakaoOAuthSecretConfig: OAuthSecretConfig.KakaoOAuthSecretConfig,
-    val kakaoOAuthUrlConfig: OAuthUrlConfig.KakaoOAuthUrlConfig,
     val googleOAuthUrlConfig: OAuthUrlConfig.GoogleOAuthUrlConfig,
     val googleOAuthSecretConfig: OAuthSecretConfig.GoogleOAuthSecretConfig,
-    val kakaoClient: KakaoClient,
     val googleClient: GoogleClient,
     @Value("\${server.domain-name}")
     private val domainName: String,
@@ -58,7 +55,7 @@ class GoogleOAuthService(
     }
 
     suspend fun getOAuthWithdrawToken(code: String): OAuthTokenResponse {
-        val redirectUrl = domainName + kakaoOAuthUrlConfig.withdrawCallbackUrl
+        val redirectUrl = domainName + googleOAuthUrlConfig.withdrawCallbackUrl
         return getGoogleToken(redirectUrl, code)
     }
 
