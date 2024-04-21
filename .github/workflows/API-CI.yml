@@ -46,10 +46,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-#      # 빌드, ktlint check도 진행됨
-#      - name: Gradle Clean & Build
-#        run: ./gradlew clean :api:build --no-daemon
-#
+      # 빌드, ktlint check도 진행됨
+      - name: Gradle Clean & Build
+        run: ./gradlew clean :api:build --no-daemon
+
 #      # 컨테이너 실행
 #      - name: Start containers  # test 돌릴때 mysql 필요
 #        run: docker-compose up -d
