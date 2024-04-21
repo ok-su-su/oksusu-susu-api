@@ -61,3 +61,7 @@ oauth:
     teamId: ${APPLE_TEAM_ID}
     webCallbackUrl: ${APPLE_WEB_CALLBACK}
     authKey: ${APPLE_AUTH_KEY}
+
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}

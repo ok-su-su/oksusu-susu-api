@@ -14,10 +14,10 @@ import com.oksusu.susu.api.post.application.PostService
 import com.oksusu.susu.api.user.application.UserService
 import com.oksusu.susu.api.user.application.UserStatusService
 import com.oksusu.susu.api.user.application.UserStatusTypeService
+import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidTokenException
 import com.oksusu.susu.common.exception.NoAuthorityException
-import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.user.domain.UserStatusHistory
@@ -108,7 +108,7 @@ class AuthFacade(
     }
 
     @Transactional
-    suspend fun withdraw(authUser: AuthUser, code: String?) {
+    suspend fun withdraw(authUser: AuthUser, code: String?, accessToken: String?) {
         val (deactivatedPosts, userAndUserStatusModel) = parZip(
             { postService.findAllByUid(authUser.uid) },
             { userService.getUserAndUserStatus(authUser.uid) }
@@ -160,7 +160,7 @@ class AuthFacade(
             }
 
             val oAuthDeferred = async {
-                oAuthService.withdraw(user.oauthInfo, code)
+                oAuthService.withdraw(user.oauthInfo, code, accessToken)
             }
 
             awaitAll(txDeferred, oAuthDeferred)

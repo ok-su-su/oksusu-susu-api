@@ -1,9 +1,9 @@
 package com.oksusu.susu.cache.statistic.infrastructure
 
 import com.oksusu.susu.cache.key.Cache
-import com.oksusu.susu.cache.service.CacheService
 import com.oksusu.susu.cache.key.CacheKeyGenerateHelper
 import com.oksusu.susu.cache.model.UserEnvelopeStatisticCacheModel
+import com.oksusu.susu.cache.service.CacheService
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
 import org.springframework.stereotype.Repository
 

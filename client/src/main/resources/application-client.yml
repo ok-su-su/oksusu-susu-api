@@ -23,14 +23,25 @@ oauth-url:
     redirect-url: ${KAKAO_REDIRECT_URL}
 
   apple:
-    appleIdUrl: ${APPLE_APPLEID_URL}
-    redirectUrl: ${APPLE_REDIRECT}
+    apple-id-url: ${APPLE_APPLEID_URL}
+    redirect-url: ${APPLE_REDIRECT}
     web-callback-url: ${APPLE_WEB_CALLBACK}
     withdraw-callback-url: ${APPLE_WITHDRAW_CALLBACK_URL}
     authorize-url: ${APPLE_AUTHORIZE_URL}
     token-url: ${APPLE_TOKEN_URL}
     oidc-key-url: ${APPLE_OIDC_KEY_URL}
     withdraw-url: ${APPLE_WITHDRAW_URL}
+
+  google:
+    withdraw-callback-url: ${GOOGLE_WITHDRAW_CALLBACK_URL}
+    revoke-url: ${GOOGLE_REVOKE_URL}
+    user-info-url: ${GOOGLE_USER_INFO_URL}
+    authorize-url: ${GOOGLE_AUTHORIZE_URL}
+    token-url: ${GOOGLE_TOKEN_URL}
+    account-google-url: ${GOOGLE_ACCOUNT_GOOGLE_URL}
+    oauth2-google-api-url: ${GOOGLE_OAUTH2_GOOGLE_API_URL}
+    google-api-url: ${GOOGLE_GOOGLE_API_URL}
+    redirect-url: ${GOOGLE_REDIRECT_URL}
 
 ---
 # ===================================================================

@@ -2,6 +2,9 @@ package com.oksusu.susu.batch.envelope.job
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.key.CacheKeyGenerateHelper
+import com.oksusu.susu.cache.statistic.domain.SusuEnvelopeStatistic
+import com.oksusu.susu.cache.statistic.infrastructure.SusuEnvelopeStatisticRepository
+import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatisticRepository
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
@@ -20,9 +23,6 @@ import com.oksusu.susu.domain.friend.domain.Relationship
 import com.oksusu.susu.domain.friend.infrastructure.FriendRelationshipRepository
 import com.oksusu.susu.domain.friend.infrastructure.RelationshipRepository
 import com.oksusu.susu.domain.friend.infrastructure.model.CountPerRelationshipIdModel
-import com.oksusu.susu.cache.statistic.domain.SusuEnvelopeStatistic
-import com.oksusu.susu.cache.statistic.infrastructure.SusuEnvelopeStatisticRepository
-import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatisticRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

@@ -1,4 +1,4 @@
-# <img width="160" style="margin-right: 20px" align=left alt="susu-logo" src="https://github.com/YAPP-Github/oksusu-susu-api/assets/67852689/f0abdec2-e215-4c9a-b817-3cd18af26ab5"/> 수수
+# <img width="160" style="margin-right: 20px" align=left alt="susu-logo" src="https://github.com/ok-su-su/.github/assets/67852689/0111afbf-fc8f-4693-b022-1af946fdf2cf"/> 수수
 
 **주고받은 소중한 마음들,** <br/>
 수수와 함께 경조사비를 똑똑하게 관리해요!<br/>

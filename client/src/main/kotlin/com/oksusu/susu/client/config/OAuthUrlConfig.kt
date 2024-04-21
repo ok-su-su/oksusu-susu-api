@@ -9,11 +9,13 @@ import kotlin.reflect.full.declaredMemberProperties
 @Configuration
 @EnableConfigurationProperties(
     OAuthUrlConfig.KakaoOAuthUrlConfig::class,
-    OAuthUrlConfig.AppleOAuthUrlConfig::class
+    OAuthUrlConfig.AppleOAuthUrlConfig::class,
+    OAuthUrlConfig.GoogleOAuthUrlConfig::class
 )
 class OAuthUrlConfig(
     val kakaoOAuthUrlConfig: KakaoOAuthUrlConfig,
     val appleOAuthUrlConfig: AppleOAuthUrlConfig,
+    val googleOAuthUrlConfig: GoogleOAuthUrlConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -49,5 +51,18 @@ class OAuthUrlConfig(
         // /auth/keys
         val withdrawUrl: String,
         // /auth/revoke
+    )
+
+    @ConfigurationProperties(prefix = "oauth-url.google")
+    class GoogleOAuthUrlConfig(
+        val withdrawCallbackUrl: String,
+        val revokeUrl: String,
+        val userInfoUrl: String,
+        val authorizeUrl: String,
+        val tokenUrl: String,
+        val accountGoogleUrl: String,
+        val oauth2GoogleApiUrl: String,
+        val googleApiUrl: String,
+        val redirectUrl: String,
     )
 }
