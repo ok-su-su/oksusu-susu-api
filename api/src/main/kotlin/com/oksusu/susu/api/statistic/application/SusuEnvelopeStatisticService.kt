@@ -3,8 +3,8 @@ package com.oksusu.susu.api.statistic.application
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.FailToExecuteException
 import com.oksusu.susu.common.extension.withMDCContext
-import com.oksusu.susu.domain.statistic.domain.SusuEnvelopeStatistic
-import com.oksusu.susu.domain.statistic.infrastructure.redis.SusuEnvelopeStatisticRepository
+import com.oksusu.susu.cache.statistic.domain.SusuEnvelopeStatistic
+import com.oksusu.susu.cache.statistic.infrastructure.SusuEnvelopeStatisticRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service

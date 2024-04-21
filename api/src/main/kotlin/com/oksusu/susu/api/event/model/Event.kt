@@ -4,7 +4,7 @@ import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.common.extension.mapper
 import com.oksusu.susu.domain.envelope.domain.Ledger
-import com.oksusu.susu.domain.statistic.domain.UserEnvelopeStatistic
+import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.domain.term.domain.TermAgreement
 import com.oksusu.susu.domain.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.domain.user.domain.UserDevice

@@ -21,9 +21,7 @@ dependencies {
     implementation("software.amazon.awssdk:sts")
 
     /** aws ssm */
-    implementation(
-        platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}")
-    )
+    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}"))
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
     /** slack */

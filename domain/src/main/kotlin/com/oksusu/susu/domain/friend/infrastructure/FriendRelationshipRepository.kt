@@ -54,9 +54,8 @@ class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepositor
 
     override suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
         return JPAQuery<FriendRelationship>(entityManager)
-            .select(
-                QCountPerRelationshipIdModel(qFriendRelationship.relationshipId, qEnvelope.id.count())
-            ).from(qFriendRelationship)
+            .select(QCountPerRelationshipIdModel(qFriendRelationship.relationshipId, qEnvelope.id.count()))
+            .from(qFriendRelationship)
             .join(qEnvelope).on(qFriendRelationship.friendId.eq(qEnvelope.friendId))
             .groupBy(qFriendRelationship.relationshipId)
             .fetch()
@@ -64,13 +63,11 @@ class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepositor
 
     override suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel> {
         return JPAQuery<FriendRelationship>(entityManager)
-            .select(
-                QCountPerRelationshipIdModel(qFriendRelationship.relationshipId, qEnvelope.id.count())
-            ).from(qFriendRelationship)
+            .select(QCountPerRelationshipIdModel(qFriendRelationship.relationshipId, qEnvelope.id.count()))
+            .from(qFriendRelationship)
             .join(qEnvelope).on(qFriendRelationship.friendId.eq(qEnvelope.friendId))
-            .where(
-                qEnvelope.uid.eq(uid)
-            ).groupBy(qFriendRelationship.relationshipId)
+            .where(qEnvelope.uid.eq(uid))
+            .groupBy(qFriendRelationship.relationshipId)
             .fetch()
     }
 }

@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.event.model.CacheAppleOidcPublicKeysEvent
-import com.oksusu.susu.cache.Cache
-import com.oksusu.susu.cache.CacheService
+import com.oksusu.susu.cache.key.Cache
+import com.oksusu.susu.cache.service.CacheService
 import com.oksusu.susu.common.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope

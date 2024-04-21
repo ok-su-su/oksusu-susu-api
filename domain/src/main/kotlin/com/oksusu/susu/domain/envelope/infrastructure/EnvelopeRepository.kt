@@ -1,14 +1,35 @@
 package com.oksusu.susu.domain.envelope.infrastructure
 
-import com.oksusu.susu.common.extension.*
 import com.oksusu.susu.domain.category.domain.QCategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
-import com.oksusu.susu.domain.common.extension.*
+import com.oksusu.susu.domain.common.extension.execute
+import com.oksusu.susu.domain.common.extension.executeSlice
+import com.oksusu.susu.domain.common.extension.isEquals
+import com.oksusu.susu.domain.common.extension.isGoe
+import com.oksusu.susu.domain.common.extension.isIn
+import com.oksusu.susu.domain.common.extension.isLoe
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.QEnvelope
 import com.oksusu.susu.domain.envelope.domain.QLedger
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
-import com.oksusu.susu.domain.envelope.infrastructure.model.*
+import com.oksusu.susu.domain.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerHandedOverAtModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeAndFriendModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeDetailAndLedgerModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeDetailModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.FriendStatisticsModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QCountAvgAmountPerStatisticGroupModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QCountPerCategoryIdModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QCountPerHandedOverAtModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QCountTotalAmountsAndCountsModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QEnvelopeAndFriendModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QEnvelopeDetailAndLedgerModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QEnvelopeDetailModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.QFriendStatisticsModel
+import com.oksusu.susu.domain.envelope.infrastructure.model.SearchEnvelopeSpec
+import com.oksusu.susu.domain.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import com.oksusu.susu.domain.friend.domain.QFriend
 import com.oksusu.susu.domain.friend.domain.QFriendRelationship
 import com.oksusu.susu.domain.user.domain.QUser
@@ -141,9 +162,8 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .where(
-                qEnvelope.ledgerId.`in`(ledgerIds)
-            ).groupBy(qEnvelope.ledgerId)
+            .where(qEnvelope.ledgerId.`in`(ledgerIds))
+            .groupBy(qEnvelope.ledgerId)
             .fetch()
     }
 
@@ -273,15 +293,12 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
-            .where(
-                qEnvelope.amount.between(minAmount, maxAmount)
-            )
+            .where(qEnvelope.amount.between(minAmount, maxAmount))
             .groupBy(
                 qCategoryAssignment.categoryId,
                 qFriendRelationship.relationshipId,
                 qUser.birth.year().castToNum(Long::class.java)
-            )
-            .fetch()
+            ).fetch()
     }
 
     override fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope> {
@@ -404,9 +421,8 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
 
     override fun getUserCountHadEnvelope(): Long {
         return JPAQuery<Envelope>(entityManager)
-            .select(
-                qEnvelope.uid.countDistinct()
-            ).from(qEnvelope)
+            .select(qEnvelope.uid.countDistinct())
+            .from(qEnvelope)
             .fetchFirst()
     }
 

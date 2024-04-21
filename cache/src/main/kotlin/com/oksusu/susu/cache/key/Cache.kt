@@ -1,4 +1,4 @@
-package com.oksusu.susu.cache
+package com.oksusu.susu.cache.key
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
