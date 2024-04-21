@@ -1,11 +1,11 @@
-package com.oksusu.susu.domain.statistic.infrastructure.redis
+package com.oksusu.susu.cache.statistic.infrastructure
 
-import com.oksusu.susu.cache.Cache
-import com.oksusu.susu.cache.CacheService
-import com.oksusu.susu.cache.CacheService.Companion.getOrNull
-import com.oksusu.susu.cache.CacheService.Companion.set
+import com.oksusu.susu.cache.key.Cache
+import com.oksusu.susu.cache.service.CacheService
+import com.oksusu.susu.cache.service.CacheService.Companion.getOrNull
+import com.oksusu.susu.cache.service.CacheService.Companion.set
 import com.oksusu.susu.cache.model.SusuEnvelopeStatisticCacheModel
-import com.oksusu.susu.domain.statistic.domain.SusuEnvelopeStatistic
+import com.oksusu.susu.cache.statistic.domain.SusuEnvelopeStatistic
 import org.springframework.stereotype.Repository
 
 @Repository

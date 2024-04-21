@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.statistic.domain
+package com.oksusu.susu.cache.statistic.domain
 
 import com.oksusu.susu.common.model.TitleValueModel
 

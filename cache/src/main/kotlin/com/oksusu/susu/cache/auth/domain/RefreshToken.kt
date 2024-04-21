@@ -1,4 +1,4 @@
-package com.oksusu.susu.domain.auth.domain
+package com.oksusu.susu.cache.auth.domain
 
 /** refresh token */
 class RefreshToken(

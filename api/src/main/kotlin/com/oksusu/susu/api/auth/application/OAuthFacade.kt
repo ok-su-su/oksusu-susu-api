@@ -17,7 +17,7 @@ import com.oksusu.susu.api.user.application.UserStatusService
 import com.oksusu.susu.api.user.application.UserStatusTypeService
 import com.oksusu.susu.api.user.model.UserDeviceContext
 import com.oksusu.susu.api.user.model.UserDeviceContextImpl
-import com.oksusu.susu.domain.auth.domain.RefreshToken
+import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates

@@ -94,10 +94,9 @@ class SlackBlockHelper {
 
     private fun getRequestParam(request: ServerHttpRequest): String {
         return request.queryParams.map { param ->
-            val value = if (param.value.size == 1) {
-                param.value.firstOrNull()
-            } else {
-                param.value
+            val value = when (param.value.size == 1) {
+                true -> param.value.firstOrNull()
+                false -> param.value
             }
             "${param.key} : $value"
         }.joinToString("\n")

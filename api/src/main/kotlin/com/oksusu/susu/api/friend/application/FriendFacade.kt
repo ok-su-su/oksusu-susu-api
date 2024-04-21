@@ -66,13 +66,13 @@ class FriendFacade(
             val categoryAssignment = envelope?.let { target -> categoryAssignments[target.id] }
             val category = categoryAssignment?.categoryId?.let { target -> categoryService.getCategory(target) }
 
-            val recentEnvelopeModel = if (envelope != null && category != null && categoryAssignment != null) {
-                RecentEnvelopeModel(
+            val recentEnvelopeModel = when (envelope != null && category != null) {
+                true -> RecentEnvelopeModel(
                     category = categoryAssignment.customCategory ?: category.name,
                     handedOverAt = envelope.handedOverAt
                 )
-            } else {
-                null
+
+                false -> null
             }
 
             SearchFriendResponse.of(
