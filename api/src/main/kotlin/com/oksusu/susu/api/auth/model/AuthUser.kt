@@ -3,10 +3,9 @@ package com.oksusu.susu.api.auth.model
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NoAuthorityException
 import com.oksusu.susu.domain.user.domain.vo.AccountRole
+import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
 
-/**
- * 모든 유저가 이용 가능한 parameter 입니다.
- */
+/** 최상위 인증 및 인가 인터페이스 */
 interface AuthUser {
     /** user id */
     val uid: Long
@@ -21,7 +20,7 @@ interface AuthUser {
     fun isNotAuthorThrow(uid: Long)
 }
 
-class AuthUserImpl(
+data class AuthUserImpl(
     override val uid: Long,
     override val context: AuthContext,
 ) : AuthUser {
@@ -42,6 +41,7 @@ class AuthUserImpl(
     }
 }
 
+/** */
 interface AuthContext {
     /** 이름 */
     val name: String
@@ -51,12 +51,16 @@ interface AuthContext {
 
     /** imageUrl */
     val profileImageUrl: String?
+
+    /** 사용자 상태 */
+    val userStatusTypeInfo: UserStatusTypeInfo
 }
 
-class AuthContextImpl(
+data class AuthContextImpl(
     override val name: String,
     override val role: AccountRole,
     override val profileImageUrl: String?,
+    override val userStatusTypeInfo: UserStatusTypeInfo,
 ) : AuthContext
 
 const val AUTH_TOKEN_KEY = "X-SUSU-AUTH-TOKEN"

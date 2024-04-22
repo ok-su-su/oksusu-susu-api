@@ -28,6 +28,9 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     ALREADY_REGISTERED_USER(HttpStatus.NOT_FOUND, "이미 가입된 유저입니다."),
     INVALID_USER_NAME_ERROR(HttpStatus.BAD_REQUEST, "유저 이름 정보가 잘못되었습니다."),
     INVALID_USER_BIRTH_ERROR(HttpStatus.BAD_REQUEST, "유저 생년월일 정보가 잘못되었습니다."),
+    WITHDRAW_USER_ERROR(HttpStatus.BAD_REQUEST, "탈퇴한 유저입니다."),
+    RESTRICTED_7_DAYS_USER_ERROR(HttpStatus.BAD_REQUEST, "7일 일시 정지된 유저입니다."),
+    BANISHED_USER_ERROR(HttpStatus.BAD_REQUEST, "7일 일시 정지된 유저입니다."),
 
     /** User Device Error Code */
     NOT_FOUND_USER_DEVICE_ERROR(HttpStatus.NOT_FOUND, "유저 디바이스 정보를 찾을 수 없습니다."),

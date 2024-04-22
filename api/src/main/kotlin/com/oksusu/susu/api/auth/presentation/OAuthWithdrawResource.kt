@@ -25,11 +25,11 @@ class OAuthWithdrawResource(
         model: Model,
         request: ServerHttpRequest,
     ): String {
-        val kakaoRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.KAKAO, request.uri.toString()).link
-        val googleRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.GOOGLE, request.uri.toString()).link
+        val kakaoRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.KAKAO, request.uri.toString())
+        val googleRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.GOOGLE, request.uri.toString())
 
-        model.addAttribute("kakaoRedirectUrl", kakaoRedirectUrl)
-        model.addAttribute("googleRedirectUrl", googleRedirectUrl)
+        model.addAttribute("kakaoRedirectUrl", kakaoRedirectUrl.link)
+        model.addAttribute("googleRedirectUrl", googleRedirectUrl.link)
         return "withdrawLogin"
     }
 
@@ -42,9 +42,9 @@ class OAuthWithdrawResource(
     ): RedirectView {
         val oAuthToken = oAuthService.getOAuthWithdrawToken(OAuthProvider.KAKAO, code)
         val susuToken = oAuthFacade.login(
-            OAuthProvider.KAKAO,
-            OAuthLoginRequest(oAuthToken.accessToken),
-            UserDeviceContextImpl.getDefault()
+            provider = OAuthProvider.KAKAO,
+            request = OAuthLoginRequest(oAuthToken.accessToken),
+            deviceContext = UserDeviceContextImpl.getDefault()
         ).accessToken
 
         return RedirectView("/withdraw?xSusuAuthToken=$susuToken")
@@ -59,9 +59,9 @@ class OAuthWithdrawResource(
     ): RedirectView {
         val googleAccessToken = oAuthService.getOAuthWithdrawToken(OAuthProvider.GOOGLE, code).accessToken
         val susuToken = oAuthFacade.login(
-            OAuthProvider.GOOGLE,
-            OAuthLoginRequest(googleAccessToken),
-            UserDeviceContextImpl.getDefault()
+            provider = OAuthProvider.GOOGLE,
+            request = OAuthLoginRequest(googleAccessToken),
+            deviceContext = UserDeviceContextImpl.getDefault()
         ).accessToken
 
         return RedirectView("/withdraw?xSusuAuthToken=$susuToken&googleAccessToken=$googleAccessToken")
