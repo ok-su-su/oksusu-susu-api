@@ -11,7 +11,7 @@ import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
 import com.oksusu.susu.common.util.toTypeReference
 import java.time.Duration
 
-class Cache<VALUE_TYPE>(
+data class Cache<VALUE_TYPE>(
     val key: String,
     val type: TypeReference<VALUE_TYPE>,
     val duration: Duration,

@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.auth.model
 
-class OidcDecodePayload(
+data class OidcDecodePayload(
     /** issuer ex https://kauth.kakao.com  */
     val iss: String,
     /** client id  */

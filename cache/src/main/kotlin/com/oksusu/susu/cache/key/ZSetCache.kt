@@ -5,7 +5,7 @@ import com.oksusu.susu.common.consts.VOTE_OPTION_SUMMARY_KEY
 import com.oksusu.susu.common.consts.VOTE_SUMMARY_KEY
 import com.oksusu.susu.common.util.toTypeReference
 
-class ZSetCache<VALUE_TYPE>(
+data class ZSetCache<VALUE_TYPE>(
     val key: String,
     val type: TypeReference<VALUE_TYPE>,
 ) {

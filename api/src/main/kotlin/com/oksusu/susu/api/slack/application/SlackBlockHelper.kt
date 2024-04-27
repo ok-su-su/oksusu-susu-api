@@ -94,6 +94,7 @@ class SlackBlockHelper {
 
     private fun getRequestParam(request: ServerHttpRequest): String {
         return request.queryParams.map { param ->
+            @Suppress("IMPLICIT_CAST_TO_ANY")
             val value = when (param.value.size == 1) {
                 true -> param.value.firstOrNull()
                 false -> param.value

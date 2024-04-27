@@ -17,7 +17,7 @@ interface AdminUser {
     fun isNotAuthorThrow(uid: Long)
 }
 
-class AdminUserImpl(
+data class AdminUserImpl(
     override val uid: Long,
 ) : AdminUser {
     override fun isAuthor(uid: Long): Boolean {
