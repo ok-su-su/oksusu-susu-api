@@ -6,7 +6,7 @@ import com.oksusu.susu.common.extension.format
 import com.oksusu.susu.common.extension.toOX
 import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeDetailAndLedgerModel
 
-class AllEnvelopeSheetDataDto(
+data class AllEnvelopeSheetDataDto(
     val date: String,
     val categoryName: String,
     val relationship: String,

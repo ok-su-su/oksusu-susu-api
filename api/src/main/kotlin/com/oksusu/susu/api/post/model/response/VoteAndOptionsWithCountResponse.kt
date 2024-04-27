@@ -6,7 +6,7 @@ import com.oksusu.susu.common.extension.equalsFromYearToSec
 import com.oksusu.susu.domain.post.domain.Post
 import java.time.LocalDateTime
 
-class VoteAndOptionsWithCountResponse(
+data class VoteAndOptionsWithCountResponse(
     /** 투표 id */
     val id: Long,
     /** 투표 생성자 id */

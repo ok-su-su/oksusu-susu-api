@@ -1,6 +1,6 @@
 package com.oksusu.susu.cache.model.vo
 
-class OidcPublicKeyCacheModel(
+data class OidcPublicKeyCacheModel(
     val kid: String,
     val alg: String,
     val use: String,

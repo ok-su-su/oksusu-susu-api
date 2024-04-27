@@ -3,7 +3,7 @@ package com.oksusu.susu.api.statistic.model.response
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.common.model.TitleValueModel
 
-class UserEnvelopeStatisticResponse(
+data class UserEnvelopeStatisticResponse(
     /** 최근 사용 금액 */
     val recentSpent: List<TitleValueModel<Long>>?,
     /** 경조사비를 가장 많이 쓴 달 */
