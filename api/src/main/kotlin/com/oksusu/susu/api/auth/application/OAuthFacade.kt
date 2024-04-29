@@ -4,6 +4,7 @@ import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.auth.model.TokenDto
 import com.oksusu.susu.api.auth.model.request.OAuthLoginRequest
 import com.oksusu.susu.api.auth.model.request.OAuthRegisterRequest
+import com.oksusu.susu.api.auth.model.request.OidcLoginRequest
 import com.oksusu.susu.api.auth.model.response.AbleRegisterResponse
 import com.oksusu.susu.api.auth.model.response.UserOAuthInfoResponse
 import com.oksusu.susu.api.event.model.CreateUserDeviceEvent
@@ -28,6 +29,7 @@ import com.oksusu.susu.domain.user.domain.UserStatus
 import com.oksusu.susu.domain.user.domain.UserStatusHistory
 import com.oksusu.susu.domain.user.domain.vo.AccountRole
 import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
+import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
@@ -54,17 +56,33 @@ class OAuthFacade(
 ) {
     val logger = KotlinLogging.logger {}
 
-    /** 회원가입 가능 여부 체크. */
-    suspend fun checkRegisterValid(provider: OAuthProvider, accessToken: String): AbleRegisterResponse {
+    /** OAuth 회원가입 가능 여부 체크. */
+    suspend fun checkRegisterValidWithOAuth(provider: OAuthProvider, accessToken: String): AbleRegisterResponse {
         val oauthInfo = oAuthService.getOAuthInfo(provider, accessToken)
+
+        return checkRegisterValid(oauthInfo)
+    }
+
+    /** Oidc 회원가입 가능 여부 체크. */
+    suspend fun checkRegisterValidWithOidc(provider: OAuthProvider, idToken: String): AbleRegisterResponse {
+        val oauthInfo = oAuthService.getOAuthInfoWithOidc(provider, idToken)
+
+        return checkRegisterValid(oauthInfo)
+    }
+
+    /**
+     * 회원가입 가능 여부 체크 공통 로직
+     */
+    private suspend fun checkRegisterValid(oauthInfo: OauthInfo): AbleRegisterResponse {
 
         val isExistUser = userService.existsByOAuthInfo(oauthInfo)
 
         return AbleRegisterResponse(!isExistUser)
+
     }
 
-    /** 회원가입 */
-    suspend fun register(
+    /** OAuth 회원가입 */
+    suspend fun registerWithOAuth(
         provider: OAuthProvider,
         accessToken: String,
         request: OAuthRegisterRequest,
@@ -74,6 +92,31 @@ class OAuthFacade(
 
         val oauthInfo = oAuthService.getOAuthInfo(provider, accessToken)
 
+        return register(oauthInfo, request, deviceContext)
+    }
+
+    /** Oidc 회원가입 */
+    suspend fun registerWithOidc(
+        provider: OAuthProvider,
+        idToken: String,
+        request: OAuthRegisterRequest,
+        deviceContext: UserDeviceContext,
+    ): TokenDto {
+        authValidateService.validateRegisterRequest(request)
+
+        val oauthInfo = oAuthService.getOAuthInfoWithOidc(provider, idToken)
+
+        return register(oauthInfo, request, deviceContext)
+    }
+
+    /**
+     * 회원가입 공통 로직
+     */
+    private suspend fun register(
+        oauthInfo: OauthInfo,
+        request: OAuthRegisterRequest,
+        deviceContext: UserDeviceContext,
+    ): TokenDto {
         coroutineScope {
             val validateNotRegistered = async(Dispatchers.IO) {
                 userService.validateNotRegistered(
@@ -149,13 +192,32 @@ class OAuthFacade(
         return generateTokenDto(user.id)
     }
 
-    /** 로그인 */
-    suspend fun login(
+    /** OAuth 로그인 */
+    suspend fun loginWithOAuth(
         provider: OAuthProvider,
         request: OAuthLoginRequest,
         deviceContext: UserDeviceContext,
     ): TokenDto {
         val oauthInfo = oAuthService.getOAuthInfo(provider, request.accessToken)
+
+        return login(oauthInfo, deviceContext)
+    }
+
+    /** Oidc 로그인 */
+    suspend fun loginWithOidc(
+        provider: OAuthProvider,
+        request: OidcLoginRequest,
+        deviceContext: UserDeviceContext,
+    ): TokenDto {
+        val oauthInfo = oAuthService.getOAuthInfoWithOidc(provider, request.idToken)
+
+        return login(oauthInfo, deviceContext)
+    }
+
+    /**
+     * 회원가입 공통 로직
+     */
+    private suspend fun login(oauthInfo: OauthInfo, deviceContext: UserDeviceContext): TokenDto {
         val user = userService.findByOAuthInfoOrThrow(oauthInfo)
 
         val userDevice = UserDevice(

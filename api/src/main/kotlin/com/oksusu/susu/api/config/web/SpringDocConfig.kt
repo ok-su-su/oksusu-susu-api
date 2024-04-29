@@ -74,6 +74,7 @@ object SwaggerTag {
     const val STATISTIC_SWAGGER_TAG = "Statistic API"
     const val AUTH_SWAGGER_TAG = "Auth API"
     const val OAUTH_SWAGGER_TAG = "OAuth API"
+    const val OAUTH_OIDC_SWAGGER_TAG = "OAuth Oidc API"
     const val CATEGORY_SWAGGER_TAG = "Category API"
     const val DEV_SWAGGER_TAG = "DEV API"
     const val DEV_OAUTH_SWAGGER_TAG = "DEV OAuth API"

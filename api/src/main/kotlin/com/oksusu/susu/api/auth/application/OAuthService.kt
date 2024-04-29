@@ -5,6 +5,8 @@ import com.oksusu.susu.api.auth.application.oauth.GoogleOAuthService
 import com.oksusu.susu.api.auth.application.oauth.KakaoOAuthService
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -48,6 +50,17 @@ class OAuthService(
             OAuthProvider.KAKAO -> kakaoOAuthService.getOAuthInfo(accessToken)
             OAuthProvider.APPLE -> appleOAuthService.getOAuthInfo(accessToken)
             OAuthProvider.GOOGLE -> googleOAuthService.getOAuthInfo(accessToken)
+        }.oauthInfo
+    }
+
+    /** oauth info 가져오기 */
+    suspend fun getOAuthInfoWithOidc(
+        provider: OAuthProvider,
+        idToken: String,
+    ): OauthInfo {
+        return when (provider) {
+            OAuthProvider.GOOGLE -> googleOAuthService.getOAuthInfoWithOidc(idToken)
+            else -> throw InvalidRequestException(ErrorCode.INVALID_OAUTH_PROVIDER)
         }.oauthInfo
     }
 

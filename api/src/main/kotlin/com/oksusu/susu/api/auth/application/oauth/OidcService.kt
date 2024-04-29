@@ -10,9 +10,11 @@ import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.cache.model.vo.OidcPublicKeyCacheModel
 import com.oksusu.susu.cache.service.CacheService
 import com.oksusu.susu.client.oauth.apple.AppleClient
+import com.oksusu.susu.client.oauth.google.GoogleClient
 import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeyModel
 import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeysResponse
 import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.InvalidTokenException
 import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
@@ -31,6 +33,7 @@ import java.util.Date
 class OidcService(
     private val cacheService: CacheService,
     private val appleClient: AppleClient,
+    private val googleClient: GoogleClient,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     private val logger = KotlinLogging.logger { }
@@ -39,10 +42,11 @@ class OidcService(
         withMDCContext(Dispatchers.IO) {
             when (provider) {
                 OAuthProvider.APPLE -> cacheService.getOrNull(Cache.getAppleOidcPublicKeyCache())
-                else -> null
+                OAuthProvider.GOOGLE -> cacheService.getOrNull(Cache.getGoogleOidcPublicKeyCache())
+                else -> throw InvalidRequestException(ErrorCode.INVALID_OAUTH_PROVIDER)
             }
         }?.run {
-            logger.debug { "apple oidc public key cache hit" }
+            logger.debug { "oidc public key cache hit" }
 
             val models = this.keys.map { key ->
                 OidcPublicKeyModel(
@@ -58,7 +62,11 @@ class OidcService(
         }
 
         return withMDCContext(Dispatchers.IO) {
-            appleClient.getOidcPublicKeys()
+            when (provider) {
+                OAuthProvider.APPLE -> appleClient.getOidcPublicKeys()
+                OAuthProvider.GOOGLE -> googleClient.getOidcPublicKeys()
+                else -> throw InvalidRequestException(ErrorCode.INVALID_OAUTH_PROVIDER)
+            }
         }.run {
             val cachekeys = this.keys.map { key ->
                 OidcPublicKeyCacheModel(
@@ -92,11 +100,13 @@ class OidcService(
 
         verifyToken(jwt, iss, aud)
 
+        logger.info { jwt.claims }
+
         return OidcDecodePayload(
             iss = jwt.getClaim("iss").asString(),
             aud = jwt.getClaim("aud").asString(),
             sub = jwt.getClaim("sub").asString(),
-            email = jwt.getClaim("email").asString()
+            email = jwt.getClaim("email")?.asString() ?: ""
         )
     }
 

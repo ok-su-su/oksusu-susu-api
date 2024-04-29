@@ -15,43 +15,37 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = SwaggerTag.OAUTH_SWAGGER_TAG, description = "OAuth API")
+@Tag(name = SwaggerTag.OAUTH_OIDC_SWAGGER_TAG, description = "OAuth Oidc API")
 @RestController
-@RequestMapping(value = ["/api/v1/oauth"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class OAuthResource(
+@RequestMapping(value = ["/api/v1/oauth/oidc"], produces = [MediaType.APPLICATION_JSON_VALUE])
+class OidcResource(
     private val oAuthFacade: OAuthFacade,
 ) {
 
-    /** 가입된 유저인지 체크합니다. */
+    /** 가입된 유저인지 체크합니다. (현재 Google만 지원) */
     @Operation(summary = "register valid check")
     @GetMapping("/{provider}/sign-up/valid")
     suspend fun checkRegisterValid(
         @PathVariable provider: OAuthProvider,
-        @RequestParam accessToken: String,
-    ) = oAuthFacade.checkRegisterValidWithOAuth(provider, accessToken).wrapOk()
+        @RequestParam idToken: String,
+    ) = oAuthFacade.checkRegisterValidWithOidc(provider, idToken).wrapOk()
 
-    /** 회원가입을 합니다. */
+    /** 회원가입을 합니다. (현재 Google만 지원) */
     @Operation(summary = "register")
     @PostMapping("/{provider}/sign-up")
     suspend fun register(
         deviceContext: UserDeviceContext,
         @PathVariable provider: OAuthProvider,
         @RequestBody request: OAuthRegisterRequest,
-        @RequestParam accessToken: String,
-    ) = oAuthFacade.registerWithOAuth(provider, accessToken, request, deviceContext).wrapCreated()
+        @RequestParam idToken: String,
+    ) = oAuthFacade.registerWithOidc(provider, idToken, request, deviceContext).wrapCreated()
 
-    /** 로그인을 합니다. */
-    @Operation(summary = "login")
+    /** OIDC 로그인을 합니다. (현재 Google만 지원) */
+    @Operation(summary = "login oidc")
     @PostMapping("/{provider}/login")
-    suspend fun login(
+    suspend fun loginWithOidc(
         deviceContext: UserDeviceContext,
         @PathVariable provider: OAuthProvider,
-        @RequestBody request: OAuthLoginRequest,
-    ) = oAuthFacade.loginWithOAuth(provider, request, deviceContext).wrapOk()
-
-    @Operation(summary = "연동된 소셜 로그인 정보 조회")
-    @GetMapping("/oauth")
-    suspend fun getOAuthInfo(
-        user: AuthUser,
-    ) = oAuthFacade.getOAuthInfo(user).wrapOk()
+        @RequestBody request: OidcLoginRequest,
+    ) = oAuthFacade.loginWithOidc(provider, request, deviceContext).wrapOk()
 }

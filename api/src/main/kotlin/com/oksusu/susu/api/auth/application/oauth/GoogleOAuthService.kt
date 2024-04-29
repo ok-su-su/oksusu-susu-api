@@ -1,12 +1,15 @@
 package com.oksusu.susu.api.auth.application.oauth
 
 import com.oksusu.susu.api.auth.model.OAuthUserInfoDto
+import com.oksusu.susu.api.auth.model.OidcDecodePayload
 import com.oksusu.susu.api.auth.model.response.OAuthLoginLinkResponse
 import com.oksusu.susu.api.auth.model.response.OAuthTokenResponse
 import com.oksusu.susu.api.config.OAuthSecretConfig
 import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.google.GoogleClient
 import com.oksusu.susu.common.extension.withMDCContext
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
+import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.beans.factory.annotation.Value
@@ -17,6 +20,7 @@ class GoogleOAuthService(
     val googleOAuthUrlConfig: OAuthUrlConfig.GoogleOAuthUrlConfig,
     val googleOAuthSecretConfig: OAuthSecretConfig.GoogleOAuthSecretConfig,
     val googleClient: GoogleClient,
+    val oidcService: OidcService,
     @Value("\${server.domain-name}")
     private val domainName: String,
 ) {
@@ -67,7 +71,10 @@ class GoogleOAuthService(
                 clientId = googleOAuthSecretConfig.clientId,
                 clientSecret = googleOAuthSecretConfig.clientSecret
             )
-        }.run { OAuthTokenResponse.fromGoogle(this) }
+        }.run {
+            logger.info { this.idToken }
+            OAuthTokenResponse.fromGoogle(this)
+        }
     }
 
     /** 유저 정보를 가져옵니다. */
@@ -77,10 +84,36 @@ class GoogleOAuthService(
         }.run { OAuthUserInfoDto.fromGoogle(this) }
     }
 
+
+    /** 유저 정보를 가져옵니다. */
+    suspend fun getOAuthInfoWithOidc(idToken: String): OAuthUserInfoDto {
+        return withMDCContext(Dispatchers.IO) {
+            getOIDCDecodePayload(idToken)
+        }.run { OAuthUserInfoDto(
+            oauthInfo = OauthInfo(
+                oAuthProvider = OAuthProvider.GOOGLE,
+                oAuthId = this.sub
+            )
+        ) }
+    }
+
     /** 회원 탈퇴합니다 */
     suspend fun withdraw(accessToken: String) {
         withMDCContext(Dispatchers.IO) {
             googleClient.withdraw(accessToken = accessToken)
         }
+    }
+
+    /**
+     * oidc decode
+     */
+    private suspend fun getOIDCDecodePayload(token: String): OidcDecodePayload {
+        val oidcPublicKeysResponse = oidcService.getOidcPublicKeys(OAuthProvider.GOOGLE)
+        return oidcService.getPayloadFromIdToken(
+            token,
+            googleOAuthUrlConfig.accountGoogleUrl,
+            googleOAuthSecretConfig.clientId,
+            oidcPublicKeysResponse
+        )
     }
 }

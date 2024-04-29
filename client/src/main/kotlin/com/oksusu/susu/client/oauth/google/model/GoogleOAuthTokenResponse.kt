@@ -25,4 +25,8 @@ data class GoogleOAuthTokenResponse(
      * Google accessToken type
      */
     val tokenType: String,
+    /**
+     * Google idToken
+     */
+    val idToken: String,
 )
