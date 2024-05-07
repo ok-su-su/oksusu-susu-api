@@ -54,6 +54,11 @@ susu:
       hibernate.hbm2ddl.auto: none
   maximum-jdbc-thread-pool-size:
 
+# ENCRYPT
+encrypt:
+  key: ${ENCRYPT_KEY}
+  algorithm: ${ENCRYPT_ALGORITHM}
+
 ---
 # ===================================================================
 # Spring Boot Configuration for the prod profile
@@ -77,6 +82,11 @@ datasource: &prod-datasource
   hikari:
     minimum-idle: 15
     maximum-pool-size: 25
+
+# ENCRYPT
+encrypt:
+  key: ${ENCRYPT_KEY}
+  algorithm: ${ENCRYPT_ALGORITHM}
 
 # DATABASE
 susu:
