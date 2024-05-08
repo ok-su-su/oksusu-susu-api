@@ -1,15 +1,13 @@
-package com.oksusu.susu.domain.encrypt
+package com.oksusu.susu.common.encrypt
 
-import com.oksusu.susu.domain.config.encrypt.EncryptConfig
-import org.springframework.stereotype.Component
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-@Component
-class Encryptor(
-    private val encryptConfig: EncryptConfig
+data class Encryptor(
+    private val key: String,
+    private val algorithm: String,
 ) {
     fun encrypt(text: String): String {
         val cipher = Cipher.ENCRYPT_MODE.cipher()
@@ -27,9 +25,9 @@ class Encryptor(
     }
 
     private fun Int.cipher(): Cipher {
-        val cipher = Cipher.getInstance(encryptConfig.algorithm)
-        val keySpec = SecretKeySpec(encryptConfig.key.toByteArray(), "AES")
-        val ivParamSpec = IvParameterSpec(encryptConfig.key.toByteArray())
+        val cipher = Cipher.getInstance(algorithm)
+        val keySpec = SecretKeySpec(key.toByteArray(), "AES")
+        val ivParamSpec = IvParameterSpec(key.toByteArray())
 
         cipher.init(this, keySpec, ivParamSpec)
 
