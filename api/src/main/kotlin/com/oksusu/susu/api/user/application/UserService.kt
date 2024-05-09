@@ -8,6 +8,7 @@ import com.oksusu.susu.domain.user.domain.User
 import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import com.oksusu.susu.domain.user.infrastructure.model.UserAndUserStatusModel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -18,6 +19,7 @@ import java.time.LocalDateTime
 class UserService(
     private val userRepository: UserRepository,
 ) {
+    val logger = KotlinLogging.logger {}
     suspend fun validateNotRegistered(oauthInfo: OauthInfo) {
         existsByOAuthInfo(oauthInfo).takeUnless { isExists -> isExists }
             ?: throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
@@ -84,6 +86,7 @@ class UserService(
     }
 
     fun getUserAndUserStatusSync(uid: Long): UserAndUserStatusModel {
+        logger.info { uid }
         return userRepository.getUserAndUserStatus(uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 }
