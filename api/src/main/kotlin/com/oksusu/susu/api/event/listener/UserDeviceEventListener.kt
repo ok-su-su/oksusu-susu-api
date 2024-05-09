@@ -3,6 +3,7 @@ package com.oksusu.susu.api.event.listener
 import com.oksusu.susu.api.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.api.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.api.user.application.UserDeviceService
+import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -22,7 +23,7 @@ class UserDeviceEventListener(
 
     @TransactionalEventListener
     fun createUserDevice(event: CreateUserDeviceEvent) {
-        CoroutineScope(Dispatchers.IO + Job()).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
             logger.info { "${event.publishAt}에 발행된 ${event.userDevice.uid} 유저 디바이스 정보 저장 실행 시작" }
 
             txTemplates.writer.coExecuteOrNull {

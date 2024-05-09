@@ -26,7 +26,8 @@ class MdcContextLifterConfiguration {
             MDC_CONTEXT_REACTOR_KEY,
             Operators.lift { _, subscriber ->
                 MdcContextLifter<Any?>(subscriber)
-            })
+            }
+        )
     }
 
     @PreDestroy
