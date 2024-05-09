@@ -2,8 +2,8 @@ package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.event.model.SentryCaptureExceptionEvent
 import com.oksusu.susu.api.extension.remoteIp
-import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.common.extension.isProd
+import com.oksusu.susu.common.extension.mdcCoroutineScope
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
