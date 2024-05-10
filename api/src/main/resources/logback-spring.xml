@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <configuration scan="true">
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="src/main/resources/logback-file-spring.xml"/>
 
     <springProperty scope="context" name="logLevel" source="logging.level.root" defaultValue="INFO"/>
     <springProperty scope="context" name="warningLogToken" source="slack.warning-log-token" defaultValue=""/>
@@ -10,6 +12,15 @@
     </contextListener>
 
     <jmxConfigurator/>
+
+    <property name="STDOUT_LOG_PATTERN"
+              value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) [%25.25thread] %clr([traceId=%X{traceId}]){faint} %clr(---){faint} %clr(${LOG_CORRELATION_PATTERN:-}){faint}%clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${STDOUT_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
 
     <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
         <minimumEventLevel>WARN</minimumEventLevel>
@@ -28,6 +39,7 @@
 
     <springProfile name="default, dev">
         <root level="${logLevel}">
+            <appender-ref ref="STDOUT"/>
         </root>
     </springProfile>
 

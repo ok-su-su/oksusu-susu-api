@@ -1,5 +1,6 @@
 package com.oksusu.susu.common.extension
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.slf4j.MDCContext
@@ -21,4 +22,10 @@ suspend fun <T> withJob(
     block: suspend () -> T,
 ): T {
     return withContext(context + job) { block() }
+}
+
+fun mdcCoroutineScope(context: CoroutineContext, traceId: String): CoroutineScope {
+    val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
+    contextMap.plus("traceId" to traceId)
+    return CoroutineScope(context + MDCContext(contextMap))
 }

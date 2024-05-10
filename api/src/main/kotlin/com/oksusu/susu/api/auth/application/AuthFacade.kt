@@ -70,7 +70,7 @@ class AuthFacade(
     }
 
     private fun raiseIf(userStatus: UserStatus): UserStatusTypeModel {
-        val userStatusType = userStatusTypeService.getStatus(userStatus.id)
+        val userStatusType = userStatusTypeService.getStatus(userStatus.accountStatusId)
 
         /** status type에 따른 처리 */
         when (userStatusType.statusTypeInfo) {
