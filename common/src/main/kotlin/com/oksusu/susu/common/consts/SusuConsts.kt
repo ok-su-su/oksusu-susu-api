@@ -21,3 +21,5 @@ const val APPLE_OIDC_PUBLIC_KEY_KEY = "apple_oidc_public_key"
 const val APPLE_OIDC_PUBLIC_KEY_TTL = 7
 
 const val KID = "kid"
+
+const val TRACE_ID = "traceId"
