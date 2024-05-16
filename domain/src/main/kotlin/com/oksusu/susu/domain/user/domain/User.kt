@@ -39,4 +39,8 @@ class User(
      */
     @Enumerated(EnumType.STRING)
     val role: AccountRole,
-) : BaseEntity()
+) : BaseEntity() {
+    override fun toString(): String {
+        return "User(id=$id, oauthInfo=$oauthInfo, name='$name', gender=$gender, birth=$birth, profileImageUrl=$profileImageUrl, role=$role)"
+    }
+}
