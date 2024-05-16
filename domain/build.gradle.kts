@@ -1,6 +1,5 @@
 dependencies {
     implementation(project(":common"))
-    implementation(project(":cache"))
 
     /** spring starter */
     api("org.springframework.boot:spring-boot-starter-data-jpa")

@@ -39,12 +39,9 @@ class RequestBodyDecorator(
     val bytes: ByteArray,
 ) : ServerHttpRequestDecorator(exchange.request) {
     override fun getBody(): Flux<DataBuffer> {
-        return if (bytes == null || bytes.size == 0) {
-            Flux.empty()
-        } else {
-            Flux.just(
-                exchange.response.bufferFactory().wrap(bytes)
-            )
+        return when (bytes.isEmpty()) {
+            true -> Flux.empty()
+            false -> Flux.just(exchange.response.bufferFactory().wrap(bytes))
         }
     }
 }

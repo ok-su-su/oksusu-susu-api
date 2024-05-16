@@ -49,8 +49,7 @@ class UserCustomRepositoryImpl : UserCustomRepository, QuerydslRepositorySupport
             .select(QUserAndUserStatusModel(qUser, qUserStatus))
             .from(qUser)
             .join(qUserStatus).on(qUser.id.eq(qUserStatus.uid))
-            .where(
-                qUser.id.isEquals(uid)
-            ).fetchFirst()
+            .where(qUser.id.isEquals(uid))
+            .fetchFirst()
     }
 }

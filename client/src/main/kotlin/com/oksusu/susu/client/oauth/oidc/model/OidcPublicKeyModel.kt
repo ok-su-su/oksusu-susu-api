@@ -1,6 +1,6 @@
 package com.oksusu.susu.client.oauth.oidc.model
 
-class OidcPublicKeyModel(
+data class OidcPublicKeyModel(
     val kid: String,
     val alg: String,
     val use: String,

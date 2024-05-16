@@ -4,7 +4,7 @@ import com.oksusu.susu.domain.count.domain.vo.CountTargetType
 import com.oksusu.susu.domain.count.domain.vo.CountType
 
 /** 카운트 모델 */
-class CountModel(
+data class CountModel(
     /** 카운트 id */
     val id: Long,
     /** 카운트 타켓 id */

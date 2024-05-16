@@ -16,8 +16,7 @@ import com.oksusu.susu.api.user.application.UserService
 import com.oksusu.susu.api.user.application.UserStatusService
 import com.oksusu.susu.api.user.application.UserStatusTypeService
 import com.oksusu.susu.api.user.model.UserDeviceContext
-import com.oksusu.susu.api.user.model.UserDeviceContextImpl
-import com.oksusu.susu.domain.auth.domain.RefreshToken
+import com.oksusu.susu.cache.auth.domain.RefreshToken
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
@@ -37,7 +36,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -193,21 +191,6 @@ class OAuthFacade(
         refreshTokenService.save(refreshToken)
 
         return tokenDto
-    }
-
-    /** 회원탈퇴 callback 페이지용 oauth 토큰 받아오기 + susu token 발급해주기 */
-    suspend fun loginWithCodeInWithdraw(
-        provider: OAuthProvider,
-        code: String,
-        request: ServerHttpRequest,
-    ): String {
-        val oAuthToken = oAuthService.getOAuthWithdrawToken(provider, code)
-
-        return this.login(
-            OAuthProvider.KAKAO,
-            OAuthLoginRequest(oAuthToken.accessToken),
-            UserDeviceContextImpl.getDefault()
-        ).accessToken
     }
 
     suspend fun getOAuthInfo(user: AuthUser): UserOAuthInfoResponse {

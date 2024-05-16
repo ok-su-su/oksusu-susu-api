@@ -1,5 +1,7 @@
-package com.oksusu.susu.cache
+package com.oksusu.susu.cache.service
 
+import com.oksusu.susu.cache.key.Cache
+import com.oksusu.susu.cache.key.ZSetCache
 import com.oksusu.susu.cache.model.ZSetModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope.coroutineContext

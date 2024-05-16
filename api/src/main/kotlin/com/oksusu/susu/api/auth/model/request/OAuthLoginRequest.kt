@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.auth.model.request
 
-class OAuthLoginRequest(
+data class OAuthLoginRequest(
     /** oauth access token */
     val accessToken: String,
 )

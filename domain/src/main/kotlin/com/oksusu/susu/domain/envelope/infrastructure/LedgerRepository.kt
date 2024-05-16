@@ -103,9 +103,8 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             )
             .from(qLedger)
             .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
-            .where(
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
-            ).groupBy(qCategoryAssignment.categoryId)
+            .where(qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER))
+            .groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }
 

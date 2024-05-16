@@ -1,7 +1,7 @@
 package com.oksusu.susu.domain.post.infrastructure.repository.model
 
 /** 투표 검색 조건 */
-class SearchVoteSpec(
+data class SearchVoteSpec(
     /** 검색 내용 */
     val content: String?,
     /** 본인 소유 여부 */

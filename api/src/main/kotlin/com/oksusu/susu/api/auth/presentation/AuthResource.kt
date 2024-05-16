@@ -31,11 +31,16 @@ class AuthResource(
         @RequestBody request: TokenRefreshRequest,
     ) = authFacade.refreshToken(request).wrapOk()
 
-    /** 회원 탈퇴 */
+    /**
+     *  회원 탈퇴
+     *  kakao는 아무것도 안넘겨줘도 됩니다
+     *  google 회원탈퇴시 구글측 accessToken을 param으로 넘겨줘야함
+     */
     @Operation(summary = "withdraw")
     @PostMapping("/withdraw")
     suspend fun tokenRefresh(
         authUser: AuthUser,
         @RequestParam code: String?,
-    ) = authFacade.withdraw(authUser, code).wrapVoid()
+        @RequestParam accessToken: String?,
+    ) = authFacade.withdraw(authUser, code, accessToken).wrapVoid()
 }

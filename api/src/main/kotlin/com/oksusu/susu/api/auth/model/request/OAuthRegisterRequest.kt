@@ -3,7 +3,7 @@ package com.oksusu.susu.api.auth.model.request
 import com.oksusu.susu.domain.user.domain.vo.Gender
 import java.time.LocalDate
 
-class OAuthRegisterRequest(
+data class OAuthRegisterRequest(
     /** 유저 이름 */
     val name: String,
     /** 동의 약관 id */
@@ -14,6 +14,6 @@ class OAuthRegisterRequest(
     val birth: Int?,
 ) {
     fun getBirth(): LocalDate? {
-        return this.birth ?.let { LocalDate.of(it, 1, 1) }
+        return this.birth?.let { LocalDate.of(it, 1, 1) }
     }
 }

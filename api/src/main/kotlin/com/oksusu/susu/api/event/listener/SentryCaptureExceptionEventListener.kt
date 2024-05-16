@@ -3,9 +3,9 @@ package com.oksusu.susu.api.event.listener
 import com.oksusu.susu.api.event.model.SentryCaptureExceptionEvent
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.common.extension.isProd
+import com.oksusu.susu.common.extension.mdcCoroutineScope
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.sentry.Sentry
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -29,7 +29,7 @@ class SentryCaptureExceptionEventListener(
             return
         }
 
-        CoroutineScope(Dispatchers.IO + Job()).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
             val throwable = event.exception
             val request = event.request
 
@@ -63,10 +63,9 @@ class SentryCaptureExceptionEventListener(
 
     private fun getRequestParam(request: ServerHttpRequest): String {
         return request.queryParams.map { param ->
-            val value = if (param.value.size == 1) {
-                param.value.firstOrNull()
-            } else {
-                param.value
+            val value = when (param.value.size == 1) {
+                true -> param.value.firstOrNull()
+                false -> param.value
             }
             "${param.key} : $value"
         }.joinToString("\n")

@@ -24,7 +24,12 @@
                 <br/>
                 회원 탈퇴가 필요한 계정으로 로그인해주세요
             </p>
-            <div class="kakaoButton">
+            <div class="oauthButton">
+                <a th:href="${googleRedirectUrl}">
+                    <img class="Button" th:src="@{/googleLogin.png}">
+                </a>
+            </div>
+            <div class="oauthButton" style="margin: 30px 0 0 0">
                 <a th:href="${kakaoRedirectUrl}">
                     <img class="Button" th:src="@{/kakaoLogin.png}">
                 </a>

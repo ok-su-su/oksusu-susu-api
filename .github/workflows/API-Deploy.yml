@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kotlin-version: [ "1.9.22" ]
+        kotlin-version: [ "1.9.23" ]
         java-version: [ "17" ]
 
     steps:
@@ -76,9 +76,9 @@ jobs:
           timeout: 60s
           script: |
             cd susu
-            
+
             sudo echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> .env
-            
+
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker rm $(sudo docker ps -a -q)
             sudo docker rmi $(sudo docker images -q)
@@ -87,7 +87,7 @@ jobs:
             sudo docker-compose -f ~/susu/docker-compose.yml --env-file ~/susu/.env up --build -d
 
             sudo docker system prune --all -f
-            
+
             rm -rf .env
 
       - name: Remove IP FROM security group

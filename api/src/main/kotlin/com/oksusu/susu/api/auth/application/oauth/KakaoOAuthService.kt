@@ -70,7 +70,7 @@ class KakaoOAuthService(
     }
 
     /** 유저 정보를 가져옵니다. */
-    suspend fun getKakaoOAuthInfo(accessToken: String): OAuthUserInfoDto {
+    suspend fun getOAuthInfo(accessToken: String): OAuthUserInfoDto {
         return withMDCContext(Dispatchers.IO) {
             kakaoClient.getUserInfo(accessToken)
         }.run { OAuthUserInfoDto.fromKakao(this) }
