@@ -1,6 +1,6 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.IntegrationSpec
+import com.oksusu.susu.api.ApiIntegrationSpec
 import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
 import com.oksusu.susu.common.config.SusuConfig
@@ -12,7 +12,7 @@ import io.kotest.assertions.throwables.shouldThrow
 class VoteValidateServiceTest(
     private val voteValidateService: VoteValidateService,
     private val postConfig: SusuConfig.PostConfig,
-) : IntegrationSpec({
+) : ApiIntegrationSpec({
     val logger = KotlinLogging.logger { }
 
     describe("투표 생성 request validation") {
@@ -57,7 +57,7 @@ class VoteValidateServiceTest(
                 voteValidateService.validateCreateVoteRequest(req)
             }
 
-            it("251이면 에러") {
+            it("${postConfig.createForm.maxContentLength} 초과면 에러") {
                 var content = ""
                 for (i: Int in 1..postConfig.createForm.maxContentLength) {
                     content += "1"

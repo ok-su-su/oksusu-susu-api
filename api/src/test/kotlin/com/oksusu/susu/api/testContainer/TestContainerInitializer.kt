@@ -19,8 +19,8 @@ class TestContainerInitializer : ApplicationContextInitializer<ConfigurableAppli
         private const val REDIS_PORT = 6379
 
         private val dockerCompose = DockerComposeContainer(File("src/test/resources/docker-compose.yml"))
-            .withExposedService(MYSQL, MYSQL_PORT, Wait.forLogMessage(".*ready for connections.*", 1))
-            .withExposedService(REDIS, REDIS_PORT, Wait.forLogMessage(".*Ready to accept connections.*", 1))
+            .withExposedService(MYSQL, MYSQL_PORT)
+            .withExposedService(REDIS, REDIS_PORT)
     }
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
@@ -37,13 +37,11 @@ class TestContainerInitializer : ApplicationContextInitializer<ConfigurableAppli
     }
 
     private fun initMySQLProperties(properties: Map<String, String>) {
-        val rdbmsHost = dockerCompose.getServiceHost(MYSQL, MYSQL_PORT)
-        val rdbmsPort = dockerCompose.getServicePort(MYSQL, MYSQL_PORT)
-
         val mysqlProperties = hashMapOf(
-            "susu.master.datasource.url" to "jdbc:mysql://$rdbmsHost:$rdbmsPort/container",
+            "susu.master.datasource.url" to "jdbc:tc:mysql:8.0.33:///susu",
             "susu.master.datasource.username" to "susu",
-            "susu.master.datasource.password" to "root",
+            "susu.master.datasource.password" to "susu",
+            "susu.master.datasource.driver-class-name" to "org.testcontainers.jdbc.ContainerDatabaseDriver",
         )
 
         properties.plus(mysqlProperties)
