@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.common.extension.mdcCoroutineScope
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
-@Component
+@SusuEventListener
 class CountEventListener(
     private val countService: CountService,
     private val txTemplates: TransactionTemplates,

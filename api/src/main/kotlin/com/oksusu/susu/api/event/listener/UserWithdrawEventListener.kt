@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.CreateUserWithdrawEvent
 import com.oksusu.susu.api.user.application.UserWithdrawService
 import com.oksusu.susu.common.extension.mdcCoroutineScope
@@ -10,7 +11,7 @@ import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
-@Component
+@SusuEventListener
 class UserWithdrawEventListener(
     private val userWithdrawService: UserWithdrawService,
 ) {

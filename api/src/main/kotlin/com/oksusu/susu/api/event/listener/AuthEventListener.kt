@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.CacheAppleOidcPublicKeysEvent
 import com.oksusu.susu.cache.key.Cache
 import com.oksusu.susu.cache.service.CacheService
@@ -12,7 +13,7 @@ import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
-@Component
+@SusuEventListener
 class AuthEventListener(
     private val cacheService: CacheService,
 ) {
