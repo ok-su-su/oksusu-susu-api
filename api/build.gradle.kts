@@ -35,6 +35,10 @@ dependencies {
     /** jwt */
     implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
     implementation("org.bouncycastle:bcpkix-jdk15on:${DependencyVersion.BOUNCY_CASTLE}")
+
+    /** test container */
+    implementation(platform("org.testcontainers:testcontainers-bom:${DependencyVersion.TEST_CONTAINER}"))
+    testImplementation("org.testcontainers:mysql")
 }
 
 tasks.getByName("bootJar") {
