@@ -175,9 +175,10 @@ class VoteFacade(
     private suspend fun castVote(uid: Long, postId: Long, optionId: Long) {
         val (voteCount, voteOptionCount) = parZip(
             { voteHistoryService.validateVoteNotExist(uid, postId) },
+            { voteOptionService.validateCorrespondWithVote(postId, optionId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
-        ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
+        ) { _, _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
@@ -193,9 +194,10 @@ class VoteFacade(
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
         val (voteCount, voteOptionCount) = parZip(
             { voteHistoryService.validateVoteExist(uid, postId, optionId) },
+            { voteOptionService.validateCorrespondWithVote(postId, optionId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
-        ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
+        ) { _, _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
@@ -251,7 +253,6 @@ class VoteFacade(
         }
     }
 
-    /** 투표가 진행된 경우 업데이트 불가능 */
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
         voteValidateService.validateUpdateVoteRequest(request)
 

@@ -41,6 +41,8 @@ class TestContainerInitializer : ApplicationContextInitializer<ConfigurableAppli
             "susu.master.datasource.url" to "jdbc:tc:mysql:8.0.33:///susu",
             "susu.master.datasource.username" to "susu",
             "susu.master.datasource.password" to "susu",
+            "susu.master.datasource.hikari.minimum-idle" to 15,
+            "susu.master.datasource.hikari.maximum-pool-size" to 25,
             "susu.master.datasource.driver-class-name" to "org.testcontainers.jdbc.ContainerDatabaseDriver",
         )
 

@@ -8,12 +8,11 @@ import io.kotest.extensions.spring.SpringExtension
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.event.RecordApplicationEvents
 
 @ActiveProfiles("dev", "test")
 @SpringBootTest(classes = [ApiIntegrationTestConfiguration::class])
 @ContextConfiguration(initializers = [TestContainerInitializer::class])
 abstract class ApiIntegrationSpec(body: DescribeSpec.() -> Unit = {}) : DescribeSpec(body) {
-    val logger = KotlinLogging.logger { }
-
     override fun extensions(): List<Extension> = listOf(SpringExtension)
 }

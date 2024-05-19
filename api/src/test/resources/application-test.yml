@@ -4,3 +4,7 @@ spring:
     schema-locations: classpath:scripts/DDL.sql
     data-locations: classpath:scripts/DML.sql
   jpa.defer-datasource-initialization: true
+
+server:
+  event-processing:
+    enabled: true
