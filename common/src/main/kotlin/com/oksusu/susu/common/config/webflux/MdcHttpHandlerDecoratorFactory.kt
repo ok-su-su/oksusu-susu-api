@@ -1,6 +1,6 @@
 package com.oksusu.susu.common.config.webflux
 
-import com.oksusu.susu.common.consts.TRACE_ID
+import com.oksusu.susu.common.consts.MDC_KEY_TRACE_ID
 import com.oksusu.susu.common.extension.insert
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.slf4j.MDC
@@ -20,9 +20,9 @@ class MdcHttpHandlerDecoratorFactory : HttpHandlerDecoratorFactory {
         return HttpHandler { request, response ->
             val uuid = UUID.randomUUID().toString()
             try {
-                MDC.put(TRACE_ID, uuid)
+                MDC.put(MDC_KEY_TRACE_ID, uuid)
                 httpHandler.handle(request, response)
-                    .contextWrite { it.insert(TRACE_ID, uuid) }
+                    .contextWrite { it.insert(MDC_KEY_TRACE_ID, uuid) }
             } finally {
                 MDC.clear()
             }
