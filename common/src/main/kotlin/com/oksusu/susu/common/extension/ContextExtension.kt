@@ -27,5 +27,4 @@ fun Context.insert(key: String, value: String): Context {
         .toList().toMap().toMutableMap()
     mapOfContext[key] = value
     return Context.of(mapOfContext)
-
 }

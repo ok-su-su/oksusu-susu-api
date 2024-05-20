@@ -14,7 +14,7 @@ import java.util.UUID
  * httpHandler.handle() 에서 로그가 남아서 그 이전에 MDC 값이 주입되도록 했습니다.
  */
 @Component
-class MdcHttpHandlerDecoratorFactory: HttpHandlerDecoratorFactory {
+class MdcHttpHandlerDecoratorFactory : HttpHandlerDecoratorFactory {
     val logger = KotlinLogging.logger { }
     override fun apply(httpHandler: HttpHandler): HttpHandler {
         return HttpHandler { request, response ->
@@ -26,7 +26,6 @@ class MdcHttpHandlerDecoratorFactory: HttpHandlerDecoratorFactory {
             } finally {
                 MDC.clear()
             }
-
         }
     }
 }
