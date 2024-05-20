@@ -1,4 +1,4 @@
-package com.oksusu.susu.common.config
+package com.oksusu.susu.common.config.reactor
 
 import com.oksusu.susu.common.extension.copyToMdc
 import jakarta.annotation.PostConstruct
