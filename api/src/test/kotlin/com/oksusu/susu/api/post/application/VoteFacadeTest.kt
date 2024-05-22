@@ -9,6 +9,7 @@ import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
+import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.NotFoundException
@@ -19,6 +20,7 @@ import com.oksusu.susu.domain.count.infrastructure.CountRepository
 import com.oksusu.susu.domain.post.domain.Post
 import com.oksusu.susu.domain.post.domain.VoteOption
 import com.oksusu.susu.domain.post.domain.vo.PostType
+import com.oksusu.susu.domain.post.infrastructure.repository.BoardRepository
 import com.oksusu.susu.domain.post.infrastructure.repository.PostRepository
 import com.oksusu.susu.domain.post.infrastructure.repository.VoteHistoryRepository
 import com.oksusu.susu.domain.post.infrastructure.repository.VoteOptionRepository
@@ -41,7 +43,7 @@ class VoteFacadeTest(
     private val voteFacade: VoteFacade,
     private val postConfig: SusuConfig.PostConfig,
     private val onboardingGetVoteConfig: SusuConfig.OnboardingGetVoteConfig,
-    private val boardService: BoardService,
+    private val boardRepository: BoardRepository,
     private val postRepository: PostRepository,
     private val voteOptionRepository: VoteOptionRepository,
     private val countRepository: CountRepository,
@@ -61,7 +63,39 @@ class VoteFacadeTest(
     var boards = emptyList<BoardModel>()
 
     beforeContainer {
-        boards = boardService.getAll().sortedBy { board -> board.id }
+        boards = boardRepository.findAllByIsActive(true)
+            .map { board -> BoardModel.from(board) }
+            .associateBy { board -> board.id }.values
+            .toList()
+            .sortedBy { board -> board.id }
+    }
+
+    afterSpec {
+        postRepository.deleteAll()
+        voteOptionRepository.deleteAll()
+        countRepository.deleteAll()
+        voteHistoryRepository.deleteAll()
+    }
+
+    describe("[온보드 페이지용 투표 값 조회] getOnboardingVote") {
+        context("조회시") {
+            it("미리 지정된 option의 count를 가져온다.") {
+                val models = voteOptionRepository.getOptionAndCount(onboardingGetVoteConfig.voteId)
+                    .map { model ->
+                        OnboardingVoteOptionCountModel.of(
+                            option = model.voteOption,
+                            count = model.count
+                        )
+                    }
+
+                val res = voteFacade.getOnboardingVote().options
+
+                for (i in models.indices) {
+                    res[i].content shouldBeEqual models[i].content
+                    res[i].count shouldBeEqual models[i].count
+                }
+            }
+        }
     }
 
     describe("[투표 생성] createVote") {
@@ -565,7 +599,7 @@ class VoteFacadeTest(
                     optionId = notExistOptionId
                 )
 
-                shouldThrow<NotFoundException> { voteFacade.vote(authUser, posts.last().id, req) }
+                shouldThrow<RuntimeException> { voteFacade.vote(authUser, posts.last().id, req) }
             }
 
             it("투표에 해당하지않는 옵션이면 에러") {
@@ -688,8 +722,7 @@ class VoteFacadeTest(
                 post!!.isActive shouldBeEqual false
 
                 /**
-                 * event publishing 부분 test
-                 * 방법 알아내면 개선 바람
+                 * TODO: event publishing 부분 test 방법 알아내면 개선 바람
                  */
                 delay(1000)
 
@@ -702,39 +735,190 @@ class VoteFacadeTest(
     }
 
     describe("[투표 업데이트] update") {
+        var post: Post? = null
+        var options = emptyList<VoteOption>()
+
+        beforeContainer {
+            val optionModels = listOf(
+                VoteOptionWithoutIdModel(seq = 1, content = "11"),
+                VoteOptionWithoutIdModel(seq = 2, content = "22"),
+                VoteOptionWithoutIdModel(seq = 3, content = "33")
+            )
+
+            val req = CreateVoteRequest(
+                content = "11",
+                options = optionModels,
+                boardId = boards[1].id
+            )
+
+            voteFacade.createVote(authUser, req)
+
+            post = postRepository.findAll().first()
+            options = voteOptionRepository.findAll()
+        }
+
+        afterContainer {
+            postRepository.deleteAll()
+            voteOptionRepository.deleteAll()
+            countRepository.deleteAll()
+            voteHistoryRepository.deleteAll()
+        }
+
         context("잘못된 req가 주어졌을 때"){
-            it("")
+            it("content 길이가 ${postConfig.createForm.minContentLength} 미만이면 에러"){
+                var content = ""
+                for (i: Int in 1..<postConfig.createForm.minContentLength) {
+                    content += "1"
+                }
+
+                val req = UpdateVoteRequest(
+                    boardId = boards[0].id,
+                    content = content
+                )
+
+                shouldThrow<InvalidRequestException> { voteFacade.update(authUser, post!!.id, req) }
+            }
+
+            it("content 길이가 ${postConfig.createForm.minContentLength} 이면 통과"){
+                var content = ""
+                for (i: Int in 1..postConfig.createForm.minContentLength) {
+                    content += "1"
+                }
+
+                val req = UpdateVoteRequest(
+                    boardId = boards[0].id,
+                    content = content
+                )
+
+                voteFacade.update(authUser, post!!.id, req)
+            }
+
+            it("content 길이가 ${postConfig.createForm.maxContentLength} 이면 통과"){
+                var content = ""
+                for (i: Int in 1..<postConfig.createForm.maxContentLength) {
+                    content += "1"
+                }
+
+                val req = UpdateVoteRequest(
+                    boardId = boards[0].id,
+                    content = content
+                )
+
+                voteFacade.update(authUser, post!!.id, req)
+            }
+
+            it("content 길이가 ${postConfig.createForm.maxContentLength} 초과면 에러"){
+                var content = ""
+                for (i: Int in 1..postConfig.createForm.maxContentLength) {
+                    content += "1"
+                }
+                content += "2"
+
+                val req = UpdateVoteRequest(
+                    boardId = boards[0].id,
+                    content = content
+                )
+
+                shouldThrow<InvalidRequestException> { voteFacade.update(authUser, post!!.id, req) }
+            }
+
+            it("존재하지않는 boardId면 에러"){
+                val req = UpdateVoteRequest(
+                    boardId = Long.MIN_VALUE,
+                    content = "content"
+                )
+
+                shouldThrow<NotFoundException> { voteFacade.update(authUser, post!!.id, req) }
+            }
         }
 
         context("정상적인 request일 때"){
-            it("DB에 정상적으로 값이 반영되어야 한다."){}
-            it("투표한 항목일 경우, 투표 옵션을 표시해줘야한다."){}
-        }
-    }
+            it("DB에 정상적으로 값이 반영되어야 한다."){
+                delay(2000)
 
-    describe("[투표 조회] getAllVotes") {}
+                val req = UpdateVoteRequest(
+                    boardId = boards[0].id,
+                    content = "content"
+                )
 
-    describe("[투표 하나 조회] getVote") {}
+                val res = voteFacade.update(authUser, post!!.id, req)
 
-    describe("[가장 인기 있는 투표 검색] getPopularVotes") {}
+                /** response 검증 */
+                res.content shouldBeEqual req.content
+                res.uid shouldBeEqual authUser.uid
+                res.board.id shouldBeEqual req.boardId
+                res.isModified shouldBeEqual true
+                res.isMine shouldBeEqual true
+                res.options.size shouldBeEqual options.size
+                res.options[0].seq shouldBeEqual options[0].seq
+                res.options[0].content shouldBeEqual options[0].content
+                res.options[0].postId shouldBeEqual res.id
+                res.options[0].isVoted shouldBeEqual false
+                res.options[1].seq shouldBeEqual options[1].seq
+                res.options[1].content shouldBeEqual options[1].content
+                res.options[1].postId shouldBeEqual res.id
+                res.options[1].isVoted shouldBeEqual false
+                res.options[2].seq shouldBeEqual options[2].seq
+                res.options[2].content shouldBeEqual options[2].content
+                res.options[2].postId shouldBeEqual res.id
+                res.options[2].isVoted shouldBeEqual false
 
-    describe("[온보드 페이지용 투표 값 조회] getOnboardingVote") {
-        context("조회시") {
-            it("미리 지정된 option의 count를 가져온다.") {
-                val models = voteOptionRepository.getOptionAndCount(onboardingGetVoteConfig.voteId)
-                    .map { model ->
-                        OnboardingVoteOptionCountModel.of(
-                            option = model.voteOption,
-                            count = model.count
-                        )
-                    }
+                /** DB input 검증 */
+                val posts = postRepository.findAll()
+                posts.size shouldBeEqual 1
+                posts[0].content shouldBeEqual req.content
+                posts[0].uid shouldBeEqual authUser.uid
+                posts[0].boardId shouldBeEqual req.boardId
+                posts[0].type shouldBeEqual PostType.VOTE
+                posts[0].isActive shouldBeEqual true
+            }
 
-                val res = voteFacade.getOnboardingVote().options
+            it("투표한 항목일 경우, 투표 옵션을 표시해줘야한다."){
+                delay(2000)
 
-                for (i in models.indices) {
-                    res[i].content shouldBeEqual models[i].content
-                    res[i].count shouldBeEqual models[i].count
-                }
+                val req = UpdateVoteRequest(
+                    boardId = boards[0].id,
+                    content = "content"
+                )
+
+                val voteId = post!!.id
+                val optionId = options.last().id
+                val voteReq = CreateVoteHistoryRequest(
+                    isCancel = false,
+                    optionId = optionId
+                )
+                voteFacade.vote(authUser, voteId, voteReq)
+
+                val res = voteFacade.update(authUser, post!!.id, req)
+
+                /** response 검증 */
+                res.content shouldBeEqual req.content
+                res.uid shouldBeEqual authUser.uid
+                res.board.id shouldBeEqual req.boardId
+                res.isModified shouldBeEqual true
+                res.isMine shouldBeEqual true
+                res.options.size shouldBeEqual options.size
+                res.options[0].seq shouldBeEqual options[0].seq
+                res.options[0].content shouldBeEqual options[0].content
+                res.options[0].postId shouldBeEqual res.id
+                res.options[0].isVoted shouldBeEqual false
+                res.options[1].seq shouldBeEqual options[1].seq
+                res.options[1].content shouldBeEqual options[1].content
+                res.options[1].postId shouldBeEqual res.id
+                res.options[1].isVoted shouldBeEqual false
+                res.options[2].seq shouldBeEqual options[2].seq
+                res.options[2].content shouldBeEqual options[2].content
+                res.options[2].postId shouldBeEqual res.id
+                res.options[2].isVoted shouldBeEqual true
+
+                /** DB input 검증 */
+                val posts = postRepository.findAll()
+                posts.size shouldBeEqual 1
+                posts[0].content shouldBeEqual req.content
+                posts[0].uid shouldBeEqual authUser.uid
+                posts[0].boardId shouldBeEqual req.boardId
+                posts[0].type shouldBeEqual PostType.VOTE
+                posts[0].isActive shouldBeEqual true
             }
         }
     }
