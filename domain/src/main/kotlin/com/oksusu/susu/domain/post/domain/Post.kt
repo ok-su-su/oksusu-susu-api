@@ -32,7 +32,7 @@ class Post(
     @Column(name = "is_active")
     var isActive: Boolean = true,
 ) : BaseEntity() {
-//    override fun toString(): String {
-//        return "Post(id=$id, uid=$uid, boardId=$boardId, type=$type, title=$title, content='$content', isActive=$isActive)"
-//    }
+    override fun toString(): String {
+        return "Post(id=$id, uid=$uid, boardId=$boardId, type=$type, title=$title, content='$content', isActive=$isActive)"
+    }
 }
