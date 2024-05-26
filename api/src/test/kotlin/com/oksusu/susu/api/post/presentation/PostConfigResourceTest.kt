@@ -5,6 +5,7 @@ import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
 import com.oksusu.susu.api.post.application.BoardService
 import com.oksusu.susu.api.post.model.BoardModel
+import com.oksusu.susu.api.testExtension.getBodyOrThrow
 import com.oksusu.susu.domain.post.infrastructure.repository.BoardRepository
 import com.oksusu.susu.domain.user.domain.vo.AccountRole
 import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
@@ -40,7 +41,7 @@ class PostConfigResourceTest(
                     .values
                     .toList()
 
-                models shouldBeEqual res.body!!
+                models shouldBeEqual res.getBodyOrThrow()
             }
         }
     }

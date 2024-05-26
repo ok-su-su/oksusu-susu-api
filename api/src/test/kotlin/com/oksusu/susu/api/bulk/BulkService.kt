@@ -1,11 +1,10 @@
 package com.oksusu.susu.api.bulk
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.config.database.TransactionTemplates
-import com.oksusu.susu.domain.count.infrastructure.CountRepository
 import com.oksusu.susu.domain.post.infrastructure.repository.BoardRepository
-import com.oksusu.susu.domain.post.infrastructure.repository.PostRepository
-import com.oksusu.susu.domain.post.infrastructure.repository.VoteOptionRepository
+import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,11 +20,9 @@ import java.time.LocalDateTime
 
 @Component
 class BulkService(
-    private val postRepository: PostRepository,
-    private val voteOptionRepository: VoteOptionRepository,
-    private val countRepository: CountRepository,
     private val txTemplates: TransactionTemplates,
     private val boardRepository: BoardRepository,
+    private val userRepository: UserRepository,
     @Qualifier("susuNamedParameterJdbcTemplate")
     private val jdbcTemplate: NamedParameterJdbcTemplate,
 ) {
@@ -40,14 +37,19 @@ class BulkService(
     val logger = KotlinLogging.logger { }
 
     suspend fun voteBulkInsert() {
-        logger.info { "bulk insert start" }
+        logger.info { "start vote bulk insert" }
+
+        val users = withContext(Dispatchers.IO) {
+            userRepository.findAll()
+        }.sortedBy { user -> user.id }
+        val firstUserId = users[0].id
 
         val boards = withContext(Dispatchers.IO) {
             boardRepository.findAllByIsActive(true)
         }.sortedBy { board -> board.id }
         val firstBoardId = boards[0].id
 
-        val postDataSize = postBulkInsert(firstBoardId)
+        val postDataSize = postBulkInsert(firstBoardId, firstUserId)
 
         val lastInsertedPostPk = getLastInsertedId()
         val firstInsertedPostPk = lastInsertedPostPk - postDataSize + 1
@@ -59,7 +61,7 @@ class BulkService(
 
         countBulkInsert(firstInsertedPostPk, firstInsertedVoteOptionPk)
 
-        logger.info { "finish bulk insert" }
+        logger.info { "finish vote bulk insert" }
     }
 
     private suspend fun getLastInsertedId(): Long {
@@ -68,7 +70,7 @@ class BulkService(
         }!!
     }
 
-    private suspend fun postBulkInsert(firstBoardId: Long): Int {
+    private suspend fun postBulkInsert(firstBoardId: Long, firstUserId: Long): Int {
         var dataSize = 0
         txTemplates.writer.coExecute(Dispatchers.IO) {
             val iterator = FileUtils.lineIterator(File(TEST_RESOURCES_PATH + POST_SQL_PATH), "UTF-8")
@@ -91,7 +93,7 @@ class BulkService(
                         insert into post(board_id, content, created_at, is_active, modified_at, title, type, uid) 
                         values (:board_id, :content, :created_at, :is_active, :modified_at, :title, :type, :uid) 
                     """.trimIndent()
-                    jdbcTemplate.batchUpdate(sql, convertToPost(lines, firstBoardId))
+                    jdbcTemplate.batchUpdate(sql, convertToPost(lines, firstBoardId, firstUserId))
                 }
             } finally {
                 iterator.closeQuietly()
@@ -100,7 +102,7 @@ class BulkService(
         return dataSize
     }
 
-    private fun convertToPost(lines: List<String>, firstBoardId: Long): Array<SqlParameterSource> {
+    private fun convertToPost(lines: List<String>, firstBoardId: Long, firstUserId: Long): Array<SqlParameterSource> {
         val maplist = lines.map { line ->
             val values = line.split(" ")
             listOf(
@@ -109,7 +111,7 @@ class BulkService(
                 "is_active" to values[2],
                 "title" to values[3],
                 "type" to values[4],
-                "uid" to values[5],
+                "uid" to values[5].toLong() + firstUserId,
                 "created_at" to LocalDateTime.now(),
                 "modified_at" to LocalDateTime.now(),
             ).toMap<String, Any>()

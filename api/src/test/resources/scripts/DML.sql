@@ -84,4 +84,16 @@ VALUES (5, 4, 1, 0, 0);
 
 -- application metadata
 INSERT INTO susu.application_metadata (id, application_version, forced_update_date, is_active)
-VALUES (1, "1.0.0", "2024-02-18 20:14:25", 1)
+VALUES (1, "1.0.0", "2024-02-18 20:14:25", 1);
+
+-- user
+INSERT INTO susu.user (id, oauth_provider, oauth_id, name, gender, birth, profile_image_url, role)
+VALUES (1, 0, '000000001', '1번', null, null, null, 'USER');
+INSERT INTO susu.user (id, oauth_provider, oauth_id, name, gender, birth, profile_image_url, role)
+VALUES (2, 0, '000000002', '2번', null, null, null, 'USER');
+
+-- user status
+INSERT INTO susu.user_status (uid, account_status_id, community_status_id)
+VALUES (1, 1, 1);
+INSERT INTO susu.user_status (uid, account_status_id, community_status_id)
+VALUES (2, 1, 1);
