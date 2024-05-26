@@ -3,6 +3,7 @@ package com.oksusu.susu.api.event.model
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
+import com.oksusu.susu.common.consts.MDC_KEY_TRACE_ID
 import com.oksusu.susu.common.extension.mapper
 import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.domain.term.domain.TermAgreement
@@ -19,7 +20,7 @@ sealed interface Event
 
 open class BaseEvent(
     val publishAt: LocalDateTime = LocalDateTime.now(),
-    val traceId: String = MDC.getCopyOfContextMap()?.get("traceId") ?: "",
+    val traceId: String = MDC.get(MDC_KEY_TRACE_ID),
 ) : Event
 
 data class DeleteLedgerEvent(

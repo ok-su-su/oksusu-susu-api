@@ -21,11 +21,10 @@ private fun Context.toMap(): Map<String, String> = this.stream()
     .map { ctx -> ctx.key.toString() to ctx.value.toString() }
     .toList().toMap()
 
-fun Context.createPutWithMDC(key: String, value: String): Context {
+fun Context.insert(key: String, value: String): Context {
     val mapOfContext = this.stream()
         .map { ctx -> ctx.key to ctx.value }
         .toList().toMap().toMutableMap()
     mapOfContext[key] = value
-    MDC.put(key, value)
     return Context.of(mapOfContext)
 }
