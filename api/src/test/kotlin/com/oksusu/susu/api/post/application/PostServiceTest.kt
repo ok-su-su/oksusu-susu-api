@@ -64,7 +64,7 @@ class PostServiceTest : DescribeSpec({
         }
 
         context("id, type으로 post, user 조회시") {
-            every { mockPostRepository.getPostAndCreator(Long.MIN_VALUE, any())} returns null
+            every { mockPostRepository.getPostAndCreator(Long.MIN_VALUE, any()) } returns null
             every { mockPostRepository.getPostAndCreator(1L, PostType.VOTE) } returns PostAndUserModel(
                 FixtureUtil.getPostBuilder().set("id", 1).set("type", PostType.VOTE).sample(),
                 FixtureUtil.getUser()

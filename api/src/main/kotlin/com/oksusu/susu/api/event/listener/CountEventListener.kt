@@ -11,7 +11,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
 @SusuEventListener

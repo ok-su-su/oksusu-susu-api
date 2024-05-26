@@ -17,8 +17,8 @@ class PostConfigResourceTest(
     private val postConfigResource: PostConfigResource,
     private val boardService: BoardService,
     private val boardRepository: BoardRepository,
-): ApiIntegrationSpec({
-    val logger = KotlinLogging.logger {  }
+) : ApiIntegrationSpec({
+    val logger = KotlinLogging.logger { }
 
     val authUser = AuthUserImpl(
         uid = 1L,
@@ -30,9 +30,9 @@ class PostConfigResourceTest(
         )
     )
 
-    describe("[게시글 카테고리 데이터 제공] getCreatePostsConfig"){
-        context("조회시"){
-            it("올바른 config 값이 조회되어야 한다."){
+    describe("[게시글 카테고리 데이터 제공] getCreatePostsConfig") {
+        context("조회시") {
+            it("올바른 config 값이 조회되어야 한다.") {
                 val res = postConfigResource.getCreatePostsConfig(authUser)
 
                 val models = boardRepository.findAllByIsActive(true)

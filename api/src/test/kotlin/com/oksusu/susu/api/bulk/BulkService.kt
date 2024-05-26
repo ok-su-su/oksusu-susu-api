@@ -1,6 +1,5 @@
 package com.oksusu.susu.api.bulk
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.post.infrastructure.repository.BoardRepository
@@ -113,7 +112,7 @@ class BulkService(
                 "type" to values[4],
                 "uid" to values[5].toLong() + firstUserId,
                 "created_at" to LocalDateTime.now(),
-                "modified_at" to LocalDateTime.now(),
+                "modified_at" to LocalDateTime.now()
             ).toMap<String, Any>()
         }
 
@@ -161,7 +160,7 @@ class BulkService(
                 "post_id" to values[1].toLong() + firstPostId,
                 "seq" to values[2],
                 "created_at" to LocalDateTime.now(),
-                "modified_at" to LocalDateTime.now(),
+                "modified_at" to LocalDateTime.now()
             ).toMap<String, Any>()
         }
 
@@ -219,7 +218,7 @@ class BulkService(
                 "target_id" to values[2].toLong() + baseId,
                 "target_type" to values[3],
                 "created_at" to LocalDateTime.now(),
-                "modified_at" to LocalDateTime.now(),
+                "modified_at" to LocalDateTime.now()
             ).toMap<String, Any>()
         }
 

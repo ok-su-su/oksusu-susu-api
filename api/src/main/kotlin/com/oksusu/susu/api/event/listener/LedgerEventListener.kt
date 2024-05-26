@@ -11,7 +11,6 @@ import com.oksusu.susu.domain.config.database.TransactionTemplates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
 @SusuEventListener

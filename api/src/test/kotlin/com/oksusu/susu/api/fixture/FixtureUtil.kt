@@ -2,11 +2,9 @@ package com.oksusu.susu.api.fixture
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder
 import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.api.introspector.BeanArbitraryIntrospector
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.setNotNullExp
 import com.navercorp.fixturemonkey.kotlin.setPostCondition
-import com.navercorp.fixturemonkey.kotlin.setPostConditionExp
 import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
 import com.oksusu.susu.domain.post.domain.Board
@@ -20,7 +18,7 @@ class FixtureUtil {
     companion object {
         private val monkey: FixtureMonkey = FixtureMonkey.builder()
             .objectIntrospector(FieldReflectionArbitraryIntrospector.INSTANCE)
-            .build();
+            .build()
 
         private val boardBuilder = monkey.giveMeBuilder(Board::class.java)
             .setNotNullExp(Board::id)

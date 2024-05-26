@@ -3,7 +3,6 @@ package com.oksusu.susu.api.post.application
 import com.oksusu.susu.api.ApiIntegrationSpec
 import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
-import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.api.post.model.BoardModel
 import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
@@ -28,16 +27,11 @@ import com.oksusu.susu.domain.user.domain.vo.AccountRole
 import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.be
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.delay
-import org.aspectj.weaver.ast.Not
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.test.context.event.ApplicationEvents
-import org.springframework.test.context.event.RecordApplicationEvents
 
 class VoteFacadeTest(
     private val voteFacade: VoteFacade,
@@ -557,8 +551,8 @@ class VoteFacadeTest(
             }
         }
 
-        context("투표할 때 정상적인 req가 주어졌을 경우"){
-            it("DB에 정상적으로 값이 반영되어야 한다."){
+        context("투표할 때 정상적인 req가 주어졌을 경우") {
+            it("DB에 정상적으로 값이 반영되어야 한다.") {
                 val voteId = posts.last().id
                 val optionId = options.last().id
                 val req = CreateVoteHistoryRequest(
@@ -634,7 +628,7 @@ class VoteFacadeTest(
                 voteFacade.vote(authUser, voteId, req)
             }
 
-            it("DB에 정상적으로 값이 반영되어야 한다."){
+            it("DB에 정상적으로 값이 반영되어야 한다.") {
                 val voteId = posts.last().id
                 val optionId = options.last().id
                 val req = CreateVoteHistoryRequest(
@@ -688,14 +682,14 @@ class VoteFacadeTest(
             voteHistoryRepository.deleteAll()
         }
 
-        context("잘못된 req가 주어졌을 때,"){
-            it("존재하지 않는 투표라면 에러"){
+        context("잘못된 req가 주어졌을 때,") {
+            it("존재하지 않는 투표라면 에러") {
                 val notExistVoteId = posts.last().id + 1
 
                 shouldThrow<NotFoundException> { voteFacade.deleteVote(authUser, notExistVoteId) }
             }
 
-            it("본인이 작성한 투표가 아니라면 에러"){
+            it("본인이 작성한 투표가 아니라면 에러") {
                 val voteId = posts.last().id
                 val invalidAuthUser = AuthUserImpl(
                     uid = 2L,
@@ -711,8 +705,8 @@ class VoteFacadeTest(
             }
         }
 
-        context("정상적인 req가 주어졌을 때,"){
-            it("DB에 정상적으로 값이 반영되어야 한다."){
+        context("정상적인 req가 주어졌을 때,") {
+            it("DB에 정상적으로 값이 반영되어야 한다.") {
                 val voteId = posts.last().id
 
                 voteFacade.deleteVote(authUser, voteId)
@@ -764,8 +758,8 @@ class VoteFacadeTest(
             voteHistoryRepository.deleteAll()
         }
 
-        context("잘못된 req가 주어졌을 때"){
-            it("content 길이가 ${postConfig.createForm.minContentLength} 미만이면 에러"){
+        context("잘못된 req가 주어졌을 때") {
+            it("content 길이가 ${postConfig.createForm.minContentLength} 미만이면 에러") {
                 var content = ""
                 for (i: Int in 1..<postConfig.createForm.minContentLength) {
                     content += "1"
@@ -779,7 +773,7 @@ class VoteFacadeTest(
                 shouldThrow<InvalidRequestException> { voteFacade.update(authUser, post!!.id, req) }
             }
 
-            it("content 길이가 ${postConfig.createForm.minContentLength} 이면 통과"){
+            it("content 길이가 ${postConfig.createForm.minContentLength} 이면 통과") {
                 var content = ""
                 for (i: Int in 1..postConfig.createForm.minContentLength) {
                     content += "1"
@@ -793,7 +787,7 @@ class VoteFacadeTest(
                 voteFacade.update(authUser, post!!.id, req)
             }
 
-            it("content 길이가 ${postConfig.createForm.maxContentLength} 이면 통과"){
+            it("content 길이가 ${postConfig.createForm.maxContentLength} 이면 통과") {
                 var content = ""
                 for (i: Int in 1..<postConfig.createForm.maxContentLength) {
                     content += "1"
@@ -807,7 +801,7 @@ class VoteFacadeTest(
                 voteFacade.update(authUser, post!!.id, req)
             }
 
-            it("content 길이가 ${postConfig.createForm.maxContentLength} 초과면 에러"){
+            it("content 길이가 ${postConfig.createForm.maxContentLength} 초과면 에러") {
                 var content = ""
                 for (i: Int in 1..postConfig.createForm.maxContentLength) {
                     content += "1"
@@ -822,7 +816,7 @@ class VoteFacadeTest(
                 shouldThrow<InvalidRequestException> { voteFacade.update(authUser, post!!.id, req) }
             }
 
-            it("존재하지않는 boardId면 에러"){
+            it("존재하지않는 boardId면 에러") {
                 val req = UpdateVoteRequest(
                     boardId = Long.MIN_VALUE,
                     content = "content"
@@ -832,8 +826,8 @@ class VoteFacadeTest(
             }
         }
 
-        context("정상적인 request일 때"){
-            it("DB에 정상적으로 값이 반영되어야 한다."){
+        context("정상적인 request일 때") {
+            it("DB에 정상적으로 값이 반영되어야 한다.") {
                 delay(2000)
 
                 val req = UpdateVoteRequest(
@@ -873,7 +867,7 @@ class VoteFacadeTest(
                 posts[0].isActive shouldBeEqual true
             }
 
-            it("투표한 항목일 경우, 투표 옵션을 표시해줘야한다."){
+            it("투표한 항목일 경우, 투표 옵션을 표시해줘야한다.") {
                 delay(2000)
 
                 val req = UpdateVoteRequest(

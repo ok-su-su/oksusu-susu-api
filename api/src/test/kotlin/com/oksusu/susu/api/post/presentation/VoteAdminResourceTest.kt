@@ -4,7 +4,6 @@ import com.oksusu.susu.api.ApiIntegrationSpec
 import com.oksusu.susu.api.auth.model.AdminUserImpl
 import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
-import com.oksusu.susu.api.post.application.BoardService
 import com.oksusu.susu.api.post.application.VoteFacade
 import com.oksusu.susu.api.post.model.BoardModel
 import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel

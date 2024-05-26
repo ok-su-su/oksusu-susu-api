@@ -5,12 +5,9 @@ import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
 import com.oksusu.susu.api.bulk.BulkService
 import com.oksusu.susu.api.common.dto.SusuPageRequest
-import com.oksusu.susu.api.fixture.FixtureUtil
 import com.oksusu.susu.api.post.application.VoteFacade
 import com.oksusu.susu.api.post.model.BoardModel
-import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
-import com.oksusu.susu.api.post.model.request.CreateVoteRequest
 import com.oksusu.susu.api.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.api.testExtension.getBodyOrThrow
 import com.oksusu.susu.common.extension.equalsFromYearToSec
@@ -125,18 +122,18 @@ class VoteResourceTest(
                     content = null,
                     mine = null,
                     sortType = null,
-                    boardId = null,
+                    boardId = null
                 )
 
                 val pageReq = SusuPageRequest(
                     page = 0,
                     size = 30,
-                    sort = null,
+                    sort = null
                 )
 
                 val res = voteResource.searchVotes(authUser, searchReq, pageReq)
 
-                res.data.forEach { model->
+                res.data.forEach { model ->
                     model.uid shouldNotBeEqual 2
                     model.id shouldNotBeEqual posts.values.last().id
                 }
@@ -149,13 +146,13 @@ class VoteResourceTest(
                     content = null,
                     mine = null,
                     sortType = null,
-                    boardId = null,
+                    boardId = null
                 )
 
                 val pageReq = SusuPageRequest(
                     page = 0,
                     size = 15,
-                    sort = null,
+                    sort = null
                 )
 
                 val res = voteResource.searchVotes(authUser, searchReq, pageReq)
@@ -169,13 +166,13 @@ class VoteResourceTest(
                     content = null,
                     mine = null,
                     sortType = null,
-                    boardId = null,
+                    boardId = null
                 )
 
                 val pageReq = SusuPageRequest(
                     page = 1,
                     size = 15,
-                    sort = null,
+                    sort = null
                 )
 
                 val res = voteResource.searchVotes(authUser, searchReq, pageReq)
@@ -191,13 +188,13 @@ class VoteResourceTest(
                     content = null,
                     mine = true,
                     sortType = null,
-                    boardId = null,
+                    boardId = null
                 )
 
                 val pageReq = SusuPageRequest(
                     page = 1,
                     size = 15,
-                    sort = null,
+                    sort = null
                 )
 
                 val res = voteResource.searchVotes(authUser, searchReq, pageReq)
@@ -212,13 +209,13 @@ class VoteResourceTest(
                     content = null,
                     mine = null,
                     sortType = VoteSortType.POPULAR,
-                    boardId = null,
+                    boardId = null
                 )
 
                 val pageReq = SusuPageRequest(
                     page = 1,
                     size = 15,
-                    sort = null,
+                    sort = null
                 )
 
                 val res = voteResource.searchVotes(authUser, searchReq, pageReq)
@@ -227,7 +224,7 @@ class VoteResourceTest(
                     model.count
                 }
 
-                for (i in 0..<resCounts.size-1) {
+                for (i in 0..<resCounts.size - 1) {
                     resCounts[i] shouldBeGreaterThanOrEqual resCounts[i + 1]
                 }
             }
@@ -237,13 +234,13 @@ class VoteResourceTest(
                     content = null,
                     mine = null,
                     sortType = VoteSortType.POPULAR,
-                    boardId = boards.values.first().id,
+                    boardId = boards.values.first().id
                 )
 
                 val pageReq = SusuPageRequest(
                     page = 0,
                     size = 15,
-                    sort = null,
+                    sort = null
                 )
 
                 val res = voteResource.searchVotes(authUser, searchReq, pageReq)

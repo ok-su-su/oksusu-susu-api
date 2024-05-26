@@ -11,7 +11,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.context.event.EventListener
 import org.springframework.core.env.Environment
-import org.springframework.stereotype.Component
 
 @SusuEventListener
 class SlackErrorAlarmEventListener(

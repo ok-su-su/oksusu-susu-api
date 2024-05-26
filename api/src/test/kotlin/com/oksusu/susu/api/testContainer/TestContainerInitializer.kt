@@ -5,7 +5,6 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.DockerComposeContainer
-import org.testcontainers.containers.wait.strategy.Wait
 import java.io.File
 
 class TestContainerInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -32,7 +31,6 @@ class TestContainerInitializer : ApplicationContextInitializer<ConfigurableAppli
         initMySQLProperties(properties)
         initRedisProperties(properties)
 
-
         TestPropertyValues.of(properties).applyTo(applicationContext)
     }
 
@@ -43,15 +41,15 @@ class TestContainerInitializer : ApplicationContextInitializer<ConfigurableAppli
             "susu.master.datasource.password" to "susu",
             "susu.master.datasource.hikari.minimum-idle" to 15,
             "susu.master.datasource.hikari.maximum-pool-size" to 25,
-            "susu.master.datasource.driver-class-name" to "org.testcontainers.jdbc.ContainerDatabaseDriver",
+            "susu.master.datasource.driver-class-name" to "org.testcontainers.jdbc.ContainerDatabaseDriver"
         )
 
         properties.plus(mysqlProperties)
     }
 
     private fun initRedisProperties(properties: Map<String, String>) {
-        val redisHost = dockerCompose.getServiceHost(REDIS, REDIS_PORT);
-        val redisPort = dockerCompose.getServicePort(REDIS, REDIS_PORT);
+        val redisHost = dockerCompose.getServiceHost(REDIS, REDIS_PORT)
+        val redisPort = dockerCompose.getServicePort(REDIS, REDIS_PORT)
 
         val redisProperties = hashMapOf(
             "spring.data.redis.host" to redisHost,
@@ -61,4 +59,3 @@ class TestContainerInitializer : ApplicationContextInitializer<ConfigurableAppli
         properties.plus(redisProperties)
     }
 }
-

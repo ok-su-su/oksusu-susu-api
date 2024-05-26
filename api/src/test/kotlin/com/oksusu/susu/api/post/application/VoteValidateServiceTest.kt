@@ -164,8 +164,8 @@ class VoteValidateServiceTest(
             }
         }
 
-        context("seq가"){
-            it("중복되면 에러"){
+        context("seq가") {
+            it("중복되면 에러") {
                 val options = listOf(
                     VoteOption(seq = 1, content = "1", postId = 1L),
                     VoteOption(seq = 1, content = "2", postId = 2L)
@@ -177,10 +177,9 @@ class VoteValidateServiceTest(
                 )
 
                 shouldThrow<InvalidRequestException> { voteValidateService.validateCreateVoteRequest(req) }
-
             }
 
-            it("올바르면 통과"){
+            it("올바르면 통과") {
                 val options = listOf(
                     VoteOption(seq = 1, content = "1", postId = 1L),
                     VoteOption(seq = 2, content = "2", postId = 2L)

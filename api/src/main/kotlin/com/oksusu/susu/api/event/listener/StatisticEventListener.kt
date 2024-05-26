@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.context.event.EventListener
-import org.springframework.stereotype.Component
 
 @SusuEventListener
 class StatisticEventListener(
