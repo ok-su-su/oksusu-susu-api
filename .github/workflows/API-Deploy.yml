@@ -37,8 +37,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      # TODO: testcontainer가 action에서 안돌아감 수정 바람
+      # 컨테이너 실행
+      - name: Start containers  # test 돌릴때 mysql 필요
+        run: docker-compose up -d
+
       - name: Build with Gradle
         run: ./gradlew :api:build --no-daemon
+
+      - name: docker stop and remove mysqldata
+        run: |
+          sudo docker stop $(sudo docker ps -a -q)
+          sudo docker rm $(sudo docker ps -a -q)
+          sudo docker rmi $(sudo docker images -q)
+          sudo rm -rf mysqldata
 
       - name: Make image tag
         run: echo "IMAGE_TAG=$ACTIVE_PROFILE-${GITHUB_SHA::7}" >> $GITHUB_ENV # activeProfile-커밋 hash 값

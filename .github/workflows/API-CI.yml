@@ -53,13 +53,22 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
+      # TODO: testcontainer가 action에서 안돌아감 수정 바람
+      # 컨테이너 실행
+      - name: Start containers  # test 돌릴때 mysql 필요
+        run: docker-compose up -d
+
       # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
         run: ./gradlew clean :api:build --no-daemon
 
-#      # 컨테이너 실행
-#      - name: Start containers  # test 돌릴때 mysql 필요
-#        run: docker-compose up -d
+      - name: docker stop and remove mysqldata
+        run: |
+          sudo docker stop $(sudo docker ps -a -q)
+          sudo docker rm $(sudo docker ps -a -q)
+          sudo docker rmi $(sudo docker images -q)
+          sudo rm -rf mysqldata
+
 #
 #      # jacoco, sonarcube
 #      - name: test and analyze
@@ -68,9 +77,3 @@ jobs:
 #          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 #
-#      - name: docker stop and remove mysqldata
-#        run: |
-#          sudo docker stop $(sudo docker ps -a -q)
-#          sudo docker rm $(sudo docker ps -a -q)
-#          sudo docker rmi $(sudo docker images -q)
-#          sudo rm -rf mysqldata
