@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.api.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.api.user.application.UserDeviceService
@@ -11,10 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
-@Component
+@SusuEventListener
 class UserDeviceEventListener(
     private val userDeviceService: UserDeviceService,
     private val txTemplates: TransactionTemplates,

@@ -25,4 +25,8 @@ data class OauthInfo(
     private fun withDrawOid(now: LocalDateTime = LocalDateTime.now()): String {
         return "withdraw:$now:${this.oAuthId}"
     }
+
+    override fun toString(): String {
+        return "OauthInfo(oAuthProvider=$oAuthProvider, oAuthId='$oAuthId')"
+    }
 }

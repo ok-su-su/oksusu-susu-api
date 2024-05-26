@@ -20,7 +20,7 @@ sealed interface Event
 
 open class BaseEvent(
     val publishAt: LocalDateTime = LocalDateTime.now(),
-    val traceId: String = MDC.get(MDC_KEY_TRACE_ID),
+    val traceId: String = MDC.getCopyOfContextMap()?.get(MDC_KEY_TRACE_ID) ?: "",
 ) : Event
 
 data class DeleteLedgerEvent(

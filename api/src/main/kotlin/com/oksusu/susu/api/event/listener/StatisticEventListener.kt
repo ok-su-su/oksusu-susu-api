@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.CacheUserEnvelopeStatisticEvent
 import com.oksusu.susu.api.statistic.application.UserEnvelopeStatisticService
 import com.oksusu.susu.common.extension.mdcCoroutineScope
@@ -8,9 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.context.event.EventListener
-import org.springframework.stereotype.Component
 
-@Component
+@SusuEventListener
 class StatisticEventListener(
     private val userEnvelopeStatisticService: UserEnvelopeStatisticService,
 ) {

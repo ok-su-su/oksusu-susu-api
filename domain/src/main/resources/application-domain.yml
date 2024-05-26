@@ -30,12 +30,6 @@ spring:
     activate:
       on-profile: dev
 
-  # REDIS
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
 # DEV-DATABASE-COMMON
 datasource: &dev-datasource
   url: jdbc:mysql://localhost:3306/susu?useUnicode=true&charset=utf8mb4&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
@@ -67,12 +61,6 @@ spring:
   config:
     activate:
       on-profile: prod
-
-  # REDIS
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
 
 # PROD-DATABASE-COMMON
 datasource: &prod-datasource

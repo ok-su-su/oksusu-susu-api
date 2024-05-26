@@ -31,4 +31,8 @@ class Post(
     /** 활성화 여부 / 활성화 : 1, 비활성화 : 0 */
     @Column(name = "is_active")
     var isActive: Boolean = true,
-) : BaseEntity()
+) : BaseEntity() {
+    override fun toString(): String {
+        return "Post(id=$id, uid=$uid, boardId=$boardId, type=$type, title=$title, content='$content', isActive=$isActive)"
+    }
+}

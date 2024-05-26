@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.SlackErrorAlarmEvent
 import com.oksusu.susu.api.slack.application.SuspendableSlackAlarmService
 import com.oksusu.susu.api.slack.model.ErrorWebhookDataModel
@@ -10,9 +11,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.springframework.context.event.EventListener
 import org.springframework.core.env.Environment
-import org.springframework.stereotype.Component
 
-@Component
+@SusuEventListener
 class SlackErrorAlarmEventListener(
     private val environment: Environment,
     private val suspendableSlackAlarmService: SuspendableSlackAlarmService,

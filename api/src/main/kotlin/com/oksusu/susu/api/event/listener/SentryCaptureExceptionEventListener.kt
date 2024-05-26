@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.SentryCaptureExceptionEvent
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.common.extension.isProd
@@ -14,9 +15,8 @@ import org.springframework.context.event.EventListener
 import org.springframework.core.env.Environment
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.server.reactive.ServerHttpRequest
-import org.springframework.stereotype.Component
 
-@Component
+@SusuEventListener
 class SentryCaptureExceptionEventListener(
     private val environment: Environment,
 ) {
