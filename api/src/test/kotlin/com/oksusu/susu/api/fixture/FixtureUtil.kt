@@ -3,6 +3,7 @@ package com.oksusu.susu.api.fixture
 import com.navercorp.fixturemonkey.ArbitraryBuilder
 import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector
+import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.navercorp.fixturemonkey.kotlin.setNotNullExp
 import com.navercorp.fixturemonkey.kotlin.setPostCondition
 import com.oksusu.susu.api.auth.model.AuthContextImpl
@@ -17,6 +18,7 @@ import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
 class FixtureUtil {
     companion object {
         private val monkey: FixtureMonkey = FixtureMonkey.builder()
+            .plugin(KotlinPlugin())
             .objectIntrospector(FieldReflectionArbitraryIntrospector.INSTANCE)
             .build()
 
