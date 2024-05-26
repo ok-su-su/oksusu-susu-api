@@ -16,8 +16,15 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        kotlin-version: [ "1.9.22" ]
+        kotlin-version: [ "1.9.23" ]
         java-version: [ "17" ]
+
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged
+        ports:
+          - 2375:2375
 
     steps:
       - name: Checkout code
