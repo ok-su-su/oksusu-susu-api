@@ -79,7 +79,7 @@ class SusuStatisticsDailySummaryJob(
                 """
                 *일단위 통계 알림${now.format("yyyyMMdd HH:mm:ss")}*
                 - 전날 종합 api 호출수 : $systemActionLogCount
-                - 전날 종합  유저 가입수 : $userCount
+                - 전날 종합 유저 가입수 : $userCount
                 - 전날 종합 봉투 생성수 : $dailyEnvelopeCount
                 - 전체 봉투 생성수 : $totalEnvelopeCount
                 - 전날 종합 장부 생성수 : $dailyLedgerCount
