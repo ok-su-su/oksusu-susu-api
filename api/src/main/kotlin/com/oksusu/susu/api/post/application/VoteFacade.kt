@@ -12,6 +12,7 @@ import com.oksusu.susu.api.post.model.VoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteOptionModel
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
+import com.oksusu.susu.api.post.model.request.OverwriteVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.api.post.model.response.CreateAndUpdateVoteResponse
 import com.oksusu.susu.api.post.model.response.OnboardingVoteResponse
@@ -206,6 +207,49 @@ class VoteFacade(
             val updatedVoteOptionCount = voteOptionCount.apply { count-- }
 
             countService.saveAllSync(listOf(updatedVoteCount, updatedVoteOptionCount))
+        }
+    }
+
+    suspend fun overwriteVote(user: AuthUser, postId: Long, request: OverwriteVoteHistoryRequest) {
+        val history = parZip(
+            { voteHistoryService.findByUidAndPostId(user.uid, postId) },
+            { voteOptionService.validateCorrespondWithVote(postId, request.optionId) }
+        ) { history, _ -> history }
+
+        if (history == null) {
+            /** 투표가 존재하지않을 경우 */
+            parZip(
+                { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
+                { countService.findByTargetIdAndTargetType(request.optionId, CountTargetType.VOTE_OPTION) }
+            ) { voteCount, voteOptionCount ->
+                VoteHistory(uid = user.uid, postId = postId, voteOptionId = request.optionId)
+                    .run { voteHistoryService.saveSync(this) }
+
+                val updatedVoteCount = voteCount.apply { count++ }
+                val updatedVoteOptionCount = voteOptionCount.apply { count++ }
+
+                txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
+                    countService.saveAllSync(listOf(updatedVoteCount, updatedVoteOptionCount))
+                }
+            }
+        } else {
+            /** 투표가 존재할 경우 다른 옵션으로 투표한 경우에만 동작하면 됨 */
+            if (request.optionId != history.voteOptionId) {
+                parZip(
+                    { countService.findByTargetIdAndTargetType(history.voteOptionId, CountTargetType.VOTE_OPTION) },
+                    { countService.findByTargetIdAndTargetType(request.optionId, CountTargetType.VOTE_OPTION) }
+                ) { beforeOptionCount, newOptionCount ->
+                    val updatedBeforeOptionCount = beforeOptionCount.apply { count-- }
+                    val updatedNewOptionCount = newOptionCount.apply { count++ }
+
+                    txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
+                        history.apply { voteOptionId = request.optionId }
+                            .run { voteHistoryService.saveSync(this) }
+
+                        countService.saveAllSync(listOf(updatedBeforeOptionCount, updatedNewOptionCount))
+                    }
+                }
+            }
         }
     }
 

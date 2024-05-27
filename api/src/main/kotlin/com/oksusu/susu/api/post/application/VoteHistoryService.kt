@@ -5,6 +5,7 @@ import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.post.domain.VoteHistory
 import com.oksusu.susu.domain.post.infrastructure.repository.VoteHistoryRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 class VoteHistoryService(
     private val voteHistoryRepository: VoteHistoryRepository,
 ) {
+    val logger = KotlinLogging.logger { }
+
     @Transactional
     fun saveSync(voteHistory: VoteHistory): VoteHistory {
         return voteHistoryRepository.save(voteHistory)
