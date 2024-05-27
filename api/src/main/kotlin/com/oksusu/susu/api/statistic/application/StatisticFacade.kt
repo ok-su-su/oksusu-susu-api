@@ -1,6 +1,5 @@
 package com.oksusu.susu.api.statistic.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.category.application.CategoryService
 import com.oksusu.susu.api.event.model.CacheUserEnvelopeStatisticEvent
@@ -9,6 +8,7 @@ import com.oksusu.susu.api.statistic.model.response.SusuEnvelopeStatisticRespons
 import com.oksusu.susu.api.statistic.model.response.UserEnvelopeStatisticResponse
 import com.oksusu.susu.api.statistic.model.vo.SusuEnvelopeStatisticRequest
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.common.extension.yearMonth
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
@@ -35,7 +35,7 @@ class StatisticFacade(
             return UserEnvelopeStatisticResponse.from(this)
         }
 
-        val userEnvelopeStatistic = parZip(
+        val userEnvelopeStatistic = parZipWithMDC(
             /** 최근 사용 금액 1년 */
             { envelopeStatisticService.getRecentSpentFor1Year(user.uid) },
             /** 최다 수수 관계 */
@@ -85,7 +85,7 @@ class StatisticFacade(
     }
 
     suspend fun getSusuEnvelopeStatistic(requestParam: SusuEnvelopeStatisticRequest): SusuEnvelopeStatisticResponse {
-        return parZip(
+        return parZipWithMDC(
             { susuSpecificEnvelopeStatisticService.getStatistic(requestParam) },
             { susuEnvelopeStatisticService.getStatisticOrThrow() }
         ) { tempSpecific, statistic ->

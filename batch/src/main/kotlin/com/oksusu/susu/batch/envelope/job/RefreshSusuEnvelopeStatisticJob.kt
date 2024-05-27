@@ -1,6 +1,5 @@
 package com.oksusu.susu.batch.envelope.job
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.key.CacheKeyGenerateHelper
 import com.oksusu.susu.cache.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.cache.statistic.infrastructure.SusuEnvelopeStatisticRepository
@@ -8,6 +7,7 @@ import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatis
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.common.extension.toStatisticAgeGroup
 import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.common.extension.yearMonth
@@ -26,7 +26,6 @@ import com.oksusu.susu.domain.friend.infrastructure.model.CountPerRelationshipId
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.slf4j.MDCContext
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -53,8 +52,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
-        parZip(
-            Dispatchers.IO + MDCContext(),
+        parZipWithMDC(
             { withContext(Dispatchers.IO) { envelopeRepository.getUserCountHadEnvelope() } },
             {
                 withContext(Dispatchers.IO) {
@@ -181,7 +179,7 @@ class RefreshSusuEnvelopeStatisticJob(
         val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).roundToLong()
         val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
 
-        return parZip(
+        return parZipWithMDC(
             { withContext(Dispatchers.IO) { envelopeRepository.getEnvelopeByPositionOrderByAmount(minIdx) } },
             { withContext(Dispatchers.IO) { envelopeRepository.getEnvelopeByPositionOrderByAmount(maxIdx) } }
         ) { min, max ->

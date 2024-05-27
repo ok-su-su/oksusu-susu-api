@@ -1,12 +1,12 @@
 package com.oksusu.susu.api.statistic.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.category.application.CategoryService
 import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.envelope.application.LedgerService
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.RelationshipService
 import com.oksusu.susu.common.config.SusuConfig
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.common.model.TitleValueModel
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
@@ -46,12 +46,12 @@ class EnvelopeStatisticService(
     /** 최다 수수 경조사 */
     suspend fun getMostFrequentCategory(uid: Long?): TitleValueModel<Long>? {
         val (envelopeCategoryCounts, ledgerCategoryCounts) = if (uid == null) {
-            parZip(
+            parZipWithMDC(
                 { envelopeService.countPerCategoryId() },
                 { ledgerService.countPerCategoryId() }
             ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
         } else {
-            parZip(
+            parZipWithMDC(
                 { envelopeService.countPerCategoryIdByUid(uid) },
                 { ledgerService.countPerCategoryIdByUid(uid) }
             ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
@@ -127,7 +127,7 @@ class EnvelopeStatisticService(
         val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).roundToLong()
         val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
 
-        return parZip(
+        return parZipWithMDC(
             { envelopeService.getEnvelopeByPositionOrderByAmount(minIdx) },
             { envelopeService.getEnvelopeByPositionOrderByAmount(maxIdx) }
         ) { min, max -> min.amount to max.amount }

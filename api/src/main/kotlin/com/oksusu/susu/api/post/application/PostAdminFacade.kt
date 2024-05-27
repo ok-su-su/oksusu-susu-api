@@ -1,8 +1,8 @@
 package com.oksusu.susu.api.post.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AdminUser
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.post.domain.vo.PostType
@@ -31,7 +31,7 @@ class PostAdminFacade(
     }
 
     private suspend fun deleteVote(id: Long) {
-        val (vote, options) = parZip(
+        val (vote, options) = parZipWithMDC(
             { voteService.getVote(id) },
             { voteOptionService.getVoteOptions(id) }
         ) { vote, options -> vote to options }
