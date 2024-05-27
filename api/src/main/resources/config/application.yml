@@ -9,7 +9,7 @@ server:
     enabled: true
   shutdown: graceful # timeout configuration property : spring.lifecycle.timeout-per-shutdown-phase
   event-processing:
-    enabled: false
+    enabled: true
 
 logging:
   level:

@@ -10,6 +10,7 @@ import com.oksusu.susu.api.extension.wrapVoid
 import com.oksusu.susu.api.post.application.VoteFacade
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
+import com.oksusu.susu.api.post.model.request.OverwriteVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.api.post.model.vo.SearchVoteRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -28,8 +29,7 @@ class VoteResource(
     @PostMapping
     suspend fun createVote(
         user: AuthUser,
-        @RequestBody
-        request: CreateVoteRequest,
+        @RequestBody request: CreateVoteRequest,
     ) = voteFacade.createVote(user, request).wrapCreated()
 
     @Operation(summary = "투표 조회")
@@ -52,9 +52,16 @@ class VoteResource(
     suspend fun castVote(
         user: AuthUser,
         @PathVariable id: Long,
-        @RequestBody
-        request: CreateVoteHistoryRequest,
+        @RequestBody request: CreateVoteHistoryRequest,
     ) = voteFacade.vote(user, id, request).wrapCreated()
+
+    @Operation(summary = "투표하기 (덮어쓰기)")
+    @PatchMapping("/{id}/vote")
+    suspend fun overwriteVote(
+        user: AuthUser,
+        @PathVariable id: Long,
+        @RequestBody request: OverwriteVoteHistoryRequest,
+    ) = voteFacade.overwriteVote(user, id, request).wrapCreated()
 
     @Operation(summary = "투표 삭제하기")
     @DeleteMapping("/{id}")
@@ -68,8 +75,7 @@ class VoteResource(
     suspend fun update(
         user: AuthUser,
         @PathVariable id: Long,
-        @RequestBody
-        request: UpdateVoteRequest,
+        @RequestBody request: UpdateVoteRequest,
     ) = voteFacade.update(user, id, request).wrapOk()
 
     @Operation(summary = "가장 인기 있는 투표 검색")
