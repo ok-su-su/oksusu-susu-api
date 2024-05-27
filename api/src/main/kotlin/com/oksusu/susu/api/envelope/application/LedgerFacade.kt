@@ -1,6 +1,5 @@
 package com.oksusu.susu.api.envelope.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.category.application.CategoryAssignmentService
 import com.oksusu.susu.api.category.application.CategoryService
@@ -13,6 +12,7 @@ import com.oksusu.susu.api.envelope.model.response.CreateAndUpdateLedgerResponse
 import com.oksusu.susu.api.envelope.model.response.LedgerDetailResponse
 import com.oksusu.susu.api.envelope.model.response.SearchLedgerResponse
 import com.oksusu.susu.api.event.model.DeleteLedgerEvent
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.category.domain.CategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.domain.common.extension.coExecute
@@ -116,7 +116,7 @@ class LedgerFacade(
     suspend fun get(user: AuthUser, id: Long): LedgerDetailResponse {
         val (ledger, categoryAssignment) = ledgerService.findLedgerDetailOrThrow(id, user.uid)
 
-        return parZip(
+        return parZipWithMDC(
             { categoryService.getCategory(categoryAssignment.categoryId) },
             { envelopeService.countTotalAmountAndCount(id) }
         ) { category, (_, totalAmounts, totalCounts) ->

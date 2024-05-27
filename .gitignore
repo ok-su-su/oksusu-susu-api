@@ -42,3 +42,5 @@ mysqldata/
 .env.dev
 
 docker-compose.prod.yml
+
+.jqwik-database

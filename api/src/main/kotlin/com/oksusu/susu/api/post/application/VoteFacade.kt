@@ -1,6 +1,5 @@
 package com.oksusu.susu.api.post.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.common.dto.SusuPageRequest
 import com.oksusu.susu.api.count.application.CountService
@@ -12,6 +11,7 @@ import com.oksusu.susu.api.post.model.VoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteOptionModel
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
+import com.oksusu.susu.api.post.model.request.OverwriteVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
 import com.oksusu.susu.api.post.model.response.CreateAndUpdateVoteResponse
 import com.oksusu.susu.api.post.model.response.OnboardingVoteResponse
@@ -23,6 +23,7 @@ import com.oksusu.susu.api.user.application.BlockService
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
@@ -135,7 +136,7 @@ class VoteFacade(
     }
 
     suspend fun getVote(user: AuthUser, voteId: Long): VoteAllInfoResponse {
-        return parZip(
+        return parZipWithMDC(
             { voteService.getVoteAndCreator(voteId) },
             { voteOptionService.getOptionAndCount(voteId) },
             { voteHistoryService.findByUidAndPostId(user.uid, voteId) }
@@ -173,11 +174,12 @@ class VoteFacade(
     }
 
     private suspend fun castVote(uid: Long, postId: Long, optionId: Long) {
-        val (voteCount, voteOptionCount) = parZip(
+        val (voteCount, voteOptionCount) = parZipWithMDC(
             { voteHistoryService.validateVoteNotExist(uid, postId) },
+            { voteOptionService.validateCorrespondWithVote(postId, optionId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
-        ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
+        ) { _, _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
             VoteHistory(uid = uid, postId = postId, voteOptionId = optionId)
@@ -191,11 +193,12 @@ class VoteFacade(
     }
 
     private suspend fun cancelVote(uid: Long, postId: Long, optionId: Long) {
-        val (voteCount, voteOptionCount) = parZip(
+        val (voteCount, voteOptionCount) = parZipWithMDC(
             { voteHistoryService.validateVoteExist(uid, postId, optionId) },
+            { voteOptionService.validateCorrespondWithVote(postId, optionId) },
             { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
             { countService.findByTargetIdAndTargetType(optionId, CountTargetType.VOTE_OPTION) }
-        ) { _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
+        ) { _, _, voteCount, voteOptionCount -> voteCount to voteOptionCount }
 
         txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
             voteHistoryService.deleteByUidAndPostId(uid, postId)
@@ -207,8 +210,51 @@ class VoteFacade(
         }
     }
 
+    suspend fun overwriteVote(user: AuthUser, postId: Long, request: OverwriteVoteHistoryRequest) {
+        val history = parZipWithMDC(
+            { voteHistoryService.findByUidAndPostId(user.uid, postId) },
+            { voteOptionService.validateCorrespondWithVote(postId, request.optionId) }
+        ) { history, _ -> history }
+
+        if (history == null) {
+            /** 투표가 존재하지않을 경우 */
+            parZipWithMDC(
+                { countService.findByTargetIdAndTargetType(postId, CountTargetType.POST) },
+                { countService.findByTargetIdAndTargetType(request.optionId, CountTargetType.VOTE_OPTION) }
+            ) { voteCount, voteOptionCount ->
+                VoteHistory(uid = user.uid, postId = postId, voteOptionId = request.optionId)
+                    .run { voteHistoryService.saveSync(this) }
+
+                val updatedVoteCount = voteCount.apply { count++ }
+                val updatedVoteOptionCount = voteOptionCount.apply { count++ }
+
+                txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
+                    countService.saveAllSync(listOf(updatedVoteCount, updatedVoteOptionCount))
+                }
+            }
+        } else {
+            /** 투표가 존재할 경우 다른 옵션으로 투표한 경우에만 동작하면 됨 */
+            if (request.optionId != history.voteOptionId) {
+                parZipWithMDC(
+                    { countService.findByTargetIdAndTargetType(history.voteOptionId, CountTargetType.VOTE_OPTION) },
+                    { countService.findByTargetIdAndTargetType(request.optionId, CountTargetType.VOTE_OPTION) }
+                ) { beforeOptionCount, newOptionCount ->
+                    val updatedBeforeOptionCount = beforeOptionCount.apply { count-- }
+                    val updatedNewOptionCount = newOptionCount.apply { count++ }
+
+                    txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
+                        history.apply { voteOptionId = request.optionId }
+                            .run { voteHistoryService.saveSync(this) }
+
+                        countService.saveAllSync(listOf(updatedBeforeOptionCount, updatedNewOptionCount))
+                    }
+                }
+            }
+        }
+    }
+
     suspend fun deleteVote(user: AuthUser, id: Long) {
-        val (vote, options) = parZip(
+        val (vote, options) = parZipWithMDC(
             { voteService.getVote(id) },
             { voteOptionService.getVoteOptions(id) }
         ) { vote, options -> vote to options }
@@ -251,11 +297,10 @@ class VoteFacade(
         }
     }
 
-    /** 투표가 진행된 경우 업데이트 불가능 */
     suspend fun update(user: AuthUser, id: Long, request: UpdateVoteRequest): CreateAndUpdateVoteResponse {
         voteValidateService.validateUpdateVoteRequest(request)
 
-        return parZip(
+        return parZipWithMDC(
             { voteHistoryService.findByUidAndPostId(user.uid, id) },
             { voteService.getVoteAndOptions(id) }
         ) { voteHistory, voteInfos ->

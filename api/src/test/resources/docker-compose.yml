@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:8.0.33
+    environment:
+      - MYSQL_USER=susu
+      - MYSQL_PASSWORD=susu
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=susu
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

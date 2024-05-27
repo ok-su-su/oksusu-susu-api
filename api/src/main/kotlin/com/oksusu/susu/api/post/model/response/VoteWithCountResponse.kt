@@ -27,4 +27,8 @@ data class VoteWithCountResponse(
             )
         }
     }
+
+    override fun toString(): String {
+        return "VoteWithCountResponse(id=$id, board=$board, content='$content', count=$count, isModified=$isModified)"
+    }
 }

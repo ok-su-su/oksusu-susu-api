@@ -49,4 +49,8 @@ class Count(
             )
         }
     }
+
+    override fun toString(): String {
+        return "Count(id=$id, targetId=$targetId, targetType=$targetType, countType=$countType, count=$count)"
+    }
 }

@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.TermAgreementHistoryCreateEvent
 import com.oksusu.susu.api.term.application.TermAgreementHistoryService
 import com.oksusu.susu.common.extension.mdcCoroutineScope
@@ -8,10 +9,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
-@Component
+@SusuEventListener
 class TermAgreementHistoryEventListener(
     private val termAgreementHistoryService: TermAgreementHistoryService,
 ) {

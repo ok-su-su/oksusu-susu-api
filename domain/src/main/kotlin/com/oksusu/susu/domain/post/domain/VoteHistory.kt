@@ -20,5 +20,5 @@ class VoteHistory(
 
     /** 투표 옵션 id */
     @Column(name = "vote_option_id")
-    val voteOptionId: Long,
+    var voteOptionId: Long,
 ) : BaseEntity()
