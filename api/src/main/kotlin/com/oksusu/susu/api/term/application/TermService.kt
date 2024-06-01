@@ -25,8 +25,8 @@ class TermService(
 
     suspend fun getAllActiveTerms(): List<Term> {
         return withMDCContext(Dispatchers.IO) {
-            termRepository.findAllByIsActiveOrderByIsEssentialDesc(true)
-        }
+            termRepository.findAllByIsActive(true)
+        }.sortedBy { term -> term.seq }
     }
 
     suspend fun validateExistTerms(ids: List<Long>) {
