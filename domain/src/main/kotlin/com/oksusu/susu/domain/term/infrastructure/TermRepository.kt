@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 @Repository
 interface TermRepository : JpaRepository<Term, Long> {
     @Transactional(readOnly = true)
-    fun findAllByIsActiveOrderByIsEssentialDesc(isActive: Boolean): List<Term>
+    fun findAllByIsActive(isActive: Boolean): List<Term>
 
     @Transactional(readOnly = true)
     fun countAllByIdIn(ids: List<Long>): Long

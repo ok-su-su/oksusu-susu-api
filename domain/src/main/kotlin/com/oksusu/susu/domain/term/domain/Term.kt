@@ -20,7 +20,10 @@ class Term(
     val title: String,
 
     /** 약관 내용 */
-    val description: String,
+    val description: String?,
+
+    /** 약관 순서 */
+    val seq: Int,
 
     /** 필수 동의 여부 / 필수 : 1, 선택 : 0 */
     @Column(name = "is_essential")
