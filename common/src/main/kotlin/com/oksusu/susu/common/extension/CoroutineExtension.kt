@@ -15,8 +15,7 @@ suspend fun <T> withMDCContext(
     context: CoroutineContext = Dispatchers.IO,
     block: suspend () -> T,
 ): T {
-    val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    return withContext(context + MDCContext(contextMap) + MdcContinuationInterceptor()) { block() }
+    return withContext(context + MdcContinuationInterceptor()) { block() }
 }
 
 suspend fun <T> withJob(
@@ -39,7 +38,7 @@ suspend inline fun <A, B, C> parZipWithMDC(
     crossinline f: suspend CoroutineScope.(A, B) -> C,
 ): C {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    val ctx = Dispatchers.Default + MDCContext(contextMap) + MdcContinuationInterceptor()
+    val ctx = Dispatchers.IO + MDCContext(contextMap) + MdcContinuationInterceptor()
     return parZip(ctx, fa, fb, f)
 }
 
@@ -50,7 +49,7 @@ suspend inline fun <A, B, C, D> parZipWithMDC(
     crossinline f: suspend CoroutineScope.(A, B, C) -> D,
 ): D {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    val ctx = Dispatchers.Default + MDCContext(contextMap) + MdcContinuationInterceptor()
+    val ctx = Dispatchers.IO + MDCContext(contextMap) + MdcContinuationInterceptor()
     return parZip(ctx, fa, fb, fc, f)
 }
 
@@ -62,7 +61,7 @@ suspend inline fun <A, B, C, D, E> parZipWithMDC(
     crossinline f: suspend CoroutineScope.(A, B, C, D) -> E,
 ): E {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    val ctx = Dispatchers.Default + MDCContext(contextMap) + MdcContinuationInterceptor()
+    val ctx = Dispatchers.IO + MDCContext(contextMap) + MdcContinuationInterceptor()
     return parZip(ctx, fa, fb, fc, fd, f)
 }
 
@@ -75,7 +74,7 @@ suspend inline fun <A, B, C, D, E, F> parZipWithMDC(
     crossinline f: suspend CoroutineScope.(A, B, C, D, E) -> F,
 ): F {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    val ctx = Dispatchers.Default + MDCContext(contextMap) + MdcContinuationInterceptor()
+    val ctx = Dispatchers.IO + MDCContext(contextMap) + MdcContinuationInterceptor()
     return parZip(ctx, fa, fb, fc, fd, fe, f)
 }
 
@@ -89,7 +88,7 @@ suspend inline fun <A, B, C, D, E, F, G> parZipWithMDC(
     crossinline f: suspend CoroutineScope.(A, B, C, D, E, F) -> G,
 ): G {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    val ctx = Dispatchers.Default + MDCContext(contextMap) + MdcContinuationInterceptor()
+    val ctx = Dispatchers.IO + MDCContext(contextMap) + MdcContinuationInterceptor()
     return parZip(ctx, fa, fb, fc, fd, fe, ff, f)
 }
 
@@ -104,7 +103,7 @@ suspend inline fun <A, B, C, D, E, F, G, H> parZipWithMDC(
     crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G) -> H,
 ): H {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    val ctx = Dispatchers.Default + MDCContext(contextMap) + MdcContinuationInterceptor()
+    val ctx = Dispatchers.IO + MDCContext(contextMap) + MdcContinuationInterceptor()
     return parZip(ctx, fa, fb, fc, fd, fe, ff, fg, f)
 }
 
@@ -120,6 +119,6 @@ suspend inline fun <A, B, C, D, E, F, G, H, I> parZipWithMDC(
     crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H) -> I,
 ): I {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
-    val ctx = Dispatchers.Default + MDCContext(contextMap) + MdcContinuationInterceptor()
+    val ctx = Dispatchers.IO + MDCContext(contextMap) + MdcContinuationInterceptor()
     return parZip(ctx, fa, fb, fc, fd, fe, ff, fg, fh, f)
 }
