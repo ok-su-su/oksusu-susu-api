@@ -55,7 +55,7 @@ jobs:
 
       # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
-        run: ./gradlew clean :api:build --no-daemon -i
+        run: ./gradlew clean :api:build --no-daemon
 
 #      # jacoco, sonarcube
 #      - name: test and analyze
