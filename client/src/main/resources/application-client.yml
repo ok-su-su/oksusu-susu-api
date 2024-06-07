@@ -41,6 +41,7 @@ oauth-url:
     account-google-url: ${GOOGLE_ACCOUNT_GOOGLE_URL}
     oauth2-google-api-url: ${GOOGLE_OAUTH2_GOOGLE_API_URL}
     google-api-url: ${GOOGLE_GOOGLE_API_URL}
+    oidc-key-url: ${GOOGLE_OIDC_KEY_URL}
     redirect-url: ${GOOGLE_REDIRECT_URL}
 
 ---

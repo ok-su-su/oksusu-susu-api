@@ -63,6 +63,7 @@ class OAuthUrlConfig(
         val accountGoogleUrl: String,
         val oauth2GoogleApiUrl: String,
         val googleApiUrl: String,
+        val oidcKeyUrl: String,
         val redirectUrl: String,
     )
 }

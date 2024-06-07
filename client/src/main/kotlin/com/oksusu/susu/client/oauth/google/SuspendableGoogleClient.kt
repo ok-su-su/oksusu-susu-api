@@ -3,6 +3,7 @@ package com.oksusu.susu.client.oauth.google
 import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthUserInfoResponse
+import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeysResponse
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.MediaType
@@ -43,6 +44,16 @@ class SuspendableGoogleClient(
             .uri(url)
             .retrieve()
             .bodyToMono(GoogleOAuthUserInfoResponse::class.java)
+            .awaitSingle()
+    }
+
+    override suspend fun getOidcPublicKeys(): OidcPublicKeysResponse {
+        val url = googleOAuthUrlConfig.googleApiUrl + googleOAuthUrlConfig.oidcKeyUrl
+
+        return webClient.get()
+            .uri(url)
+            .retrieve()
+            .bodyToMono(OidcPublicKeysResponse::class.java)
             .awaitSingle()
     }
 

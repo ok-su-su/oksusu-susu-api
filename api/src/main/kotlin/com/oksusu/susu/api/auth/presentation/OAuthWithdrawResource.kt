@@ -41,7 +41,7 @@ class OAuthWithdrawResource(
         @RequestParam code: String,
     ): RedirectView {
         val oAuthToken = oAuthService.getOAuthWithdrawToken(OAuthProvider.KAKAO, code)
-        val susuToken = oAuthFacade.login(
+        val susuToken = oAuthFacade.loginWithOAuth(
             provider = OAuthProvider.KAKAO,
             request = OAuthLoginRequest(oAuthToken.accessToken),
             deviceContext = UserDeviceContextImpl.getDefault()
@@ -58,7 +58,7 @@ class OAuthWithdrawResource(
         @RequestParam code: String,
     ): RedirectView {
         val googleAccessToken = oAuthService.getOAuthWithdrawToken(OAuthProvider.GOOGLE, code).accessToken
-        val susuToken = oAuthFacade.login(
+        val susuToken = oAuthFacade.loginWithOAuth(
             provider = OAuthProvider.GOOGLE,
             request = OAuthLoginRequest(googleAccessToken),
             deviceContext = UserDeviceContextImpl.getDefault()

@@ -27,6 +27,7 @@ import com.oksusu.susu.domain.user.domain.UserWithdraw
 import com.oksusu.susu.domain.user.domain.vo.AccountRole
 import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -47,6 +48,8 @@ class AuthFacade(
     private val txTemplates: TransactionTemplates,
     private val userStatusTypeService: UserStatusTypeService,
 ) {
+    val logger = KotlinLogging.logger {  }
+
     fun resolveAuthUser(token: Mono<AuthUserToken>): Mono<Any> {
         return jwtTokenService.verifyTokenMono(token)
             .map { payload ->
