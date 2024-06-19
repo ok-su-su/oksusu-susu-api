@@ -2,9 +2,9 @@ package com.oksusu.susu.api.metadata.model.response
 
 import java.time.LocalDateTime
 
-class ApplicationVersionMetadataResponse(
+data class ApplicationVersionMetadataResponse(
     /** 최신 어플리케이션 버전 */
-    var applicationVersion: String,
+    val applicationVersion: String,
     /** 강제 업데이트 날짜 */
-    var forcedUpdateDate: LocalDateTime,
+    val forcedUpdateDate: LocalDateTime,
 )

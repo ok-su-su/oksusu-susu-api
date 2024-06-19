@@ -4,7 +4,7 @@ import com.oksusu.susu.client.oauth.apple.model.AppleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthTokenResponse
 
-class OAuthTokenResponse(
+data class OAuthTokenResponse(
     /** oauth access token */
     val accessToken: String,
     /** oauth refresh token */

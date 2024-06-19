@@ -20,4 +20,8 @@ class Board(
     /** 활성화 여부 / 활성화 : 1, 비활성화 : 0 */
     @Column(name = "is_active")
     var isActive: Boolean = true,
-) : BaseEntity()
+) : BaseEntity() {
+    override fun toString(): String {
+        return "Board(id=$id, name='$name', seq=$seq, isActive=$isActive)"
+    }
+}

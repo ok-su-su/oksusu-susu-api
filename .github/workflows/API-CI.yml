@@ -13,10 +13,10 @@ on:
 jobs:
   build:
     name: CI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        kotlin-version: [ "1.9.22" ]
+        kotlin-version: [ "1.9.23" ]
         java-version: [ "17" ]
 
     steps:
@@ -46,24 +46,20 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
       # 빌드, ktlint check도 진행됨
       - name: Gradle Clean & Build
         run: ./gradlew clean :api:build --no-daemon
 
-#      # 컨테이너 실행
-#      - name: Start containers  # test 돌릴때 mysql 필요
-#        run: docker-compose up -d
-#
 #      # jacoco, sonarcube
 #      - name: test and analyze
 #        run: ./gradlew test sonar --stacktrace --no-daemon
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#
-#      - name: docker stop and remove mysqldata
-#        run: |
-#          sudo docker stop $(sudo docker ps -a -q)
-#          sudo docker rm $(sudo docker ps -a -q)
-#          sudo docker rmi $(sudo docker images -q)
-#          sudo rm -rf mysqldata

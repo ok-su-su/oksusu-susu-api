@@ -1,11 +1,12 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.SentryCaptureExceptionEvent
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.common.extension.isProd
+import com.oksusu.susu.common.extension.mdcCoroutineScope
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.sentry.Sentry
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -14,9 +15,8 @@ import org.springframework.context.event.EventListener
 import org.springframework.core.env.Environment
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.server.reactive.ServerHttpRequest
-import org.springframework.stereotype.Component
 
-@Component
+@SusuEventListener
 class SentryCaptureExceptionEventListener(
     private val environment: Environment,
 ) {
@@ -29,7 +29,7 @@ class SentryCaptureExceptionEventListener(
             return
         }
 
-        CoroutineScope(Dispatchers.IO + Job()).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
             val throwable = event.exception
             val request = event.request
 

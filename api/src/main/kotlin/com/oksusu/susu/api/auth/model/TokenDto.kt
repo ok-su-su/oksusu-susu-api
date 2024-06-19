@@ -3,7 +3,7 @@ package com.oksusu.susu.api.auth.model
 import java.time.LocalDateTime
 
 /** 토큰 정보 dto */
-class TokenDto(
+data class TokenDto(
     /** access token */
     val accessToken: String,
     /** access token 유효기간 */

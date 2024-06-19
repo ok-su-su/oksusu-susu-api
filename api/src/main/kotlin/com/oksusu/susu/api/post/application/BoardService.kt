@@ -41,7 +41,7 @@ class BoardService(
         }
     }
 
-    suspend fun getAll(): List<BoardModel> {
+    fun getAll(): List<BoardModel> {
         return boards.values.toList()
     }
 

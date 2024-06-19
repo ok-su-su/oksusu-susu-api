@@ -58,10 +58,12 @@ class LedgerResource(
 
     /**
      * **검색조건**
-     * - title, categoryIds, fromStartAT, toStartAt 모두 현재 조건상 nullable
+     * - title, categoryIds, fromStartAt, toStartAt 모두 현재 조건상 nullable
      *
      * **검색 정렬 조건**
      * - createdAt (생성)
+     * - startAt (시작일)
+     * - endAt (종료일)
      * - totalSentAmounts (보낸 금액 총합)
      * - totalReceivedAmounts (받은 금액 총합)
      */

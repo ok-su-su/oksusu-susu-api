@@ -1,9 +1,9 @@
 package com.oksusu.susu.batch.summary.job
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.model.SlackMessageModel
 import com.oksusu.susu.common.extension.format
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
 import com.oksusu.susu.domain.envelope.infrastructure.LedgerRepository
 import com.oksusu.susu.domain.friend.infrastructure.FriendRepository
@@ -12,7 +12,6 @@ import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import com.oksusu.susu.domain.user.infrastructure.UserWithdrawRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.slf4j.MDCContext
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -33,8 +32,7 @@ class SusuStatisticsDailySummaryJob(
         val now = LocalDateTime.now()
         val beforeOneDay = now.minusDays(1)
 
-        parZip(
-            Dispatchers.IO + MDCContext(),
+        parZipWithMDC(
             { withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { envelopeRepository.count() } },
@@ -79,7 +77,7 @@ class SusuStatisticsDailySummaryJob(
                 """
                 *일단위 통계 알림${now.format("yyyyMMdd HH:mm:ss")}*
                 - 전날 종합 api 호출수 : $systemActionLogCount
-                - 전날 종합  유저 가입수 : $userCount
+                - 전날 종합 유저 가입수 : $userCount
                 - 전날 종합 봉투 생성수 : $dailyEnvelopeCount
                 - 전체 봉투 생성수 : $totalEnvelopeCount
                 - 전날 종합 장부 생성수 : $dailyLedgerCount

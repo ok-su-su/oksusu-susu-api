@@ -79,7 +79,11 @@ class UserService(
 
     suspend fun getUserAndUserStatus(uid: Long): UserAndUserStatusModel {
         return withMDCContext(Dispatchers.IO) {
-            userRepository.getUserAndUserStatus(uid)
-        } ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
+            getUserAndUserStatusSync(uid)
+        }
+    }
+
+    fun getUserAndUserStatusSync(uid: Long): UserAndUserStatusModel {
+        return userRepository.getUserAndUserStatus(uid) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 }

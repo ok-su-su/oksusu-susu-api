@@ -17,7 +17,7 @@ data class GetTermResponse(
             return GetTermResponse(
                 id = term.id,
                 title = term.title,
-                description = term.description,
+                description = term.description ?: "",
                 isEssential = term.isEssential
             )
         }

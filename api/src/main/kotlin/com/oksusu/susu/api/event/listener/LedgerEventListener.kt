@@ -1,19 +1,19 @@
 package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.category.application.CategoryAssignmentService
+import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.event.model.DeleteLedgerEvent
+import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
-@Component
+@SusuEventListener
 class LedgerEventListener(
     private val envelopeService: EnvelopeService,
     private val categoryAssignmentService: CategoryAssignmentService,
@@ -21,7 +21,7 @@ class LedgerEventListener(
 ) {
     @TransactionalEventListener
     fun handel(event: DeleteLedgerEvent) {
-        CoroutineScope(Dispatchers.IO + Job()).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
             val envelopes = envelopeService.findAllByLedgerId(event.ledger.id)
             val envelopeIds = envelopes.map { envelope -> envelope.id }
 

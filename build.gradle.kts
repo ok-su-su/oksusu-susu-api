@@ -129,6 +129,8 @@ subprojects {
         testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST}")
         testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST}")
         testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION}")
+        testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:${DependencyVersion.FIXTURE_MONKEY}")
+        testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependencyVersion.COROUTINE_TEST}")
     }
 
     tasks.getByName("bootJar") {

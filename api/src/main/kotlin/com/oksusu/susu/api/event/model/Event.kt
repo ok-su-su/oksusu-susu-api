@@ -3,6 +3,7 @@ package com.oksusu.susu.api.event.model
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
+import com.oksusu.susu.common.consts.MDC_KEY_TRACE_ID
 import com.oksusu.susu.common.extension.mapper
 import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.domain.term.domain.TermAgreement
@@ -10,6 +11,7 @@ import com.oksusu.susu.domain.term.domain.vo.TermAgreementChangeType
 import com.oksusu.susu.domain.user.domain.UserDevice
 import com.oksusu.susu.domain.user.domain.UserStatusHistory
 import com.oksusu.susu.domain.user.domain.UserWithdraw
+import org.slf4j.MDC
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.server.ServerWebExchange
 import java.time.LocalDateTime
@@ -18,6 +20,7 @@ sealed interface Event
 
 open class BaseEvent(
     val publishAt: LocalDateTime = LocalDateTime.now(),
+    val traceId: String = MDC.getCopyOfContextMap()?.get(MDC_KEY_TRACE_ID) ?: "",
 ) : Event
 
 data class DeleteLedgerEvent(

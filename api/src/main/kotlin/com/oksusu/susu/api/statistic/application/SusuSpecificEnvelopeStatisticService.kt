@@ -1,10 +1,10 @@
 package com.oksusu.susu.api.statistic.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.statistic.model.SusuSpecificEnvelopeStatisticModel
 import com.oksusu.susu.api.statistic.model.vo.SusuEnvelopeStatisticRequest
 import com.oksusu.susu.cache.key.CacheKeyGenerateHelper
 import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatisticRepository
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.common.model.TitleValueModel
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -27,7 +27,7 @@ class SusuSpecificEnvelopeStatisticService(
         val categoryKey = cacheKeyGenerateHelper.getSusuCategoryStatisticKey(request.categoryId)
         val relationshipKey = cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)
 
-        return parZip(
+        return parZipWithMDC(
             { findByKey(ageCategoryRelationshipKey) },
             { findByKey(categoryKey) },
             { findByKey(relationshipKey) }

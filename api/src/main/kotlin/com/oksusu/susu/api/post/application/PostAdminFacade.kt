@@ -1,12 +1,14 @@
 package com.oksusu.susu.api.post.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AdminUser
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.post.domain.vo.PostType
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.slf4j.MDCContext
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
@@ -29,12 +31,13 @@ class PostAdminFacade(
     }
 
     private suspend fun deleteVote(id: Long) {
-        val (vote, options) = parZip(
+        val (vote, options) = parZipWithMDC(
             { voteService.getVote(id) },
             { voteOptionService.getVoteOptions(id) }
         ) { vote, options -> vote to options }
+        val optionIds = options.map { option -> option.id }
 
-        txTemplates.writer.coExecute {
+        txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
             vote.apply { isActive = false }.run {
                 postService.saveSync(this)
             }
@@ -42,7 +45,7 @@ class PostAdminFacade(
             eventPublisher.publishEvent(
                 DeleteVoteCountEvent(
                     postId = vote.id,
-                    optionIds = options.map { option -> option.id }
+                    optionIds = optionIds
                 )
             )
         }

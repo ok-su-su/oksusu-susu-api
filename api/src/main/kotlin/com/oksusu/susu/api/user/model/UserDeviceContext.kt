@@ -35,7 +35,7 @@ interface UserDeviceContext {
     val simState: String?
 }
 
-class UserDeviceContextImpl(
+data class UserDeviceContextImpl(
     override val applicationVersion: String?,
     override val deviceId: String?,
     override val deviceSoftwareVersion: String?,

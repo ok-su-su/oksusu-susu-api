@@ -2,7 +2,7 @@ package com.oksusu.susu.cache.model
 
 import com.oksusu.susu.common.model.TitleValueModel
 
-class SusuEnvelopeStatisticCacheModel(
+data class SusuEnvelopeStatisticCacheModel(
     /** 최근 사용 금액 */
     val recentSpent: List<TitleValueModel<Long>>?,
     /** 경조사비를 가장 많이 쓴 달 */

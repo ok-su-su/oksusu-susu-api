@@ -3,7 +3,7 @@ package com.oksusu.susu.domain.post.infrastructure.repository.model
 import org.springframework.data.domain.Pageable
 
 /** 투표 조회 조건 */
-class GetVoteSpec(
+data class GetVoteSpec(
     /** 유저 id */
     val uid: Long,
     /** 투표 검색 조건 */

@@ -19,8 +19,6 @@ class VoteValidateService(
         val createVoteForm = postConfig.createVoteForm
         val createVoteOptionForm = postConfig.createVoteOptionForm
 
-        logger.info { request.content.length }
-
         if (request.content.length !in createPostForm.minContentLength..createPostForm.maxContentLength) {
             throw InvalidRequestException(ErrorCode.INVALID_POST_CONTENT_ERROR)
         }

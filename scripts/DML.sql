@@ -12,15 +12,15 @@ VALUES ('기타', NULL, 1);
 
 -- category
 INSERT INTO susu.category (seq, name, is_active, style)
-VALUES (1, '결혼식', 1, );
+VALUES (1, '결혼식', 1, '#FFA500');
 INSERT INTO susu.category (seq, name, is_active, style)
-VALUES (2, '돌잔치', 1);
+VALUES (2, '돌잔치', 1, '#FFA500');
 INSERT INTO susu.category (seq, name, is_active, style)
-VALUES (3, '장례식', 1);
+VALUES (3, '장례식', 1, '#242424');
 INSERT INTO susu.category (seq, name, is_active, style)
-VALUES (4, '생일 기념일', 1);
+VALUES (4, '생일 기념일', 1, '#007BFF');
 INSERT INTO susu.category (seq, name, is_active, style)
-VALUES (5, '기타', 1);
+VALUES (5, '기타', 1, '#D0D0D0');
 
 -- term
 INSERT INTO susu.term (title, description, is_essential, is_active)
@@ -81,3 +81,7 @@ INSERT INTO susu.count (id, target_id, target_type, count_type, count)
 VALUES (4, 3, 1, 0, 0);
 INSERT INTO susu.count (id, target_id, target_type, count_type, count)
 VALUES (5, 4, 1, 0, 0);
+
+-- application metadata
+INSERT INTO susu.application_metadata (id, application_version, forced_update_date, is_active)
+VALUES (1, "1.0.0", "2024-02-18 20:14:25", 1)

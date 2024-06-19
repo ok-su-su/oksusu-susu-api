@@ -1,6 +1,5 @@
 -- scheme
-CREATE
-DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- 유저 정보
 CREATE TABLE `user`
@@ -237,6 +236,8 @@ CREATE TABLE `term`
     `modified_at`  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보';
+ALTER TABLE term ADD (`seq` int NOT NULL COMMENT '노출 순서');
+ALTER TABLE term MODIFY `description` text NULL;
 
 -- 약관 정보 동의
 CREATE TABLE `term_agreement`

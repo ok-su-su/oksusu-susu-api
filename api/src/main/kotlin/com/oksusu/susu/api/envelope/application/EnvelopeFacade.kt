@@ -1,6 +1,5 @@
 package com.oksusu.susu.api.envelope.application
 
-import arrow.fx.coroutines.parZip
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.category.application.CategoryAssignmentService
 import com.oksusu.susu.api.category.application.CategoryService
@@ -23,6 +22,7 @@ import com.oksusu.susu.api.friend.model.FriendModel
 import com.oksusu.susu.api.friend.model.FriendRelationshipModel
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.category.domain.CategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.domain.common.extension.coExecute
@@ -40,21 +40,21 @@ import org.springframework.stereotype.Service
 
 @Service
 class EnvelopeFacade(
-    private val envelopeService: com.oksusu.susu.api.envelope.application.EnvelopeService,
+    private val envelopeService: EnvelopeService,
     private val friendService: FriendService,
     private val relationshipService: RelationshipService,
     private val categoryService: CategoryService,
     private val categoryAssignmentService: CategoryAssignmentService,
-    private val ledgerService: com.oksusu.susu.api.envelope.application.LedgerService,
+    private val ledgerService: LedgerService,
     private val friendRelationshipService: FriendRelationshipService,
     private val txTemplates: TransactionTemplates,
     private val publisher: ApplicationEventPublisher,
-    private val envelopeValidateService: com.oksusu.susu.api.envelope.application.EnvelopeValidateService,
+    private val envelopeValidateService: EnvelopeValidateService,
 ) {
     suspend fun create(user: AuthUser, request: CreateAndUpdateEnvelopeRequest): CreateAndUpdateEnvelopeResponse {
         envelopeValidateService.validateEnvelopeRequest(request)
 
-        return parZip(
+        return parZipWithMDC(
             { friendService.findByIdAndUidOrThrow(request.friendId, user.uid) },
             { friendRelationshipService.findByFriendIdOrThrow(request.friendId) },
             {
@@ -226,7 +226,7 @@ class EnvelopeFacade(
         val friendIds = response.content.map { envelope -> envelope.friendId }
         val envelopeIds = response.content.map { envelope -> envelope.id }
 
-        return parZip(
+        return parZipWithMDC(
             {
                 when (request.includeFriend) {
                     true -> friendService.findAllByIdIn(friendIds)
