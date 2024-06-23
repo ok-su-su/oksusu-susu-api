@@ -8,23 +8,25 @@ import org.springframework.stereotype.Component
 
 @Component
 class CacheKeyGenerateHelper {
-    suspend fun getUserStatisticKey(uid: Long): String {
-        return "$USER_STATISTIC_KEY_PREFIX$uid"
-    }
+    companion object{
+        fun getUserStatisticKey(uid: Long): String {
+            return "$USER_STATISTIC_KEY_PREFIX$uid"
+        }
 
-    suspend fun getSusuSpecificStatisticKey(age: Long, categoryId: Long, relationshipId: Long): String {
-        return "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_KEY_PREFIX$age:$categoryId:$relationshipId"
-    }
+        fun getSusuSpecificStatisticKey(age: Long, categoryId: Long, relationshipId: Long): String {
+            return "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_KEY_PREFIX$age:$categoryId:$relationshipId"
+        }
 
-    suspend fun getSusuSpecificStatisticKey(key: String): String {
-        return "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_KEY_PREFIX$key"
-    }
+        fun getSusuSpecificStatisticKey(key: String): String {
+            return "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_KEY_PREFIX$key"
+        }
 
-    suspend fun getSusuCategoryStatisticKey(id: Long): String {
-        return "$SUSU_CATEGORY_ENVELOPE_STATISTIC_KEY_PREFIX$id"
-    }
+        fun getSusuCategoryStatisticKey(id: Long): String {
+            return "$SUSU_CATEGORY_ENVELOPE_STATISTIC_KEY_PREFIX$id"
+        }
 
-    suspend fun getSusuRelationshipStatisticKey(id: Long): String {
-        return "$SUSU_RELATIONSHIP_ENVELOPE_STATISTIC_KEY_PREFIX$id"
+        fun getSusuRelationshipStatisticKey(id: Long): String {
+            return "$SUSU_RELATIONSHIP_ENVELOPE_STATISTIC_KEY_PREFIX$id"
+        }
     }
 }
