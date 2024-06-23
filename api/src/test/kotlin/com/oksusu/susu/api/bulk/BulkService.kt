@@ -7,7 +7,6 @@ import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.internal.closeQuietly
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -89,13 +88,13 @@ class BulkService(
                     }
 
                     val sql = """
-                        insert into post(board_id, content, created_at, is_active, modified_at, title, type, uid) 
+                        insert into susu.post(board_id, content, created_at, is_active, modified_at, title, type, uid) 
                         values (:board_id, :content, :created_at, :is_active, :modified_at, :title, :type, :uid) 
                     """.trimIndent()
                     jdbcTemplate.batchUpdate(sql, convertToPost(lines, firstBoardId, firstUserId))
                 }
             } finally {
-                iterator.closeQuietly()
+                iterator.close()
             }
         }
         return dataSize
@@ -140,13 +139,13 @@ class BulkService(
                     }
 
                     val sql = """
-                        insert into vote_option(content, created_at, modified_at, post_id, seq) 
+                        insert into susu.vote_option(content, created_at, modified_at, post_id, seq) 
                         values (:content, :created_at, :modified_at, :post_id, :seq) 
                     """.trimIndent()
                     jdbcTemplate.batchUpdate(sql, convertToVoteOption(lines, firstPostId))
                 }
             } finally {
-                iterator.closeQuietly()
+                iterator.close()
             }
         }
         return dataSize
@@ -188,13 +187,13 @@ class BulkService(
                     }
 
                     val sql = """
-                        insert into `count`(count, count_type, created_at, modified_at, target_id, target_type)
+                        insert into susu.count(count, count_type, created_at, modified_at, target_id, target_type)
                         values (:count, :count_type, :created_at, :modified_at, :target_id, :target_type)
                     """.trimIndent()
                     jdbcTemplate.batchUpdate(sql, convertToCount(lines, firstPostId, firstVoteOptionId))
                 }
             } finally {
-                iterator.closeQuietly()
+                iterator.close()
             }
         }
         return dataSize

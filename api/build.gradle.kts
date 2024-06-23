@@ -24,9 +24,6 @@ dependencies {
     implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}"))
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
 
-    /** slack */
-    implementation("com.slack.api:slack-api-client:${DependencyVersion.SLACK_API}")
-
     /** sentry */
     implementation(platform("io.sentry:sentry-bom:${DependencyVersion.SENTRY}"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")

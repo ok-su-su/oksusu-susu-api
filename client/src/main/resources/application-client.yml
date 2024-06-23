@@ -3,11 +3,8 @@
 # ===================================================================
 slack:
   webhook:
-    error:
-      url: ${SLACK_ALARM_ERROR_URL}
-      text: ${SLACK_ALARM_ERROR_TEXT}
-      user-name: ${SLACK_ALARM_ERROR_USERNAME}
     summary-token: ${SLACK_SUMMARY_TOKEN}
+    error-token: ${SLACK_ERROR_TOKEN}
     warning-log-token: ${SLACK_WARNING_LOG_TOKEN}
 
 # OAUTH
