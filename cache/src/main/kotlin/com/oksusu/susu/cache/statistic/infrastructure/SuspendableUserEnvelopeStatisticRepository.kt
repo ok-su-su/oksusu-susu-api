@@ -7,7 +7,6 @@ import com.oksusu.susu.cache.service.CacheService
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
 import org.springframework.stereotype.Repository
 
-
 @Repository
 class SuspendableUserEnvelopeStatisticRepository(
     private val cacheService: CacheService,

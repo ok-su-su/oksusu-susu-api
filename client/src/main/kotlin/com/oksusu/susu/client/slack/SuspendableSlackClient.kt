@@ -20,7 +20,7 @@ class SuspendableSlackClient(
         return sendMessage(message, slackWebhookConfig.errorToken)
     }
 
-    private suspend fun sendMessage(message: SlackMessageModel, token: String):String{
+    private suspend fun sendMessage(message: SlackMessageModel, token: String): String {
         return withMDCContext(Dispatchers.IO) {
             webclient
                 .post()

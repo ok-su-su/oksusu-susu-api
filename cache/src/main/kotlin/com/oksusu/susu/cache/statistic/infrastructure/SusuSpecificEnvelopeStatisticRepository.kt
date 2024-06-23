@@ -5,4 +5,3 @@ interface SusuSpecificEnvelopeStatisticRepository {
 
     suspend fun save(key: String, value: Long)
 }
-

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class CacheKeyGenerateHelper {
-    companion object{
+    companion object {
         fun getUserStatisticKey(uid: Long): String {
             return "$USER_STATISTIC_KEY_PREFIX$uid"
         }

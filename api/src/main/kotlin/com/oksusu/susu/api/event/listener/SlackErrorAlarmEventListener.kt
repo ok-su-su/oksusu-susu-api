@@ -98,7 +98,7 @@ private data class ErrorMessage(
                 - Request Body : $body
                 - Message : $errorMessage
                 - Stack Trace : $errorStack
-                """.trimIndent()
+            """.trimIndent()
         )
     }
 }

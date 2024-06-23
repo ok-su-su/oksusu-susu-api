@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 @Repository
 class SuspendableRefreshTokenRepository(
     private val cacheService: CacheService,
-): RefreshTokenRepository {
+) : RefreshTokenRepository {
     override suspend fun save(value: RefreshToken, ttl: Long) {
         cacheService.set(
             cache = getCache(value.uid.toString(), ttl),
