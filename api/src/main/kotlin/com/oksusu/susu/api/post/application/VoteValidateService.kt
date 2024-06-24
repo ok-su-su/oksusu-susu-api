@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 class VoteValidateService(
     private val postConfig: SusuConfig.PostConfig,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     fun validateCreateVoteRequest(request: CreateVoteRequest) {
         val createPostForm = postConfig.createForm

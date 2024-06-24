@@ -88,7 +88,7 @@ class WebClientFactory {
  * webclient 결과값 디버깅용
  * response body 로깅 필터
  */
-class ResponseLoggingFilter : ExchangeFilterFunction {
+private class ResponseLoggingFilter : ExchangeFilterFunction {
     val logger = KotlinLogging.logger { }
 
     override fun filter(request: ClientRequest, next: ExchangeFunction): Mono<ClientResponse> {

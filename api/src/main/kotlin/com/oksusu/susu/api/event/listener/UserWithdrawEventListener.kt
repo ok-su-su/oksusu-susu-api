@@ -14,7 +14,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 class UserWithdrawEventListener(
     private val userWithdrawService: UserWithdrawService,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createUserWithdrawService(event: CreateUserWithdrawEvent) {

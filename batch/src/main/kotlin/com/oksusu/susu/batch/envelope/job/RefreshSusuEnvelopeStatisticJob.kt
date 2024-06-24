@@ -40,10 +40,9 @@ class RefreshSusuEnvelopeStatisticJob(
     private val ledgerRepository: LedgerRepository,
     private val categoryRepository: CategoryRepository,
     private val relationshipRepository: RelationshipRepository,
-    private val cacheKeyGenerateHelper: CacheKeyGenerateHelper,
     private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun refreshSusuEnvelopeStatistic() {
         logger.info { "start refresh susu statistic" }
@@ -76,7 +75,7 @@ class RefreshSusuEnvelopeStatisticJob(
             { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } }
         ) {
-                /** 봉투 소유 유저 수 */
+            /** 봉투 소유 유저 수 */
                 userCount,
                 envelopHandOverAtMonthCount,
                 relationShipConuts,
@@ -137,7 +136,7 @@ class RefreshSusuEnvelopeStatisticJob(
             parseIntoGroup(totalAmountModels).map { model ->
                 async {
                     susuSpecificEnvelopeStatisticRepository.save(
-                        cacheKeyGenerateHelper.getSusuSpecificStatisticKey(model.key),
+                        CacheKeyGenerateHelper.getSusuSpecificStatisticKey(model.key),
                         model.value
                     )
                 }
@@ -145,7 +144,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
             /** key: susu_category_statistic:categoryId, value: avg */
             totalAmountModels.groupBy { it.categoryId }.map { modelsMap ->
-                val key = cacheKeyGenerateHelper.getSusuCategoryStatisticKey(modelsMap.key)
+                val key = CacheKeyGenerateHelper.getSusuCategoryStatisticKey(modelsMap.key)
 
                 val totalAmounts = modelsMap.value.sumOf { value -> value.totalAmounts }
                 val totalCounts = modelsMap.value.sumOf { value -> value.counts }
@@ -156,7 +155,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
             /** key: susu_relationship_statistic:relationshipId, value: avg */
             totalAmountModels.groupBy { it.relationshipId }.map { modelsMap ->
-                val key = cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(modelsMap.key)
+                val key = CacheKeyGenerateHelper.getSusuRelationshipStatisticKey(modelsMap.key)
 
                 val totalAmounts = modelsMap.value.sumOf { value -> value.totalAmounts }
                 val totalCounts = modelsMap.value.sumOf { value -> value.counts }

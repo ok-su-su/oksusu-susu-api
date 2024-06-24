@@ -14,7 +14,7 @@ import org.springframework.context.event.EventListener
 class StatisticEventListener(
     private val userEnvelopeStatisticService: UserEnvelopeStatisticService,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @EventListener
     fun cacheUserEnvelopStatistic(event: CacheUserEnvelopeStatisticEvent) {

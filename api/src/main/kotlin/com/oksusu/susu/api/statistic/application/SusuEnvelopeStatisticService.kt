@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 class SusuEnvelopeStatisticService(
     private val susuEnvelopeStatisticRepository: SusuEnvelopeStatisticRepository,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun getStatisticOrThrow(): SusuEnvelopeStatistic {
         return getStatisticOrNull() ?: throw FailToExecuteException(ErrorCode.NOT_FOUND_SUSU_STATISTIC_ERROR)

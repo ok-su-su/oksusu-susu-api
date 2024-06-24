@@ -14,18 +14,17 @@ import org.springframework.stereotype.Service
 @Service
 class SusuSpecificEnvelopeStatisticService(
     private val susuSpecificEnvelopeStatisticRepository: SusuSpecificEnvelopeStatisticRepository,
-    private val cacheKeyGenerateHelper: CacheKeyGenerateHelper,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun getStatistic(request: SusuEnvelopeStatisticRequest): SusuSpecificEnvelopeStatisticModel {
-        val ageCategoryRelationshipKey = cacheKeyGenerateHelper.getSusuSpecificStatisticKey(
+        val ageCategoryRelationshipKey = CacheKeyGenerateHelper.getSusuSpecificStatisticKey(
             age = request.age.number,
             categoryId = request.categoryId,
             relationshipId = request.relationshipId
         )
-        val categoryKey = cacheKeyGenerateHelper.getSusuCategoryStatisticKey(request.categoryId)
-        val relationshipKey = cacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)
+        val categoryKey = CacheKeyGenerateHelper.getSusuCategoryStatisticKey(request.categoryId)
+        val relationshipKey = CacheKeyGenerateHelper.getSusuRelationshipStatisticKey(request.relationshipId)
 
         return parZipWithMDC(
             { findByKey(ageCategoryRelationshipKey) },

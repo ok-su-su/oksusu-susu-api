@@ -11,7 +11,7 @@ import java.io.ByteArrayOutputStream
 
 @Service
 class ExcelService {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     /** 제목 입력 */
     fun insertTitle(ws: Worksheet, sheet: Sheet) {

@@ -20,7 +20,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest
 class SentryCaptureExceptionEventListener(
     private val environment: Environment,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @EventListener
     fun execute(event: SentryCaptureExceptionEvent) {

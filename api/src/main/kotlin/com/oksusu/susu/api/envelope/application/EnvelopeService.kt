@@ -32,7 +32,7 @@ class EnvelopeService(
     private val envelopeRepository: EnvelopeRepository,
     private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @Transactional
     fun saveSync(envelope: Envelope): Envelope {

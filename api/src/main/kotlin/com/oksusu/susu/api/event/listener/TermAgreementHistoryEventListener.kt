@@ -15,7 +15,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 class TermAgreementHistoryEventListener(
     private val termAgreementHistoryService: TermAgreementHistoryService,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createTermAgreementHistoryService(event: TermAgreementHistoryCreateEvent) {

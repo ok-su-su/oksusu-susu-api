@@ -14,7 +14,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 class UserStatusHistoryEventListener(
     private val userStatusHistoryRepository: UserStatusHistoryRepository,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createUserStatusHistoryService(event: CreateUserStatusHistoryEvent) {

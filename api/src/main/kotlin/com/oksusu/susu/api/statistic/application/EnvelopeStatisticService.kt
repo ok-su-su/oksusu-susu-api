@@ -23,7 +23,7 @@ class EnvelopeStatisticService(
     private val relationshipService: RelationshipService,
     private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
-    val logger = KotlinLogging.logger {}
+    private val logger = KotlinLogging.logger {}
 
     /** 가장 많이 보낸 금액 */
     suspend fun getMaxSentEnvelope(uid: Long): TitleValueModel<Long>? {
