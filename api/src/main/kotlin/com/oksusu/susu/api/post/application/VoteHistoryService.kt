@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 class VoteHistoryService(
     private val voteHistoryRepository: VoteHistoryRepository,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @Transactional
     fun saveSync(voteHistory: VoteHistory): VoteHistory {

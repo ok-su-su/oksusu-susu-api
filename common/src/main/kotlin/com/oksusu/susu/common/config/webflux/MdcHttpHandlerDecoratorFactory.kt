@@ -15,7 +15,8 @@ import java.util.UUID
  */
 @Component
 class MdcHttpHandlerDecoratorFactory : HttpHandlerDecoratorFactory {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
+
     override fun apply(httpHandler: HttpHandler): HttpHandler {
         return HttpHandler { request, response ->
             val uuid = UUID.randomUUID().toString()

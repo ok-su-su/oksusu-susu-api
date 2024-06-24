@@ -42,7 +42,7 @@ class RefreshSusuEnvelopeStatisticJob(
     private val relationshipRepository: RelationshipRepository,
     private val statisticConfig: SusuConfig.StatisticConfig,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun refreshSusuEnvelopeStatistic() {
         logger.info { "start refresh susu statistic" }
@@ -75,7 +75,7 @@ class RefreshSusuEnvelopeStatisticJob(
             { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } }
         ) {
-                /** 봉투 소유 유저 수 */
+            /** 봉투 소유 유저 수 */
                 userCount,
                 envelopHandOverAtMonthCount,
                 relationShipConuts,

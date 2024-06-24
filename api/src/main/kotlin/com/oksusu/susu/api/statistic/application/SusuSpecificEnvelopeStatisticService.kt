@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 class SusuSpecificEnvelopeStatisticService(
     private val susuSpecificEnvelopeStatisticRepository: SusuSpecificEnvelopeStatisticRepository,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun getStatistic(request: SusuEnvelopeStatisticRequest): SusuSpecificEnvelopeStatisticModel {
         val ageCategoryRelationshipKey = CacheKeyGenerateHelper.getSusuSpecificStatisticKey(

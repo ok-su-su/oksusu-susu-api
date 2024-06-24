@@ -16,7 +16,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 class AuthEventListener(
     private val cacheService: CacheService,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun cacheAppleOidcPublicKeysService(event: CacheAppleOidcPublicKeysEvent) {

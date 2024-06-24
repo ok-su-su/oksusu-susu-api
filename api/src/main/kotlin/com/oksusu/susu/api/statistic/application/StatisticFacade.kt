@@ -25,7 +25,7 @@ class StatisticFacade(
     private val envelopeStatisticService: EnvelopeStatisticService,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun getUserEnvelopeStatistic(user: AuthUser): UserEnvelopeStatisticResponse {
         /** 통계 캐싱 여부 확인 */

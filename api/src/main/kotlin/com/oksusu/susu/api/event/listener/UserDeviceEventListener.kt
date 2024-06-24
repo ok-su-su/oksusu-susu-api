@@ -19,7 +19,7 @@ class UserDeviceEventListener(
     private val userDeviceService: UserDeviceService,
     private val txTemplates: TransactionTemplates,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createUserDevice(event: CreateUserDeviceEvent) {

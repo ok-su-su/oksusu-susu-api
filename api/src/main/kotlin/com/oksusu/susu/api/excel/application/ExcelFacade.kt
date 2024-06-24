@@ -23,7 +23,7 @@ class ExcelFacade(
     private val excelService: ExcelService,
     private val excelDataHelper: ExcelDataHelper,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     companion object {
         const val PAGE_SIZE = 100

@@ -18,7 +18,7 @@ class CountEventListener(
     private val countService: CountService,
     private val txTemplates: TransactionTemplates,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun deleteCount(event: DeleteVoteCountEvent) {

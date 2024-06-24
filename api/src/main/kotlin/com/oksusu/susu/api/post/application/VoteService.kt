@@ -18,7 +18,7 @@ class VoteService(
     private val postService: PostService,
     private val postRepository: PostRepository,
 ) {
-    val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger { }
 
     suspend fun getVoteAndCountExceptBlock(spec: GetVoteSpec): Slice<PostAndVoteCountModel> {
         return withMDCContext(Dispatchers.IO) {
