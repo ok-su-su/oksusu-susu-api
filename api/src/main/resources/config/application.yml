@@ -17,9 +17,6 @@ logging:
 
 # SPRING
 spring:
-  config:
-    import:
-      - classpath:/config/susu-config.yml
   lifecycle:
     timeout-per-shutdown-phase: 5s # format : https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion-duration
   application:

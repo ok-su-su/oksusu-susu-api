@@ -32,7 +32,7 @@ interface FriendRelationshipRepository : JpaRepository<FriendRelationship, Long>
 
 interface FriendRelationshipCustomRepository {
     @Transactional(readOnly = true)
-    suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel>
+    suspend fun countPerRelationshipIdExceptUid(uid: List<Long>): List<CountPerRelationshipIdModel>
 
     @Transactional(readOnly = true)
     suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel>
@@ -52,11 +52,12 @@ class FriendRelationshipCustomRepositoryImpl : FriendRelationshipCustomRepositor
     private val qFriendRelationship = QFriendRelationship.friendRelationship
     private val qRelationShip = QRelationship.relationship
 
-    override suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
+    override suspend fun countPerRelationshipIdExceptUid(uid: List<Long>): List<CountPerRelationshipIdModel> {
         return JPAQuery<FriendRelationship>(entityManager)
             .select(QCountPerRelationshipIdModel(qFriendRelationship.relationshipId, qEnvelope.id.count()))
             .from(qFriendRelationship)
             .join(qEnvelope).on(qFriendRelationship.friendId.eq(qEnvelope.friendId))
+            .where(qEnvelope.uid.notIn(uid))
             .groupBy(qFriendRelationship.relationshipId)
             .fetch()
     }

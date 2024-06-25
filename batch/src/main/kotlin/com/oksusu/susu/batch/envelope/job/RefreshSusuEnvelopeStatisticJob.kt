@@ -5,8 +5,6 @@ import com.oksusu.susu.cache.statistic.domain.SusuEnvelopeStatistic
 import com.oksusu.susu.cache.statistic.infrastructure.SusuEnvelopeStatisticRepository
 import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatisticRepository
 import com.oksusu.susu.common.config.SusuConfig
-import com.oksusu.susu.common.exception.ErrorCode
-import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.common.extension.toStatisticAgeGroup
 import com.oksusu.susu.common.extension.withMDCContext
@@ -41,13 +39,14 @@ class RefreshSusuEnvelopeStatisticJob(
     private val categoryRepository: CategoryRepository,
     private val relationshipRepository: RelationshipRepository,
     private val statisticConfig: SusuConfig.StatisticConfig,
+    private val adminUserConfig: SusuConfig.AdminUserConfig,
 ) {
     private val logger = KotlinLogging.logger { }
 
     suspend fun refreshSusuEnvelopeStatistic() {
         logger.info { "start refresh susu statistic" }
 
-        val (minAmount, maxAmount) = getMaxAndMinAmount()
+        val (minAmount, maxAmount) = getMaxAndMinAmount() //
 
         val from = LocalDate.now().minusMonths(11).atTime(0, 0)
         val to = LocalDate.now().atTime(23, 59)
@@ -55,29 +54,34 @@ class RefreshSusuEnvelopeStatisticJob(
             { withContext(Dispatchers.IO) { envelopeRepository.getUserCountHadEnvelope() } },
             {
                 withContext(Dispatchers.IO) {
-                    envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetween(
+                    envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetweenExceptUid(
                         type = EnvelopeType.SENT,
                         from = from,
                         to = to,
                         minAmount = minAmount,
-                        maxAmount = maxAmount
+                        maxAmount = maxAmount,
+                        uid = adminUserConfig.adminUserUid
                     )
                 }
             },
-            { withContext(Dispatchers.IO) { friendRelationshipRepository.countPerRelationshipId() } },
-            { withContext(Dispatchers.IO) { envelopeRepository.countPerCategoryId() } },
-            { withContext(Dispatchers.IO) { ledgerRepository.countPerCategoryId() } },
+            { withContext(Dispatchers.IO) { friendRelationshipRepository.countPerRelationshipIdExceptUid(adminUserConfig.adminUserUid) } },
+            { withContext(Dispatchers.IO) { envelopeRepository.countPerCategoryIdExceptUid(adminUserConfig.adminUserUid) } },
+            { withContext(Dispatchers.IO) { ledgerRepository.countPerCategoryIdExceptUid(adminUserConfig.adminUserUid) } },
             {
                 withContext(Dispatchers.IO) {
-                    envelopeRepository.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount)
+                    envelopeRepository.getCuttingTotalAmountPerStatisticGroupExceptUid(
+                        minAmount,
+                        maxAmount,
+                        adminUserConfig.adminUserUid
+                    )
                 }
             },
             { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } }
         ) {
-            /** 봉투 소유 유저 수 */
-                userCount,
-                envelopHandOverAtMonthCount,
+                /** 봉투 소유 유저 수 */
+                totalUserCount,
+                envelopeHandOverAtMonthCount,
                 relationShipConuts,
                 envelopeCategoryCounts,
                 ledgerCategoryCounts,
@@ -86,11 +90,12 @@ class RefreshSusuEnvelopeStatisticJob(
                 relationships,
                 categories,
             ->
+            val userCount = totalUserCount - adminUserConfig.adminUserUid.size
             val relationshipMap = relationships.associateBy { relationship -> relationship.id }
             val categoryMap = categories.associateBy { category -> category.id }
 
             /** 최근 사용 금액 1년 */
-            val recentSpent = envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
+            val recentSpent = envelopeHandOverAtMonthCount.takeIf { it.isNotEmpty() }
                 ?.map { count ->
                     TitleValueModel(count.handedOverAtMonth.toString(), count.totalAmounts)
                 }?.sortedBy { model -> model.title }
@@ -172,24 +177,39 @@ class RefreshSusuEnvelopeStatisticJob(
         val susuEnvelopeConfig = statisticConfig.susuEnvelopeConfig
 
         val count = withMDCContext(Dispatchers.IO) {
-            envelopeRepository.count()
+            envelopeRepository.countExceptUid(adminUserConfig.adminUserUid)
         }
 
         val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).roundToLong()
         val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
 
         return parZipWithMDC(
-            { withContext(Dispatchers.IO) { envelopeRepository.getEnvelopeByPositionOrderByAmount(minIdx) } },
-            { withContext(Dispatchers.IO) { envelopeRepository.getEnvelopeByPositionOrderByAmount(maxIdx) } }
+            {
+                withContext(Dispatchers.IO) {
+                    envelopeRepository.getEnvelopeAmountByPositionOrderByAmountExceptUid(
+                        minIdx,
+                        adminUserConfig.adminUserUid
+                    )
+                }
+            },
+            {
+                withContext(Dispatchers.IO) {
+                    envelopeRepository.getEnvelopeAmountByPositionOrderByAmountExceptUid(
+                        maxIdx,
+                        adminUserConfig.adminUserUid
+                    )
+                }
+            }
         ) { min, max ->
-            val minAmount = min.takeIf { it.isNotEmpty() }
-                ?.first()?.amount
-                ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
-            val maxAmount = max.takeIf { it.isNotEmpty() }
-                ?.first()?.amount
-                ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
-
-            minAmount to maxAmount
+//            val minAmount = min.takeIf { it.isNotEmpty() }
+//                ?.first()?.amount
+//                ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
+//            val maxAmount = max.takeIf { it.isNotEmpty() }
+//                ?.first()?.amount
+//                ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
+//
+//            minAmount to maxAmount
+            min to max
         }
     }
 

@@ -19,10 +19,6 @@ class FriendRelationshipService(
         return friendRelationshipRepository.save(friendRelationship)
     }
 
-    suspend fun countPerRelationshipId(): List<CountPerRelationshipIdModel> {
-        return withMDCContext(Dispatchers.IO) { friendRelationshipRepository.countPerRelationshipId() }
-    }
-
     suspend fun countPerRelationshipIdByUid(uid: Long): List<CountPerRelationshipIdModel> {
         return withMDCContext(Dispatchers.IO) { friendRelationshipRepository.countPerRelationshipIdByUid(uid) }
     }

@@ -42,3 +42,10 @@ susu:
     susu-envelope-config:
       min-cutting-average: 0.1
       max-cutting-average: 0.9
+  admin-user-config:
+    admin-user-uid:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5

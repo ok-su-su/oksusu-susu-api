@@ -14,7 +14,8 @@ import kotlin.reflect.full.declaredMemberProperties
     SusuConfig.CategoryConfig::class,
     SusuConfig.PostConfig::class,
     SusuConfig.UserConfig::class,
-    SusuConfig.StatisticConfig::class
+    SusuConfig.StatisticConfig::class,
+    SusuConfig.AdminUserConfig::class
 )
 data class SusuConfig(
     val ledgerConfig: LedgerConfig,
@@ -23,6 +24,7 @@ data class SusuConfig(
     val categoryConfig: CategoryConfig,
     val postConfig: PostConfig,
     val userConfig: UserConfig,
+    val adminUserConfig: AdminUserConfig,
 ) {
     init {
         val logger = KotlinLogging.logger { }
@@ -112,4 +114,9 @@ data class SusuConfig(
             val maxCuttingAverage: Float,
         )
     }
+
+    @ConfigurationProperties(prefix = "susu.admin-user-config")
+    data class AdminUserConfig(
+        val adminUserUid: List<Long>,
+    )
 }

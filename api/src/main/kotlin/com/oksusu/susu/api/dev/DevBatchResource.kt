@@ -1,6 +1,8 @@
 package com.oksusu.susu.api.dev
 
+import com.oksusu.susu.api.auth.model.AdminUser
 import com.oksusu.susu.api.config.web.SwaggerTag
+import com.oksusu.susu.batch.envelope.job.RefreshSusuEnvelopeStatisticJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
 import io.swagger.v3.oas.annotations.Operation
@@ -19,10 +21,13 @@ import org.springframework.web.bind.annotation.RestController
 class DevBatchResource(
     private val susuStatisticsHourSummaryJob: SusuStatisticsHourSummaryJob,
     private val susuStatisticsDailySummaryJob: SusuStatisticsDailySummaryJob,
+    private val susuEnvelopeStatisticJob: RefreshSusuEnvelopeStatisticJob,
 ) {
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "hour summary 호출")
     @GetMapping("/hour-summaries")
-    suspend fun getHourSummaries() {
+    suspend fun getHourSummaries(
+        adminUser: AdminUser,
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             susuStatisticsHourSummaryJob.runHourSummaryJob()
         }
@@ -30,9 +35,21 @@ class DevBatchResource(
 
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "daily summary 호출")
     @GetMapping("/daily-summaries")
-    suspend fun getDailySummaries() {
+    suspend fun getDailySummaries(
+        adminUser: AdminUser,
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             susuStatisticsDailySummaryJob.runDailySummaryJob()
+        }
+    }
+
+    @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "refresh susu envelope statistic 호출")
+    @GetMapping("/refresh-susu-envelope-statistic")
+    suspend fun refreshSusuEnvelopeStatistic(
+        adminUser: AdminUser,
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            susuEnvelopeStatisticJob.refreshSusuEnvelopeStatistic()
         }
     }
 }

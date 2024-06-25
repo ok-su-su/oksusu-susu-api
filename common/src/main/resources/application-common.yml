@@ -2,6 +2,11 @@
 # Spring Boot Configuration for the default profile
 # ===================================================================
 
+spring:
+  config:
+    import:
+      - classpath:/susu-config.yml
+
 ---
 # ===================================================================
 # Spring Boot Configuration for the dev profile
