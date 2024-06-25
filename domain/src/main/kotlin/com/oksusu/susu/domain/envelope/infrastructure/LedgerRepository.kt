@@ -28,6 +28,9 @@ interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository
 
     @Transactional(readOnly = true)
     fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
+
+    @Transactional(readOnly = true)
+    fun findAllByUidIn(uid: List<Long>) : List<Ledger>
 }
 
 interface LedgerCustomRepository {

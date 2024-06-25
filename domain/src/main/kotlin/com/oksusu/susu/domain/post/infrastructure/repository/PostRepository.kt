@@ -29,6 +29,9 @@ interface PostRepository : JpaRepository<Post, Long>, PostCustomRepository {
 
     @Transactional(readOnly = true)
     fun findAllByUid(uid: Long): List<Post>
+
+    @Transactional(readOnly = true)
+    fun findAllByUidIn(uid: List<Long>): List<Post>
 }
 
 interface PostCustomRepository {

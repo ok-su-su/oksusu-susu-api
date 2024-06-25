@@ -5,6 +5,7 @@ import com.oksusu.susu.api.config.web.SwaggerTag
 import com.oksusu.susu.batch.envelope.job.RefreshSusuEnvelopeStatisticJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
+import com.oksusu.susu.batch.user.job.DeleteWithdrawUserDataJob
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +23,7 @@ class DevBatchResource(
     private val susuStatisticsHourSummaryJob: SusuStatisticsHourSummaryJob,
     private val susuStatisticsDailySummaryJob: SusuStatisticsDailySummaryJob,
     private val susuEnvelopeStatisticJob: RefreshSusuEnvelopeStatisticJob,
+    private val deleteWithdrawUserDataJob: DeleteWithdrawUserDataJob,
 ) {
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "hour summary 호출")
     @GetMapping("/hour-summaries")
@@ -50,6 +52,16 @@ class DevBatchResource(
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             susuEnvelopeStatisticJob.refreshSusuEnvelopeStatistic()
+        }
+    }
+
+    @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "delete withdraw user data 호출")
+    @GetMapping("/delete-withdraw-user-data")
+    suspend fun deleteWithdrawUserData(
+        adminUser: AdminUser,
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            deleteWithdrawUserDataJob.deleteWithdrawUserData()
         }
     }
 }
