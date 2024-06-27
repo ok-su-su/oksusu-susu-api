@@ -3,6 +3,7 @@ package com.oksusu.susu.api.dev
 import com.oksusu.susu.api.auth.model.AdminUser
 import com.oksusu.susu.api.config.web.SwaggerTag
 import com.oksusu.susu.batch.envelope.job.RefreshSusuEnvelopeStatisticJob
+import com.oksusu.susu.batch.report.job.ImposeSanctionsAboutReportJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.batch.user.job.DeleteWithdrawUserDataJob
@@ -24,6 +25,7 @@ class DevBatchResource(
     private val susuStatisticsDailySummaryJob: SusuStatisticsDailySummaryJob,
     private val susuEnvelopeStatisticJob: RefreshSusuEnvelopeStatisticJob,
     private val deleteWithdrawUserDataJob: DeleteWithdrawUserDataJob,
+    private val imposeSanctionsAboutReportJob: ImposeSanctionsAboutReportJob,
 ) {
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "hour summary 호출")
     @GetMapping("/hour-summaries")
@@ -62,6 +64,16 @@ class DevBatchResource(
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             deleteWithdrawUserDataJob.deleteWithdrawUserData()
+        }
+    }
+
+    @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "impose sanctions about report 호출")
+    @GetMapping("/impose-sanction-about-report")
+    suspend fun imposeSanctionsAboutReport(
+        adminUser: AdminUser,
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            imposeSanctionsAboutReportJob.imposeSanctionsAboutReport()
         }
     }
 }

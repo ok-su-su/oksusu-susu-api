@@ -13,6 +13,7 @@ import com.oksusu.susu.domain.post.domain.vo.PostType
 import com.oksusu.susu.domain.post.infrastructure.repository.model.*
 import com.oksusu.susu.domain.user.domain.QUser
 import com.querydsl.jpa.impl.JPAQuery
+import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -43,6 +44,9 @@ interface PostCustomRepository {
 
     @Transactional(readOnly = true)
     fun getPostAndCreator(id: Long, type: PostType): PostAndUserModel?
+
+    @Transactional
+    fun updateIsActiveById(ids: List<Long>): Long
 }
 
 class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport(Post::class.java) {
@@ -113,5 +117,13 @@ class PostCustomRepositoryImpl : PostCustomRepository, QuerydslRepositorySupport
                 qPost.isActive.eq(true),
                 qPost.type.eq(type)
             ).fetchFirst()
+    }
+
+    override fun updateIsActiveById(ids: List<Long>): Long {
+        return JPAQueryFactory(entityManager)
+            .update(qPost)
+            .where(qPost.id.`in`(ids))
+            .set(qPost.isActive, false)
+            .execute()
     }
 }
