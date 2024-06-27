@@ -52,11 +52,11 @@ class OAuthService(
     }
 
     /** oauth 유저 회원 탈퇴하기 */
-    suspend fun withdraw(oauthInfo: OauthInfo, code: String?, accessToken: String?) {
+    suspend fun withdraw(oauthInfo: OauthInfo, code: String?, googleAccessToken: String?, appleAccessToken: String?) {
         when (oauthInfo.oAuthProvider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.withdraw(oauthInfo.oAuthId)
-            OAuthProvider.APPLE -> appleOAuthService.withdraw(code!!)
-            OAuthProvider.GOOGLE -> googleOAuthService.withdraw(accessToken!!)
+            OAuthProvider.APPLE -> appleOAuthService.withdraw(googleAccessToken!!)
+            OAuthProvider.GOOGLE -> googleOAuthService.withdraw(appleAccessToken!!)
         }
     }
 }

@@ -39,12 +39,12 @@ class AppleOAuthService(
 
     /** link */
     suspend fun getOAuthLoginLinkDev(): OAuthLoginLinkResponse {
-        val redirectUrl = domainName + appleOAuthUrlConfig.webCallbackUrl
+        val redirectUrl = domainName + appleOAuthUrlConfig.devCallbackUrl
         return OAuthLoginLinkResponse(
             appleOAuthUrlConfig.appleIdUrl +
                 String.format(
                     appleOAuthUrlConfig.authorizeUrl,
-                    appleOAuthSecretConfig.webClientId,
+                    appleOAuthSecretConfig.clientId,
                     redirectUrl
                 )
         )
@@ -64,7 +64,7 @@ class AppleOAuthService(
 
     /** oauth token 받아오기 */
     suspend fun getOAuthTokenDev(code: String): OAuthTokenResponse {
-        val redirectUrl = domainName + appleOAuthUrlConfig.redirectUrl
+        val redirectUrl = domainName + appleOAuthUrlConfig.devCallbackUrl
         return getAppleToken(redirectUrl, code, appleOAuthSecretConfig.clientId, getClientSecretDev())
     }
 
@@ -96,11 +96,6 @@ class AppleOAuthService(
         return OAuthUserInfoDto.fromApple(oidcDecodePayload.sub)
     }
 
-    suspend fun getAppleOAuthInfoDev(idToken: String): OAuthUserInfoDto {
-        val oidcDecodePayload = getOIDCDecodePayloadDev(idToken)
-        return OAuthUserInfoDto.fromApple(oidcDecodePayload.sub)
-    }
-
     /**
      * oidc decode
      */
@@ -110,16 +105,6 @@ class AppleOAuthService(
             token,
             appleOAuthUrlConfig.appleIdUrl,
             appleOAuthSecretConfig.clientId,
-            oidcPublicKeysResponse
-        )
-    }
-
-    private suspend fun getOIDCDecodePayloadDev(token: String): OidcDecodePayload {
-        val oidcPublicKeysResponse = oidcService.getOidcPublicKeys(OAuthProvider.APPLE)
-        return oidcService.getPayloadFromIdToken(
-            token,
-            appleOAuthUrlConfig.appleIdUrl,
-            appleOAuthSecretConfig.webClientId,
             oidcPublicKeysResponse
         )
     }
@@ -145,7 +130,7 @@ class AppleOAuthService(
     }
 
     private fun getClientSecretDev(): String {
-        return createClientSecret(appleOAuthSecretConfig.webClientId)
+        return createClientSecret(appleOAuthSecretConfig.clientId)
     }
 
     private fun createClientSecret(clientId: String): String {
@@ -157,7 +142,7 @@ class AppleOAuthService(
         val unsignedJWT = JWT.create().apply {
             this.withHeader(headers)
             this.withIssuer(appleOAuthSecretConfig.teamId)
-            this.withAudience(appleOAuthSecretConfig.authKey)
+            this.withAudience(appleOAuthUrlConfig.appleIdUrl)
             this.withIssuedAt(iat)
             this.withExpiresAt(exp)
             this.withSubject(clientId)

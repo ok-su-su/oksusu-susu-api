@@ -39,18 +39,13 @@ class OAuthUrlConfig(
 
     @ConfigurationProperties(prefix = "oauth-url.apple")
     class AppleOAuthUrlConfig(
-        val appleIdUrl: String, // https://appleid.apple.com
-        val redirectUrl: String, // https://www.allchive.co.kr/api/auth/oauth/login/APPLE/dev
-        val webCallbackUrl: String, // apple/callback
+        val appleIdUrl: String,
+        val devCallbackUrl: String,
         val withdrawCallbackUrl: String,
         val authorizeUrl: String,
-        // /auth/authorize?client_id=%s&redirect_uri=%s&response_type=code
         val tokenUrl: String,
-        // /auth/token?grant_type=authorization_code&client_id=%s&redirect_uri=%s&code=%s&client_secret=%s
         val oidcKeyUrl: String,
-        // /auth/keys
         val withdrawUrl: String,
-        // /auth/revoke
     )
 
     @ConfigurationProperties(prefix = "oauth-url.google")

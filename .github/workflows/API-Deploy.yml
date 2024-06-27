@@ -2,7 +2,7 @@ name: API Deploy
 
 on:
   push:
-    branches: ['main']
+    branches: ['main', 'fix/MZ-298']
 #    tags:
 #      - v*.*.*
 
