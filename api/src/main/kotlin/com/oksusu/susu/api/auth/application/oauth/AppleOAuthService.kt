@@ -137,7 +137,7 @@ class AppleOAuthService(
         val iat = Date().toInstant()
         val exp = Date(iat.epochSecond + 3600000).toInstant()
 
-        val headers = mapOf("alg" to "ES256", "kid" to appleOAuthSecretConfig.keyId)
+        val headers = mapOf("kid" to appleOAuthSecretConfig.keyId)
 
         val unsignedJWT = JWT.create().apply {
             this.withHeader(headers)
