@@ -320,6 +320,7 @@ CREATE TABLE `report_result`
 CREATE INDEX idx__uid ON report_result (uid);
 ALTER TABLE report_result ADD (`target_type` varchar(128) NOT NULL COMMENT '신고 대상');
 ALTER TABLE report_result CHANGE COLUMN `uid` `target_id` bigint NOT NULL COMMENT '신고 대상 id';
+ALTER TABLE report_result CHANGE COLUMN `status` `status` varchar (128) NOT NULL COMMENT '신고 결과 상태';
 DROP INDEX idx__uid ON report_result;
 CREATE INDEX idx__target_id__target_type ON report_result (target_id, target_type);
 

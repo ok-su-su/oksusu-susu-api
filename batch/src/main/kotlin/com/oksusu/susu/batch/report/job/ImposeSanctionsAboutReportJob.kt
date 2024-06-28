@@ -3,6 +3,7 @@ package com.oksusu.susu.batch.report.job
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.cache.key.Cache
 import com.oksusu.susu.cache.service.CacheService
+import com.oksusu.susu.common.extension.merge
 import com.oksusu.susu.domain.post.infrastructure.repository.PostRepository
 import com.oksusu.susu.domain.report.domain.ReportResult
 import com.oksusu.susu.domain.report.domain.vo.ReportResultStatus
@@ -36,7 +37,27 @@ class ImposeSanctionsAboutReportJob(
         private const val REPORT_BEFORE_DAYS = 1L
     }
 
-    suspend fun imposeSanctionsAboutReport() {
+    /** 서비스 시작 시점부터 지금까지의 report 카운트를 처리합니다. */
+    suspend fun updateReportCount() {
+        val reports = withContext(Dispatchers.IO) { reportHistoryRepository.findAll() }
+
+        val userReports = reports.filter { report -> report.targetType == ReportTargetType.USER }
+            .groupBy { it.targetId }
+            .mapValues { it.value.size.toLong() }
+        val postReports = reports.filter { report -> report.targetType == ReportTargetType.POST }
+            .groupBy { it.targetId }
+            .mapValues { it.value.size.toLong() }
+
+        /** 기록을 캐싱한다. */
+        coroutineScope {
+            val cacheUserReportCountDeferred = async { cacheService.set(Cache.getUserReportCountCache(), userReports) }
+            val cachePostReportCountDeferred = async { cacheService.set(Cache.getPostReportCountCache(), postReports) }
+
+            awaitAll(cacheUserReportCountDeferred, cachePostReportCountDeferred)
+        }
+    }
+
+    suspend fun imposeSanctionsAboutReportForDay() {
         logger.info { "start impose sanction about report" }
 
         /** 제재 완료 유저 석방 */
@@ -45,10 +66,19 @@ class ImposeSanctionsAboutReportJob(
         /** 제재 대상 식별 */
         val (punishUids, punishPostIds) = getPunishTargetIds()
 
+        /** 제재 */
+        punish(punishUids, punishPostIds)
+
+        logger.info { "finish impose sanction about report" }
+    }
+
+    suspend fun punish(punishUids: List<Long>, punishPostIds: List<Long>) {
         val reportResults = mutableListOf<ReportResult>()
+        val histories = mutableListOf<UserStatusHistory>()
+
         /** 게시물 제재 */
         punishPostIds.forEach { id ->
-            reportResults.plus(
+            reportResults.add(
                 ReportResult(
                     targetId = id,
                     targetType = ReportTargetType.POST,
@@ -58,8 +88,6 @@ class ImposeSanctionsAboutReportJob(
         }
 
         /** 유저 제재 */
-        val histories = mutableListOf<UserStatusHistory>()
-
         val updatedStatuses = parZip(
             { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(punishUids) } }
@@ -68,17 +96,17 @@ class ImposeSanctionsAboutReportJob(
                 userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.RESTRICTED_7_DAYS }.id
 
             statuses.map { status ->
-                histories.plus(
+                histories.add(
                     UserStatusHistory(
                         uid = status.uid,
-                        statusAssignmentType = UserStatusAssignmentType.ACCOUNT,
-                        fromStatusId = status.accountStatusId,
+                        statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
+                        fromStatusId = status.communityStatusId,
                         toStatusId = restrict7DaysUserStatusId,
                         isForced = true,
                     )
                 )
 
-                reportResults.plus(
+                reportResults.add(
                     ReportResult(
                         targetId = status.uid,
                         targetType = ReportTargetType.USER,
@@ -87,7 +115,7 @@ class ImposeSanctionsAboutReportJob(
                 )
 
                 status.apply {
-                    this.accountStatusId = restrict7DaysUserStatusId
+                    this.communityStatusId = restrict7DaysUserStatusId
                 }
             }
         }
@@ -100,8 +128,6 @@ class ImposeSanctionsAboutReportJob(
 
             awaitAll(updatePostDeferred, reportResultDeferred, statusDeferred, statusHistoryDeferred)
         }
-
-        logger.info { "finish impose sanction about report" }
     }
 
     suspend fun freePunishedUsers() {
@@ -113,25 +139,29 @@ class ImposeSanctionsAboutReportJob(
             .map { result -> result.targetId }
 
         /** RESTRICTED_7_DAYS 제재 해제 */
-        val userStatus = withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) }
-        val statuses = withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(freeUid) }
-
-        val activeUserStatusId = userStatus.first { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }.id
-
         val histories = mutableListOf<UserStatusHistory>()
-        val updatedStatuses = statuses.map { status ->
-            histories.plus(
-                UserStatusHistory(
-                    uid = status.uid,
-                    statusAssignmentType = UserStatusAssignmentType.ACCOUNT,
-                    fromStatusId = status.accountStatusId,
-                    toStatusId = activeUserStatusId,
-                    isForced = true,
-                )
-            )
 
-            status.apply {
-                this.accountStatusId = activeUserStatusId
+        val updatedStatuses = parZip(
+            { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
+            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(freeUid) } }
+        ) { userStatus, statuses ->
+            val activeUserStatusId =
+                userStatus.first { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }.id
+
+            statuses.map { status ->
+                histories.add(
+                    UserStatusHistory(
+                        uid = status.uid,
+                        statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
+                        fromStatusId = status.communityStatusId,
+                        toStatusId = activeUserStatusId,
+                        isForced = true,
+                    )
+                )
+
+                status.apply {
+                    this.communityStatusId = activeUserStatusId
+                }
             }
         }
 
@@ -153,18 +183,19 @@ class ImposeSanctionsAboutReportJob(
         ) { reports, userReportHistory, postReportHistory ->
             /** 일주일간 기록과 7일 전까지의 기록을 병합한다 */
             val userReports = reports.filter { report -> report.targetType == ReportTargetType.USER }
-                .groupBy { it.uid }
+                .groupBy { it.targetId }
                 .mapValues { it.value.size.toLong() }
-                .plus(userReportHistory ?: emptyMap())
+                .merge(userReportHistory!!)
                 .toMutableMap()
+
             val postReports = reports.filter { report -> report.targetType == ReportTargetType.POST }
-                .groupBy { it.uid }
+                .groupBy { it.targetId }
                 .mapValues { it.value.size.toLong() }
-                .plus(postReportHistory ?: emptyMap())
+                .merge(postReportHistory!!)
 
             /** 5회 이상인 유저 게시물을 찾는다. */
-            val punishUids = userReports.filter { it.value / 5 >= 0 }.map { report -> report.key }
-            val punishPostIds = userReports.filter { it.value / 5 >= 0 }.map { report -> report.key }
+            val punishUids = userReports.filter { it.value / 5 > 0 }.map { report -> report.key }
+            val punishPostIds = postReports.filter { it.value / 5 > 0 }.map { report -> report.key }
 
             /** 유저 기록의 경우 초기화한다. */
             for (uid in punishUids) {

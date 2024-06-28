@@ -30,43 +30,67 @@ class DeleteWithdrawUserDataJob(
         private const val DELETE_CHUNK = 1000
     }
 
+    /** 기간 지정 없이 생성부터 지금까지 모든 데이터에 대해 삭제합니다. */
     suspend fun deleteWithdrawUserData() {
         logger.info { "start delete withdraw user data" }
 
-        val deletedUserStatusId = getDeletedUserStatusId()
-        val targetDate = LocalDateTime.now().minusDays(DELETE_BEFORE_DAYS)
+        val targetUserStatusId = getTargetUserStatusId()
 
         /** 삭제된 uid */
-        val deletedUids = getDeletedUids(deletedUserStatusId, targetDate)
+        val targetUids = getDeletedUids(targetUserStatusId)
 
-        coroutineScope {
-            /** 삭제 유저의 봉투 삭제 */
-            val deleteEnvelopesDeferred = async { deleteEnvelopes(deletedUids) }
-
-            /** 삭제 유저의 장부 삭제 */
-            val deleteLedgersDeferred = async { deleteLedgers(deletedUids) }
-
-            /** 삭제 유저의 친구 및 친구 관계 삭제 */
-            val deleteFriendsDeferred = async { deleteFriends(deletedUids) }
-
-            /** 삭제 유저의 게시물 삭제 */
-            val deletePostsDeferred = async { deletePosts(deletedUids) }
-
-            awaitAll(deleteEnvelopesDeferred, deleteLedgersDeferred, deleteFriendsDeferred, deletePostsDeferred)
-        }
+        deleteData(targetUids)
 
         logger.info { "finish delete withdraw user data" }
     }
 
-    suspend fun getDeletedUserStatusId(): Long {
+    suspend fun deleteWithdrawUserDataForWeek() {
+        logger.info { "start delete withdraw user data for week" }
+
+        val targetUserStatusId = getTargetUserStatusId()
+        val targetDate = LocalDateTime.now().minusDays(DELETE_BEFORE_DAYS)
+
+        /** 삭제 대상 uid */
+        val targetUids = getDeletedUidsAfter(targetUserStatusId, targetDate)
+
+        deleteData(targetUids)
+
+        logger.info { "finish delete withdraw user data for week" }
+    }
+
+    suspend fun deleteData(targetUids: List<Long>){
+        coroutineScope {
+            /** 삭제 유저의 봉투 삭제 */
+            val deleteEnvelopesDeferred = async { deleteEnvelopes(targetUids) }
+
+            /** 삭제 유저의 장부 삭제 */
+            val deleteLedgersDeferred = async { deleteLedgers(targetUids) }
+
+            /** 삭제 유저의 친구 및 친구 관계 삭제 */
+            val deleteFriendsDeferred = async { deleteFriends(targetUids) }
+
+            /** 삭제 유저의 게시물 삭제 */
+            val deletePostsDeferred = async { deletePosts(targetUids) }
+
+            awaitAll(deleteEnvelopesDeferred, deleteLedgersDeferred, deleteFriendsDeferred, deletePostsDeferred)
+        }
+    }
+
+    suspend fun getTargetUserStatusId(): Long {
         return withContext(Dispatchers.IO) {
             userStatusTypeRepository.findAllByIsActive(true)
         }.first { type -> type.statusTypeInfo == UserStatusTypeInfo.DELETED }.id
     }
 
-    suspend fun getDeletedUids(deletedUserStatusId: Long, targetDate: LocalDateTime): List<Long> {
+    suspend fun getDeletedUidsAfter(targetUserStatusId: Long, targetDate: LocalDateTime): List<Long> {
         return withContext(Dispatchers.IO) {
-            userStatusHistoryRepository.getUidByToStatusIdAfter(deletedUserStatusId, targetDate)
+            userStatusHistoryRepository.getUidByToStatusIdAfter(targetUserStatusId, targetDate)
+        }
+    }
+
+    suspend fun getDeletedUids(targetUserStatusId: Long): List<Long> {
+        return withContext(Dispatchers.IO) {
+            userStatusHistoryRepository.getUidByToStatusId(targetUserStatusId)
         }
     }
 

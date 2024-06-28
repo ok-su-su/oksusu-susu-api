@@ -12,9 +12,9 @@ class ReportScheduler(
     private val imposeSanctionsAboutReportJob: ImposeSanctionsAboutReportJob,
 ) {
     @Scheduled(cron = "0 0 0 * * *")
-    fun imposeSanctionsAboutReport(){
+    fun imposeSanctionsAboutReportForDay(){
         CoroutineScope(Dispatchers.IO).launch {
-            imposeSanctionsAboutReportJob.imposeSanctionsAboutReport()
+            imposeSanctionsAboutReportJob.imposeSanctionsAboutReportForDay()
         }
     }
 }
