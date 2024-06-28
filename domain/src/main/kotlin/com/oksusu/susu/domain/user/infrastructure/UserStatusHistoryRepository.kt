@@ -15,7 +15,6 @@ import java.time.LocalDateTime
 @Repository
 interface UserStatusHistoryRepository : JpaRepository<UserStatusHistory, Long>, UserStatusHistoryCustomRepository
 
-
 interface UserStatusHistoryCustomRepository {
     @Transactional(readOnly = true)
     fun getUidByToStatusIdAfter(toStatusId: Long, targetDate: LocalDateTime): List<Long>
@@ -51,7 +50,7 @@ class UserStatusHistoryCustomRepositoryImpl : UserStatusHistoryCustomRepository,
             .select(qUserStatusHistory.uid)
             .from(qUserStatusHistory)
             .where(
-                qUserStatusHistory.toStatusId.eq(toStatusId),
+                qUserStatusHistory.toStatusId.eq(toStatusId)
             )
             .fetch()
     }

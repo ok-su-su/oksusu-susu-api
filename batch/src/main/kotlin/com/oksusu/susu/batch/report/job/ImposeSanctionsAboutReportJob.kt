@@ -66,6 +66,8 @@ class ImposeSanctionsAboutReportJob(
         /** 제재 대상 식별 */
         val (punishUids, punishPostIds) = getPunishTargetIds()
 
+        logger.info { "$punishUids 유저 제재 및 $punishPostIds 게시글 삭제" }
+
         /** 제재 */
         punish(punishUids, punishPostIds)
 
@@ -102,7 +104,7 @@ class ImposeSanctionsAboutReportJob(
                         statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
                         fromStatusId = status.communityStatusId,
                         toStatusId = restrict7DaysUserStatusId,
-                        isForced = true,
+                        isForced = true
                     )
                 )
 
@@ -138,6 +140,8 @@ class ImposeSanctionsAboutReportJob(
             .filter { report -> report.status == ReportResultStatus.RESTRICTED_7_DAYS && report.targetType == ReportTargetType.USER }
             .map { result -> result.targetId }
 
+        logger.info { "$freeUid 유저 석방" }
+
         /** RESTRICTED_7_DAYS 제재 해제 */
         val histories = mutableListOf<UserStatusHistory>()
 
@@ -155,7 +159,7 @@ class ImposeSanctionsAboutReportJob(
                         statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
                         fromStatusId = status.communityStatusId,
                         toStatusId = activeUserStatusId,
-                        isForced = true,
+                        isForced = true
                     )
                 )
 

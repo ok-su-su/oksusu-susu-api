@@ -20,7 +20,6 @@ const val FAIL_TO_VALIDATE_MESSAGE = "fail to validate"
 const val APPLE_OIDC_PUBLIC_KEY_KEY = "apple_oidc_public_key"
 const val APPLE_OIDC_PUBLIC_KEY_TTL = 7
 
-
 const val USER_REPORT_COUNT_KEY = "user_report_count_key"
 const val POST_REPORT_COUNT_KEY = "post_report_count_key"
 

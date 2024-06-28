@@ -58,7 +58,7 @@ class DeleteWithdrawUserDataJob(
         logger.info { "finish delete withdraw user data for week" }
     }
 
-    suspend fun deleteData(targetUids: List<Long>){
+    suspend fun deleteData(targetUids: List<Long>) {
         coroutineScope {
             /** 삭제 유저의 봉투 삭제 */
             val deleteEnvelopesDeferred = async { deleteEnvelopes(targetUids) }

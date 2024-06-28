@@ -1,6 +1,6 @@
 package com.oksusu.susu.domain.report.domain.vo
 
-enum class ReportResultStatus{
+enum class ReportResultStatus {
     /** 일시 정지 7일 */
     RESTRICTED_7_DAYS,
 
