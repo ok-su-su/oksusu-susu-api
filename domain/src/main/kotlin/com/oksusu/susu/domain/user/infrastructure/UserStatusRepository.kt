@@ -8,5 +8,5 @@ import org.springframework.transaction.annotation.Transactional
 @Repository
 interface UserStatusRepository : JpaRepository<UserStatus, Long> {
     @Transactional(readOnly = true)
-    fun findAllByUid(freeUid: List<Long>): List<UserStatus>
+    fun findAllByUidIn(freeUid: List<Long>): List<UserStatus>
 }

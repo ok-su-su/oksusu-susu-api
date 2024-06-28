@@ -50,7 +50,8 @@ class ImposeSanctionsAboutReportJob(
         punishPostIds.forEach { id ->
             reportResults.plus(
                 ReportResult(
-                    uid = id,
+                    targetId = id,
+                    targetType = ReportTargetType.POST,
                     status = ReportResultStatus.DELETED
                 )
             )
@@ -58,25 +59,38 @@ class ImposeSanctionsAboutReportJob(
 
         /** 유저 제재 */
         val histories = mutableListOf<UserStatusHistory>()
-        val restrict7DaysUserStatusId =
-            withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) }
-                .first { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }.id
-        val statuses = withContext(Dispatchers.IO) { userStatusRepository.findAllByUid(punishUids) }
-        val updatedStatuses = statuses.map { status ->
-            histories.plus(
-                UserStatusHistory(
-                    uid = status.uid,
-                    statusAssignmentType = UserStatusAssignmentType.ACCOUNT,
-                    fromStatusId = status.accountStatusId,
-                    toStatusId = restrict7DaysUserStatusId
-                )
-            )
 
-            status.apply {
-                this.accountStatusId = restrict7DaysUserStatusId
+        val updatedStatuses = parZip(
+            { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
+            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(punishUids) } }
+        ) { userStatuses, statuses ->
+            val restrict7DaysUserStatusId =
+                userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.RESTRICTED_7_DAYS }.id
+
+            statuses.map { status ->
+                histories.plus(
+                    UserStatusHistory(
+                        uid = status.uid,
+                        statusAssignmentType = UserStatusAssignmentType.ACCOUNT,
+                        fromStatusId = status.accountStatusId,
+                        toStatusId = restrict7DaysUserStatusId,
+                        isForced = true,
+                    )
+                )
+
+                reportResults.plus(
+                    ReportResult(
+                        targetId = status.uid,
+                        targetType = ReportTargetType.USER,
+                        status = ReportResultStatus.RESTRICTED_7_DAYS
+                    )
+                )
+
+                status.apply {
+                    this.accountStatusId = restrict7DaysUserStatusId
+                }
             }
         }
-
 
         coroutineScope {
             val updatePostDeferred = async { postRepository.updateIsActiveById(punishPostIds) }
@@ -95,12 +109,12 @@ class ImposeSanctionsAboutReportJob(
         val from = LocalDateTime.now().minusDays(7).minusHours(1)
         val to = LocalDateTime.now().minusDays(7).plusHours(1)
         val freeUid = withContext(Dispatchers.IO) { reportResultRepository.findAllByCreatedAtBetween(from, to) }
-            .filter { report -> report.status == ReportResultStatus.RESTRICTED_7_DAYS }
-            .map { result -> result.uid }
+            .filter { report -> report.status == ReportResultStatus.RESTRICTED_7_DAYS && report.targetType == ReportTargetType.USER }
+            .map { result -> result.targetId }
 
         /** RESTRICTED_7_DAYS 제재 해제 */
         val userStatus = withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) }
-        val statuses = withContext(Dispatchers.IO) { userStatusRepository.findAllByUid(freeUid) }
+        val statuses = withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(freeUid) }
 
         val activeUserStatusId = userStatus.first { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }.id
 
@@ -111,7 +125,8 @@ class ImposeSanctionsAboutReportJob(
                     uid = status.uid,
                     statusAssignmentType = UserStatusAssignmentType.ACCOUNT,
                     fromStatusId = status.accountStatusId,
-                    toStatusId = activeUserStatusId
+                    toStatusId = activeUserStatusId,
+                    isForced = true,
                 )
             )
 

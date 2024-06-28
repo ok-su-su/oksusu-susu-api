@@ -27,4 +27,8 @@ class UserStatusHistory(
     /** 변경 후 상태 id */
     @Column(name = "to_status_id")
     val toStatusId: Long,
+
+    /** 관리자 실행 여부, 1 : 관리자, 0 : 유저 */
+    @Column(name = "is_forced")
+    val isForced: Boolean = false,
 ) : BaseEntity()

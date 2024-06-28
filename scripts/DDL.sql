@@ -55,6 +55,7 @@ CREATE TABLE `user_status_history`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
 CREATE INDEX idx__uid ON user_status_history (uid);
+ALTER TABLE user_status_history ADD (`is_forced` tinyint DEFAULT 0 NOT NULL COMMENT '관리자 실행 여부, 1 : 관리자, 0 : 유저');
 
 -- 탈퇴 유저 기록
 CREATE TABLE `user_withdraw`
@@ -317,6 +318,10 @@ CREATE TABLE `report_result`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '신고 결과';
 CREATE INDEX idx__uid ON report_result (uid);
+ALTER TABLE report_result ADD (`target_type` varchar(128) NOT NULL COMMENT '신고 대상');
+ALTER TABLE report_result CHANGE COLUMN `uid` `target_id` bigint NOT NULL COMMENT '신고 대상 id';
+DROP INDEX idx__uid ON report_result;
+CREATE INDEX idx__target_id__target_type ON report_result (target_id, target_type);
 
 -- 카운트
 CREATE TABLE `count`
