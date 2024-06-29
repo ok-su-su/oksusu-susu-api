@@ -19,6 +19,10 @@ class ApplicationMetadata(
     @Column(name = "forced_update_date")
     val forcedUpdateDate: LocalDateTime,
 
+    /** 해당 버전의 주요 기능 설명 */
+    @Column(name = "description")
+    val description: String? = null,
+
     /** 활성화 여부 / 활성화 : 1, 비활성화 : 0 */
     @Column(name = "is_active")
     var isActive: Boolean = true,
