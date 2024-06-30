@@ -100,13 +100,41 @@ class RefreshSusuEnvelopeStatisticJob(
                 ledgerCategoryCounts,
                 totalAmountModels,
             ->
-            cacheAmountData(
-                monthlySpentEnvelopAmountForLastYear = monthlySpentEnvelopAmountForLastYear,
-                relationShipConuts = relationShipConuts,
-                envelopeCategoryCounts = envelopeCategoryCounts,
-                ledgerCategoryCounts = ledgerCategoryCounts,
-                totalAmountModels = totalAmountModels
-            )
+            val cache = mutableMapOf<String, Long>()
+
+            /** 월별 사용 총 금액 캐싱 */
+            monthlySpentEnvelopAmountForLastYear.map { count ->
+                val key = "$MONTHLY_SPENT_ENVELOPE_AMOUNT_FOR_LAST_YEAR_PREFIX${count.handedOverAtMonth}"
+                cache[key] = count.totalAmounts
+            }
+
+            /** 나이, 카테고리, 관계별 금액 총 합 key: age:categoryId:relationshipId, value: avg */
+            parseIntoEnvelopeSpecificStatisticGroup(totalAmountModels).map { model ->
+                val amountKey = "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_AMOUNT_PREFIX${model.key}"
+                cache[amountKey] = model.value.first
+                val countKey = "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX${model.key}"
+                cache[countKey] = model.value.second
+            }
+
+            /** 관계별 총 횟수 캐싱 */
+            relationShipConuts.map { relationship ->
+                val key = "$RELATIONSHIP_COUNT_PREFIX${relationship.relationshipId}"
+                cache[key] = relationship.totalCounts
+            }
+
+            /** 경조사별 총 횟수 캐싱 */
+            envelopeCategoryCounts.map { category ->
+                val key = "$CATEGORY_COUNT_PREFIX${category.categoryId}"
+                val currentCount = cache[key] ?: 0
+                cache[key] = currentCount + category.totalCounts
+            }
+            ledgerCategoryCounts.map { category ->
+                val key = "$CATEGORY_COUNT_PREFIX${category.categoryId}"
+                val currentCount = cache[key] ?: 0
+                cache[key] = currentCount + category.totalCounts
+            }
+
+            withMDCContext(Dispatchers.IO) { cacheService.set(Cache.getSusuEnvelopeStatisticAmountCache(), cache) }
 
             logger.info { "finish refresh susu envelope statistic amount" }
         }
@@ -183,6 +211,7 @@ class RefreshSusuEnvelopeStatisticJob(
                 relationships,
                 categories,
             ->
+            val cache = mutableMapOf<String, Long>()
             val userCount = totalUserCount - adminUserConfig.adminUserUid.size
             val relationshipMap = relationships.associateBy { relationship -> relationship.id }
             val categoryMap = categories.associateBy { category -> category.id }
@@ -196,15 +225,11 @@ class RefreshSusuEnvelopeStatisticJob(
             val specificCountCache = cachedAmount.classifyKeyByPrefix(SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX)
 
             /** 최근 사용 금액 1년 */
-            val monthlySpent = monthlySpentEnvelopAmountForLastYear
-                .associate { spent -> spent.handedOverAtMonth.toString() to spent.totalAmounts }
-                .merge(monthlySpentCache)
-                .takeIf { it.isNotEmpty() }
-                ?.map { map -> TitleValueModel(map.key, map.value) }
-                ?.sortedBy { model -> model.title }
-
-            /** 경조사비 가장 많이 쓴 달 */
-            val mostSpentMonth = monthlySpent?.maxBy { model -> model.value }?.title?.substring(4)?.toLong()
+            val monthlySpent = getMonthlySpentForLastYear(
+                monthlySpentEnvelopAmountForLastYear = monthlySpentEnvelopAmountForLastYear,
+                monthlySpentCache = monthlySpentCache,
+                cache = cache,
+            )
 
             /** 최근 사용 금액 8달 */
             val monthlySpentForLast8Months = getMonthlySpentForLast8Months(
@@ -212,11 +237,15 @@ class RefreshSusuEnvelopeStatisticJob(
                 userCount = userCount
             )
 
+            /** 경조사비 가장 많이 쓴 달 */
+            val mostSpentMonth = monthlySpent?.maxBy { model -> model.value }?.title?.substring(4)?.toLong()
+
             /** 최다 수수 관계 */
             val mostFrequentRelationShip = getMostFrequentRelationShip(
                 relationShipConuts = relationShipConuts,
                 relationships = relationshipMap,
-                relationshipCache = relationshipCache
+                relationshipCache = relationshipCache,
+                cache = cache,
             )
 
             /** 최다 수수 경조사 */
@@ -224,7 +253,8 @@ class RefreshSusuEnvelopeStatisticJob(
                 envelopeCategoryCounts = envelopeCategoryCounts,
                 ledgerCategoryCounts = ledgerCategoryCounts,
                 categories = categoryMap,
-                categoryCache = categoryCache
+                categoryCache = categoryCache,
+                cache = cache,
             )
 
             /** 최다 수수 경조사 평균 */
@@ -249,18 +279,36 @@ class RefreshSusuEnvelopeStatisticJob(
                 specificCache[key] = value to specificCountCache[key]!!
             }
 
-            parseIntoEnvelopeSpecificStatisticGroup(totalAmountModels).mergePair(specificCache)
+            val sortTypeAmountsMap = parseIntoEnvelopeSpecificStatisticGroup(totalAmountModels).mergePair(specificCache)
+
+            sortTypeAmountsMap.map {map ->
+                async {
+                    susuSpecificEnvelopeStatisticRepository.save(
+                        CacheKeyGenerateHelper.getSusuSpecificStatisticKey(map.key),
+                        map.value.first / map.value.second
+                    )
+                }
+            }
+
+            val sortTypeAmounts = sortTypeAmountsMap
                 .map { model ->
-                    async {
-                        susuSpecificEnvelopeStatisticRepository.save(
-                            CacheKeyGenerateHelper.getSusuSpecificStatisticKey(model.key),
-                            model.value.first / model.value.second
-                        )
-                    }
+                    val amountKey = "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_AMOUNT_PREFIX${model.key}"
+                    cache[amountKey] = model.value.first
+                    val countKey = "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX${model.key}"
+                    cache[countKey] = model.value.second
+
+                    val keys = model.key.split(":")
+                    CountAvgAmountPerStatisticGroupModel(
+                        birth = keys[0].toLong(),
+                        categoryId = keys[1].toLong(),
+                        relationshipId = keys[2].toLong(),
+                        totalAmounts = model.value.first,
+                        counts = model.value.second,
+                    )
                 }
 
             /** key: susu_category_statistic:categoryId, value: avg */
-            totalAmountModels.groupBy { it.categoryId }.map { modelsMap ->
+            sortTypeAmounts.groupBy { it.categoryId }.map { modelsMap ->
                 val key = CacheKeyGenerateHelper.getSusuCategoryStatisticKey(modelsMap.key)
 
                 val totalAmounts = modelsMap.value.sumOf { value -> value.totalAmounts }
@@ -271,7 +319,7 @@ class RefreshSusuEnvelopeStatisticJob(
             }
 
             /** key: susu_relationship_statistic:relationshipId, value: avg */
-            totalAmountModels.groupBy { it.relationshipId }.map { modelsMap ->
+            sortTypeAmounts.groupBy { it.relationshipId }.map { modelsMap ->
                 val key = CacheKeyGenerateHelper.getSusuRelationshipStatisticKey(modelsMap.key)
 
                 val totalAmounts = modelsMap.value.sumOf { value -> value.totalAmounts }
@@ -282,61 +330,11 @@ class RefreshSusuEnvelopeStatisticJob(
             }
 
             /** amount 값 캐싱 */
-            cacheAmountData(
-                monthlySpentEnvelopAmountForLastYear = monthlySpentEnvelopAmountForLastYear,
-                relationShipConuts = relationShipConuts,
-                envelopeCategoryCounts = envelopeCategoryCounts,
-                ledgerCategoryCounts = ledgerCategoryCounts,
-                totalAmountModels = totalAmountModels
-            )
+            CoroutineScope(Dispatchers.IO).launch {
+                cacheService.set(Cache.getSusuEnvelopeStatisticAmountCache(), cache)
+            }
 
             logger.info { "finish refresh susu statistic" }
-        }
-    }
-
-    private suspend fun cacheAmountData(
-        monthlySpentEnvelopAmountForLastYear: List<CountPerHandedOverAtModel>,
-        relationShipConuts: List<CountPerRelationshipIdModel>,
-        envelopeCategoryCounts: List<CountPerCategoryIdModel>,
-        ledgerCategoryCounts: List<CountPerCategoryIdModel>,
-        totalAmountModels: List<CountAvgAmountPerStatisticGroupModel>,
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val cache = mutableMapOf<String, Long>()
-
-            /** 월별 사용 총 금액 캐싱 */
-            monthlySpentEnvelopAmountForLastYear.map { count ->
-                val key = "$MONTHLY_SPENT_ENVELOPE_AMOUNT_FOR_LAST_YEAR_PREFIX${count.handedOverAtMonth}"
-                cache[key] = count.totalAmounts
-            }
-
-            /** 나이, 카테고리, 관계별 금액 총 합 key: age:categoryId:relationshipId, value: avg */
-            parseIntoEnvelopeSpecificStatisticGroup(totalAmountModels).map { model ->
-                val amountKey = "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_AMOUNT_PREFIX${model.key}"
-                cache[amountKey] = model.value.first
-                val countKey = "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX${model.key}"
-                cache[countKey] = model.value.second
-            }
-
-            /** 관계별 총 횟수 캐싱 */
-            relationShipConuts.map { relationship ->
-                val key = "$RELATIONSHIP_COUNT_PREFIX${relationship.relationshipId}"
-                cache[key] = relationship.totalCounts
-            }
-
-            /** 경조사별 총 횟수 캐싱 */
-            envelopeCategoryCounts.map { category ->
-                val key = "$CATEGORY_COUNT_PREFIX${category.categoryId}"
-                val currentCount = cache[key] ?: 0
-                cache[key] = currentCount + category.totalCounts
-            }
-            ledgerCategoryCounts.map { category ->
-                val key = "$CATEGORY_COUNT_PREFIX${category.categoryId}"
-                val currentCount = cache[key] ?: 0
-                cache[key] = currentCount + category.totalCounts
-            }
-
-            withMDCContext(Dispatchers.IO) { cacheService.set(Cache.getSusuEnvelopeStatisticAmountCache(), cache) }
         }
     }
 
@@ -368,6 +366,23 @@ class RefreshSusuEnvelopeStatisticJob(
         ) { min, max -> min to max }
     }
 
+    private fun getMonthlySpentForLastYear(
+        monthlySpentEnvelopAmountForLastYear: List<CountPerHandedOverAtModel>,
+        monthlySpentCache: Map<String, Long>,
+        cache: MutableMap<String, Long>,
+    ): List<TitleValueModel<Long>>? {
+        return monthlySpentEnvelopAmountForLastYear
+            .associate { spent -> spent.handedOverAtMonth.toString() to spent.totalAmounts }
+            .merge(monthlySpentCache)
+            .takeIf { it.isNotEmpty() }
+            ?.map { map ->
+                val key = "$MONTHLY_SPENT_ENVELOPE_AMOUNT_FOR_LAST_YEAR_PREFIX${map.key}"
+                cache[key] = map.value
+                TitleValueModel(map.key, map.value)
+            }
+            ?.sortedBy { model -> model.title }
+    }
+
     private fun getMonthlySpentForLast8Months(
         monthlySpent: List<TitleValueModel<Long>>?,
         userCount: Long,
@@ -382,9 +397,15 @@ class RefreshSusuEnvelopeStatisticJob(
         relationShipConuts: List<CountPerRelationshipIdModel>,
         relationships: Map<Long, Relationship>,
         relationshipCache: Map<String, Long>,
+        cache: MutableMap<String, Long>,
     ): TitleValueModel<Long>? {
         return relationShipConuts.associate { relationship -> relationship.relationshipId.toString() to relationship.totalCounts }
             .merge(relationshipCache)
+            .map { map ->
+                val key = "$RELATIONSHIP_COUNT_PREFIX${map.key}"
+                cache[key] = map.value
+                map
+            }
             .maxByOrNull { map -> map.value }
             ?.run {
                 TitleValueModel(
@@ -399,6 +420,7 @@ class RefreshSusuEnvelopeStatisticJob(
         ledgerCategoryCounts: List<CountPerCategoryIdModel>,
         categories: Map<Long, Category>,
         categoryCache: Map<String, Long>,
+        cache: MutableMap<String, Long>,
     ): TitleValueModel<Long>? {
         val countMap = mutableMapOf<String, Long>()
 
@@ -412,6 +434,11 @@ class RefreshSusuEnvelopeStatisticJob(
         }
 
         return countMap.merge(categoryCache)
+            .map { map ->
+                val key = "$CATEGORY_COUNT_PREFIX${map.key}"
+                cache[key] = map.value
+                map
+            }
             .maxByOrNull { it.value }
             ?.run {
                 val category = categories[this.key.toLong()]
