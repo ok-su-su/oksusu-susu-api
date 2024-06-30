@@ -52,4 +52,15 @@ class DevBatchResource(
             susuEnvelopeStatisticJob.refreshSusuEnvelopeStatistic()
         }
     }
+
+    /** 수수 통계 캐싱 데이터를 초기화합니다. */
+    @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "refresh susu envelope statistic amount 호출")
+    @GetMapping("/refresh-susu-envelope-statistic-amount")
+    suspend fun refreshSusuEnvelopeStatisticAmount(
+        adminUser: AdminUser,
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            susuEnvelopeStatisticJob.refreshSusuEnvelopeStatisticAmount()
+        }
+    }
 }
