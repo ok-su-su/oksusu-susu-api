@@ -9,7 +9,8 @@ fun <T : Any> Map<T, Long>.merge(map: Map<T, Long>): Map<T, Long> {
 
     for ((key, value) in map) {
         resultMap.merge(key, value) { oldValue, newValue ->
-            oldValue + newValue }
+            oldValue + newValue
+        }
     }
 
     return resultMap

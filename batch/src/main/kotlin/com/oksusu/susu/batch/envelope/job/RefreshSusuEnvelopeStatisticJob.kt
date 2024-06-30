@@ -66,8 +66,8 @@ class RefreshSusuEnvelopeStatisticJob(
 
         val (minAmount, maxAmount) = getMaxAndMinAmount()
 
-        val from = LocalDate.now().minusMonths(11).atTime(0, 0)
-        val to = LocalDate.now().atTime(23, 59)
+        val from = LocalDateTime.now().minusMonths(12)
+        val to = LocalDateTime.now()
         parZipWithMDC(
             {
                 withContext(Dispatchers.IO) {
@@ -117,7 +117,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
         val (minAmount, maxAmount) = getMaxAndMinAmount()
 
-        val targetDate = LocalDateTime.now().minusDays(REFRESH_BEFORE_HOURS)
+        val targetDate = LocalDateTime.now().minusHours(REFRESH_BEFORE_HOURS)
 
         val to = LocalDateTime.now()
         parZipWithMDC(
@@ -209,14 +209,14 @@ class RefreshSusuEnvelopeStatisticJob(
             /** 최근 사용 금액 8달 */
             val monthlySpentForLast8Months = getMonthlySpentForLast8Months(
                 monthlySpent = monthlySpent,
-                userCount = userCount,
+                userCount = userCount
             )
 
             /** 최다 수수 관계 */
             val mostFrequentRelationShip = getMostFrequentRelationShip(
                 relationShipConuts = relationShipConuts,
                 relationships = relationshipMap,
-                relationshipCache = relationshipCache,
+                relationshipCache = relationshipCache
             )
 
             /** 최다 수수 경조사 */
@@ -224,7 +224,7 @@ class RefreshSusuEnvelopeStatisticJob(
                 envelopeCategoryCounts = envelopeCategoryCounts,
                 ledgerCategoryCounts = ledgerCategoryCounts,
                 categories = categoryMap,
-                categoryCache = categoryCache,
+                categoryCache = categoryCache
             )
 
             /** 최다 수수 경조사 평균 */
@@ -311,8 +311,6 @@ class RefreshSusuEnvelopeStatisticJob(
             }
 
             /** 나이, 카테고리, 관계별 금액 총 합 key: age:categoryId:relationshipId, value: avg */
-
-            /** 나이, 카테고리, 관계별 금액 총 합 key: age:categoryId:relationshipId, value: avg */
             parseIntoEnvelopeSpecificStatisticGroup(totalAmountModels).map { model ->
                 val amountKey = "$SUSU_SPECIFIC_ENVELOPE_STATISTIC_AMOUNT_PREFIX${model.key}"
                 cache[amountKey] = model.value.first
@@ -321,14 +319,10 @@ class RefreshSusuEnvelopeStatisticJob(
             }
 
             /** 관계별 총 횟수 캐싱 */
-
-            /** 관계별 총 횟수 캐싱 */
             relationShipConuts.map { relationship ->
                 val key = "$RELATIONSHIP_COUNT_PREFIX${relationship.relationshipId}"
                 cache[key] = relationship.totalCounts
             }
-
-            /** 경조사별 총 횟수 캐싱 */
 
             /** 경조사별 총 횟수 캐싱 */
             envelopeCategoryCounts.map { category ->
@@ -349,9 +343,7 @@ class RefreshSusuEnvelopeStatisticJob(
     private suspend fun getMaxAndMinAmount(): Pair<Long, Long> {
         val susuEnvelopeConfig = statisticConfig.susuEnvelopeConfig
 
-        val count = withMDCContext(Dispatchers.IO) {
-            envelopeRepository.countExceptUid(adminUserConfig.adminUserUid)
-        }
+        val count = withMDCContext(Dispatchers.IO) { envelopeRepository.countExceptUid(adminUserConfig.adminUserUid) }
 
         val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).roundToLong()
         val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
@@ -373,9 +365,7 @@ class RefreshSusuEnvelopeStatisticJob(
                     )
                 }
             }
-        ) { min, max ->
-            min to max
-        }
+        ) { min, max -> min to max }
     }
 
     private fun getMonthlySpentForLast8Months(
@@ -383,6 +373,7 @@ class RefreshSusuEnvelopeStatisticJob(
         userCount: Long,
     ): List<TitleValueModel<Long>>? {
         val before8Month = LocalDate.now().minusMonths(7).yearMonth()
+
         return monthlySpent?.filter { spent -> spent.title >= before8Month }
             ?.map { model -> model.apply { value /= userCount } }
     }

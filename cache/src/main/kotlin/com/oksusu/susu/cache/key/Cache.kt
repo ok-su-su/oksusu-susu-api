@@ -63,7 +63,6 @@ data class Cache<VALUE_TYPE>(
                 type = toTypeReference(),
                 duration = Duration.ofDays(1).plusHours(1)
             )
-
         }
     }
 }
