@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.cache.model.SusuEnvelopeStatisticCacheModel
 import com.oksusu.susu.cache.model.UserEnvelopeStatisticCacheModel
-import com.oksusu.susu.common.consts.APPLE_OIDC_PUBLIC_KEY_KEY
-import com.oksusu.susu.common.consts.SUSU_ENVELOPE_STATISTIC_KEY
-import com.oksusu.susu.common.consts.SUSU_STATISTIC_TTL
-import com.oksusu.susu.common.consts.USER_STATISTIC_TTL
+import com.oksusu.susu.common.consts.*
 import com.oksusu.susu.common.util.toTypeReference
 import java.time.Duration
 
@@ -58,6 +55,15 @@ data class Cache<VALUE_TYPE>(
                 type = toTypeReference(),
                 duration = Duration.ofDays(7)
             )
+        }
+
+        fun getSusuEnvelopeStatisticAmountCache(): Cache<Map<String, Long>> {
+            return Cache(
+                key = SUSU_ENVELOPE_STATISTIC_AMOUNT_KEY,
+                type = toTypeReference(),
+                duration = Duration.ofDays(1).plusHours(1)
+            )
+
         }
     }
 }

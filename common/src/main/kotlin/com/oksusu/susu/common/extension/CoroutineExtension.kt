@@ -117,3 +117,19 @@ suspend inline fun <A, B, C, D, E, F, G, H, I> parZipWithMDC(
     val ctx = MDCContext() + Dispatchers.IO
     return parZip(ctx, fa, fb, fc, fd, fe, ff, fg, fh, f)
 }
+
+suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZipWithMDC(
+    crossinline fa: suspend CoroutineScope.() -> A,
+    crossinline fb: suspend CoroutineScope.() -> B,
+    crossinline fc: suspend CoroutineScope.() -> C,
+    crossinline fd: suspend CoroutineScope.() -> D,
+    crossinline fe: suspend CoroutineScope.() -> E,
+    crossinline ff: suspend CoroutineScope.() -> F,
+    crossinline fg: suspend CoroutineScope.() -> G,
+    crossinline fh: suspend CoroutineScope.() -> H,
+    crossinline fj: suspend CoroutineScope.() -> J,
+    crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H, J) -> I,
+): I {
+    val ctx = MDCContext() + Dispatchers.IO
+    return parZip(ctx, fa, fb, fc, fd, fe, ff, fg, fh, fj, f)
+}
