@@ -228,7 +228,7 @@ class RefreshSusuEnvelopeStatisticJob(
             val monthlySpent = getMonthlySpentForLastYear(
                 monthlySpentEnvelopAmountForLastYear = monthlySpentEnvelopAmountForLastYear,
                 monthlySpentCache = monthlySpentCache,
-                cache = cache,
+                cache = cache
             )
 
             /** 최근 사용 금액 8달 */
@@ -245,7 +245,7 @@ class RefreshSusuEnvelopeStatisticJob(
                 relationShipConuts = relationShipConuts,
                 relationships = relationshipMap,
                 relationshipCache = relationshipCache,
-                cache = cache,
+                cache = cache
             )
 
             /** 최다 수수 경조사 */
@@ -254,7 +254,7 @@ class RefreshSusuEnvelopeStatisticJob(
                 ledgerCategoryCounts = ledgerCategoryCounts,
                 categories = categoryMap,
                 categoryCache = categoryCache,
-                cache = cache,
+                cache = cache
             )
 
             /** 최다 수수 경조사 평균 */
@@ -281,7 +281,7 @@ class RefreshSusuEnvelopeStatisticJob(
 
             val sortTypeAmountsMap = parseIntoEnvelopeSpecificStatisticGroup(totalAmountModels).mergePair(specificCache)
 
-            sortTypeAmountsMap.map {map ->
+            sortTypeAmountsMap.map { map ->
                 async {
                     susuSpecificEnvelopeStatisticRepository.save(
                         CacheKeyGenerateHelper.getSusuSpecificStatisticKey(map.key),
@@ -303,7 +303,7 @@ class RefreshSusuEnvelopeStatisticJob(
                         categoryId = keys[1].toLong(),
                         relationshipId = keys[2].toLong(),
                         totalAmounts = model.value.first,
-                        counts = model.value.second,
+                        counts = model.value.second
                     )
                 }
 
