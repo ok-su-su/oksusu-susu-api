@@ -89,10 +89,16 @@ class ImposeSanctionsAboutReportJob(
             )
         }
 
+        /** 제재 게시물 글쓴이 조회 */
+        val punishPostUids = withContext(Dispatchers.IO) { postRepository.findAllByIdIn(punishPostIds) }
+            .map { post -> post.uid }
+
+        val targetUids = punishUids.toSet().plus(punishPostUids)
+
         /** 유저 제재 */
         val updatedStatuses = parZip(
             { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
-            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(punishUids) } }
+            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(targetUids) } }
         ) { userStatuses, statuses ->
             val restrict7DaysUserStatusId =
                 userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.RESTRICTED_7_DAYS }.id
@@ -147,7 +153,7 @@ class ImposeSanctionsAboutReportJob(
 
         val updatedStatuses = parZip(
             { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
-            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(freeUid) } }
+            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(freeUid.toSet()) } }
         ) { userStatus, statuses ->
             val activeUserStatusId =
                 userStatus.first { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }.id
