@@ -57,6 +57,22 @@ data class Cache<VALUE_TYPE>(
             )
         }
 
+        fun getUserReportCountCache(): Cache<Map<Long, Long>> {
+            return Cache(
+                key = USER_REPORT_COUNT_KEY,
+                type = toTypeReference(),
+                duration = Duration.ofDays(2)
+            )
+        }
+
+        fun getPostReportCountCache(): Cache<Map<Long, Long>> {
+            return Cache(
+                key = POST_REPORT_COUNT_KEY,
+                type = toTypeReference(),
+                duration = Duration.ofDays(2)
+            )
+        }
+
         fun getSusuEnvelopeStatisticAmountCache(): Cache<Map<String, Long>> {
             return Cache(
                 key = SUSU_ENVELOPE_STATISTIC_AMOUNT_KEY,

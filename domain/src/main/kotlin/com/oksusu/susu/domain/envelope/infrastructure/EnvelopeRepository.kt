@@ -50,6 +50,9 @@ interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepo
 
     @Transactional(readOnly = true)
     fun countByUidAndFriendId(uid: Long, friendId: Long): Long
+
+    @Transactional(readOnly = true)
+    fun findAllByUidIn(uid: List<Long>): List<Envelope>
 }
 
 interface EnvelopeCustomRepository {

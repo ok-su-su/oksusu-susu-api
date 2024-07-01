@@ -2,6 +2,7 @@ package com.oksusu.susu.domain.report.domain
 
 import com.oksusu.susu.domain.common.BaseEntity
 import com.oksusu.susu.domain.report.domain.vo.ReportResultStatus
+import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -19,8 +20,14 @@ class ReportResult(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
-    /** 신고 대상 uid */
-    val uid: Long,
+    /** 신고 대상 id */
+    @Column(name = "target_id")
+    val targetId: Long,
+
+    /** 신고 대상 타입 */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "target_type")
+    val targetType: ReportTargetType,
 
     /** 신고 결과 상태 */
     @Enumerated(EnumType.STRING)
