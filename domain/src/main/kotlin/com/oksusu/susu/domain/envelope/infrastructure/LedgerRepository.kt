@@ -47,6 +47,12 @@ interface LedgerCustomRepository {
     fun countPerCategoryIdExceptUid(uid: List<Long>): List<CountPerCategoryIdModel>
 
     @Transactional(readOnly = true)
+    fun countPerCategoryIdExceptUidByCreatedAtAfter(
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountPerCategoryIdModel>
+
+    @Transactional(readOnly = true)
     fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
 }
 
@@ -118,6 +124,27 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
             .where(
                 qLedger.uid.notIn(uid)
+            )
+            .groupBy(qCategoryAssignment.categoryId)
+            .fetch()
+    }
+
+    override fun countPerCategoryIdExceptUidByCreatedAtAfter(
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountPerCategoryIdModel> {
+        return JPAQuery<QLedger>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qLedger.id.count()
+                )
+            )
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qLedger.uid.notIn(uid),
+                qLedger.createdAt.after(targetDate)
             )
             .groupBy(qCategoryAssignment.categoryId)
             .fetch()

@@ -2,7 +2,7 @@ package com.oksusu.susu.api.metadata.presentation
 
 import com.oksusu.susu.api.config.web.SwaggerTag
 import com.oksusu.susu.api.extension.wrapOk
-import com.oksusu.susu.api.metadata.application.ApplicationMetadataFacade
+import com.oksusu.susu.api.metadata.application.ApplicationMetadataService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(value = ["/api/v1/metadata"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class ApplicationMetadataResource(
-    private val applicationMetadataFacade: ApplicationMetadataFacade,
+    private val applicationMetadataService: ApplicationMetadataService,
 ) {
     @Operation(summary = "버전 설정 정보 조회")
     @GetMapping("/version")
-    suspend fun getApplicationVersionMetadata() = applicationMetadataFacade.getApplicationVersionMetadata().wrapOk()
+    suspend fun getApplicationVersionMetadata() = applicationMetadataService.getApplicationVersionMetadata().wrapOk()
 }

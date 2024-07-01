@@ -18,7 +18,7 @@ class HealthResource(
     private val environment: Environment,
 ) {
     @Operation(summary = "health-check-v1")
-    @GetMapping("/api/v1/health-check")
+    @GetMapping("/api/v1/health")
     fun healthCheckV1() = environment.activeProfiles.first()
         .run { HealthResponse.from(this) }
         .wrapOk()

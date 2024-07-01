@@ -23,6 +23,8 @@ const val APPLE_OIDC_PUBLIC_KEY_TTL = 7
 const val USER_REPORT_COUNT_KEY = "user_report_count_key"
 const val POST_REPORT_COUNT_KEY = "post_report_count_key"
 
+const val SUSU_ENVELOPE_STATISTIC_AMOUNT_KEY = "susu_envelope_statistic_amount"
+
 const val KID = "kid"
 
 const val MDC_KEY_TRACE_ID = "traceId"

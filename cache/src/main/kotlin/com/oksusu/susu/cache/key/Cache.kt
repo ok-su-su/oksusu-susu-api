@@ -72,5 +72,13 @@ data class Cache<VALUE_TYPE>(
                 duration = Duration.ofDays(2)
             )
         }
+
+        fun getSusuEnvelopeStatisticAmountCache(): Cache<Map<String, Long>> {
+            return Cache(
+                key = SUSU_ENVELOPE_STATISTIC_AMOUNT_KEY,
+                type = toTypeReference(),
+                duration = Duration.ofDays(1).plusHours(1)
+            )
+        }
     }
 }

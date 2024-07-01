@@ -8,5 +8,5 @@ import org.springframework.transaction.annotation.Transactional
 @Repository
 interface ApplicationMetadataRepository : JpaRepository<ApplicationMetadata, Long> {
     @Transactional(readOnly = true)
-    fun findTop1ByIsActiveOrderByCreatedAtDesc(isActive: Boolean): ApplicationMetadata
+    fun findTop1ByIsActiveOrderByCreatedAtDesc(isActive: Boolean): ApplicationMetadata?
 }
