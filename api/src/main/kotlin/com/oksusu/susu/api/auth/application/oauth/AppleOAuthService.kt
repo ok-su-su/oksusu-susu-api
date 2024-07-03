@@ -101,8 +101,8 @@ class AppleOAuthService(
         val oidcPublicKeysResponse = oidcService.getOidcPublicKeys(OAuthProvider.APPLE)
         return oidcService.getPayloadFromIdToken(
             token,
-            appleOAuthSecretConfig.teamId,
             appleOAuthUrlConfig.appleIdUrl,
+            appleOAuthSecretConfig.clientId,
             oidcPublicKeysResponse
         )
     }
