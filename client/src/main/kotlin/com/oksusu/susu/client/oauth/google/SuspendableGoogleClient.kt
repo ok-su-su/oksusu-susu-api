@@ -5,7 +5,6 @@ import com.oksusu.susu.client.oauth.google.model.GoogleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.google.model.GoogleOAuthUserInfoResponse
 import com.oksusu.susu.common.extension.awaitSingleOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 

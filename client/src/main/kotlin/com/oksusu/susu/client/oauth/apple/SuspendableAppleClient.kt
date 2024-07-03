@@ -6,7 +6,6 @@ import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeysResponse
 import com.oksusu.susu.common.extension.awaitSingleOptionalOrThrow
 import com.oksusu.susu.common.extension.awaitSingleOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
