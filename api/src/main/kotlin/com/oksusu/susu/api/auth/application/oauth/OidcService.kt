@@ -88,7 +88,8 @@ class OidcService(
         oidcPublicKeysResponse: OidcPublicKeysResponse,
     ): OidcDecodePayload {
         val jwt = decodeIdToken(token, oidcPublicKeysResponse.keys)
-            ?: throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
+        logger.info { "1" }
+        jwt ?: throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
 
         verifyToken(jwt, iss, aud)
 
@@ -128,6 +129,7 @@ class OidcService(
         val verifyAud = token.audience.firstOrNull() == aud
         val verifyIssuer = token.issuer == iss
 
+        logger.info { "2" }
         if (!verifyTime || !verifyAud || !verifyIssuer) {
             throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
         }
