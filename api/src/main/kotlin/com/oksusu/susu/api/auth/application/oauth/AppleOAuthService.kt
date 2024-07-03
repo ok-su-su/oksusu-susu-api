@@ -83,8 +83,6 @@ class AppleOAuthService(
             appleClient.getToken(redirectUrl, code, clientId, clientSecret)
         }
 
-        getOIDCDecodePayload(tokens.idToken)
-
         return OAuthTokenResponse.fromApple(tokens)
     }
 
@@ -103,8 +101,8 @@ class AppleOAuthService(
         val oidcPublicKeysResponse = oidcService.getOidcPublicKeys(OAuthProvider.APPLE)
         return oidcService.getPayloadFromIdToken(
             token,
+            appleOAuthSecretConfig.teamId,
             appleOAuthUrlConfig.appleIdUrl,
-            appleOAuthSecretConfig.clientId,
             oidcPublicKeysResponse
         )
     }

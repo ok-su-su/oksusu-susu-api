@@ -9,6 +9,8 @@ data class OAuthTokenResponse(
     val accessToken: String,
     /** oauth refresh token */
     val refreshToken: String,
+    /** oauth id token (apple은 이거 사용) */
+    val idToken: String? = null,
 ) {
     companion object {
         fun fromKakao(kakaoOAuthTokenResponse: KakaoOAuthTokenResponse): OAuthTokenResponse {
@@ -21,7 +23,8 @@ data class OAuthTokenResponse(
         fun fromApple(appleOAuthTokenResponse: AppleOAuthTokenResponse): OAuthTokenResponse {
             return OAuthTokenResponse(
                 accessToken = appleOAuthTokenResponse.accessToken,
-                refreshToken = appleOAuthTokenResponse.refreshToken
+                refreshToken = appleOAuthTokenResponse.refreshToken,
+                idToken = appleOAuthTokenResponse.idToken
             )
         }
 
