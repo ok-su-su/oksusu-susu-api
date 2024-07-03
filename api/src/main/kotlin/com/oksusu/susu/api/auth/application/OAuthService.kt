@@ -55,8 +55,8 @@ class OAuthService(
     suspend fun withdraw(oauthInfo: OauthInfo, code: String?, googleAccessToken: String?, appleAccessToken: String?) {
         when (oauthInfo.oAuthProvider) {
             OAuthProvider.KAKAO -> kakaoOAuthService.withdraw(oauthInfo.oAuthId)
-            OAuthProvider.APPLE -> appleOAuthService.withdraw(googleAccessToken!!)
-            OAuthProvider.GOOGLE -> googleOAuthService.withdraw(appleAccessToken!!)
+            OAuthProvider.APPLE -> appleOAuthService.withdraw(appleAccessToken!!)
+            OAuthProvider.GOOGLE -> googleOAuthService.withdraw(googleAccessToken!!)
         }
     }
 }

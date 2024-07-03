@@ -108,13 +108,11 @@ class AppleOAuthService(
     }
 
     /** 회원 탈퇴합니다 */
-    suspend fun withdraw(code: String) {
-        val tokens = getOAuthWithdrawToken(code)
-
+    suspend fun withdraw(accessToken: String) {
         withMDCContext(Dispatchers.IO) {
             appleClient.withdraw(
                 appleOAuthSecretConfig.clientId,
-                tokens.accessToken,
+                accessToken,
                 getClientSecret()
             )
         }
