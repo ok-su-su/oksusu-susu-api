@@ -134,10 +134,10 @@ class AppleOAuthService(
     }
 
     private fun createClientSecret(clientId: String): String {
-        val iat = Date().toInstant()
-        val exp = Date(iat.epochSecond + 3600000).toInstant()
+        val iat = Date()
+        val exp = Date(iat.time + 3600000).toInstant()
 
-        val headers = mapOf("kid" to appleOAuthSecretConfig.keyId)
+        val headers = mapOf("alg" to "ES256", "kid" to appleOAuthSecretConfig.keyId)
 
         val unsignedJWT = JWT.create().apply {
             this.withHeader(headers)

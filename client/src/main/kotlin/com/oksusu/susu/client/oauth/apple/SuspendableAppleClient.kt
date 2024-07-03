@@ -6,6 +6,7 @@ import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeysResponse
 import com.oksusu.susu.common.extension.awaitSingleOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.reactor.awaitSingle
+import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
 class SuspendableAppleClient(
@@ -29,6 +30,7 @@ class SuspendableAppleClient(
         )
         return webClient.post()
             .uri(url)
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .retrieve()
             .bodyToMono(AppleOAuthTokenResponse::class.java)
             .awaitSingleOrThrow()
@@ -52,6 +54,7 @@ class SuspendableAppleClient(
         )
         return webClient.post()
             .uri(url)
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .retrieve()
             .bodyToMono(Unit::class.java)
             .awaitSingleOrThrow()
