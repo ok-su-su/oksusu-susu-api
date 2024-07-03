@@ -119,6 +119,7 @@ class OidcService(
                     )
                 ).build().verify(token)
             } catch (e: Exception) {
+                logger.info { e.toString() }
                 throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
             }
         }
