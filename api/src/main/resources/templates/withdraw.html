@@ -7,17 +7,17 @@
             crossorigin
             href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
     />
-    <link rel="stylesheet" th:href="@{/css/withdraw.css}" />
+    <link rel="stylesheet" th:href="@{/css/withdraw.css}"/>
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
-    <link rel="icon" type="image/png" sizes="192x192"  th:href="@{/susufavicon_16_16.png}">
+    <link rel="icon" type="image/png" sizes="192x192" th:href="@{/susufavicon_16_16.png}">
     <link rel="icon" type="image/png" sizes="32x32" th:href="@{/susufavicon_32_32.png}">
     <link rel="icon" type="image/png" sizes="16x16" th:href="@{/susufavicon_16_16.png}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
-        function withdrawUser(xSusuAuthToken, googleAccessToken) {
+        function withdrawUser(xSusuAuthToken, googleAccessToken, appleAccessToken) {
             $.ajax({
-                url: `/api/v1/auth/withdraw?accessToken=` + googleAccessToken,
+                url: `/api/v1/auth/withdraw?googleAccessToken=` + googleAccessToken + `appleAccessToken=` + appleAccessToken,
                 type: 'post',
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'application/json',
@@ -33,9 +33,10 @@
                 }
             });
         }
+
         /*]]>*/
     </script>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>SUSU 회원 탈퇴</title>
 </head>
 <body>
@@ -48,15 +49,15 @@
                 탈퇴 시 작성했던 데이터를 복구할 수 없어요
             </p>
             <div class="withdrawButton"
-                 th:attr="xSusuAuthToken=${xSusuAuthToken}, googleAccessToken=${googleAccessToken}"
-                 th:onclick="withdrawUser(this.getAttribute('xSusuAuthToken'), this.getAttribute('googleAccessToken'))" />
-                <p>탈퇴</p>
-            </div>
+                 th:attr="xSusuAuthToken=${xSusuAuthToken}, googleAccessToken=${googleAccessToken}, appleAccessToken=${appleAccessToken}"
+                 th:onclick="withdrawUser(this.getAttribute('xSusuAuthToken'), this.getAttribute('googleAccessToken'),  this.getAttribute('appleAccessToken')))"/>
+            <p>탈퇴</p>
         </div>
     </div>
-    <div class="Logo">
-        <svg th:replace="~{component/logo}">logo</svg>
-    </div>
+</div>
+<div class="Logo">
+    <svg th:replace="~{component/logo}">logo</svg>
+</div>
 </div>
 </body>
 </html>

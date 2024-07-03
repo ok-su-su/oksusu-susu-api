@@ -27,9 +27,11 @@ class OAuthWithdrawResource(
     ): String {
         val kakaoRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.KAKAO, request.uri.toString())
         val googleRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.GOOGLE, request.uri.toString())
+        val appleRedirectUrl = oAuthService.getOAuthWithdrawLoginLink(OAuthProvider.APPLE, request.uri.toString())
 
         model.addAttribute("kakaoRedirectUrl", kakaoRedirectUrl.link)
         model.addAttribute("googleRedirectUrl", googleRedirectUrl.link)
+        model.addAttribute("appleRedirectUrl", appleRedirectUrl.link)
         return "withdrawLogin"
     }
 
@@ -52,7 +54,7 @@ class OAuthWithdrawResource(
 
     /** oauth callback용 url, 로그인 완료되면 /withdraw로 redirect */
     @GetMapping("/GOOGLE/callback")
-    suspend fun getGooGleCallbackPage(
+    suspend fun getGoogleCallbackPage(
         model: Model,
         request: ServerHttpRequest,
         @RequestParam code: String,
@@ -67,15 +69,34 @@ class OAuthWithdrawResource(
         return RedirectView("/withdraw?xSusuAuthToken=$susuToken&googleAccessToken=$googleAccessToken")
     }
 
+    /** oauth callback용 url, 로그인 완료되면 /withdraw로 redirect */
+    @GetMapping("/apple/callback")
+    suspend fun getAppleCallbackPage(
+        model: Model,
+        request: ServerHttpRequest,
+        @RequestParam code: String,
+    ): RedirectView {
+        val appleAccessToken = oAuthService.getOAuthWithdrawToken(OAuthProvider.APPLE, code).accessToken
+        val susuToken = oAuthFacade.login(
+            provider = OAuthProvider.APPLE,
+            request = OAuthLoginRequest(appleAccessToken),
+            deviceContext = UserDeviceContextImpl.getDefault()
+        ).accessToken
+
+        return RedirectView("/withdraw?xSusuAuthToken=$susuToken&appleAccessToken=$appleAccessToken")
+    }
+
     /** 회원 탈퇴 페이지 */
     @GetMapping("/withdraw")
     suspend fun getWithdrawPage(
         model: Model,
         @RequestParam xSusuAuthToken: String,
         @RequestParam googleAccessToken: String?,
+        @RequestParam appleAccessToken: String?,
     ): String {
         model.addAttribute("xSusuAuthToken", xSusuAuthToken)
         model.addAttribute("googleAccessToken", googleAccessToken)
+        model.addAttribute("appleAccessToken", appleAccessToken)
         return "withdraw"
     }
 }

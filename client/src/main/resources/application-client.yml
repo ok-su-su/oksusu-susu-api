@@ -21,8 +21,7 @@ oauth-url:
 
   apple:
     apple-id-url: ${APPLE_APPLEID_URL}
-    redirect-url: ${APPLE_REDIRECT}
-    web-callback-url: ${APPLE_WEB_CALLBACK}
+    dev-callback-url: ${APPLE_DEV_CALLBACK_URL}
     withdraw-callback-url: ${APPLE_WITHDRAW_CALLBACK_URL}
     authorize-url: ${APPLE_AUTHORIZE_URL}
     token-url: ${APPLE_TOKEN_URL}

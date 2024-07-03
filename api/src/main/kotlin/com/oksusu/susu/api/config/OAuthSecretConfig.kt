@@ -35,7 +35,6 @@ class OAuthSecretConfig(
     @ConfigurationProperties(prefix = "oauth.apple")
     class AppleOAuthSecretConfig(
         val clientId: String,
-        val webClientId: String,
         val keyId: String,
         val teamId: String,
         val authKey: String,
