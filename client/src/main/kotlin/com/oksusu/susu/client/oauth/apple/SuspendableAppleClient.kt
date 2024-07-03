@@ -3,6 +3,7 @@ package com.oksusu.susu.client.oauth.apple
 import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.apple.model.AppleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeysResponse
+import com.oksusu.susu.common.extension.awaitSingleOptionalOrThrow
 import com.oksusu.susu.common.extension.awaitSingleOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.reactor.awaitSingle
@@ -57,6 +58,6 @@ class SuspendableAppleClient(
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .retrieve()
             .bodyToMono(Unit::class.java)
-            .awaitSingleOrThrow()
+            .awaitSingleOptionalOrThrow() ?: Unit
     }
 }
