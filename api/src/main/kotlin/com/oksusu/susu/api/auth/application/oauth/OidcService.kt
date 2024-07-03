@@ -119,6 +119,7 @@ class OidcService(
                     )
                 ).build().verify(token)
             } catch (e: Exception) {
+                throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
             }
         }
         return null
@@ -129,7 +130,7 @@ class OidcService(
         val verifyAud = token.audience.firstOrNull() == aud
         val verifyIssuer = token.issuer == iss
 
-        logger.info { "2" }
+        logger.info { "2 ${Date()} ${token.expiresAt} ${token.audience.firstOrNull()} $aud ${token.issuer} $iss" }
         if (!verifyTime || !verifyAud || !verifyIssuer) {
             throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
         }
