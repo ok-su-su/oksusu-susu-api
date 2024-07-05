@@ -2,6 +2,7 @@ package com.oksusu.susu.domain.user.infrastructure
 
 import com.oksusu.susu.domain.user.domain.QUserStatusHistory
 import com.oksusu.susu.domain.user.domain.UserStatusHistory
+import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +14,14 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Repository
-interface UserStatusHistoryRepository : JpaRepository<UserStatusHistory, Long>, UserStatusHistoryCustomRepository
+interface UserStatusHistoryRepository : JpaRepository<UserStatusHistory, Long>, UserStatusHistoryCustomRepository {
+    @Transactional(readOnly = true)
+    fun findAllByIsForcedAndStatusAssignmentTypeAndToStatusId(
+        isForced: Boolean,
+        assignmentType: UserStatusAssignmentType,
+        toStatusId: Long,
+    ): List<UserStatusHistory>
+}
 
 interface UserStatusHistoryCustomRepository {
     @Transactional(readOnly = true)

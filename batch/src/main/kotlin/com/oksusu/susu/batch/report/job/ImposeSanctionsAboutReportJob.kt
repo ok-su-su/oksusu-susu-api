@@ -11,6 +11,7 @@ import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
 import com.oksusu.susu.domain.report.infrastructure.ReportHistoryRepository
 import com.oksusu.susu.domain.report.infrastructure.ReportResultRepository
 import com.oksusu.susu.domain.user.domain.UserStatusHistory
+import com.oksusu.susu.domain.user.domain.UserStatusType
 import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
 import com.oksusu.susu.domain.user.infrastructure.UserStatusHistoryRepository
@@ -50,18 +51,41 @@ class ImposeSanctionsAboutReportJob(
 
         /** 기록을 캐싱한다. */
         coroutineScope {
-            val cacheUserReportCountDeferred = async { cacheService.set(Cache.getUserReportCountCache(), userReports) }
-            val cachePostReportCountDeferred = async { cacheService.set(Cache.getPostReportCountCache(), postReports) }
+            val cacheUserReportCountDeferred =
+                async { cacheService.set(Cache.getUserReportCountCache(), userReports) }
+            val cachePostReportCountDeferred =
+                async { cacheService.set(Cache.getPostReportCountCache(), postReports) }
 
             awaitAll(cacheUserReportCountDeferred, cachePostReportCountDeferred)
         }
     }
 
+    /** 서비스 시작 시점부터 지금까지의 유저 커뮤니티 처벌 카운트를 처리합니다. */
+    suspend fun updateUserCommunityPunishCount() {
+        val userStatuses = withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) }
+        val restrict7DaysUserStatusId =
+            userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.RESTRICTED_7_DAYS }.id
+
+        val histories = withContext(Dispatchers.IO) {
+            userStatusHistoryRepository.findAllByIsForcedAndStatusAssignmentTypeAndToStatusId(
+                isForced = true,
+                assignmentType = UserStatusAssignmentType.COMMUNITY,
+                toStatusId = restrict7DaysUserStatusId
+            )
+        }
+        val userCommunityPunishedCount = histories.groupBy { it.uid }
+            .mapValues { it.value.size.toLong() }
+
+        cacheService.set(Cache.getUserCommunityPunishedCountCache(), userCommunityPunishedCount)
+    }
+
     suspend fun imposeSanctionsAboutReportForDay() {
         logger.info { "start impose sanction about report" }
 
+        val userStatuses = withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) }
+
         /** 제재 완료 유저 석방 */
-        freePunishedUsers()
+        freePunishedUsers(userStatuses)
 
         /** 제재 대상 식별 */
         val (punishUids, punishPostIds) = getPunishTargetIds()
@@ -69,14 +93,18 @@ class ImposeSanctionsAboutReportJob(
         logger.info { "$punishUids 유저 제재 및 $punishPostIds 게시글 삭제" }
 
         /** 제재 */
-        punish(punishUids, punishPostIds)
+        punish(punishUids, punishPostIds, userStatuses)
 
         logger.info { "finish impose sanction about report" }
     }
 
-    suspend fun punish(punishUids: List<Long>, punishPostIds: List<Long>) {
+    suspend fun punish(punishUids: List<Long>, punishPostIds: List<Long>, userStatuses: List<UserStatusType>) {
         val reportResults = mutableListOf<ReportResult>()
         val histories = mutableListOf<UserStatusHistory>()
+        val restrict7DaysUserStatusId =
+            userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.RESTRICTED_7_DAYS }.id
+        val banishedUserStatusId =
+            userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.BANISHED }.id
 
         /** 게시물 제재 */
         punishPostIds.forEach { id ->
@@ -96,34 +124,66 @@ class ImposeSanctionsAboutReportJob(
         val targetUids = punishUids.toSet().plus(punishPostUids)
 
         /** 유저 제재 */
+        val punishedCountMap = mutableMapOf<Long, Long>()
+
         val updatedStatuses = parZip(
-            { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
-            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(targetUids) } }
-        ) { userStatuses, statuses ->
-            val restrict7DaysUserStatusId =
-                userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.RESTRICTED_7_DAYS }.id
-
+            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(targetUids) } },
+            { withContext(Dispatchers.IO) { cacheService.getOrNull(Cache.getUserCommunityPunishedCountCache()) } }
+        ) { statuses, userCommunityPublishedCount ->
             statuses.map { status ->
-                histories.add(
-                    UserStatusHistory(
-                        uid = status.uid,
-                        statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
-                        fromStatusId = status.communityStatusId,
-                        toStatusId = restrict7DaysUserStatusId,
-                        isForced = true
-                    )
-                )
+                val punishedCount = userCommunityPublishedCount!!.getOrDefault(status.uid, 0)
 
-                reportResults.add(
-                    ReportResult(
-                        targetId = status.uid,
-                        targetType = ReportTargetType.USER,
-                        status = ReportResultStatus.RESTRICTED_7_DAYS
-                    )
-                )
+                punishedCountMap[status.uid] = punishedCount + 1
 
-                status.apply {
-                    this.communityStatusId = restrict7DaysUserStatusId
+                /**
+                 * 신고 누적 횟수가 3번일 경우 커뮤니티 이용 정지이므로
+                 * 누적 횟수가 2 미만이면 7일 정지
+                 * 2 이상이면 커뮤니티 밴
+                 */
+                if (punishedCount < 2L) {
+                    histories.add(
+                        UserStatusHistory(
+                            uid = status.uid,
+                            statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
+                            fromStatusId = status.communityStatusId,
+                            toStatusId = restrict7DaysUserStatusId,
+                            isForced = true
+                        )
+                    )
+
+                    reportResults.add(
+                        ReportResult(
+                            targetId = status.uid,
+                            targetType = ReportTargetType.USER,
+                            status = ReportResultStatus.RESTRICTED_7_DAYS
+                        )
+                    )
+
+                    status.apply {
+                        this.communityStatusId = restrict7DaysUserStatusId
+                    }
+                } else {
+                    histories.add(
+                        UserStatusHistory(
+                            uid = status.uid,
+                            statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
+                            fromStatusId = status.communityStatusId,
+                            toStatusId = banishedUserStatusId,
+                            isForced = true
+                        )
+                    )
+
+                    reportResults.add(
+                        ReportResult(
+                            targetId = status.uid,
+                            targetType = ReportTargetType.USER,
+                            status = ReportResultStatus.BANISHED
+                        )
+                    )
+
+                    status.apply {
+                        this.communityStatusId = banishedUserStatusId
+                    }
                 }
             }
         }
@@ -133,12 +193,20 @@ class ImposeSanctionsAboutReportJob(
             val reportResultDeferred = async { reportResultRepository.saveAll(reportResults) }
             val statusHistoryDeferred = async { userStatusHistoryRepository.saveAll(histories) }
             val statusDeferred = async { userStatusRepository.saveAll(updatedStatuses) }
+            val punishedCountDeferred =
+                async { cacheService.set(Cache.getUserCommunityPunishedCountCache(), punishedCountMap) }
 
-            awaitAll(updatePostDeferred, reportResultDeferred, statusDeferred, statusHistoryDeferred)
+            awaitAll(
+                updatePostDeferred,
+                reportResultDeferred,
+                statusDeferred,
+                statusHistoryDeferred,
+                punishedCountDeferred
+            )
         }
     }
 
-    suspend fun freePunishedUsers() {
+    suspend fun freePunishedUsers(userStatuses: List<UserStatusType>) {
         /** RESTRICTED_7_DAYS 대응 */
         val from = LocalDateTime.now().minusDays(7).minusHours(1)
         val to = LocalDateTime.now().minusDays(7).plusHours(1)
@@ -151,27 +219,23 @@ class ImposeSanctionsAboutReportJob(
         /** RESTRICTED_7_DAYS 제재 해제 */
         val histories = mutableListOf<UserStatusHistory>()
 
-        val updatedStatuses = parZip(
-            { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
-            { withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(freeUid.toSet()) } }
-        ) { userStatus, statuses ->
-            val activeUserStatusId =
-                userStatus.first { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }.id
+        val activeUserStatusId =
+            userStatuses.first { status -> status.statusTypeInfo == UserStatusTypeInfo.ACTIVE }.id
 
-            statuses.map { status ->
-                histories.add(
-                    UserStatusHistory(
-                        uid = status.uid,
-                        statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
-                        fromStatusId = status.communityStatusId,
-                        toStatusId = activeUserStatusId,
-                        isForced = true
-                    )
+        val statuses = withContext(Dispatchers.IO) { userStatusRepository.findAllByUidIn(freeUid.toSet()) }
+        val updatedStatuses = statuses.map { status ->
+            histories.add(
+                UserStatusHistory(
+                    uid = status.uid,
+                    statusAssignmentType = UserStatusAssignmentType.COMMUNITY,
+                    fromStatusId = status.communityStatusId,
+                    toStatusId = activeUserStatusId,
+                    isForced = true
                 )
+            )
 
-                status.apply {
-                    this.communityStatusId = activeUserStatusId
-                }
+            status.apply {
+                this.communityStatusId = activeUserStatusId
             }
         }
 

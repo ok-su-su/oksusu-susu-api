@@ -99,6 +99,17 @@ class DevBatchResource(
         }
     }
 
+    /** 서비스 시작 시점부터 지금까지의 유저 커뮤니티 처벌 카운트를 처리합니다. */
+    @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "update user community punish count 호출")
+    @GetMapping("/update-user-community-punish-count")
+    suspend fun updateUserCommunityPunishCount(
+        adminUser: AdminUser,
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            imposeSanctionsAboutReportJob.updateUserCommunityPunishCount()
+        }
+    }
+
     /** 수수 통계 캐싱 데이터를 초기화합니다. */
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "refresh susu envelope statistic amount 호출")
     @GetMapping("/refresh-susu-envelope-statistic-amount")
