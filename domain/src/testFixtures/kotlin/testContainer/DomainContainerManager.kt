@@ -23,7 +23,7 @@ class DomainContainerManager : BeforeProjectListener, AfterProjectListener {
     }
 
     override suspend fun beforeProject() {
-        logger.info { "start redis container" }
+        logger.info { "start mysql container" }
         mysqlContainer.start()
         System.setProperty("susu.master.datasource.url", mysqlContainer.getJdbcUrl())
         System.setProperty("susu.master.datasource.username", mysqlContainer.username)
@@ -33,6 +33,6 @@ class DomainContainerManager : BeforeProjectListener, AfterProjectListener {
 
     override suspend fun afterProject() {
         mysqlContainer.stop()
-        logger.info { "stop redis container" }
+        logger.info { "stop mysql container" }
     }
 }

@@ -12,7 +12,7 @@ class CacheContainerManager : BeforeProjectListener, AfterProjectListener {
     private val logger = KotlinLogging.logger { }
 
     companion object {
-        private const val REDIS_DOCKER_IMAGE = "redis:7.2-alpine"
+        private const val REDIS_DOCKER_IMAGE = "redis"
         private const val REDIS_PORT = 6379
 
         private val redisContainer = GenericContainer(DockerImageName.parse(REDIS_DOCKER_IMAGE))

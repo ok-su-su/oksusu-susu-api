@@ -8,6 +8,7 @@ import com.navercorp.fixturemonkey.kotlin.setNotNullExp
 import com.oksusu.susu.domain.post.domain.Board
 import com.oksusu.susu.domain.post.domain.Post
 import com.oksusu.susu.domain.post.domain.VoteOption
+import com.oksusu.susu.domain.report.domain.ReportHistory
 import com.oksusu.susu.domain.user.domain.User
 
 class DomainFixtureUtil {
@@ -18,19 +19,16 @@ class DomainFixtureUtil {
             .build()
 
         private val boardBuilder = monkey.giveMeBuilder(Board::class.java)
-            .setNotNullExp(Board::id)
-            .setPostCondition { 0 < it.id }
+            .set("id", -1)
             .setNotNullExp(Board::name)
             .setNotNullExp(Board::isActive)
             .setNotNullExp(Board::seq)
 
         fun getBoard(): Board = boardBuilder.sample()
         fun getBoards(size: Int): List<Board> = boardBuilder.sampleList(size)
-        fun getBoardBuilder(): ArbitraryBuilder<Board> = boardBuilder
 
         private val postBuilder = monkey.giveMeBuilder(Post::class.java)
-            .setNotNullExp(Post::id)
-            .setPostCondition { 0 < it.id }
+            .set("id", -1)
             .setNotNullExp(Post::uid)
             .setPostCondition { 0 < it.uid }
             .setNotNullExp(Post::boardId)
@@ -41,11 +39,9 @@ class DomainFixtureUtil {
 
         fun getPost(): Post = postBuilder.sample()
         fun getPosts(size: Int): List<Post> = postBuilder.sampleList(size)
-        fun getPostBuilder(): ArbitraryBuilder<Post> = postBuilder
 
         private val userBuilder = monkey.giveMeBuilder(User::class.java)
-            .setNotNullExp(User::id)
-            .setPostCondition { 0 < it.id }
+            .set("id", -1)
             .setNotNullExp(User::oauthInfo)
             .setNotNullExp(User::name)
             .setPostCondition { it.name.length <= 100 }
@@ -53,11 +49,9 @@ class DomainFixtureUtil {
 
         fun getUser(): User = userBuilder.sample()
         fun getUsers(size: Int): List<User> = userBuilder.sampleList(size)
-        fun getUserBuilder(): ArbitraryBuilder<User> = userBuilder
 
         private val voteOptionBuilder = monkey.giveMeBuilder(VoteOption::class.java)
-            .setNotNullExp(VoteOption::id)
-            .setPostCondition { 0 < it.id }
+            .set("id", -1)
             .setNotNullExp(VoteOption::postId)
             .setPostCondition { 0 < it.postId }
             .setNotNullExp(VoteOption::content)
@@ -67,6 +61,18 @@ class DomainFixtureUtil {
 
         fun getVoteOption(): VoteOption = voteOptionBuilder.sample()
         fun getVoteOptions(size: Int): List<VoteOption> = voteOptionBuilder.sampleList(size)
-        fun getVoteOptionBuilder(): ArbitraryBuilder<VoteOption> = voteOptionBuilder
+
+        private val reportHistoryBuilder = monkey.giveMeBuilder(ReportHistory::class.java)
+            .set("id", -1)
+            .setNotNullExp(ReportHistory::targetType)
+            .set("metadataId", 1L)
+
+        fun getReportHistory(): ReportHistory = reportHistoryBuilder.sample()
+        fun getReportHistorys(size: Int): List<ReportHistory> = reportHistoryBuilder
+            .setNotNullExp(ReportHistory::targetId)
+            .setPostCondition { 0 < it.targetId && it.targetId < size / 3 }
+            .sampleList(size)
+
+
     }
 }
