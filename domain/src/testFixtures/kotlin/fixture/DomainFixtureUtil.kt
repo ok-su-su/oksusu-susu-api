@@ -1,21 +1,16 @@
-package com.oksusu.susu.api.fixture
+package fixture
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder
 import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.navercorp.fixturemonkey.kotlin.setNotNullExp
-import com.navercorp.fixturemonkey.kotlin.setPostCondition
-import com.oksusu.susu.api.auth.model.AuthContextImpl
-import com.oksusu.susu.api.auth.model.AuthUserImpl
 import com.oksusu.susu.domain.post.domain.Board
 import com.oksusu.susu.domain.post.domain.Post
 import com.oksusu.susu.domain.post.domain.VoteOption
 import com.oksusu.susu.domain.user.domain.User
-import com.oksusu.susu.domain.user.domain.vo.AccountRole
-import com.oksusu.susu.domain.user.domain.vo.UserStatusTypeInfo
 
-class FixtureUtil {
+class DomainFixtureUtil {
     companion object {
         private val monkey: FixtureMonkey = FixtureMonkey.builder()
             .plugin(KotlinPlugin())
@@ -73,15 +68,5 @@ class FixtureUtil {
         fun getVoteOption(): VoteOption = voteOptionBuilder.sample()
         fun getVoteOptions(size: Int): List<VoteOption> = voteOptionBuilder.sampleList(size)
         fun getVoteOptionBuilder(): ArbitraryBuilder<VoteOption> = voteOptionBuilder
-
-        fun getAuthUser() = AuthUserImpl(
-            uid = 1L,
-            context = AuthContextImpl(
-                name = "name",
-                role = AccountRole.USER,
-                profileImageUrl = null,
-                userStatusTypeInfo = UserStatusTypeInfo.ACTIVE
-            )
-        )
     }
 }

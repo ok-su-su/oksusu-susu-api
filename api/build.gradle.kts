@@ -5,6 +5,9 @@ dependencies {
     implementation(project(":batch"))
     implementation(project(":cache"))
 
+    testImplementation(testFixtures(project(":cache")))
+    testImplementation(testFixtures(project(":domain")))
+
     /** swagger */
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${DependencyVersion.SPRINGDOC}")
     runtimeOnly("com.github.therapi:therapi-runtime-javadoc-scribe:${DependencyVersion.JAVADOC_SCRIBE}")
@@ -33,9 +36,7 @@ dependencies {
     implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
     implementation("org.bouncycastle:bcpkix-jdk15on:${DependencyVersion.BOUNCY_CASTLE}")
 
-    /** test container */
-    implementation(platform("org.testcontainers:testcontainers-bom:${DependencyVersion.TEST_CONTAINER}"))
-    testImplementation("org.testcontainers:mysql")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:${DependencyVersion.FIXTURE_MONKEY}")
 }
 
 tasks.getByName("bootJar") {

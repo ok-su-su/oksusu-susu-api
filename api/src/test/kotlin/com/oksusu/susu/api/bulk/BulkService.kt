@@ -12,9 +12,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.stereotype.Component
-import org.testcontainers.shaded.org.apache.commons.io.FileUtils
 import java.io.File
 import java.time.LocalDateTime
+import java.util.Scanner
 
 @Component
 class BulkService(
@@ -70,31 +70,32 @@ class BulkService(
 
     private suspend fun postBulkInsert(firstBoardId: Long, firstUserId: Long): Int {
         var dataSize = 0
-        txTemplates.writer.coExecute(Dispatchers.IO) {
-            val iterator = FileUtils.lineIterator(File(TEST_RESOURCES_PATH + POST_SQL_PATH), "UTF-8")
+        val iterator = withContext(Dispatchers.IO) {
+            Scanner(File(TEST_RESOURCES_PATH + POST_SQL_PATH), "UTF-8")
+        }
 
-            try {
-                while (true) {
-                    if (!iterator.hasNext()) {
-                        break
+        iterator.use {
+            while (true) {
+                if (!it.hasNext()) {
+                    break
+                }
+
+                val lines = mutableListOf<String>()
+                for (i in 1..CHUNK_SIZE) {
+                    if (it.hasNext()) {
+                        lines.add(it.nextLine())
+                        dataSize++
                     }
+                }
 
-                    val lines = mutableListOf<String>()
-                    for (i in 1..CHUNK_SIZE) {
-                        if (iterator.hasNext()) {
-                            lines.add(iterator.nextLine())
-                            dataSize++
-                        }
-                    }
+                val sql = """
+                            insert into susu.post(board_id, content, created_at, is_active, modified_at, title, type, uid) 
+                            values (:board_id, :content, :created_at, :is_active, :modified_at, :title, :type, :uid) 
+                """.trimIndent()
 
-                    val sql = """
-                        insert into susu.post(board_id, content, created_at, is_active, modified_at, title, type, uid) 
-                        values (:board_id, :content, :created_at, :is_active, :modified_at, :title, :type, :uid) 
-                    """.trimIndent()
+                txTemplates.writer.coExecute(Dispatchers.IO) {
                     jdbcTemplate.batchUpdate(sql, convertToPost(lines, firstBoardId, firstUserId))
                 }
-            } finally {
-                iterator.close()
             }
         }
         return dataSize
@@ -121,33 +122,35 @@ class BulkService(
 
     private suspend fun voteOptionBulkInsert(firstPostId: Long): Int {
         var dataSize = 0
-        txTemplates.writer.coExecute(Dispatchers.IO) {
-            val iterator = FileUtils.lineIterator(File(TEST_RESOURCES_PATH + VOTE_OPTION_SQL_PATH), "UTF-8")
+        val iterator = withContext(Dispatchers.IO) {
+            Scanner(File(TEST_RESOURCES_PATH + VOTE_OPTION_SQL_PATH), "UTF-8")
+        }
 
-            try {
-                while (true) {
-                    if (!iterator.hasNext()) {
-                        break
+        iterator.use {
+            while (true) {
+                if (!it.hasNext()) {
+                    break
+                }
+
+                val lines = mutableListOf<String>()
+                for (i in 1..CHUNK_SIZE) {
+                    if (it.hasNext()) {
+                        lines.add(it.nextLine())
+                        dataSize++
                     }
+                }
 
-                    val lines = mutableListOf<String>()
-                    for (i in 1..CHUNK_SIZE) {
-                        if (iterator.hasNext()) {
-                            lines.add(iterator.nextLine())
-                            dataSize++
-                        }
-                    }
+                val sql = """
+                            insert into susu.vote_option(content, created_at, modified_at, post_id, seq) 
+                            values (:content, :created_at, :modified_at, :post_id, :seq) 
+                """.trimIndent()
 
-                    val sql = """
-                        insert into susu.vote_option(content, created_at, modified_at, post_id, seq) 
-                        values (:content, :created_at, :modified_at, :post_id, :seq) 
-                    """.trimIndent()
+                txTemplates.writer.coExecute(Dispatchers.IO) {
                     jdbcTemplate.batchUpdate(sql, convertToVoteOption(lines, firstPostId))
                 }
-            } finally {
-                iterator.close()
             }
         }
+
         return dataSize
     }
 
@@ -169,33 +172,35 @@ class BulkService(
 
     private suspend fun countBulkInsert(firstPostId: Long, firstVoteOptionId: Long): Int {
         var dataSize = 0
-        txTemplates.writer.coExecute(Dispatchers.IO) {
-            val iterator = FileUtils.lineIterator(File(TEST_RESOURCES_PATH + COUNT_SQL_PATH), "UTF-8")
+        val iterator = withContext(Dispatchers.IO) {
+            Scanner(File(TEST_RESOURCES_PATH + COUNT_SQL_PATH), "UTF-8")
+        }
 
-            try {
-                while (true) {
-                    if (!iterator.hasNext()) {
-                        break
+        iterator.use {
+            while (true) {
+                if (!it.hasNext()) {
+                    break
+                }
+
+                val lines = mutableListOf<String>()
+                for (i in 1..CHUNK_SIZE) {
+                    if (it.hasNext()) {
+                        lines.add(it.nextLine())
+                        dataSize++
                     }
+                }
 
-                    val lines = mutableListOf<String>()
-                    for (i in 1..CHUNK_SIZE) {
-                        if (iterator.hasNext()) {
-                            lines.add(iterator.nextLine())
-                            dataSize++
-                        }
-                    }
+                val sql = """
+                            insert into susu.count(count, count_type, created_at, modified_at, target_id, target_type)
+                            values (:count, :count_type, :created_at, :modified_at, :target_id, :target_type)
+                """.trimIndent()
 
-                    val sql = """
-                        insert into susu.count(count, count_type, created_at, modified_at, target_id, target_type)
-                        values (:count, :count_type, :created_at, :modified_at, :target_id, :target_type)
-                    """.trimIndent()
+                txTemplates.writer.coExecute(Dispatchers.IO) {
                     jdbcTemplate.batchUpdate(sql, convertToCount(lines, firstPostId, firstVoteOptionId))
                 }
-            } finally {
-                iterator.close()
             }
         }
+
         return dataSize
     }
 
