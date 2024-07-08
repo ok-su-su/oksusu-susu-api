@@ -35,7 +35,7 @@ interface PostRepository : JpaRepository<Post, Long>, PostCustomRepository {
     fun findAllByUidIn(uid: List<Long>): List<Post>
 
     @Transactional(readOnly = true)
-    fun findAllByIdIn(punishPostIds: List<Long>) : List<Post>
+    fun findAllByIdIn(punishPostIds: List<Long>): List<Post>
 }
 
 interface PostCustomRepository {
