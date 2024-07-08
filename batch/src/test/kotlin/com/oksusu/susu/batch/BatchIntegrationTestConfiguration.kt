@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
         "com.oksusu.susu.domain",
         "com.oksusu.susu.batch",
         "com.oksusu.susu.cache",
-        "com.oksusu.susu.common",
+        "com.oksusu.susu.common"
     ]
 )
 class BatchIntegrationTestConfiguration

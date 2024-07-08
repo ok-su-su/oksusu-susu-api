@@ -73,6 +73,7 @@ class ImposeSanctionsAboutReportJob(
                 toStatusId = restrict7DaysUserStatusId
             )
         }
+
         val userCommunityPunishedCount = histories.groupBy { it.uid }
             .mapValues { it.value.size.toLong() }
 
@@ -90,15 +91,13 @@ class ImposeSanctionsAboutReportJob(
         /** 제재 대상 식별 */
         val (punishUids, punishPostIds) = getPunishTargetIds()
 
-        logger.info { "$punishUids 유저 제재 및 $punishPostIds 게시글 삭제" }
-
         /** 제재 */
         punish(punishUids, punishPostIds, userStatuses)
 
         logger.info { "finish impose sanction about report" }
     }
 
-    suspend fun punish(punishUids: List<Long>, punishPostIds: List<Long>, userStatuses: List<UserStatusType>) {
+    private suspend fun punish(punishUids: List<Long>, punishPostIds: List<Long>, userStatuses: List<UserStatusType>) {
         val reportResults = mutableListOf<ReportResult>()
         val histories = mutableListOf<UserStatusHistory>()
         val restrict7DaysUserStatusId =
@@ -122,6 +121,8 @@ class ImposeSanctionsAboutReportJob(
             .map { post -> post.uid }
 
         val targetUids = punishUids.toSet().plus(punishPostUids)
+
+        logger.info { "${targetUids.sorted()} 유저 제재 및 ${punishPostIds.sorted()} 게시글 삭제" }
 
         /** 유저 제재 */
         val punishedCountMap = mutableMapOf<Long, Long>()
@@ -163,6 +164,7 @@ class ImposeSanctionsAboutReportJob(
                         this.communityStatusId = restrict7DaysUserStatusId
                     }
                 } else {
+                    logger.info { "${status.uid} 유저 커뮤니티 영구 정지" }
                     histories.add(
                         UserStatusHistory(
                             uid = status.uid,
@@ -206,15 +208,16 @@ class ImposeSanctionsAboutReportJob(
         }
     }
 
-    suspend fun freePunishedUsers(userStatuses: List<UserStatusType>) {
+    private suspend fun freePunishedUsers(userStatuses: List<UserStatusType>) {
         /** RESTRICTED_7_DAYS 대응 */
         val from = LocalDateTime.now().minusDays(7).minusHours(1)
         val to = LocalDateTime.now().minusDays(7).plusHours(1)
         val freeUid = withContext(Dispatchers.IO) { reportResultRepository.findAllByCreatedAtBetween(from, to) }
             .filter { report -> report.status == ReportResultStatus.RESTRICTED_7_DAYS && report.targetType == ReportTargetType.USER }
             .map { result -> result.targetId }
+            .toSet()
 
-        logger.info { "$freeUid 유저 석방" }
+        logger.info { "${freeUid.sorted()}유저 석방" }
 
         /** RESTRICTED_7_DAYS 제재 해제 */
         val histories = mutableListOf<UserStatusHistory>()
@@ -247,7 +250,7 @@ class ImposeSanctionsAboutReportJob(
         }
     }
 
-    suspend fun getPunishTargetIds(): Pair<List<Long>, List<Long>> {
+    private suspend fun getPunishTargetIds(): Pair<List<Long>, List<Long>> {
         val targetDate = LocalDateTime.now().minusDays(REPORT_BEFORE_DAYS)
 
         return parZip(

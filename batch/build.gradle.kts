@@ -14,4 +14,8 @@ dependencies {
     /** aws ssm */
     testImplementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${DependencyVersion.SPRING_CLOUD_AWS}"))
     testImplementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+
+    /** fixture monkey */
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-kotlin:${DependencyVersion.FIXTURE_MONKEY}")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:${DependencyVersion.FIXTURE_MONKEY}")
 }

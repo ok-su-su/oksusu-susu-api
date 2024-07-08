@@ -18,8 +18,7 @@ class DomainContainerManager : BeforeProjectListener, AfterProjectListener {
         private val mysqlContainer = MySQLContainer(MYSQL_DOCKER_IMAGE)
             .withExposedPorts(MYSQL_PORT)
             .withDatabaseName(DB_NAME)
-            .withInitScript("scripts/DDL.sql")
-//            .withInitScript("classpath:scripts/DML.sql")
+            .withInitScript("scripts/init.sql")
     }
 
     override suspend fun beforeProject() {
