@@ -118,7 +118,8 @@ class EnvelopeFacade(
                 envelope = createdEnvelope,
                 friend = friend,
                 friendRelationship = friendRelationship,
-                relationship = relationship
+                relationship = relationship,
+                category = CategoryWithCustomModel.of(category, customCategory)
             )
         }
     }
@@ -168,7 +169,8 @@ class EnvelopeFacade(
             envelope = updatedEnvelope,
             friend = friend,
             friendRelationship = friendRelationship,
-            relationship = relationship
+            relationship = relationship,
+            category = CategoryWithCustomModel.of(category, customCategory)
         )
     }
 

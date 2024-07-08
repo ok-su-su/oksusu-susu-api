@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.envelope.model.response
 
+import com.oksusu.susu.api.category.model.CategoryWithCustomModel
 import com.oksusu.susu.api.envelope.model.EnvelopeModel
 import com.oksusu.susu.api.friend.model.FriendModel
 import com.oksusu.susu.api.friend.model.FriendRelationshipModel
@@ -17,6 +18,8 @@ data class CreateAndUpdateEnvelopeResponse(
     val friendRelationship: FriendRelationshipModel,
     /** 관계 정보 */
     val relationship: RelationshipModel,
+    /** 카테고리 정보 */
+    val category: CategoryWithCustomModel,
 ) {
     companion object {
         fun of(
@@ -24,12 +27,14 @@ data class CreateAndUpdateEnvelopeResponse(
             friend: Friend,
             friendRelationship: FriendRelationship,
             relationship: RelationshipModel,
+            category: CategoryWithCustomModel,
         ): CreateAndUpdateEnvelopeResponse {
             return CreateAndUpdateEnvelopeResponse(
                 envelope = EnvelopeModel.from(envelope),
                 friend = FriendModel.from(friend),
                 friendRelationship = FriendRelationshipModel.from(friendRelationship),
-                relationship = relationship
+                relationship = relationship,
+                category = category
             )
         }
     }
