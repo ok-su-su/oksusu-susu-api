@@ -35,6 +35,10 @@ dependencies {
     /** jwt */
     implementation("com.auth0:java-jwt:${DependencyVersion.JWT}")
     implementation("org.bouncycastle:bcpkix-jdk15on:${DependencyVersion.BOUNCY_CASTLE}")
+
+    /** fixture monkey */
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-kotlin:${DependencyVersion.FIXTURE_MONKEY}")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:${DependencyVersion.FIXTURE_MONKEY}")
 }
 
 tasks.getByName("bootJar") {

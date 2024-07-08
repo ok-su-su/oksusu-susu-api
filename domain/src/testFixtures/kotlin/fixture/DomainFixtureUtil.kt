@@ -25,7 +25,6 @@ class DomainFixtureUtil {
          * board
          */
         private val boardBuilder = monkey.giveMeBuilder(Board::class.java)
-            .set("id", -1)
             .setNotNullExp(Board::name)
             .setNotNullExp(Board::isActive)
             .setNotNullExp(Board::seq)

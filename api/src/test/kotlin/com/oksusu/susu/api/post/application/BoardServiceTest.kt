@@ -27,12 +27,10 @@ class BoardServiceTest : DescribeSpec({
     describe("scheduler") {
         context("run 될 경우") {
             it("board data를 리프레시 해야한다.") {
-                runTest {
-                    val boards = boardService.getAll()
-                    logger.info { boards }
+                val boards = boardService.getAll()
+                logger.info { boards }
 
-                    boards.size shouldBeEqual 5
-                }
+                boards.size shouldBeEqual 5
             }
         }
     }
