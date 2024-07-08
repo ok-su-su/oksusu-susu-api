@@ -21,6 +21,9 @@ data class CreateAndUpdateEnvelopeRequest(
     val hasVisited: Boolean? = null,
     /** 전달일 */
     val handedOverAt: LocalDateTime,
-    /** 카테고리 정보, null인 경우 기타로 등록 */
-    val category: CreateCategoryAssignmentRequest?,
+    /**
+     * - ledgerId가 존재하는 경우, 해당 id로 등록, 없다면 하위 조건으로 진행
+     * - 카테고리 정보, null인 경우 기타로 등록
+     */
+    val category: CreateCategoryAssignmentRequest? = null,
 )
