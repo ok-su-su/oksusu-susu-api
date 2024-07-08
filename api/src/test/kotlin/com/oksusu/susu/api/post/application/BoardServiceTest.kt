@@ -1,15 +1,14 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.fixture.FixtureUtil
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.domain.post.infrastructure.repository.BoardRepository
+import fixture.DomainFixtureUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 
 class BoardServiceTest : DescribeSpec({
@@ -19,7 +18,7 @@ class BoardServiceTest : DescribeSpec({
 
     val boardService = BoardService(mockBoardRepository)
 
-    every { mockBoardRepository.findAllByIsActive(any()) } returns FixtureUtil.getBoards(5)
+    every { mockBoardRepository.findAllByIsActive(any()) } returns DomainFixtureUtil.getBoards(5)
 
     beforeSpec {
         boardService.refreshBoards()
@@ -28,12 +27,10 @@ class BoardServiceTest : DescribeSpec({
     describe("scheduler") {
         context("run 될 경우") {
             it("board data를 리프레시 해야한다.") {
-                runTest {
-                    val boards = boardService.getAll()
-                    logger.info { boards }
+                val boards = boardService.getAll()
+                logger.info { boards }
 
-                    boards.size shouldBeEqual 5
-                }
+                boards.size shouldBeEqual 5
             }
         }
     }

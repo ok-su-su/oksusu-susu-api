@@ -1,4 +1,4 @@
-package com.oksusu.susu.api
+package com.oksusu.susu.batch
 
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.DescribeSpec
@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 
 @ActiveProfiles("dev")
-@SpringBootTest(classes = [ApiIntegrationTestConfiguration::class])
-abstract class ApiIntegrationSpec(body: DescribeSpec.() -> Unit = {}) : DescribeSpec(body) {
+@SpringBootTest(classes = [BatchIntegrationTestConfiguration::class])
+abstract class BatchIntegrationSpec(body: DescribeSpec.() -> Unit = {}) : DescribeSpec(body) {
     override fun extensions(): List<Extension> = listOf(SpringExtension)
 }

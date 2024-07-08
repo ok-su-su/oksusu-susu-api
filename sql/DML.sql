@@ -23,16 +23,16 @@ INSERT INTO susu.category (seq, name, is_active, style)
 VALUES (5, '기타', 1, '#D0D0D0');
 
 -- term
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term1', 'des1', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term2', 'des2', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term3', 'des3', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term4', 'des4', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term5', 'des5', 1, 1);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term1', 'des1', 1, 1, 1);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term2', 'des2', 1, 1, 2);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term3', 'des3', 1, 1, 3);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term4', 'des4', 1, 1, 4);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term5', 'des5', 1, 1, 5);
 
 -- board
 INSERT INTO susu.board (seq, name, is_active)

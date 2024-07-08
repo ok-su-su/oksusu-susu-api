@@ -2,5 +2,8 @@ dependencies {
     implementation(project(":common"))
 
     /** spring starter */
-    api("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+
+    /** test container */
+    testFixturesImplementation("org.testcontainers:testcontainers")
 }
