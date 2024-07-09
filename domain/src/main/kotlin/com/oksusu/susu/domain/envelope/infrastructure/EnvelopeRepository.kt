@@ -420,7 +420,8 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 QFriendStatisticsModel(
                     qEnvelope.friendId,
                     sentAmount.sum(),
-                    receivedAmount.sum()
+                    receivedAmount.sum(),
+                    qEnvelope.handedOverAt
                 )
             )
             .from(QEnvelope.envelope)

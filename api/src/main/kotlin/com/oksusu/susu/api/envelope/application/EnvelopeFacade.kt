@@ -62,7 +62,8 @@ class EnvelopeFacade(
                     true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.uid)
                     false -> null
                 }
-            }, {
+            },
+            {
                 when (request.ledgerId != null) {
                     true -> categoryAssignmentService.findByIdAndTypeOrNull(
                         request.ledgerId,
@@ -147,7 +148,8 @@ class EnvelopeFacade(
         return parZipWithMDC(
             {
                 envelopeService.getDetail(id, user.uid)
-            }, {
+            },
+            {
                 when (request.ledgerId != null) {
                     true -> categoryAssignmentService.findByIdAndTypeOrNull(
                         request.ledgerId,
