@@ -1,3 +1,7 @@
+-- scheme
+CREATE
+DATABASE susu CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
 -- 유저 정보
 CREATE TABLE `user`
 (
@@ -52,6 +56,7 @@ CREATE TABLE `user_status_history`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
 CREATE INDEX idx__uid ON user_status_history (uid);
+ALTER TABLE user_status_history ADD (`is_forced` tinyint DEFAULT 0 NOT NULL COMMENT '관리자 실행 여부, 1 : 관리자, 0 : 유저');
 
 -- 탈퇴 유저 기록
 CREATE TABLE `user_withdraw`
@@ -233,6 +238,8 @@ CREATE TABLE `term`
     `modified_at`  datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT ='약관 정보';
+ALTER TABLE term ADD (`seq` int NOT NULL COMMENT '노출 순서');
+ALTER TABLE term MODIFY `description` text NULL;
 
 -- 약관 정보 동의
 CREATE TABLE `term_agreement`
@@ -312,6 +319,11 @@ CREATE TABLE `report_result`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE =utf8mb4_general_ci COMMENT '신고 결과';
 CREATE INDEX idx__uid ON report_result (uid);
+ALTER TABLE report_result ADD (`target_type` varchar(128) NOT NULL COMMENT '신고 대상');
+ALTER TABLE report_result CHANGE COLUMN `uid` `target_id` bigint NOT NULL COMMENT '신고 대상 id';
+ALTER TABLE report_result CHANGE COLUMN `status` `status` varchar (128) NOT NULL COMMENT '신고 결과 상태';
+DROP INDEX idx__uid ON report_result;
+CREATE INDEX idx__target_id__target_type ON report_result (target_id, target_type);
 
 -- 카운트
 CREATE TABLE `count`
@@ -368,11 +380,12 @@ CREATE TABLE `system_action_log`
 -- 어플리케이션 설정 정보
 CREATE TABLE `application_metadata`
 (
-    `id`                  bigint  NOT NULL AUTO_INCREMENT COMMENT '어플리케이션 설정 정보 id',
-    `application_version` varchar(255) DEFAULT NULL COMMENT '최신 어플리케이션 버전',
-    `forced_update_date`  datetime     DEFAULT NULL COMMENT '강제 업데이트 날짜',
-    `is_active`           tinyint NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
-    `created_at`          datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    `modified_at`         datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `id`                  bigint       NOT NULL AUTO_INCREMENT COMMENT '어플리케이션 설정 정보 id',
+    `application_version` varchar(255) NOT NULL COMMENT '최신 어플리케이션 버전',
+    `forced_update_date`  datetime     NOT NULL COMMENT '강제 업데이트 날짜',
+    `description`         text COMMENT '해당 버전의 주요 기능 설명',
+    `is_active`           tinyint      NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
+    `created_at`          datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    `modified_at`         datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '어플리케이션 설정 정보';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='어플리케이션 설정 정보';

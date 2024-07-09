@@ -2,20 +2,10 @@ package com.oksusu.susu.domain.envelope.infrastructure
 
 import com.oksusu.susu.domain.category.domain.QCategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
-import com.oksusu.susu.domain.common.extension.execute
-import com.oksusu.susu.domain.common.extension.isContains
-import com.oksusu.susu.domain.common.extension.isGoe
-import com.oksusu.susu.domain.common.extension.isIn
-import com.oksusu.susu.domain.common.extension.isLoe
+import com.oksusu.susu.domain.common.extension.*
 import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.domain.envelope.domain.QLedger
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.LedgerDetailModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QCountPerCategoryIdModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QLedgerDetailModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QSearchLedgerModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.SearchLedgerModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.SearchLedgerSpec
+import com.oksusu.susu.domain.envelope.infrastructure.model.*
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,6 +28,9 @@ interface LedgerRepository : JpaRepository<Ledger, Long>, LedgerCustomRepository
 
     @Transactional(readOnly = true)
     fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
+
+    @Transactional(readOnly = true)
+    fun findAllByUidIn(uid: List<Long>): List<Ledger>
 }
 
 interface LedgerCustomRepository {
@@ -49,6 +42,15 @@ interface LedgerCustomRepository {
 
     @Transactional(readOnly = true)
     fun countPerCategoryId(): List<CountPerCategoryIdModel>
+
+    @Transactional(readOnly = true)
+    fun countPerCategoryIdExceptUid(uid: List<Long>): List<CountPerCategoryIdModel>
+
+    @Transactional(readOnly = true)
+    fun countPerCategoryIdExceptUidByCreatedAtAfter(
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountPerCategoryIdModel>
 
     @Transactional(readOnly = true)
     fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
@@ -103,7 +105,47 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             )
             .from(qLedger)
             .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
-            .where(qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER))
+            .where(
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            )
+            .groupBy(qCategoryAssignment.categoryId)
+            .fetch()
+    }
+
+    override fun countPerCategoryIdExceptUid(uid: List<Long>): List<CountPerCategoryIdModel> {
+        return JPAQuery<QLedger>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qLedger.id.count()
+                )
+            )
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qLedger.uid.notIn(uid)
+            )
+            .groupBy(qCategoryAssignment.categoryId)
+            .fetch()
+    }
+
+    override fun countPerCategoryIdExceptUidByCreatedAtAfter(
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountPerCategoryIdModel> {
+        return JPAQuery<QLedger>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qLedger.id.count()
+                )
+            )
+            .from(qLedger)
+            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qLedger.uid.notIn(uid),
+                qLedger.createdAt.after(targetDate)
+            )
             .groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }
@@ -119,8 +161,7 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             .from(qLedger)
             .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
             .where(
-                qLedger.uid.eq(uid),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+                qLedger.uid.eq(uid)
             ).groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }

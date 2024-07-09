@@ -12,7 +12,6 @@ import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
-import kotlin.math.roundToLong
 
 @Service
 class EnvelopeStatisticService(
@@ -44,18 +43,11 @@ class EnvelopeStatisticService(
     }
 
     /** 최다 수수 경조사 */
-    suspend fun getMostFrequentCategory(uid: Long?): TitleValueModel<Long>? {
-        val (envelopeCategoryCounts, ledgerCategoryCounts) = if (uid == null) {
-            parZipWithMDC(
-                { envelopeService.countPerCategoryId() },
-                { ledgerService.countPerCategoryId() }
-            ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
-        } else {
-            parZipWithMDC(
-                { envelopeService.countPerCategoryIdByUid(uid) },
-                { ledgerService.countPerCategoryIdByUid(uid) }
-            ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
-        }
+    suspend fun getMostFrequentCategory(uid: Long): TitleValueModel<Long>? {
+        val (envelopeCategoryCounts, ledgerCategoryCounts) = parZipWithMDC(
+            { envelopeService.countPerCategoryIdByUid(uid) },
+            { ledgerService.countPerCategoryIdByUid(uid) }
+        ) { envelopeCategoryCounts, ledgerCategoryCounts -> envelopeCategoryCounts to ledgerCategoryCounts }
 
         val categoryIdSet = envelopeCategoryCounts.map { count -> count.categoryId }.toSet()
             .union(ledgerCategoryCounts.map { count -> count.categoryId })
@@ -79,12 +71,8 @@ class EnvelopeStatisticService(
     }
 
     /** 최다 수수 관계 */
-    suspend fun getMostFrequentRelationship(uid: Long?): TitleValueModel<Long>? {
-        val relationShipConuts = if (uid == null) {
-            friendRelationshipService.countPerRelationshipId()
-        } else {
-            friendRelationshipService.countPerRelationshipIdByUid(uid)
-        }
+    suspend fun getMostFrequentRelationship(uid: Long): TitleValueModel<Long>? {
+        val relationShipConuts = friendRelationshipService.countPerRelationshipIdByUid(uid)
 
         return relationShipConuts.takeIf { it.isNotEmpty() }
             ?.maxBy { it.totalCounts }
@@ -105,31 +93,5 @@ class EnvelopeStatisticService(
             ?.map { count ->
                 TitleValueModel(count.handedOverAtMonth.toString(), count.totalAmounts)
             }?.sortedBy { model -> model.title }
-    }
-
-    /** 최근 사용 금액 (절사) */
-    suspend fun getCuttingRecentSpentFor1Year(minAmount: Long, maxAmount: Long): List<TitleValueModel<Long>>? {
-        val envelopHandOverAtMonthCount =
-            envelopeService.getCuttingTotalAmountPerHandedOverAtInLast1Year(EnvelopeType.SENT, minAmount, maxAmount)
-
-        return envelopHandOverAtMonthCount.takeIf { it.isNotEmpty() }
-            ?.map { count ->
-                TitleValueModel(count.handedOverAtMonth.toString(), count.totalAmounts)
-            }?.sortedBy { model -> model.title }
-    }
-
-    /** 절사 평균 limit 지점 amount 구하기 */
-    suspend fun getLimitAmountForCutting(): Pair<Long, Long> {
-        val susuEnvelopeConfig = statisticConfig.susuEnvelopeConfig
-
-        val count = envelopeService.count()
-
-        val minIdx = (count * susuEnvelopeConfig.minCuttingAverage).roundToLong()
-        val maxIdx = (count * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
-
-        return parZipWithMDC(
-            { envelopeService.getEnvelopeByPositionOrderByAmount(minIdx) },
-            { envelopeService.getEnvelopeByPositionOrderByAmount(maxIdx) }
-        ) { min, max -> min.amount to max.amount }
     }
 }

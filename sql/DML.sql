@@ -23,16 +23,16 @@ INSERT INTO susu.category (seq, name, is_active, style)
 VALUES (5, '기타', 1, '#D0D0D0');
 
 -- term
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term1', 'des1', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term2', 'des2', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term3', 'des3', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term4', 'des4', 1, 1);
-INSERT INTO susu.term (title, description, is_essential, is_active)
-VALUES ('term5', 'des5', 1, 1);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term1', 'des1', 1, 1, 1);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term2', 'des2', 1, 1, 2);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term3', 'des3', 1, 1, 3);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term4', 'des4', 1, 1, 4);
+INSERT INTO susu.term (title, description, is_essential, is_active, seq)
+VALUES ('term5', 'des5', 1, 1, 5);
 
 -- board
 INSERT INTO susu.board (seq, name, is_active)
@@ -84,16 +84,4 @@ VALUES (5, 4, 1, 0, 0);
 
 -- application metadata
 INSERT INTO susu.application_metadata (id, application_version, forced_update_date, is_active)
-VALUES (1, "1.0.0", "2024-02-18 20:14:25", 1);
-
--- user
-INSERT INTO susu.user (id, oauth_provider, oauth_id, name, gender, birth, profile_image_url, role)
-VALUES (1, 0, '000000001', '1번', null, null, null, 'USER');
-INSERT INTO susu.user (id, oauth_provider, oauth_id, name, gender, birth, profile_image_url, role)
-VALUES (2, 0, '000000002', '2번', null, null, null, 'USER');
-
--- user status
-INSERT INTO susu.user_status (uid, account_status_id, community_status_id)
-VALUES (1, 1, 1);
-INSERT INTO susu.user_status (uid, account_status_id, community_status_id)
-VALUES (2, 1, 1);
+VALUES (1, "1.0.0", "2024-02-18 20:14:25", 1)

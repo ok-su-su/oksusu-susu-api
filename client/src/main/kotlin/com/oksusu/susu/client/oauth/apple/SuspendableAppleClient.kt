@@ -3,8 +3,10 @@ package com.oksusu.susu.client.oauth.apple
 import com.oksusu.susu.client.config.OAuthUrlConfig
 import com.oksusu.susu.client.oauth.apple.model.AppleOAuthTokenResponse
 import com.oksusu.susu.client.oauth.oidc.model.OidcPublicKeysResponse
+import com.oksusu.susu.common.extension.awaitSingleOptionalOrThrow
+import com.oksusu.susu.common.extension.awaitSingleOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.reactor.awaitSingle
+import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
 class SuspendableAppleClient(
@@ -28,9 +30,10 @@ class SuspendableAppleClient(
         )
         return webClient.post()
             .uri(url)
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .retrieve()
             .bodyToMono(AppleOAuthTokenResponse::class.java)
-            .awaitSingle()
+            .awaitSingleOrThrow()
     }
 
     override suspend fun getOidcPublicKeys(): OidcPublicKeysResponse {
@@ -39,7 +42,7 @@ class SuspendableAppleClient(
             .uri(url)
             .retrieve()
             .bodyToMono(OidcPublicKeysResponse::class.java)
-            .awaitSingle()
+            .awaitSingleOrThrow()
     }
 
     override suspend fun withdraw(clientId: String, clientSecret: String, token: String) {
@@ -51,8 +54,9 @@ class SuspendableAppleClient(
         )
         return webClient.post()
             .uri(url)
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .retrieve()
             .bodyToMono(Unit::class.java)
-            .awaitSingle()
+            .awaitSingleOptionalOrThrow() ?: Unit
     }
 }

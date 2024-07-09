@@ -95,8 +95,7 @@ class OidcService(
         return OidcDecodePayload(
             iss = jwt.getClaim("iss").asString(),
             aud = jwt.getClaim("aud").asString(),
-            sub = jwt.getClaim("sub").asString(),
-            email = jwt.getClaim("email").asString()
+            sub = jwt.getClaim("sub").asString()
         )
     }
 

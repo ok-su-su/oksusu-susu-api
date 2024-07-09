@@ -10,6 +10,8 @@ plugins {
     kotlin("plugin.jpa") version kotlinVersion
     kotlin("plugin.allopen") version kotlinVersion
     kotlin("kapt") version kotlinVersion
+    id("java-test-fixtures")
+    id("java-library")
     idea
 
     /** ktlint **/
@@ -38,6 +40,8 @@ allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "idea")
+    apply(plugin = "java-test-fixtures")
+    apply(plugin = "java-library")
 
     repositories {
         mavenCentral()
@@ -125,11 +129,13 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK}")
 
+        testFixturesImplementation(platform("org.testcontainers:testcontainers-bom:${DependencyVersion.TEST_CONTAINER}"))
+        testFixturesImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST}")
+
         /** kotest */
         testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST}")
         testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST}")
         testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION}")
-        testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:${DependencyVersion.FIXTURE_MONKEY}")
         testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependencyVersion.COROUTINE_TEST}")
     }
 

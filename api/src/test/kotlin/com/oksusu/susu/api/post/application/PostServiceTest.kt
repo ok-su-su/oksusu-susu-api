@@ -1,11 +1,11 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.fixture.FixtureUtil
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.domain.post.domain.vo.PostType
 import com.oksusu.susu.domain.post.infrastructure.repository.PostRepository
 import com.oksusu.susu.domain.post.infrastructure.repository.model.PostAndUserModel
+import fixture.DomainFixtureUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -24,7 +24,7 @@ class PostServiceTest : DescribeSpec({
     describe("조회") {
         context("id로 post 조회시") {
             every { mockPostRepository.findByIdOrNull(Long.MIN_VALUE) } returns null
-            every { mockPostRepository.findByIdOrNull(1L) } returns FixtureUtil.getPostBuilder().set("id", 1).sample()
+            every { mockPostRepository.findByIdOrNull(1L) } returns DomainFixtureUtil.getPostBuilder().set("id", 1).sample()
 
             it("없으면 에러 발생") {
                 shouldThrow<NotFoundException> { postService.findByIdOrThrow(Long.MIN_VALUE) }
@@ -45,7 +45,7 @@ class PostServiceTest : DescribeSpec({
                     true,
                     PostType.VOTE
                 )
-            } returns FixtureUtil.getPostBuilder().set("id", 1).set("isActive", true).set("type", PostType.VOTE)
+            } returns DomainFixtureUtil.getPostBuilder().set("id", 1).set("isActive", true).set("type", PostType.VOTE)
                 .sample()
 
             it("없으면 에러 발생") {
@@ -66,8 +66,8 @@ class PostServiceTest : DescribeSpec({
         context("id, type으로 post, user 조회시") {
             every { mockPostRepository.getPostAndCreator(Long.MIN_VALUE, any()) } returns null
             every { mockPostRepository.getPostAndCreator(1L, PostType.VOTE) } returns PostAndUserModel(
-                FixtureUtil.getPostBuilder().set("id", 1).set("type", PostType.VOTE).sample(),
-                FixtureUtil.getUser()
+                DomainFixtureUtil.getPostBuilder().set("id", 1).set("type", PostType.VOTE).sample(),
+                DomainFixtureUtil.getUser()
             )
 
             it("없으면 에러") {
@@ -98,7 +98,7 @@ class PostServiceTest : DescribeSpec({
         }
 
         context("post 소유권 검증시") {
-            every { mockPostRepository.findByIdOrNull(1L) } returns FixtureUtil.getPostBuilder().set("id", 1)
+            every { mockPostRepository.findByIdOrNull(1L) } returns DomainFixtureUtil.getPostBuilder().set("id", 1)
                 .set("uid", 1).sample()
 
             it("본인꺼 아니면 에러") {

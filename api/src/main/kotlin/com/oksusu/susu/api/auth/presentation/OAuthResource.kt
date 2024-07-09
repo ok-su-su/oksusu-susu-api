@@ -21,7 +21,10 @@ class OAuthResource(
     private val oAuthFacade: OAuthFacade,
 ) {
 
-    /** 가입된 유저인지 체크합니다. */
+    /**
+     * 가입된 유저인지 체크합니다. /n
+     * APPLE 로그인은 accessToken에 idToken 넣어주세요
+     */
     @Operation(summary = "register valid check")
     @GetMapping("/{provider}/sign-up/valid")
     suspend fun checkRegisterValid(
@@ -29,7 +32,10 @@ class OAuthResource(
         @RequestParam accessToken: String,
     ) = oAuthFacade.checkRegisterValid(provider, accessToken).wrapOk()
 
-    /** 회원가입을 합니다. */
+    /**
+     * 회원가입을 합니다.
+     * APPLE 로그인은 accessToken에 idToken 넣어주세요
+     */
     @Operation(summary = "register")
     @PostMapping("/{provider}/sign-up")
     suspend fun register(
@@ -39,7 +45,10 @@ class OAuthResource(
         @RequestParam accessToken: String,
     ) = oAuthFacade.register(provider, accessToken, request, deviceContext).wrapCreated()
 
-    /** 로그인을 합니다. */
+    /**
+     * 로그인을 합니다.
+     * APPLE 로그인은 accessToken에 idToken 넣어주세요
+     */
     @Operation(summary = "login")
     @PostMapping("/{provider}/login")
     suspend fun login(

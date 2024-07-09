@@ -62,11 +62,25 @@ class EnvelopeFacade(
                     true -> ledgerService.findByIdAndUidOrNull(request.ledgerId, user.uid)
                     false -> null
                 }
+            },
+            {
+                when (request.ledgerId != null) {
+                    true -> categoryAssignmentService.findByIdAndTypeOrNull(
+                        request.ledgerId,
+                        CategoryAssignmentType.LEDGER
+                    )
+
+                    false -> null
+                }
             }
-        ) { friend, friendRelationship, ledger ->
-            val categoryAssignmentRequest = when (request.category == null) {
-                true -> CreateCategoryAssignmentRequest(5)
-                false -> request.category
+        ) { friend, friendRelationship, ledger, ledgerCategory ->
+            val categoryAssignmentRequest = if (ledgerCategory == null) {
+                when (request.category == null) {
+                    true -> CreateCategoryAssignmentRequest(5)
+                    false -> request.category
+                }
+            } else {
+                CreateCategoryAssignmentRequest(ledgerCategory.categoryId, ledgerCategory.customCategory)
             }
 
             val category = categoryService.getCategory(categoryAssignmentRequest.id)
@@ -118,7 +132,8 @@ class EnvelopeFacade(
                 envelope = createdEnvelope,
                 friend = friend,
                 friendRelationship = friendRelationship,
-                relationship = relationship
+                relationship = relationship,
+                category = CategoryWithCustomModel.of(category, customCategory)
             )
         }
     }
@@ -130,46 +145,66 @@ class EnvelopeFacade(
     ): CreateAndUpdateEnvelopeResponse {
         envelopeValidateService.validateEnvelopeRequest(request)
 
-        val categoryAssignmentRequest = when (request.category == null) {
-            true -> CreateCategoryAssignmentRequest(5)
-            false -> request.category
+        return parZipWithMDC(
+            {
+                envelopeService.getDetail(id, user.uid)
+            },
+            {
+                when (request.ledgerId != null) {
+                    true -> categoryAssignmentService.findByIdAndTypeOrNull(
+                        request.ledgerId,
+                        CategoryAssignmentType.LEDGER
+                    )
+
+                    false -> null
+                }
+            }
+        ) { (envelope, friend, friendRelationship, categoryAssignment), ledgerCategory ->
+            val categoryAssignmentRequest = if (ledgerCategory == null) {
+                when (request.category == null) {
+                    true -> CreateCategoryAssignmentRequest(5)
+                    false -> request.category
+                }
+            } else {
+                CreateCategoryAssignmentRequest(ledgerCategory.categoryId, ledgerCategory.customCategory)
+            }
+
+            val category = categoryService.getCategory(categoryAssignmentRequest.id)
+
+            /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
+            val customCategory = when (category.isMiscCategory()) {
+                true -> categoryAssignmentRequest.customCategory
+                else -> null
+            }
+
+            val updatedEnvelope = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
+                val updatedEnvelope = envelope.apply {
+                    this.type = request.type
+                    this.friendId = friend.id
+                    this.amount = request.amount
+                    this.gift = request.gift
+                    this.memo = request.memo
+                    this.hasVisited = request.hasVisited
+                    this.handedOverAt = request.handedOverAt
+                }.run { envelopeService.saveSync(this) }
+
+                categoryAssignment.apply {
+                    this.categoryId = category.id
+                    this.customCategory = customCategory
+                }.run { categoryAssignmentService.saveSync(this) }
+
+                updatedEnvelope
+            }
+            val relationship = relationshipService.getRelationship(friendRelationship.relationshipId)
+
+            CreateAndUpdateEnvelopeResponse.of(
+                envelope = updatedEnvelope,
+                friend = friend,
+                friendRelationship = friendRelationship,
+                relationship = relationship,
+                category = CategoryWithCustomModel.of(category, customCategory)
+            )
         }
-
-        val (envelope, friend, friendRelationship, categoryAssignment) = envelopeService.getDetail(id, user.uid)
-        val category = categoryService.getCategory(categoryAssignmentRequest.id)
-
-        /** 기타 항목인 경우에만 커스텀 카테고리를 생성한다. */
-        val customCategory = when (category.isMiscCategory()) {
-            true -> categoryAssignmentRequest.customCategory
-            else -> null
-        }
-
-        val updatedEnvelope = txTemplates.writer.coExecute(Dispatchers.IO + MDCContext()) {
-            val updatedEnvelope = envelope.apply {
-                this.type = request.type
-                this.friendId = friend.id
-                this.amount = request.amount
-                this.gift = request.gift
-                this.memo = request.memo
-                this.hasVisited = request.hasVisited
-                this.handedOverAt = request.handedOverAt
-            }.run { envelopeService.saveSync(this) }
-
-            categoryAssignment.apply {
-                this.categoryId = category.id
-                this.customCategory = customCategory
-            }.run { categoryAssignmentService.saveSync(this) }
-
-            updatedEnvelope
-        }
-        val relationship = relationshipService.getRelationship(friendRelationship.relationshipId)
-
-        return CreateAndUpdateEnvelopeResponse.of(
-            envelope = updatedEnvelope,
-            friend = friend,
-            friendRelationship = friendRelationship,
-            relationship = relationship
-        )
     }
 
     suspend fun getDetail(user: AuthUser, id: Long): EnvelopeDetailResponse {

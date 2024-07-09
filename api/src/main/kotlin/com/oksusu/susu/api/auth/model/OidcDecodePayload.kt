@@ -7,5 +7,4 @@ data class OidcDecodePayload(
     val aud: String,
     /** oauth provider account unique id  */
     val sub: String,
-    val email: String,
 )

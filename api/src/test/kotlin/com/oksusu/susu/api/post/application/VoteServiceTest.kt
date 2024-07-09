@@ -1,16 +1,15 @@
 package com.oksusu.susu.api.post.application
 
-import com.oksusu.susu.api.fixture.FixtureUtil
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.domain.post.infrastructure.repository.PostRepository
 import com.oksusu.susu.domain.post.infrastructure.repository.model.PostAndVoteOptionModel
+import fixture.DomainFixtureUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.*
 
 class VoteServiceTest : DescribeSpec({
     val logger = KotlinLogging.logger { }
@@ -24,7 +23,7 @@ class VoteServiceTest : DescribeSpec({
         context("vote와 post 조회시") {
             every { mockPostRepository.getVoteAndOptions(Long.MIN_VALUE) } returns emptyList()
             every { mockPostRepository.getVoteAndOptions(1L) } returns listOf(
-                PostAndVoteOptionModel(FixtureUtil.getPost(), FixtureUtil.getVoteOption())
+                PostAndVoteOptionModel(DomainFixtureUtil.getPost(), DomainFixtureUtil.getVoteOption())
             )
 
             it("없으면 에러") {

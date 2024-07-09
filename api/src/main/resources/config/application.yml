@@ -17,9 +17,6 @@ logging:
 
 # SPRING
 spring:
-  config:
-    import:
-      - classpath:/config/susu-config.yml
   lifecycle:
     timeout-per-shutdown-phase: 5s # format : https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion-duration
   application:
@@ -55,14 +52,10 @@ oauth:
     admin-key: ${KAKAO_ADMIN_KEY}
 
   apple:
-    baseUrl: ${APPLE_BASE_URL}
-    clientId: ${APPLE_CLIENT_ID}
-    webClientId: ${APPLE_WEB_CLIENT_ID}
-    keyId: ${APPLE_KEY_ID}
-    redirectUrl: ${APPLE_REDIRECT}
-    teamId: ${APPLE_TEAM_ID}
-    webCallbackUrl: ${APPLE_WEB_CALLBACK}
-    authKey: ${APPLE_AUTH_KEY}
+    client-id: ${APPLE_CLIENT_ID}
+    key-id: ${APPLE_KEY_ID}
+    team-id: ${APPLE_TEAM_ID}
+    auth-key: ${APPLE_AUTH_KEY}
 
   google:
     client-id: ${GOOGLE_CLIENT_ID}

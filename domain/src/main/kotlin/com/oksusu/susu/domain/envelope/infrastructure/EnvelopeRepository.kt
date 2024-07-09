@@ -2,34 +2,12 @@ package com.oksusu.susu.domain.envelope.infrastructure
 
 import com.oksusu.susu.domain.category.domain.QCategoryAssignment
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
-import com.oksusu.susu.domain.common.extension.execute
-import com.oksusu.susu.domain.common.extension.executeSlice
-import com.oksusu.susu.domain.common.extension.isEquals
-import com.oksusu.susu.domain.common.extension.isGoe
-import com.oksusu.susu.domain.common.extension.isIn
-import com.oksusu.susu.domain.common.extension.isLoe
+import com.oksusu.susu.domain.common.extension.*
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.QEnvelope
 import com.oksusu.susu.domain.envelope.domain.QLedger
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerHandedOverAtModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeAndFriendModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeDetailAndLedgerModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeDetailModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.FriendStatisticsModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QCountAvgAmountPerStatisticGroupModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QCountPerCategoryIdModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QCountPerHandedOverAtModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QCountTotalAmountsAndCountsModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QEnvelopeAndFriendModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QEnvelopeDetailAndLedgerModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QEnvelopeDetailModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.QFriendStatisticsModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.SearchEnvelopeSpec
-import com.oksusu.susu.domain.envelope.infrastructure.model.SearchFriendStatisticsSpec
+import com.oksusu.susu.domain.envelope.infrastructure.model.*
 import com.oksusu.susu.domain.friend.domain.QFriend
 import com.oksusu.susu.domain.friend.domain.QFriendRelationship
 import com.oksusu.susu.domain.user.domain.QUser
@@ -72,6 +50,9 @@ interface EnvelopeRepository : JpaRepository<Envelope, Long>, EnvelopeCustomRepo
 
     @Transactional(readOnly = true)
     fun countByUidAndFriendId(uid: Long, friendId: Long): Long
+
+    @Transactional(readOnly = true)
+    fun findAllByUidIn(uid: List<Long>): List<Envelope>
 }
 
 interface EnvelopeCustomRepository {
@@ -85,12 +66,13 @@ interface EnvelopeCustomRepository {
     fun findDetailEnvelope(id: Long, uid: Long): EnvelopeDetailModel?
 
     @Transactional(readOnly = true)
-    fun getCuttingTotalAmountPerHandedOverAtBetween(
+    fun getCuttingTotalAmountPerHandedOverAtBetweenExceptUid(
         type: EnvelopeType,
         from: LocalDateTime,
         to: LocalDateTime,
         minAmount: Long,
         maxAmount: Long,
+        uid: List<Long>,
     ): List<CountPerHandedOverAtModel>
 
     @Transactional(readOnly = true)
@@ -105,10 +87,31 @@ interface EnvelopeCustomRepository {
     fun countPerCategoryId(): List<CountPerCategoryIdModel>
 
     @Transactional(readOnly = true)
+    fun countPerCategoryIdExceptUid(uid: List<Long>): List<CountPerCategoryIdModel>
+
+    @Transactional(readOnly = true)
+    fun countPerCategoryIdExceptUidByCreatedAtAfter(
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountPerCategoryIdModel>
+
+    @Transactional(readOnly = true)
     fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel>
 
     @Transactional(readOnly = true)
-    fun getCuttingTotalAmountPerStatisticGroup(min: Long, max: Long): List<CountAvgAmountPerStatisticGroupModel>
+    fun getCuttingTotalAmountPerStatisticGroupExceptUid(
+        min: Long,
+        max: Long,
+        uid: List<Long>,
+    ): List<CountAvgAmountPerStatisticGroupModel>
+
+    @Transactional(readOnly = true)
+    fun getCuttingTotalAmountPerStatisticGroupExceptUidByCreatedAtAfter(
+        min: Long,
+        max: Long,
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountAvgAmountPerStatisticGroupModel>
 
     @Transactional(readOnly = true)
     fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope>
@@ -136,7 +139,10 @@ interface EnvelopeCustomRepository {
     fun getUserCountHadEnvelope(): Long
 
     @Transactional(readOnly = true)
-    fun getEnvelopeByPositionOrderByAmount(position: Long): List<Envelope>
+    fun getEnvelopeAmountByPositionOrderByAmountExceptUid(position: Long, uid: List<Long>): Long
+
+    @Transactional(readOnly = true)
+    fun countExceptUid(uid: List<Long>): Long
 }
 
 class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositorySupport(Envelope::class.java) {
@@ -200,12 +206,13 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).fetchFirst()
     }
 
-    override fun getCuttingTotalAmountPerHandedOverAtBetween(
+    override fun getCuttingTotalAmountPerHandedOverAtBetweenExceptUid(
         type: EnvelopeType,
         from: LocalDateTime,
         to: LocalDateTime,
         minAmount: Long,
         maxAmount: Long,
+        uid: List<Long>,
     ): List<CountPerHandedOverAtModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
@@ -217,7 +224,8 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .where(
                 qEnvelope.type.eq(type),
                 qEnvelope.handedOverAt.between(from, to),
-                qEnvelope.amount.between(minAmount, maxAmount)
+                qEnvelope.amount.between(minAmount, maxAmount),
+                qEnvelope.uid.notIn(uid)
             ).groupBy(qEnvelope.handedOverAt.yearMonth())
             .fetch()
     }
@@ -259,6 +267,42 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
+    override fun countPerCategoryIdExceptUid(uid: List<Long>): List<CountPerCategoryIdModel> {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qEnvelope.id.count()
+                )
+            ).from(qEnvelope)
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.ledgerId.isNull,
+                qEnvelope.uid.notIn(uid)
+            ).groupBy(qCategoryAssignment.categoryId)
+            .fetch()
+    }
+
+    override fun countPerCategoryIdExceptUidByCreatedAtAfter(
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountPerCategoryIdModel> {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QCountPerCategoryIdModel(
+                    qCategoryAssignment.categoryId,
+                    qEnvelope.id.count()
+                )
+            ).from(qEnvelope)
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.ledgerId.isNull,
+                qEnvelope.uid.notIn(uid),
+                qEnvelope.createdAt.after(targetDate)
+            ).groupBy(qCategoryAssignment.categoryId)
+            .fetch()
+    }
+
     override fun countPerCategoryIdByUid(uid: Long): List<CountPerCategoryIdModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
@@ -276,9 +320,10 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetch()
     }
 
-    override fun getCuttingTotalAmountPerStatisticGroup(
+    override fun getCuttingTotalAmountPerStatisticGroupExceptUid(
         minAmount: Long,
         maxAmount: Long,
+        uid: List<Long>,
     ): List<CountAvgAmountPerStatisticGroupModel> {
         return JPAQuery<Envelope>(entityManager)
             .select(
@@ -290,14 +335,48 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
+            .join(qUser).on(qEnvelope.uid.eq(qUser.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
-            .join(qUser).on(qEnvelope.uid.eq(qUser.id))
-            .where(qEnvelope.amount.between(minAmount, maxAmount))
+            .where(
+                qEnvelope.amount.between(minAmount, maxAmount),
+                qEnvelope.uid.notIn(uid)
+            )
             .groupBy(
                 qCategoryAssignment.categoryId,
-                qFriendRelationship.relationshipId,
-                qUser.birth.year().castToNum(Long::class.java)
+                qUser.birth.year().castToNum(Long::class.java),
+                qFriendRelationship.relationshipId
+            ).fetch()
+    }
+
+    override fun getCuttingTotalAmountPerStatisticGroupExceptUidByCreatedAtAfter(
+        minAmount: Long,
+        maxAmount: Long,
+        uid: List<Long>,
+        targetDate: LocalDateTime,
+    ): List<CountAvgAmountPerStatisticGroupModel> {
+        return JPAQuery<Envelope>(entityManager)
+            .select(
+                QCountAvgAmountPerStatisticGroupModel(
+                    qCategoryAssignment.categoryId,
+                    qFriendRelationship.relationshipId,
+                    qUser.birth.year().castToNum(Long::class.java),
+                    qEnvelope.amount.sum(),
+                    qEnvelope.id.count()
+                )
+            ).from(qEnvelope)
+            .join(qUser).on(qEnvelope.uid.eq(qUser.id))
+            .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .where(
+                qEnvelope.amount.between(minAmount, maxAmount),
+                qEnvelope.uid.notIn(uid),
+                qEnvelope.createdAt.after(targetDate)
+            )
+            .groupBy(
+                qCategoryAssignment.categoryId,
+                qUser.birth.year().castToNum(Long::class.java),
+                qFriendRelationship.relationshipId
             ).fetch()
     }
 
@@ -341,7 +420,8 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                 QFriendStatisticsModel(
                     qEnvelope.friendId,
                     sentAmount.sum(),
-                    receivedAmount.sum()
+                    receivedAmount.sum(),
+                    qEnvelope.handedOverAt
                 )
             )
             .from(QEnvelope.envelope)
@@ -426,13 +506,22 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetchFirst()
     }
 
-    override fun getEnvelopeByPositionOrderByAmount(position: Long): List<Envelope> {
+    override fun getEnvelopeAmountByPositionOrderByAmountExceptUid(position: Long, uid: List<Long>): Long {
         return JPAQuery<Envelope>(entityManager)
-            .select(qEnvelope)
+            .select(qEnvelope.amount)
             .from(qEnvelope)
+            .where(qEnvelope.uid.notIn(uid))
             .orderBy(qEnvelope.amount.asc())
             .offset(position)
             .limit(position + 1)
-            .fetch()
+            .fetchFirst()
+    }
+
+    override fun countExceptUid(uid: List<Long>): Long {
+        return JPAQuery<Envelope>(entityManager)
+            .select(qEnvelope.count())
+            .from(qEnvelope)
+            .where(qEnvelope.uid.notIn(uid))
+            .fetchFirst()
     }
 }

@@ -6,8 +6,8 @@ import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthUserInfoResponse
 import com.oksusu.susu.client.oauth.kakao.model.KakaoOAuthWithdrawResponse
 import com.oksusu.susu.common.consts.BEARER
 import com.oksusu.susu.common.consts.KAKAO_AK
+import com.oksusu.susu.common.extension.awaitSingleOrThrow
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
@@ -35,7 +35,7 @@ class SuspendableKakaoClient(
             .uri(url)
             .retrieve()
             .bodyToMono(KakaoOAuthTokenResponse::class.java)
-            .awaitSingle()
+            .awaitSingleOrThrow()
     }
 
     override suspend fun getUserInfo(
@@ -46,7 +46,7 @@ class SuspendableKakaoClient(
             .header("Authorization", BEARER + accessToken)
             .retrieve()
             .bodyToMono(KakaoOAuthUserInfoResponse::class.java)
-            .awaitSingle()
+            .awaitSingleOrThrow()
     }
 
     override suspend fun withdraw(targetId: String, adminKey: String): KakaoOAuthWithdrawResponse? {
@@ -64,6 +64,6 @@ class SuspendableKakaoClient(
             .body(BodyInserters.fromFormData(multiValueMap))
             .retrieve()
             .bodyToMono(KakaoOAuthWithdrawResponse::class.java)
-            .awaitSingle()
+            .awaitSingleOrThrow()
     }
 }

@@ -7,7 +7,6 @@ import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountAvgAmountPerStatisticGroupModel
 import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
 import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerHandedOverAtModel
 import com.oksusu.susu.domain.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
@@ -25,7 +24,6 @@ import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Service
 class EnvelopeService(
@@ -91,19 +89,6 @@ class EnvelopeService(
         }
     }
 
-    suspend fun getCuttingTotalAmountPerHandedOverAtInLast1Year(
-        type: EnvelopeType,
-        minAmount: Long,
-        maxAmount: Long,
-    ): List<CountPerHandedOverAtModel> {
-        val from = LocalDate.now().minusMonths(11).atTime(0, 0)
-        val to = LocalDate.now().atTime(23, 59)
-
-        return withMDCContext(Dispatchers.IO) {
-            envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetween(type, from, to, minAmount, maxAmount)
-        }
-    }
-
     suspend fun getTotalAmountPerHandedOverAtInLast1YearByUid(
         uid: Long,
         type: EnvelopeType,
@@ -115,23 +100,10 @@ class EnvelopeService(
         }
     }
 
-    suspend fun countPerCategoryId(): List<CountPerCategoryIdModel> {
-        return withMDCContext(Dispatchers.IO) { envelopeRepository.countPerCategoryId() }
-    }
-
     suspend fun countPerCategoryIdByUid(
         uid: Long,
     ): List<CountPerCategoryIdModel> {
         return withMDCContext(Dispatchers.IO) { envelopeRepository.countPerCategoryIdByUid(uid) }
-    }
-
-    suspend fun getCuttingTotalAmountPerStatisticGroup(
-        minAmount: Long,
-        maxAmount: Long,
-    ): List<CountAvgAmountPerStatisticGroupModel> {
-        return withMDCContext(Dispatchers.IO) {
-            envelopeRepository.getCuttingTotalAmountPerStatisticGroup(minAmount, maxAmount)
-        }
     }
 
     suspend fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope> {
@@ -163,20 +135,12 @@ class EnvelopeService(
         }
     }
 
-    suspend fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long {
-        return withMDCContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(startAt, endAt) }
-    }
-
     suspend fun count(): Long {
         return withMDCContext(Dispatchers.IO) { envelopeRepository.count() }
     }
 
     suspend fun countTotalAmountByUid(uid: Long): Long {
         return withMDCContext(Dispatchers.IO) { envelopeRepository.countTotalAmountByUid(uid) }
-    }
-
-    suspend fun getUserCountHadEnvelope(): Long {
-        return withMDCContext(Dispatchers.IO) { envelopeRepository.getUserCountHadEnvelope() }
     }
 
     @Transactional
@@ -186,13 +150,5 @@ class EnvelopeService(
 
     suspend fun countByUidAndFriendId(uid: Long, friendId: Long): Long {
         return withMDCContext(Dispatchers.IO) { envelopeRepository.countByUidAndFriendId(uid, friendId) }
-    }
-
-    suspend fun getEnvelopeByPositionOrderByAmount(idx: Long): Envelope {
-        return withMDCContext(Dispatchers.IO) {
-            envelopeRepository.getEnvelopeByPositionOrderByAmount(idx)
-        }.takeIf { it.isNotEmpty() }
-            ?.first()
-            ?: throw NotFoundException(ErrorCode.NOT_FOUND_ENVELOPE_ERROR)
     }
 }
