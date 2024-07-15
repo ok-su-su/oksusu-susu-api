@@ -2,13 +2,17 @@ package com.oksusu.susu.common.extension
 
 import arrow.fx.coroutines.parZip
 import com.oksusu.susu.common.consts.MDC_KEY_TRACE_ID
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.*
 import kotlinx.coroutines.slf4j.MDCContext
-import kotlinx.coroutines.withContext
 import org.slf4j.MDC
 import kotlin.coroutines.CoroutineContext
+
+private val logger = KotlinLogging.logger {  }
+
+val LoggingCoroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
+    logger.error { "$exception ${exception.errorStack}" }
+}
 
 suspend fun <T> withMDCContext(
     context: CoroutineContext = Dispatchers.IO,
