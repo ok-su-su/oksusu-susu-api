@@ -8,7 +8,7 @@ import kotlinx.coroutines.slf4j.MDCContext
 import org.slf4j.MDC
 import kotlin.coroutines.CoroutineContext
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger { }
 
 val LoggingCoroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
     logger.error { "$exception ${exception.errorStack}" }

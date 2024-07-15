@@ -38,7 +38,7 @@ class ErrorPublishingCoroutineExceptionHandler(
                         * 스케줄러 에러 발생 ${LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")}*
                         - Message : $errorMessage
                         - Stack Trace : $errorStack
-                    """.trimIndent()
+                        """.trimIndent()
                     )
                 )
             }

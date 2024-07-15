@@ -8,7 +8,6 @@ import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.batch.user.job.DeleteWithdrawUserDataJob
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
-import com.oksusu.susu.common.extension.LoggingCoroutineExceptionHandler
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import kotlin.coroutines.AbstractCoroutineContextElement
 
 @Tag(name = SwaggerTag.DEV_BATCH_SWAGGER_TAG, description = "개발용 Batch 관리 API")
 @RestController
