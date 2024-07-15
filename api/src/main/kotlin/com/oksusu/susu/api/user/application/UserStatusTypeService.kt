@@ -1,6 +1,7 @@
 package com.oksusu.susu.api.user.application
 
 import com.oksusu.susu.api.user.model.UserStatusTypeModel
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.resolveCancellation
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service
 @Service
 class UserStatusTypeService(
     private val userStatusTypeRepository: UserStatusTypeRepository,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
     private var statuses: Map<Long, UserStatusTypeModel> = emptyMap()
@@ -25,7 +27,7 @@ class UserStatusTypeService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-statuses.initial-delay:0}"
     )
     fun refreshStatuses() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             logger.info { "start refresh statuses" }
 
             statuses = runCatching {

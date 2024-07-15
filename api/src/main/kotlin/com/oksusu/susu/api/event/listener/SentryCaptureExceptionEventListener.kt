@@ -3,6 +3,7 @@ package com.oksusu.susu.api.event.listener
 import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.SentryCaptureExceptionEvent
 import com.oksusu.susu.api.extension.remoteIp
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.isProd
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -19,6 +20,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest
 @SusuEventListener
 class SentryCaptureExceptionEventListener(
     private val environment: Environment,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -29,7 +31,7 @@ class SentryCaptureExceptionEventListener(
             return
         }
 
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             val throwable = event.exception
             val request = event.request
 

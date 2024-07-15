@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class SystemActionLogScheduler(
     private val systemActionLogDeleteJob: SystemActionLogDeleteJob,
-    private val errorPublishingCoroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     /** 한달이 지난 system action log 삭제 처리 */
     @Scheduled(
@@ -19,7 +19,7 @@ class SystemActionLogScheduler(
         initialDelayString = "\${oksusu.scheduled-tasks.delete-system-action-log.initial-delay:100}"
     )
     fun runDeleteJob() {
-        CoroutineScope(Dispatchers.IO + errorPublishingCoroutineExceptionHandler.handler).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             systemActionLogDeleteJob.runDeleteJob()
         }
     }

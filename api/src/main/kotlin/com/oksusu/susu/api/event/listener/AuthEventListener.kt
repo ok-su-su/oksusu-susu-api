@@ -4,6 +4,7 @@ import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.CacheAppleOidcPublicKeysEvent
 import com.oksusu.susu.cache.key.Cache
 import com.oksusu.susu.cache.service.CacheService
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.common.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -15,12 +16,13 @@ import org.springframework.transaction.event.TransactionalEventListener
 @SusuEventListener
 class AuthEventListener(
     private val cacheService: CacheService,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun cacheAppleOidcPublicKeysService(event: CacheAppleOidcPublicKeysEvent) {
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             logger.info { "[${event.publishAt}] apple oidc pub key 캐싱 시작" }
 
             withMDCContext(Dispatchers.IO) {

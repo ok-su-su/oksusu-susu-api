@@ -5,6 +5,7 @@ import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.event.model.DeleteEnvelopeEvent
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.FriendService
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,10 +17,11 @@ class EnvelopeEventListener(
     private val envelopeService: EnvelopeService,
     private val friendService: FriendService,
     private val friendRelationshipService: FriendRelationshipService,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @TransactionalEventListener
     fun handel(event: DeleteEnvelopeEvent) {
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             val count = envelopeService.countByUidAndFriendId(
                 uid = event.uid,
                 friendId = event.friendId

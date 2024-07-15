@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component
 @Component
 class UserScheduler(
     private val deleteWithdrawUserDataJob: DeleteWithdrawUserDataJob,
-    private val errorPublishingCoroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @Scheduled(cron = "0 0 3 * * *")
     fun deleteWithdrawUserData() {
-        CoroutineScope(Dispatchers.IO + errorPublishingCoroutineExceptionHandler.handler).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             deleteWithdrawUserDataJob.deleteWithdrawUserDataForWeek()
         }
     }

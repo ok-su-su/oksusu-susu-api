@@ -16,18 +16,18 @@ import org.springframework.stereotype.Component
 class SusuStatisticsSummaryScheduler(
     private val hourSummaryJob: SusuStatisticsHourSummaryJob,
     private val dailySummaryJob: SusuStatisticsDailySummaryJob,
-    private val errorPublishingCoroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @Scheduled(cron = "0 0 0/1 * * *")
     fun runHourSummary() {
-        CoroutineScope(Dispatchers.IO + errorPublishingCoroutineExceptionHandler.handler).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             hourSummaryJob.runHourSummaryJob()
         }
     }
 
     @Scheduled(cron = "0 0 9 * * *")
     fun runDailySummary() {
-        CoroutineScope(Dispatchers.IO + errorPublishingCoroutineExceptionHandler.handler).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             dailySummaryJob.runDailySummaryJob()
         }
     }

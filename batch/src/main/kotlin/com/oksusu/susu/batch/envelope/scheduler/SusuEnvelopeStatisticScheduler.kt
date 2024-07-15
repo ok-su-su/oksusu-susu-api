@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component
 @Component
 class SusuEnvelopeStatisticScheduler(
     private val refreshSusuEnvelopeStatisticJob: RefreshSusuEnvelopeStatisticJob,
-    private val errorPublishingCoroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @Scheduled(
         fixedRate = 1000 * 60 * 60,
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-susu-envelope-statistic.initial-delay:100}"
     )
     fun refreshSusuEnvelopeStatistic() {
-        CoroutineScope(Dispatchers.IO + errorPublishingCoroutineExceptionHandler.handler).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             refreshSusuEnvelopeStatisticJob.refreshSusuEnvelopeStatistic()
         }
     }

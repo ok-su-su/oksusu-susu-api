@@ -4,6 +4,7 @@ import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.SlackErrorAlarmEvent
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.api.extension.requestParam
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.model.SlackMessageModel
 import com.oksusu.susu.common.extension.*
@@ -21,6 +22,7 @@ import java.time.LocalDateTime
 class SlackErrorAlarmEventListener(
     private val environment: Environment,
     private val slackClient: SlackClient,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @EventListener
     fun execute(event: SlackErrorAlarmEvent) {
@@ -29,7 +31,7 @@ class SlackErrorAlarmEventListener(
             return
         }
 
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             val url = event.request.uri.toString()
             val method = event.request.method.toString()
             val errorMessage = event.exception.toString()

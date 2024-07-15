@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component
 @Component
 class ReportScheduler(
     private val imposeSanctionsAboutReportJob: ImposeSanctionsAboutReportJob,
-    private val errorPublishingCoroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @Scheduled(cron = "0 0 0 * * *")
     fun imposeSanctionsAboutReportForDay() {
-        CoroutineScope(Dispatchers.IO + errorPublishingCoroutineExceptionHandler.handler).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             imposeSanctionsAboutReportJob.imposeSanctionsAboutReportForDay()
         }
     }

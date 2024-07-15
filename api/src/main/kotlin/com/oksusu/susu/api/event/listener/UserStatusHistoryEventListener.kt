@@ -2,6 +2,7 @@ package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.CreateUserStatusHistoryEvent
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.domain.user.infrastructure.UserStatusHistoryRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -13,12 +14,13 @@ import org.springframework.transaction.event.TransactionalEventListener
 @SusuEventListener
 class UserStatusHistoryEventListener(
     private val userStatusHistoryRepository: UserStatusHistoryRepository,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createUserStatusHistoryService(event: CreateUserStatusHistoryEvent) {
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             val history = event.userStatusHistory
 
             logger.info { "[${event.publishAt}] ${history.uid} 유저 user status ${history.fromStatusId} -> ${history.toStatusId} 변경 시작" }
