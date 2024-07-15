@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.post.application
 
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.domain.post.infrastructure.repository.BoardRepository
 import fixture.DomainFixtureUtil
@@ -9,16 +10,18 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 
 class BoardServiceTest : DescribeSpec({
     val logger = KotlinLogging.logger { }
 
     val mockBoardRepository = mockk<BoardRepository>()
+    val mockCoroutineExceptionHandler = mockk<ErrorPublishingCoroutineExceptionHandler>()
 
-    val boardService = BoardService(mockBoardRepository)
+    val boardService = BoardService(mockBoardRepository, mockCoroutineExceptionHandler)
 
     every { mockBoardRepository.findAllByIsActive(any()) } returns DomainFixtureUtil.getBoards(5)
+    every { mockCoroutineExceptionHandler.handler } returns CoroutineExceptionHandler { _, _ -> }
 
     beforeSpec {
         boardService.refreshBoards()
