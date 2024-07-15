@@ -4,6 +4,7 @@ import com.oksusu.susu.api.category.application.CategoryAssignmentService
 import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.envelope.application.EnvelopeService
 import com.oksusu.susu.api.event.model.DeleteLedgerEvent
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.domain.category.domain.vo.CategoryAssignmentType
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
@@ -18,10 +19,11 @@ class LedgerEventListener(
     private val envelopeService: EnvelopeService,
     private val categoryAssignmentService: CategoryAssignmentService,
     private val txTemplates: TransactionTemplates,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @TransactionalEventListener
     fun handel(event: DeleteLedgerEvent) {
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             val envelopes = envelopeService.findAllByLedgerId(event.ledger.id)
             val envelopeIds = envelopes.map { envelope -> envelope.id }
 

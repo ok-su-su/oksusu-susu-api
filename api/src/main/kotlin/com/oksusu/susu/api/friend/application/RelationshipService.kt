@@ -1,6 +1,7 @@
 package com.oksusu.susu.api.friend.application
 
 import com.oksusu.susu.api.friend.model.RelationshipModel
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.resolveCancellation
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service
 @Service
 class RelationshipService(
     private val relationshipRepository: RelationshipRepository,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
     private var relationships: Map<Long, RelationshipModel> = emptyMap()
@@ -26,7 +28,7 @@ class RelationshipService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-relationships.initial-delay:0}"
     )
     fun refreshRelationships() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             logger.info { "start refresh relationships" }
 
             relationships = runCatching {

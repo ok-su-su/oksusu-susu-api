@@ -7,6 +7,7 @@ import com.oksusu.susu.batch.report.job.ImposeSanctionsAboutReportJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.batch.user.job.DeleteWithdrawUserDataJob
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.CoroutineScope
@@ -26,13 +27,14 @@ class DevBatchResource(
     private val susuEnvelopeStatisticJob: RefreshSusuEnvelopeStatisticJob,
     private val deleteWithdrawUserDataJob: DeleteWithdrawUserDataJob,
     private val imposeSanctionsAboutReportJob: ImposeSanctionsAboutReportJob,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @Operation(tags = [SwaggerTag.DEV_SWAGGER_TAG], summary = "hour summary 호출")
     @GetMapping("/hour-summaries")
     suspend fun getHourSummaries(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             susuStatisticsHourSummaryJob.runHourSummaryJob()
         }
     }
@@ -42,7 +44,7 @@ class DevBatchResource(
     suspend fun getDailySummaries(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             susuStatisticsDailySummaryJob.runDailySummaryJob()
         }
     }
@@ -52,7 +54,7 @@ class DevBatchResource(
     suspend fun refreshSusuEnvelopeStatistic(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             susuEnvelopeStatisticJob.refreshSusuEnvelopeStatistic()
         }
     }
@@ -63,7 +65,7 @@ class DevBatchResource(
     suspend fun deleteWithdrawUserData(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             deleteWithdrawUserDataJob.deleteWithdrawUserData()
         }
     }
@@ -73,7 +75,7 @@ class DevBatchResource(
     suspend fun deleteWithdrawUserDataForWeek(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             deleteWithdrawUserDataJob.deleteWithdrawUserDataForWeek()
         }
     }
@@ -83,7 +85,7 @@ class DevBatchResource(
     suspend fun imposeSanctionsAboutReportForDay(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             imposeSanctionsAboutReportJob.imposeSanctionsAboutReportForDay()
         }
     }
@@ -94,7 +96,7 @@ class DevBatchResource(
     suspend fun updateReportCount(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             imposeSanctionsAboutReportJob.updateReportCount()
         }
     }
@@ -105,7 +107,7 @@ class DevBatchResource(
     suspend fun updateUserCommunityPunishCount(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             imposeSanctionsAboutReportJob.updateUserCommunityPunishCount()
         }
     }
@@ -116,7 +118,7 @@ class DevBatchResource(
     suspend fun refreshSusuEnvelopeStatisticAmount(
         adminUser: AdminUser,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             susuEnvelopeStatisticJob.refreshSusuEnvelopeStatisticAmount()
         }
     }

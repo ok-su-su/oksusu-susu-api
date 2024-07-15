@@ -1,6 +1,7 @@
 package com.oksusu.susu.api.report.application
 
 import com.oksusu.susu.api.report.model.ReportMetadataModel
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.resolveCancellation
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service
 @Service
 class ReportMetadataService(
     private val reportMetadataRepository: ReportMetadataRepository,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
     private var reportMetadata: Map<Long, ReportMetadataModel> = emptyMap()
@@ -28,7 +30,7 @@ class ReportMetadataService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-report-metadata.initial-delay:0}"
     )
     fun refreshRelationships() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             logger.info { "start refresh report metadata" }
 
             reportMetadata = runCatching {

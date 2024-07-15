@@ -1,6 +1,7 @@
 package com.oksusu.susu.api.category.application
 
 import com.oksusu.susu.api.category.model.CategoryModel
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.resolveCancellation
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service
 @Service
 class CategoryService(
     private val categoryRepository: CategoryRepository,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
     private var categories: Map<Long, CategoryModel> = emptyMap()
@@ -27,7 +29,7 @@ class CategoryService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-categories.initial-delay:0}"
     )
     fun refreshCategories() {
-        CoroutineScope(Dispatchers.IO + Job()).launch {
+        CoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler).launch {
             logger.info { "start refresh categories" }
 
             categories = runCatching {

@@ -4,6 +4,7 @@ import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.CreateUserDeviceEvent
 import com.oksusu.susu.api.event.model.UpdateUserDeviceEvent
 import com.oksusu.susu.api.user.application.UserDeviceService
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
@@ -18,12 +19,13 @@ import org.springframework.transaction.event.TransactionalEventListener
 class UserDeviceEventListener(
     private val userDeviceService: UserDeviceService,
     private val txTemplates: TransactionTemplates,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun createUserDevice(event: CreateUserDeviceEvent) {
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             logger.info { "${event.publishAt}에 발행된 ${event.userDevice.uid} 유저 디바이스 정보 저장 실행 시작" }
 
             txTemplates.writer.coExecuteOrNull {
@@ -36,7 +38,7 @@ class UserDeviceEventListener(
 
     @TransactionalEventListener
     fun updateUserDevice(event: UpdateUserDeviceEvent) {
-        CoroutineScope(Dispatchers.IO + Job()).launch {
+        CoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler).launch {
             logger.info { "${event.publishAt}에 발행된 ${event.userDevice.uid} 유저 디바이스 정보 업데이트 실행 시작" }
 
             val userDevice = userDeviceService.findByUid(event.userDevice.uid)
