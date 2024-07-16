@@ -46,7 +46,6 @@ class DeleteWithdrawUserDataJobTest(
     var envelopes = emptyList<Envelope>()
     var userStatusTypes = emptyList<UserStatusType>()
 
-
     beforeEach {
         /** friend */
         val mockFriends = DomainFixtureUtil.getFriendBuilder()
@@ -61,12 +60,11 @@ class DeleteWithdrawUserDataJobTest(
         parZip(
             { withContext(Dispatchers.IO) { userStatusTypeRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { friendRepository.saveAll(mockFriends) } },
-            { withContext(Dispatchers.IO) { ledgerRepository.saveAll(mockLedger) } },
+            { withContext(Dispatchers.IO) { ledgerRepository.saveAll(mockLedger) } }
         ) { newUserStatusTypes, newFriends, newLedgeres ->
             userStatusTypes = newUserStatusTypes
             friends = newFriends
             ledgeres = newLedgeres
-
 
             val deletedUserStatusTypeId = userStatusTypes
                 .first { type -> type.statusTypeInfo == UserStatusTypeInfo.DELETED }.id
@@ -121,7 +119,7 @@ class DeleteWithdrawUserDataJobTest(
                         type = EnvelopeType.SENT,
                         amount = (1L..5000000L).random(),
                         handedOverAt = LocalDateTime.now(),
-                        ledgerId = (minLedgerId..maxLedgerId).random(),
+                        ledgerId = (minLedgerId..maxLedgerId).random()
                     )
                 )
                 mockEnvelopes.add(
@@ -131,7 +129,7 @@ class DeleteWithdrawUserDataJobTest(
                         type = EnvelopeType.RECEIVED,
                         amount = (1L..5000000L).random(),
                         handedOverAt = LocalDateTime.now(),
-                        ledgerId = (minLedgerId..maxLedgerId).random(),
+                        ledgerId = (minLedgerId..maxLedgerId).random()
                     )
                 )
                 mockEnvelopes.add(
@@ -141,7 +139,7 @@ class DeleteWithdrawUserDataJobTest(
                         type = EnvelopeType.SENT,
                         amount = (1L..5000000L).random(),
                         handedOverAt = LocalDateTime.now(),
-                        ledgerId = null,
+                        ledgerId = null
                     )
                 )
                 mockEnvelopes.add(
@@ -151,7 +149,7 @@ class DeleteWithdrawUserDataJobTest(
                         type = EnvelopeType.RECEIVED,
                         amount = (1L..5000000L).random(),
                         handedOverAt = LocalDateTime.now(),
-                        ledgerId = null,
+                        ledgerId = null
                     )
                 )
             }
@@ -200,7 +198,7 @@ class DeleteWithdrawUserDataJobTest(
                 { withContext(Dispatchers.IO) { ledgerRepository.findAll() } },
                 { withContext(Dispatchers.IO) { friendRepository.findAll() } },
                 { withContext(Dispatchers.IO) { friendRelationshipRepository.findAll() } },
-                { withContext(Dispatchers.IO) { postRepository.findAll() } },
+                { withContext(Dispatchers.IO) { postRepository.findAll() } }
             ) {
                     envelopesAfterExecution,
                     ledgeresAfterExecution,
@@ -228,7 +226,6 @@ class DeleteWithdrawUserDataJobTest(
             }
         }
     }
-
 
     context("delete withdraw user data for day") {
         it("실행시 일주일간 탈퇴 유저의 기록이 삭제된다") {
