@@ -5,6 +5,10 @@ import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.navercorp.fixturemonkey.kotlin.setNotNullExp
+import com.oksusu.susu.domain.envelope.domain.Envelope
+import com.oksusu.susu.domain.envelope.domain.Ledger
+import com.oksusu.susu.domain.friend.domain.Friend
+import com.oksusu.susu.domain.friend.domain.FriendRelationship
 import com.oksusu.susu.domain.post.domain.Board
 import com.oksusu.susu.domain.post.domain.Post
 import com.oksusu.susu.domain.post.domain.VoteOption
@@ -145,5 +149,42 @@ class DomainFixtureUtil {
         fun getReportResults(size: Int, minTargetId: Long, maxTargetId: Long): List<ReportResult> = reportResultBuilder
             .setPostCondition("targetId", Long::class.java) { targetId -> targetId in minTargetId..maxTargetId }
             .sampleList(size)
+
+        /** friend */
+        private val friendBuilder = monkey.giveMeBuilder(Friend::class.java)
+            .set("id", -1)
+            .setNotNullExp(Friend::uid)
+            .setNotNullExp(Friend::name)
+
+        fun getFriendBuilder(): ArbitraryBuilder<Friend> = friendBuilder
+
+        /** friend relationship */
+        private val friendRelationshipBuilder = monkey.giveMeBuilder(FriendRelationship::class.java)
+            .set("id", -1)
+            .setNotNullExp(FriendRelationship::friendId)
+            .setNotNullExp(FriendRelationship::relationshipId)
+            .setPostCondition { it.relationshipId in 1..5 }
+
+        fun getFriendRelationshipBuilder(): ArbitraryBuilder<FriendRelationship> = friendRelationshipBuilder
+
+        /** ledger */
+        private val ledgerBuilder = monkey.giveMeBuilder(Ledger::class.java)
+            .set("id", -1)
+            .setNotNullExp(Ledger::uid)
+            .setNotNullExp(Ledger::title)
+            .setNotNullExp(Ledger::startAt)
+            .setNotNullExp(Ledger::endAt)
+
+        fun getLedgerBuilder(): ArbitraryBuilder<Ledger> = ledgerBuilder
+
+        /** envelope */
+        private val envelopeBuilder = monkey.giveMeBuilder(Envelope::class.java)
+            .set("id", -1)
+            .setNotNullExp(Envelope::uid)
+            .setNotNullExp(Envelope::type)
+            .setNotNullExp(Envelope::friendId)
+            .setNotNullExp(Envelope::handedOverAt)
+
+        fun getEnvelopeBuilder(): ArbitraryBuilder<Envelope> = envelopeBuilder
     }
 }

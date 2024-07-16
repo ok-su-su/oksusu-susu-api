@@ -76,7 +76,7 @@ class DevBatchResource(
         adminUser: AdminUser,
     ) {
         CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
-            deleteWithdrawUserDataJob.deleteWithdrawUserDataForWeek()
+            deleteWithdrawUserDataJob.deleteWithdrawUserDataForDay()
         }
     }
 
