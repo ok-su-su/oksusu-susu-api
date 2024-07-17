@@ -1,6 +1,7 @@
 package com.oksusu.susu.api.post.application
 
 import com.oksusu.susu.api.post.model.BoardModel
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.resolveCancellation
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service
 @Service
 class BoardService(
     private val boardRepository: BoardRepository,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
     private var boards: Map<Long, BoardModel> = emptyMap()
@@ -26,7 +28,7 @@ class BoardService(
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-boards.initial-delay:0}"
     )
     fun refreshBoards() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
             logger.info { "start refresh boards" }
 
             boards = runCatching {

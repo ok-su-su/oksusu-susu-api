@@ -119,11 +119,11 @@ class LedgerFacade(
         return parZipWithMDC(
             { categoryService.getCategory(categoryAssignment.categoryId) },
             { envelopeService.countTotalAmountAndCount(id) }
-        ) { category, (_, totalAmounts, totalCounts) ->
+        ) { category, (_, _, totalReceivedAmounts, totalCounts) ->
             LedgerDetailResponse(
                 ledger = LedgerModel.from(ledger),
                 category = CategoryWithCustomModel.of(category, categoryAssignment.customCategory),
-                totalAmounts = totalAmounts,
+                totalAmounts = totalReceivedAmounts,
                 totalCounts = totalCounts
             )
         }
@@ -157,7 +157,7 @@ class LedgerFacade(
             SearchLedgerResponse(
                 ledger = LedgerModel.from(ledger),
                 category = CategoryWithCustomModel.of(category, categoryAssignment.customCategory),
-                totalAmounts = statistic?.totalAmounts ?: 0L,
+                totalAmounts = statistic?.totalReceivedAmounts ?: 0L,
                 totalCounts = statistic?.totalCounts ?: 0L
             )
         }

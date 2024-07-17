@@ -234,11 +234,8 @@ class EnvelopeFacade(
                 targetType = CategoryAssignmentType.ENVELOPE
             )
 
-            DeleteEnvelopeEvent(
-                envelopeId = envelope.id,
-                uid = user.uid,
-                friendId = envelope.friendId
-            ).run { publisher.publishEvent(this) }
+            DeleteEnvelopeEvent(envelope, user.uid)
+                .run { publisher.publishEvent(this) }
         }
     }
 

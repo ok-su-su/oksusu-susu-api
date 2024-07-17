@@ -330,9 +330,7 @@ class RefreshSusuEnvelopeStatisticJob(
             }
 
             /** amount 값 캐싱 */
-            CoroutineScope(Dispatchers.IO).launch {
-                cacheService.set(Cache.getSusuEnvelopeStatisticAmountCache(), cache)
-            }
+            cacheService.set(Cache.getSusuEnvelopeStatisticAmountCache(), cache)
 
             logger.info { "finish refresh susu statistic" }
         }

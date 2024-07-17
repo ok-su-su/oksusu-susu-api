@@ -3,6 +3,7 @@ package com.oksusu.susu.api.event.listener
 import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
@@ -17,12 +18,13 @@ import org.springframework.transaction.event.TransactionalEventListener
 class CountEventListener(
     private val countService: CountService,
     private val txTemplates: TransactionTemplates,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     private val logger = KotlinLogging.logger { }
 
     @TransactionalEventListener
     fun deleteCount(event: DeleteVoteCountEvent) {
-        mdcCoroutineScope(Dispatchers.IO + Job(), event.traceId).launch {
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             logger.info { "[${event.publishAt}] ${event.postId} post 관련 count delete 시작" }
 
             txTemplates.writer.coExecuteOrNull {

@@ -5,6 +5,7 @@ import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.common.consts.MDC_KEY_TRACE_ID
 import com.oksusu.susu.common.extension.mapper
+import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.Ledger
 import com.oksusu.susu.domain.term.domain.TermAgreement
 import com.oksusu.susu.domain.term.domain.vo.TermAgreementChangeType
@@ -95,9 +96,8 @@ data class CacheUserEnvelopeStatisticEvent(
 ) : BaseEvent()
 
 data class DeleteEnvelopeEvent(
-    val envelopeId: Long,
+    val envelope: Envelope,
     val uid: Long,
-    val friendId: Long,
 ) : BaseEvent()
 
 data class CreateUserWithdrawEvent(
