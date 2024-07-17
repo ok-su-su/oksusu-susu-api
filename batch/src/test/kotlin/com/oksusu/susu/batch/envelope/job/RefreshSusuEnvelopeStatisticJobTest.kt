@@ -8,6 +8,7 @@ import com.oksusu.susu.cache.statistic.infrastructure.SusuEnvelopeStatisticRepos
 import com.oksusu.susu.cache.statistic.infrastructure.SusuSpecificEnvelopeStatisticRepository
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.extension.classifyKeyByPrefix
+import com.oksusu.susu.common.extension.merge
 import com.oksusu.susu.common.extension.toStatisticAgeGroup
 import com.oksusu.susu.common.extension.yearMonth
 import com.oksusu.susu.domain.category.domain.Category
@@ -37,6 +38,7 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.math.roundToLong
@@ -87,7 +89,6 @@ class RefreshSusuEnvelopeStatisticJobTest(
     val SUSU_SPECIFIC_ENVELOPE_STATISTIC_AMOUNT_PREFIX = "susu_specific_envelope_statistic_amount:"
     val SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX = "susu_specific_envelope_statistic_count:"
 
-
     beforeEach {
         /** user */
         val mockUser = DomainFixtureUtil.getUsers(10).map { user ->
@@ -97,7 +98,6 @@ class RefreshSusuEnvelopeStatisticJobTest(
                     oAuthProvider = OAuthProvider.KAKAO
                 )
             }
-
         }
         users = withContext(Dispatchers.IO) { userRepository.saveAll(mockUser) }
 
@@ -132,7 +132,7 @@ class RefreshSusuEnvelopeStatisticJobTest(
             { withContext(Dispatchers.IO) { friendRepository.saveAll(mockFriends) } },
             { withContext(Dispatchers.IO) { ledgerRepository.saveAll(mockLedger) } },
             { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } },
-            { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
+            { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } }
         ) { newFriends, newLedgeres, newCategories, newRelationships ->
             friends = newFriends
             ledgeres = newLedgeres
@@ -201,10 +201,9 @@ class RefreshSusuEnvelopeStatisticJobTest(
                 )
             }
 
-
             parZip(
                 { withContext(Dispatchers.IO) { friendRelationshipRepository.saveAll(mockFriendRelationships) } },
-                { withContext(Dispatchers.IO) { envelopeRepository.saveAll(mockEnvelopes) } },
+                { withContext(Dispatchers.IO) { envelopeRepository.saveAll(mockEnvelopes) } }
             ) { newFriendRelathionships, newEnvelopes ->
                 friendRelationships = newFriendRelathionships
                 envelopes = newEnvelopes
@@ -371,6 +370,151 @@ class RefreshSusuEnvelopeStatisticJobTest(
                 specificCountCache.getOrDefault(model.key, null) shouldNotBe null
                 specificCountCache[model.key]?.shouldBeEqual(model.value.second)
             }
+        }
+    }
+
+    context("refresh susu envelope statistic") {
+        it("작동시 susu envelope statistic 통계 캐시 값이 정상적으로 업데이트 되어야 한다.") {
+            /** 캐시 값 리뉴얼 */
+            refreshSusuEnvelopeStatisticJob.refreshSusuEnvelopeStatisticAmount()
+
+            delay(500)
+
+            /** 과거 캐시 값 분류 */
+            val oldCachedAmount = withContext(Dispatchers.IO) {
+                cacheService.getOrNull(Cache.getSusuEnvelopeStatisticAmountCache())
+            }
+
+            val monthlySpentOldCache =
+                oldCachedAmount!!.classifyKeyByPrefix(MONTHLY_SPENT_ENVELOPE_AMOUNT_FOR_LAST_YEAR_PREFIX)
+            val relationshipOldCache = oldCachedAmount.classifyKeyByPrefix(RELATIONSHIP_COUNT_PREFIX)
+            val categoryOldCache = oldCachedAmount.classifyKeyByPrefix(CATEGORY_COUNT_PREFIX)
+
+            /** 테스트 대상 실행 */
+            refreshSusuEnvelopeStatisticJob.refreshSusuEnvelopeStatistic()
+
+            delay(1000)
+
+            /** 새로운 캐시 값 분류 */
+            val newCachedAmount = withContext(Dispatchers.IO) {
+                cacheService.getOrNull(Cache.getSusuEnvelopeStatisticAmountCache())
+            }
+
+            val susuEnvelopeStatistic = withContext(Dispatchers.IO) { susuEnvelopeStatisticRepository.getStatistic() }
+                ?: throw RuntimeException()
+
+            val monthlySpentNewCache = newCachedAmount!!
+                .classifyKeyByPrefix(MONTHLY_SPENT_ENVELOPE_AMOUNT_FOR_LAST_YEAR_PREFIX)
+            val relationshipNewCache = newCachedAmount.classifyKeyByPrefix(RELATIONSHIP_COUNT_PREFIX)
+            val categoryNewCache = newCachedAmount.classifyKeyByPrefix(CATEGORY_COUNT_PREFIX)
+
+            /** 봉투 가진 유저 수 */
+            val userCount = envelopes.distinctBy { it.uid }.count() - adminUserConfig.adminUserUid.size
+
+            /** 월별 사용 총 금액 캐싱 */
+            val susuEnvelopeConfig = statisticConfig.susuEnvelopeConfig
+
+            val minEnvelopeIdx = (envelopes.size * susuEnvelopeConfig.minCuttingAverage).roundToLong()
+            val maxEnvelopeIdx = (envelopes.size * susuEnvelopeConfig.maxCuttingAverage).roundToLong()
+
+            val minEnvelopeAmount = envelopes.sortedBy { it.amount }[minEnvelopeIdx.toInt()].amount
+            val maxEnvelopeAmount = envelopes.sortedBy { it.amount }[maxEnvelopeIdx.toInt()].amount
+
+            val from = LocalDateTime.now().minusHours(REFRESH_BEFORE_HOURS)
+            val to = LocalDateTime.now()
+
+            // 1년치 월별 사용 금액
+            val monthlySpent = envelopes.asSequence()
+                .filter { it.type == EnvelopeType.SENT }
+                .filter { from <= it.handedOverAt && it.handedOverAt <= to }
+                .filter { it.amount in minEnvelopeAmount..maxEnvelopeAmount }
+                .filter { it.uid !in adminUserConfig.adminUserUid }
+                .groupBy { it.handedOverAt.yearMonth() }
+                .mapValues { map -> map.value.sumOf { it.amount } }
+                .merge(monthlySpentOldCache)
+
+            // count 캐싱 값 비교
+            monthlySpent.forEach { (key, value) ->
+                monthlySpentNewCache.getOrDefault(key, null) shouldNotBe null
+                monthlySpentNewCache[key]?.shouldBeEqual(value)
+            }
+
+            // 8개월치 월별 사용 금액
+            val before8Month = LocalDate.now().minusMonths(7).yearMonth()
+            val monthlySpentForLast8Months = monthlySpent.filter { (key, _) -> key >= before8Month }
+                .map { (key, value) -> key to value / userCount }
+                .toMap()
+
+            // 8개월치 월별 사용 금액 통계 캐싱 값과 비교
+            susuEnvelopeStatistic.recentSpent?.forEach { model ->
+                monthlySpentForLast8Months.getOrDefault(model.title, -1) shouldBeEqual model.value
+            }
+
+            /** 경조사비 가장 많이 쓴 달 */
+            susuEnvelopeStatistic.mostSpentMonth?.shouldBeEqual(
+                monthlySpent.maxBy { it.value / userCount }.key.substring(4).toLong()
+            )
+
+            /** 최다 수수 관계 */
+            val relationshipCount = friendRelationships.groupBy { it.relationshipId.toString() }
+                .mapValues { it.value.map { friendRelationship -> friendRelationship.friendId } }
+                .map { (key, value) ->
+                    val cacheValue = envelopes.filter { it.uid !in adminUserConfig.adminUserUid }
+                        .filter { from <= it.createdAt }
+                        .count { it.friendId in value }
+
+                    key to cacheValue.toLong()
+                }.toMap()
+                .merge(relationshipOldCache)
+
+            // count 캐싱 값 비교
+            relationshipCount.forEach { (key, value) ->
+                relationshipNewCache.getOrDefault(key, null) shouldNotBe null
+                relationshipNewCache[key]?.shouldBeEqual(value)
+            }
+
+            // 통계 캐싱 값 비교
+            val mostFrequentRelationship = relationshipCount.maxBy { it.value }
+            val relationshipName = relationships.first { it.id == mostFrequentRelationship.key.toLong() }.relation
+            susuEnvelopeStatistic.mostFrequentRelationShip?.title?.shouldBeEqual(relationshipName)
+            susuEnvelopeStatistic.mostFrequentRelationShip?.value?.shouldBeEqual(mostFrequentRelationship.value / userCount)
+
+            /** 경조사별 총 횟수 캐싱 */
+            val envelopeCategoryMap = categoryAssignments.filter { it.targetType == CategoryAssignmentType.ENVELOPE }
+                .groupBy { it.categoryId.toString() }
+                .mapValues {
+                    it.value.map { assignment -> assignment.targetId }.run {
+                        envelopes.filter { envelope -> envelope.id in this }
+                            .filter { from <= it.createdAt }
+                            .filter { envelope -> envelope.uid !in adminUserConfig.adminUserUid }
+                            .count { envelope -> envelope.ledgerId == null }
+                    }.toLong()
+                }
+
+            val ledgerCategoryMap = categoryAssignments.filter { it.targetType == CategoryAssignmentType.LEDGER }
+                .groupBy { it.categoryId.toString() }
+                .mapValues {
+                    it.value.map { assignment -> assignment.targetId }.run {
+                        ledgeres.filter { ledger -> ledger.id in this }
+                            .filter { from <= it.createdAt }
+                            .count { ledger -> ledger.uid !in adminUserConfig.adminUserUid }
+                    }.toLong()
+                }
+
+            val categoryCountMap = envelopeCategoryMap.merge(ledgerCategoryMap)
+                .merge(categoryOldCache)
+
+            // count 캐싱 값 비교
+            categoryCountMap.forEach { (key, value) ->
+                categoryNewCache.getOrDefault(key, null) shouldNotBe null
+                categoryNewCache[key]?.shouldBeEqual(value)
+            }
+
+            // 통계 캐싱 값 비교
+            val mostFrequentCategory = categoryCountMap.maxBy { it.value }
+            val categoryName = categories.first { it.id == mostFrequentCategory.key.toLong() }.name
+            susuEnvelopeStatistic.mostFrequentCategory?.title?.shouldBeEqual(categoryName)
+            susuEnvelopeStatistic.mostFrequentCategory?.value?.shouldBeEqual(mostFrequentCategory.value / userCount)
         }
     }
 })

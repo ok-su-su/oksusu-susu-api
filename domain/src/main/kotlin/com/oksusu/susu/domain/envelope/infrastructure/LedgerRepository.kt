@@ -144,6 +144,7 @@ class LedgerCustomRepositoryImpl : LedgerCustomRepository, QuerydslRepositorySup
             .from(qLedger)
             .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
             .where(
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER),
                 qLedger.uid.notIn(uid),
                 qLedger.createdAt.after(targetDate)
             )
