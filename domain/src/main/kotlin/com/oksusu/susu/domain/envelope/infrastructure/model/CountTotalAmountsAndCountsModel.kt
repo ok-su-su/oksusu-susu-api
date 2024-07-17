@@ -4,6 +4,7 @@ import com.querydsl.core.annotations.QueryProjection
 
 data class CountTotalAmountsAndCountsModel @QueryProjection constructor(
     val ledgerId: Long,
-    val totalAmounts: Long,
+    val totalSentAmounts: Long,
+    val totalReceivedAmounts: Long,
     val totalCounts: Long,
 )

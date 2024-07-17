@@ -164,7 +164,17 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .select(
                 QCountTotalAmountsAndCountsModel(
                     qEnvelope.ledgerId,
-                    qEnvelope.amount.sum(),
+
+                    CaseBuilder()
+                        .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
+                        .then(QEnvelope.envelope.amount)
+                        .otherwise(0),
+
+                    CaseBuilder()
+                        .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
+                        .then(QEnvelope.envelope.amount)
+                        .otherwise(0),
+
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
@@ -178,7 +188,17 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .select(
                 QCountTotalAmountsAndCountsModel(
                     qEnvelope.ledgerId,
-                    qEnvelope.amount.sum(),
+
+                    CaseBuilder()
+                        .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
+                        .then(QEnvelope.envelope.amount)
+                        .otherwise(0),
+
+                    CaseBuilder()
+                        .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
+                        .then(QEnvelope.envelope.amount)
+                        .otherwise(0),
+
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)

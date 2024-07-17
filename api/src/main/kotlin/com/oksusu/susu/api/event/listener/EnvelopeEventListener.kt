@@ -7,7 +7,6 @@ import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.FriendService
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
-import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.LedgerRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,18 +35,11 @@ class EnvelopeEventListener(
                 val ledger = ledgerRepository.findByIdOrNull(event.envelope.ledgerId)
 
                 if (ledger != null) {
-                    when (event.envelope.type) {
-                        EnvelopeType.SENT -> {
-                            ledger.apply {
-                                this.totalSentAmounts - event.envelope.amount
-                            }
-                        }
+                    val countTotalAmountsAndCountsModel = envelopeService.countTotalAmountAndCount(ledger.id)
 
-                        EnvelopeType.RECEIVED -> {
-                            ledger.apply {
-                                this.totalReceivedAmounts - event.envelope.amount
-                            }
-                        }
+                    ledger.apply {
+                        this.totalSentAmounts = countTotalAmountsAndCountsModel.totalSentAmounts
+                        this.totalReceivedAmounts = countTotalAmountsAndCountsModel.totalReceivedAmounts
                     }.run { ledgerRepository.save(this) }
                 }
             }
