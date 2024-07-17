@@ -16,7 +16,7 @@ class UserScheduler(
     @Scheduled(cron = "0 0 3 * * *")
     fun deleteWithdrawUserData() {
         CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
-            deleteWithdrawUserDataJob.deleteWithdrawUserDataForWeek()
+            deleteWithdrawUserDataJob.deleteWithdrawUserDataForDay()
         }
     }
 }

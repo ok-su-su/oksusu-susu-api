@@ -4,6 +4,7 @@ import com.oksusu.susu.domain.user.domain.QUserStatusHistory
 import com.oksusu.susu.domain.user.domain.UserStatusHistory
 import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
 import com.querydsl.jpa.impl.JPAQuery
+import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -29,6 +30,9 @@ interface UserStatusHistoryCustomRepository {
 
     @Transactional(readOnly = true)
     fun getUidByToStatusId(toStatusId: Long): List<Long>
+
+    @Transactional
+    fun updateAllCreatedAt(createdAt: LocalDateTime): Long
 }
 
 class UserStatusHistoryCustomRepositoryImpl : UserStatusHistoryCustomRepository,
@@ -61,5 +65,12 @@ class UserStatusHistoryCustomRepositoryImpl : UserStatusHistoryCustomRepository,
                 qUserStatusHistory.toStatusId.eq(toStatusId)
             )
             .fetch()
+    }
+
+    override fun updateAllCreatedAt(createdAt: LocalDateTime): Long {
+        return JPAQueryFactory(entityManager)
+            .update(qUserStatusHistory)
+            .set(qUserStatusHistory.createdAt, createdAt)
+            .execute()
     }
 }

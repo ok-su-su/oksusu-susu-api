@@ -15,13 +15,13 @@ import java.time.LocalDateTime
 
 @Component
 class DeleteWithdrawUserDataJob(
-    val userStatusTypeRepository: UserStatusTypeRepository,
-    val userStatusHistoryRepository: UserStatusHistoryRepository,
-    val envelopeRepository: EnvelopeRepository,
-    val ledgerRepository: LedgerRepository,
-    val friendRepository: FriendRepository,
-    val friendRelationshipRepository: FriendRelationshipRepository,
-    val postRepository: PostRepository,
+    private val userStatusTypeRepository: UserStatusTypeRepository,
+    private val userStatusHistoryRepository: UserStatusHistoryRepository,
+    private val envelopeRepository: EnvelopeRepository,
+    private val ledgerRepository: LedgerRepository,
+    private val friendRepository: FriendRepository,
+    private val friendRelationshipRepository: FriendRelationshipRepository,
+    private val postRepository: PostRepository,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -39,12 +39,14 @@ class DeleteWithdrawUserDataJob(
         /** 삭제된 uid */
         val targetUids = getDeletedUids(targetUserStatusId)
 
+        logger.info { "${targetUids.toSortedSet()}탈퇴유저 정보 삭제" }
+
         deleteData(targetUids)
 
         logger.info { "finish delete withdraw user data" }
     }
 
-    suspend fun deleteWithdrawUserDataForWeek() {
+    suspend fun deleteWithdrawUserDataForDay() {
         logger.info { "start delete withdraw user data for week" }
 
         val targetUserStatusId = getTargetUserStatusId()
@@ -53,12 +55,14 @@ class DeleteWithdrawUserDataJob(
         /** 삭제 대상 uid */
         val targetUids = getDeletedUidsAfter(targetUserStatusId, targetDate)
 
+        logger.info { "${targetUids.toSortedSet()}탈퇴유저 정보 삭제" }
+
         deleteData(targetUids)
 
         logger.info { "finish delete withdraw user data for week" }
     }
 
-    suspend fun deleteData(targetUids: List<Long>) {
+    private suspend fun deleteData(targetUids: List<Long>) {
         coroutineScope {
             /** 삭제 유저의 봉투 삭제 */
             val deleteEnvelopesDeferred = async { deleteEnvelopes(targetUids) }
@@ -76,25 +80,25 @@ class DeleteWithdrawUserDataJob(
         }
     }
 
-    suspend fun getTargetUserStatusId(): Long {
+    private suspend fun getTargetUserStatusId(): Long {
         return withContext(Dispatchers.IO) {
             userStatusTypeRepository.findAllByIsActive(true)
         }.first { type -> type.statusTypeInfo == UserStatusTypeInfo.DELETED }.id
     }
 
-    suspend fun getDeletedUidsAfter(targetUserStatusId: Long, targetDate: LocalDateTime): List<Long> {
+    private suspend fun getDeletedUidsAfter(targetUserStatusId: Long, targetDate: LocalDateTime): List<Long> {
         return withContext(Dispatchers.IO) {
             userStatusHistoryRepository.getUidByToStatusIdAfter(targetUserStatusId, targetDate)
         }
     }
 
-    suspend fun getDeletedUids(targetUserStatusId: Long): List<Long> {
+    private suspend fun getDeletedUids(targetUserStatusId: Long): List<Long> {
         return withContext(Dispatchers.IO) {
             userStatusHistoryRepository.getUidByToStatusId(targetUserStatusId)
         }
     }
 
-    suspend fun deleteEnvelopes(uid: List<Long>) {
+    private suspend fun deleteEnvelopes(uid: List<Long>) {
         val envelopes = withContext(Dispatchers.IO) {
             envelopeRepository.findAllByUidIn(uid)
         }.takeIf { envelopes -> envelopes.isNotEmpty() } ?: return
@@ -105,7 +109,7 @@ class DeleteWithdrawUserDataJob(
         }
     }
 
-    suspend fun deleteLedgers(uid: List<Long>) {
+    private suspend fun deleteLedgers(uid: List<Long>) {
         val ledgers = withContext(Dispatchers.IO) {
             ledgerRepository.findAllByUidIn(uid)
         }.takeIf { ledgers -> ledgers.isNotEmpty() } ?: return
@@ -116,7 +120,7 @@ class DeleteWithdrawUserDataJob(
         }
     }
 
-    suspend fun deleteFriends(uid: List<Long>) {
+    private suspend fun deleteFriends(uid: List<Long>) {
         val friends = withContext(Dispatchers.IO) {
             friendRepository.findAllByUidIn(uid)
         }.takeIf { friends -> friends.isNotEmpty() } ?: return
@@ -139,7 +143,7 @@ class DeleteWithdrawUserDataJob(
         }
     }
 
-    suspend fun deletePosts(uid: List<Long>) {
+    private suspend fun deletePosts(uid: List<Long>) {
         val posts = withContext(Dispatchers.IO) {
             postRepository.findAllByUidIn(uid)
         }.takeIf { posts -> posts.isNotEmpty() } ?: return
