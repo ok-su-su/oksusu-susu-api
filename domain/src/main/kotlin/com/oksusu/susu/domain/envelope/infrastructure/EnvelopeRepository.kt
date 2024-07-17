@@ -277,6 +277,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).from(qEnvelope)
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .where(
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE),
                 qEnvelope.ledgerId.isNull,
                 qEnvelope.uid.notIn(uid)
             ).groupBy(qCategoryAssignment.categoryId)
