@@ -7,15 +7,7 @@ import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.envelope.domain.Envelope
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerCategoryIdModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountPerHandedOverAtModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.CountTotalAmountsAndCountsModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeAndFriendModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeDetailAndLedgerModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.EnvelopeDetailModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.FriendStatisticsModel
-import com.oksusu.susu.domain.envelope.infrastructure.model.SearchEnvelopeSpec
-import com.oksusu.susu.domain.envelope.infrastructure.model.SearchFriendStatisticsSpec
+import com.oksusu.susu.domain.envelope.infrastructure.model.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.domain.Page
@@ -56,7 +48,11 @@ class EnvelopeService(
     }
 
     suspend fun countTotalAmountAndCount(ledgerId: Long): CountTotalAmountsAndCountsModel {
-        return withMDCContext(Dispatchers.IO) { envelopeRepository.countTotalAmountAndCount(ledgerId) }
+        return withMDCContext(Dispatchers.IO) { countTotalAmountAndCountSync(ledgerId) }
+    }
+
+    fun countTotalAmountAndCountSync(ledgerId: Long): CountTotalAmountsAndCountsModel {
+        return envelopeRepository.countTotalAmountAndCount(ledgerId)
     }
 
     suspend fun findByIdOrThrow(id: Long, uid: Long): Envelope {

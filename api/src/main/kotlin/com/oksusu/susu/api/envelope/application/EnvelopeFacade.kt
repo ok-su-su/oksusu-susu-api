@@ -14,7 +14,9 @@ import com.oksusu.susu.api.envelope.model.response.CreateAndUpdateEnvelopeRespon
 import com.oksusu.susu.api.envelope.model.response.EnvelopeDetailResponse
 import com.oksusu.susu.api.envelope.model.response.GetFriendStatisticsResponse
 import com.oksusu.susu.api.envelope.model.response.SearchEnvelopeResponse
+import com.oksusu.susu.api.event.model.CreateEnvelopeEvent
 import com.oksusu.susu.api.event.model.DeleteEnvelopeEvent
+import com.oksusu.susu.api.event.model.UpdateEnvelopeEvent
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.FriendService
 import com.oksusu.susu.api.friend.application.RelationshipService
@@ -29,7 +31,6 @@ import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
 import com.oksusu.susu.domain.envelope.domain.Envelope
-import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.model.SearchEnvelopeSpec
 import com.oksusu.susu.domain.envelope.infrastructure.model.SearchFriendStatisticsSpec
 import kotlinx.coroutines.Dispatchers
@@ -111,18 +112,7 @@ class EnvelopeFacade(
                     customCategory = customCategory
                 ).run { categoryAssignmentService.saveSync(this) }
 
-                // TODO 바꿔야함..
-                ledger?.let {
-                    if (createdEnvelope.type == EnvelopeType.RECEIVED) {
-                        it.totalReceivedAmounts = it.totalReceivedAmounts + createdEnvelope.amount
-                    }
-
-                    if (createdEnvelope.type == EnvelopeType.SENT) {
-                        it.totalSentAmounts = it.totalSentAmounts + createdEnvelope.amount
-                    }
-
-                    ledgerService.saveSync(it)
-                }
+                publisher.publishEvent(CreateEnvelopeEvent(createdEnvelope, ledger))
 
                 createdEnvelope
             }
@@ -192,6 +182,8 @@ class EnvelopeFacade(
                     this.categoryId = category.id
                     this.customCategory = customCategory
                 }.run { categoryAssignmentService.saveSync(this) }
+
+                publisher.publishEvent(UpdateEnvelopeEvent(updatedEnvelope))
 
                 updatedEnvelope
             }
