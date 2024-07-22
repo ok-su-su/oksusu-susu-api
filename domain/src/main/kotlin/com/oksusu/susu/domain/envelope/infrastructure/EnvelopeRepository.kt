@@ -168,12 +168,14 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
                         .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .otherwise(0)
+                        .sum(),
 
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
                         .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .otherwise(0)
+                        .sum(),
 
                     qEnvelope.id.count()
                 )
@@ -192,12 +194,14 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
                         .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .otherwise(0)
+                        .sum(),
 
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
-                        .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .then(QEnvelope.envelope.amount.sum())
+                        .otherwise(0)
+                        .sum(),
 
                     qEnvelope.id.count()
                 )
