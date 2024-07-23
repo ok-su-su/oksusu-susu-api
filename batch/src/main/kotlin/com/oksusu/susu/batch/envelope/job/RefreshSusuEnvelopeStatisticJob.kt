@@ -22,7 +22,9 @@ import com.oksusu.susu.domain.friend.infrastructure.FriendRelationshipRepository
 import com.oksusu.susu.domain.friend.infrastructure.RelationshipRepository
 import com.oksusu.susu.domain.friend.infrastructure.model.CountPerRelationshipIdModel
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -217,12 +219,16 @@ class RefreshSusuEnvelopeStatisticJob(
             val categoryMap = categories.associateBy { category -> category.id }
 
             /** 캐시 값 분류 */
-            val monthlySpentCache =
-                cachedAmount!!.classifyKeyByPrefix(MONTHLY_SPENT_ENVELOPE_AMOUNT_FOR_LAST_YEAR_PREFIX)
-            val relationshipCache = cachedAmount.classifyKeyByPrefix(RELATIONSHIP_COUNT_PREFIX)
-            val categoryCache = cachedAmount.classifyKeyByPrefix(CATEGORY_COUNT_PREFIX)
-            val specificAmountCache = cachedAmount.classifyKeyByPrefix(SUSU_SPECIFIC_ENVELOPE_STATISTIC_AMOUNT_PREFIX)
-            val specificCountCache = cachedAmount.classifyKeyByPrefix(SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX)
+            val monthlySpentCache = cachedAmount
+                ?.classifyKeyByPrefix(MONTHLY_SPENT_ENVELOPE_AMOUNT_FOR_LAST_YEAR_PREFIX) ?: emptyMap()
+            val relationshipCache = cachedAmount
+                ?.classifyKeyByPrefix(RELATIONSHIP_COUNT_PREFIX) ?: emptyMap()
+            val categoryCache = cachedAmount
+                ?.classifyKeyByPrefix(CATEGORY_COUNT_PREFIX) ?: emptyMap()
+            val specificAmountCache = cachedAmount
+                ?.classifyKeyByPrefix(SUSU_SPECIFIC_ENVELOPE_STATISTIC_AMOUNT_PREFIX) ?: emptyMap()
+            val specificCountCache = cachedAmount
+                ?.classifyKeyByPrefix(SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX) ?: emptyMap()
 
             /** 최근 사용 금액 1년 */
             val monthlySpent = getMonthlySpentForLastYear(

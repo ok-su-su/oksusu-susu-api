@@ -95,6 +95,15 @@ data class CacheUserEnvelopeStatisticEvent(
     val statistic: UserEnvelopeStatistic,
 ) : BaseEvent()
 
+data class CreateEnvelopeEvent(
+    val envelope: Envelope,
+    val ledger: Ledger?,
+) : BaseEvent()
+
+data class UpdateEnvelopeEvent(
+    val envelope: Envelope,
+) : BaseEvent()
+
 data class DeleteEnvelopeEvent(
     val envelope: Envelope,
     val uid: Long,

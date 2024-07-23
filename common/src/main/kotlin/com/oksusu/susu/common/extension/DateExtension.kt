@@ -40,3 +40,14 @@ fun LocalDate.yearMonth(): String {
 
     return "$year$month"
 }
+
+fun LocalDateTime.yearMonth(): String {
+    val year = this.year
+    val month = if (this.monthValue >= 10) {
+        this.monthValue
+    } else {
+        "0${this.monthValue}"
+    }
+
+    return "$year$month"
+}

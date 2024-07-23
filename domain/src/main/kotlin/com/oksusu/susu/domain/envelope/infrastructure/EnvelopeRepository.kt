@@ -168,12 +168,14 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
                         .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .otherwise(0)
+                        .sum(),
 
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
                         .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .otherwise(0)
+                        .sum(),
 
                     qEnvelope.id.count()
                 )
@@ -192,12 +194,14 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
                         .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .otherwise(0)
+                        .sum(),
 
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
-                        .then(QEnvelope.envelope.amount)
-                        .otherwise(0),
+                        .then(QEnvelope.envelope.amount.sum())
+                        .otherwise(0)
+                        .sum(),
 
                     qEnvelope.id.count()
                 )
@@ -297,6 +301,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).from(qEnvelope)
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .where(
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE),
                 qEnvelope.ledgerId.isNull,
                 qEnvelope.uid.notIn(uid)
             ).groupBy(qCategoryAssignment.categoryId)
@@ -316,6 +321,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             ).from(qEnvelope)
             .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
             .where(
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE),
                 qEnvelope.ledgerId.isNull,
                 qEnvelope.uid.notIn(uid),
                 qEnvelope.createdAt.after(targetDate)
