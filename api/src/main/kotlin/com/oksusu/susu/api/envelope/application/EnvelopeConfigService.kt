@@ -35,7 +35,7 @@ class EnvelopeConfigService(
                 maxReceivedAmount = maxReceivedAmount?.amount ?: 0L,
                 minSentAmount = minSentAmount?.amount ?: 0L,
                 maxSentAmount = maxSentAmount?.amount ?: 0L,
-                totalAmount = totalAmount
+                totalAmount = totalAmount ?: 0L
             )
         }
     }

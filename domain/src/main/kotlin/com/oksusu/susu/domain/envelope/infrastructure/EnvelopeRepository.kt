@@ -133,7 +133,7 @@ interface EnvelopeCustomRepository {
     fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel?
 
     @Transactional(readOnly = true)
-    fun countTotalAmountByUid(uid: Long): Long
+    fun countTotalAmountByUid(uid: Long): Long?
 
     @Transactional(readOnly = true)
     fun getUserCountHadEnvelope(): Long
@@ -519,12 +519,12 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetchFirst()
     }
 
-    override fun countTotalAmountByUid(uid: Long): Long {
+    override fun countTotalAmountByUid(uid: Long): Long? {
         return JPAQuery<Envelope>(entityManager)
             .select(qEnvelope.amount.sum())
             .from(qEnvelope)
             .where(qEnvelope.uid.eq(uid))
-            .fetchFirst()
+            .fetchOne()
     }
 
     override fun getUserCountHadEnvelope(): Long {
