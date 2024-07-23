@@ -199,7 +199,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
 
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
-                        .then(QEnvelope.envelope.amount.sum())
+                        .then(QEnvelope.envelope.amount)
                         .otherwise(0)
                         .sum(),
 
@@ -433,20 +433,22 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
             .then(QEnvelope.envelope.amount)
             .otherwise(0)
+            .sum()
 
         val receivedAmount = CaseBuilder()
             .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
             .then(QEnvelope.envelope.amount)
             .otherwise(0)
+            .sum()
 
-        val totalAmount = sentAmount.sum().add(receivedAmount.sum())
+        val totalAmount = sentAmount.add(receivedAmount)
 
         val query = JPAQuery<Envelope>(entityManager)
             .select(
                 QFriendStatisticsModel(
                     qEnvelope.friendId,
-                    sentAmount.sum(),
-                    receivedAmount.sum(),
+                    sentAmount,
+                    receivedAmount,
                     qEnvelope.handedOverAt
                 )
             )
