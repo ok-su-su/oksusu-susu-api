@@ -135,7 +135,7 @@ class EnvelopeService(
         return withMDCContext(Dispatchers.IO) { envelopeRepository.count() }
     }
 
-    suspend fun countTotalAmountByUid(uid: Long): Long {
+    suspend fun countTotalAmountByUid(uid: Long): Long? {
         return withMDCContext(Dispatchers.IO) { envelopeRepository.countTotalAmountByUid(uid) }
     }
 

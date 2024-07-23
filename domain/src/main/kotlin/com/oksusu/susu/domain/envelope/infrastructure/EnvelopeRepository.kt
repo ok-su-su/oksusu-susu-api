@@ -133,7 +133,7 @@ interface EnvelopeCustomRepository {
     fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel?
 
     @Transactional(readOnly = true)
-    fun countTotalAmountByUid(uid: Long): Long
+    fun countTotalAmountByUid(uid: Long): Long?
 
     @Transactional(readOnly = true)
     fun getUserCountHadEnvelope(): Long
@@ -199,7 +199,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
 
                     CaseBuilder()
                         .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
-                        .then(QEnvelope.envelope.amount.sum())
+                        .then(QEnvelope.envelope.amount)
                         .otherwise(0)
                         .sum(),
 
@@ -433,20 +433,22 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .`when`(QEnvelope.envelope.type.eq(EnvelopeType.SENT))
             .then(QEnvelope.envelope.amount)
             .otherwise(0)
+            .sum()
 
         val receivedAmount = CaseBuilder()
             .`when`(QEnvelope.envelope.type.eq(EnvelopeType.RECEIVED))
             .then(QEnvelope.envelope.amount)
             .otherwise(0)
+            .sum()
 
-        val totalAmount = sentAmount.sum().add(receivedAmount.sum())
+        val totalAmount = sentAmount.add(receivedAmount)
 
         val query = JPAQuery<Envelope>(entityManager)
             .select(
                 QFriendStatisticsModel(
                     qEnvelope.friendId,
-                    sentAmount.sum(),
-                    receivedAmount.sum(),
+                    sentAmount,
+                    receivedAmount,
                     qEnvelope.handedOverAt
                 )
             )
@@ -517,12 +519,12 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .fetchFirst()
     }
 
-    override fun countTotalAmountByUid(uid: Long): Long {
+    override fun countTotalAmountByUid(uid: Long): Long? {
         return JPAQuery<Envelope>(entityManager)
             .select(qEnvelope.amount.sum())
             .from(qEnvelope)
             .where(qEnvelope.uid.eq(uid))
-            .fetchFirst()
+            .fetchOne()
     }
 
     override fun getUserCountHadEnvelope(): Long {
