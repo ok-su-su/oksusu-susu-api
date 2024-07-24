@@ -541,7 +541,7 @@ class EnvelopeCustomRepositoryImpl : EnvelopeCustomRepository, QuerydslRepositor
             .where(qEnvelope.uid.notIn(uid))
             .orderBy(qEnvelope.amount.asc())
             .offset(position)
-            .limit(position + 1)
+            .limit(1)
             .fetchFirst()
     }
 
