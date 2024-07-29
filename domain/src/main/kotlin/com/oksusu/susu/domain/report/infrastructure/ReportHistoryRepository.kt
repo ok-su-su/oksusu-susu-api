@@ -1,6 +1,5 @@
 package com.oksusu.susu.domain.report.infrastructure
 
-import com.oksusu.susu.domain.post.infrastructure.repository.model.*
 import com.oksusu.susu.domain.report.domain.QReportHistory
 import com.oksusu.susu.domain.report.domain.ReportHistory
 import com.oksusu.susu.domain.report.domain.vo.ReportTargetType
@@ -21,6 +20,9 @@ interface ReportHistoryRepository : JpaRepository<ReportHistory, Long>, ReportHi
 
     @Transactional(readOnly = true)
     fun findAllByCreatedAtAfter(createdAt: LocalDateTime): List<ReportHistory>
+
+    @Transactional(readOnly = true)
+    fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
 }
 
 interface ReportHistoryCustomRepository {
@@ -28,7 +30,8 @@ interface ReportHistoryCustomRepository {
     fun updateAllCreatedAt(createdAt: LocalDateTime): Long
 }
 
-class ReportHistoryCustomRepositoryImpl : ReportHistoryCustomRepository, QuerydslRepositorySupport(ReportHistory::class.java) {
+class ReportHistoryCustomRepositoryImpl : ReportHistoryCustomRepository,
+    QuerydslRepositorySupport(ReportHistory::class.java) {
     @Autowired
     @Qualifier("susuEntityManager")
     override fun setEntityManager(entityManager: EntityManager) {
