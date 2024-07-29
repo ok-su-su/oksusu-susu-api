@@ -4,6 +4,8 @@ import com.oksusu.susu.batch.summary.job.SusuStatisticsDailySummaryJob
 import com.oksusu.susu.batch.summary.job.SusuStatisticsHourSummaryJob
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.config.environment.EnvironmentType
+import com.oksusu.susu.common.extension.resolveCancellation
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,17 +20,27 @@ class SusuStatisticsSummaryScheduler(
     private val dailySummaryJob: SusuStatisticsDailySummaryJob,
     private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
+    private val logger = KotlinLogging.logger { }
+
     @Scheduled(cron = "0 0 0/1 * * *")
     fun runHourSummary() {
         CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
-            hourSummaryJob.runHourSummaryJob()
+            runCatching {
+                hourSummaryJob.runHourSummaryJob()
+            }.onFailure { e ->
+                logger.resolveCancellation("[BATCH] fail to run runHourSummaryJob", e)
+            }
         }
     }
 
     @Scheduled(cron = "0 0 9 * * *")
     fun runDailySummary() {
         CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
-            dailySummaryJob.runDailySummaryJob()
+            runCatching {
+                dailySummaryJob.runDailySummaryJob()
+            }.onFailure { e ->
+                logger.resolveCancellation("[BATCH] fail to run runDailySummaryJob", e)
+            }
         }
     }
 }
