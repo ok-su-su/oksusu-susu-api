@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
+@Transactional(readOnly = true)
 @Repository
 interface UserWithdrawRepository : JpaRepository<UserWithdraw, Long> {
-    @Transactional(readOnly = true)
     fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
 }

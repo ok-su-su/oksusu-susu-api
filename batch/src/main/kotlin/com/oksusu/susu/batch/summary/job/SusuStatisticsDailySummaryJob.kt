@@ -8,6 +8,7 @@ import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
 import com.oksusu.susu.domain.envelope.infrastructure.LedgerRepository
 import com.oksusu.susu.domain.friend.infrastructure.FriendRepository
 import com.oksusu.susu.domain.log.infrastructure.SystemActionLogRepository
+import com.oksusu.susu.domain.report.infrastructure.ReportHistoryRepository
 import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import com.oksusu.susu.domain.user.infrastructure.UserWithdrawRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -25,6 +26,7 @@ class SusuStatisticsDailySummaryJob(
     private val ledgerRepository: LedgerRepository,
     private val friendRepository: FriendRepository,
     private val userWithdrawRepository: UserWithdrawRepository,
+    private val reportHistoryRepository: ReportHistoryRepository,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -39,7 +41,8 @@ class SusuStatisticsDailySummaryJob(
             { withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(beforeOneDay, now) } },
-            { withContext(Dispatchers.IO) { userWithdrawRepository.countByCreatedAtBetween(beforeOneDay, now) } }
+            { withContext(Dispatchers.IO) { userWithdrawRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { withContext(Dispatchers.IO) { reportHistoryRepository.countByCreatedAtBetween(beforeOneDay, now) } }
         ) {
                 systemActionLogCount,
                 userCount,
@@ -48,6 +51,7 @@ class SusuStatisticsDailySummaryJob(
                 dailyLedgerCount,
                 friendCount,
                 userWithdrawCount,
+                dailyReportHistoryCount,
             ->
             DailySummaryMessage(
                 now = now,
@@ -57,7 +61,8 @@ class SusuStatisticsDailySummaryJob(
                 dailyEnvelopeCount = dailyEnvelopeCount,
                 dailyLedgerCount = dailyLedgerCount,
                 friendCount = friendCount,
-                userWithdrawCount = userWithdrawCount
+                userWithdrawCount = userWithdrawCount,
+                dailyReportHistoryCount = dailyReportHistoryCount,
             )
         }.run { slackClient.sendSummary(this.message()) }
     }
@@ -71,6 +76,7 @@ class SusuStatisticsDailySummaryJob(
         val dailyLedgerCount: Long,
         val friendCount: Long,
         val userWithdrawCount: Long,
+        val dailyReportHistoryCount: Long,
     ) {
         fun message(): SlackMessageModel {
             return SlackMessageModel(
@@ -83,6 +89,7 @@ class SusuStatisticsDailySummaryJob(
                 - 전날 종합 장부 생성수 : $dailyLedgerCount
                 - 전날 종합 친구 생성수 : $friendCount
                 - 전날 종합 유저 탈퇴수 : $userWithdrawCount
+                - 전날 종합 신고수 : $dailyReportHistoryCount
                 """.trimIndent()
             )
         }
