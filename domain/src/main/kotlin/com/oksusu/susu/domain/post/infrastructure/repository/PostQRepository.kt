@@ -29,6 +29,7 @@ interface PostQRepository {
 
     fun getPostAndCreator(id: Long, type: PostType): PostAndUserModel?
 
+    @Transactional
     fun updateIsActiveById(ids: List<Long>): Long
 }
 
