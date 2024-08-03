@@ -35,7 +35,7 @@ class SuspendableSlackClient(
         return runCatching {
             withMDCContext(Dispatchers.IO) {
                 webclient.post()
-                    .uri("/${token}aasd")
+                    .uri("/$token")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(message)
                     .retrieve()
