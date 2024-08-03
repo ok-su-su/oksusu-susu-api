@@ -12,6 +12,7 @@ CREATE TABLE `report_history`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT '신고 기록';
 CREATE INDEX idx__uid__target_id ON report_history (target_id, target_type);
+CREATE INDEX idx__created_at ON report_history (created_at);
 
 -- 신고 메타데이터
 CREATE TABLE `report_metadata`
@@ -42,3 +43,4 @@ ALTER TABLE report_result CHANGE COLUMN `uid` `target_id` bigint NOT NULL COMMEN
 ALTER TABLE report_result CHANGE COLUMN `status` `status` varchar (128) NOT NULL COMMENT '신고 결과 상태';
 DROP INDEX idx__uid ON report_result;
 CREATE INDEX idx__target_id__target_type ON report_result (target_id, target_type);
+CREATE INDEX idx__created_at ON report_result (created_at);

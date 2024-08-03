@@ -19,6 +19,7 @@ CREATE INDEX idx__uid ON envelope (uid);
 CREATE INDEX idx__friend_id__uid ON envelope (friend_id, uid);
 CREATE INDEX idx__ledger_id__uid ON envelope (ledger_id, uid);
 CREATE INDEX idx__handed_over_at ON envelope (handed_over_at);
+CREATE INDEX idx__created_at ON envelope (created_at);
 
 -- 장부
 CREATE TABLE `ledger`
@@ -36,3 +37,4 @@ CREATE TABLE `ledger`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 200000 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='장부';
 CREATE INDEX idx__uid ON ledger (uid);
+CREATE INDEX idx__created_at ON ledger (created_at);
