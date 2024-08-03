@@ -11,4 +11,3 @@ import java.time.LocalDateTime
 interface ReportResultRepository : JpaRepository<ReportResult, Long>, ReportResultQRepository {
     fun findAllByCreatedAtBetween(from: LocalDateTime, to: LocalDateTime): List<ReportResult>
 }
-
