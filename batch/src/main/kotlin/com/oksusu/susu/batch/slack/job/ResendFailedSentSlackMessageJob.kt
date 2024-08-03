@@ -81,7 +81,7 @@ class ResendFailedSentSlackMessageJob(
             message[model.token] = if (stackedMessage == null) {
                 recoverMsg
             } else {
-                "$stackedMessage\n${recoverMsg}"
+                "$stackedMessage\n$recoverMsg"
             }
         }
 
@@ -96,7 +96,7 @@ class ResendFailedSentSlackMessageJob(
                 val model = FailedSentSlackMessageCache(
                     token = token,
                     message = message,
-                    isStacked = true,
+                    isStacked = true
                 )
 
                 async(Dispatchers.IO) {

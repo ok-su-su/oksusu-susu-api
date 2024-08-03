@@ -5,8 +5,6 @@ import com.oksusu.susu.cache.model.FailedSentSlackMessageCache
 import com.oksusu.susu.cache.service.CacheService
 import com.oksusu.susu.client.config.SlackConfig
 import com.oksusu.susu.client.slack.model.SlackMessageModel
-import com.oksusu.susu.common.exception.ErrorCode
-import com.oksusu.susu.common.exception.FailToExecuteException
 import com.oksusu.susu.common.extension.awaitSingleOrThrow
 import com.oksusu.susu.common.extension.withMDCContext
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -23,7 +21,7 @@ class SuspendableSlackClient(
     private val slackWebhookConfig: SlackConfig.SlackWebhookConfig,
     private val cacheService: CacheService,
 ) : SlackClient {
-    private val logger = KotlinLogging.logger {  }
+    private val logger = KotlinLogging.logger { }
 
     override suspend fun sendSummary(message: SlackMessageModel): String {
         return sendMessage(message, slackWebhookConfig.summaryToken)
@@ -46,7 +44,7 @@ class SuspendableSlackClient(
                     .awaitSingleOrThrow()
             }
         }.onFailure {
-            if (withRecover){
+            if (withRecover) {
                 recoverSendMessage(message, token)
             }
         }.getOrThrow()

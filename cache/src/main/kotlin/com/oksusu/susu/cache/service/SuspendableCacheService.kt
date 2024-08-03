@@ -77,7 +77,7 @@ class SuspendableCacheService(
                 runCatching {
                     setOps.add(
                         cache.key,
-                        mapper.writeValueAsString(value),
+                        mapper.writeValueAsString(value)
                     ).cache().awaitSingleOrNull()
                 }.onFailure { e ->
                     when (e) {

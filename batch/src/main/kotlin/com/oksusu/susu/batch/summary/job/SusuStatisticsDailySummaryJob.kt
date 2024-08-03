@@ -62,7 +62,7 @@ class SusuStatisticsDailySummaryJob(
                 dailyLedgerCount = dailyLedgerCount,
                 friendCount = friendCount,
                 userWithdrawCount = userWithdrawCount,
-                dailyReportHistoryCount = dailyReportHistoryCount,
+                dailyReportHistoryCount = dailyReportHistoryCount
             )
         }.run { slackClient.sendSummary(this.message()) }
     }

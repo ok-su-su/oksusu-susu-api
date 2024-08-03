@@ -2,9 +2,9 @@ package com.oksusu.susu.cache.model
 
 import java.time.LocalDateTime
 
-data class FailedSentSlackMessageCache (
+data class FailedSentSlackMessageCache(
     val token: String,
     val message: String,
     val failedAt: LocalDateTime = LocalDateTime.now(),
-    val isStacked: Boolean = false
+    val isStacked: Boolean = false,
 )

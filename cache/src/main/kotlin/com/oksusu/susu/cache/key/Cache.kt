@@ -1,10 +1,10 @@
 package com.oksusu.susu.cache.key
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.oksusu.susu.cache.model.FailedSentSlackMessageCache
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.cache.model.SusuEnvelopeStatisticCacheModel
 import com.oksusu.susu.cache.model.UserEnvelopeStatisticCacheModel
-import com.oksusu.susu.cache.model.FailedSentSlackMessageCache
 import com.oksusu.susu.common.consts.*
 import com.oksusu.susu.common.util.toTypeReference
 import java.time.Duration
