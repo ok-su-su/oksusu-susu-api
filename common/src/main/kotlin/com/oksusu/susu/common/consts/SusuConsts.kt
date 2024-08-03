@@ -26,6 +26,8 @@ const val USER_COMMUNITY_PUNISHED_COUNT_KEY = "user_community_punished_count_key
 
 const val SUSU_ENVELOPE_STATISTIC_AMOUNT_KEY = "susu_envelope_statistic_amount"
 
+const val FAILED_SENT_SLACK_MESSAGE_KEY = "failed_sent_slack_message_key"
+
 const val KID = "kid"
 
 const val MDC_KEY_TRACE_ID = "traceId"

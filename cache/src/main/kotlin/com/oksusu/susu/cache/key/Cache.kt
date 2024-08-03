@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
 import com.oksusu.susu.cache.model.SusuEnvelopeStatisticCacheModel
 import com.oksusu.susu.cache.model.UserEnvelopeStatisticCacheModel
+import com.oksusu.susu.cache.model.FailedSentSlackMessageCache
 import com.oksusu.susu.common.consts.*
 import com.oksusu.susu.common.util.toTypeReference
 import java.time.Duration
+import java.time.LocalDateTime
 
 data class Cache<VALUE_TYPE>(
     val key: String,
@@ -86,6 +88,14 @@ data class Cache<VALUE_TYPE>(
                 key = SUSU_ENVELOPE_STATISTIC_AMOUNT_KEY,
                 type = toTypeReference(),
                 duration = Duration.ofDays(1).plusHours(1)
+            )
+        }
+
+        fun getFailedSentSlackMessageCache(time: LocalDateTime): Cache<FailedSentSlackMessageCache> {
+            return Cache(
+                key = "$FAILED_SENT_SLACK_MESSAGE_KEY:${time.minute}",
+                type = toTypeReference(),
+                duration = Duration.ofHours(2)
             )
         }
     }
