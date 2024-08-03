@@ -342,7 +342,7 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             ).from(qEnvelope)
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId).and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)))
             .where(
                 qEnvelope.amount.between(minAmount, maxAmount),
                 qEnvelope.uid.notIn(uid),
