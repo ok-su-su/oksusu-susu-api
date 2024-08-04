@@ -76,6 +76,11 @@ data class SlackErrorAlarmEvent(
     val exception: Exception,
 ) : BaseEvent()
 
+data class DiscordErrorAlarmEvent(
+    val request: ServerHttpRequest,
+    val exception: Exception,
+) : BaseEvent()
+
 data class CreateUserStatusHistoryEvent(
     val userStatusHistory: UserStatusHistory,
 ) : BaseEvent()
