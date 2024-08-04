@@ -5,9 +5,12 @@ import com.oksusu.susu.api.event.model.SlackErrorAlarmEvent
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.api.extension.requestParam
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
-import com.oksusu.susu.client.slack.SlackClient
-import com.oksusu.susu.client.slack.model.SlackMessageModel
-import com.oksusu.susu.common.extension.*
+import com.oksusu.susu.client.discord.DiscordClient
+import com.oksusu.susu.client.discord.model.DiscordMessageModel
+import com.oksusu.susu.common.extension.format
+import com.oksusu.susu.common.extension.isProd
+import com.oksusu.susu.common.extension.mdcCoroutineScope
+import com.oksusu.susu.common.extension.supressedErrorStack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -20,7 +23,7 @@ import java.time.LocalDateTime
 @SusuEventListener
 class SlackErrorAlarmEventListener(
     private val environment: Environment,
-    private val slackClient: SlackClient,
+    private val discordClient: DiscordClient,
     private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @EventListener
@@ -53,7 +56,7 @@ class SlackErrorAlarmEventListener(
                 errorUserIP = errorUserIP,
                 errorRequestParam = errorRequestParam,
                 body = body
-            ).run { slackClient.sendError(this.message()) }
+            ).run { discordClient.sendError(this.message()) }
         }
     }
 }
@@ -67,10 +70,10 @@ private data class ErrorMessage(
     val errorRequestParam: String,
     val body: String,
 ) {
-    fun message(): SlackMessageModel {
-        return SlackMessageModel(
+    fun message(): DiscordMessageModel {
+        return DiscordMessageModel(
             """
-                * 에러 발생 ${LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")}*
+                **[ 에러 발생 ${LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")} ]**
                 - User IP : $errorUserIP
                 - Request Addr : $method - $url
                 - Requset Param : $errorRequestParam

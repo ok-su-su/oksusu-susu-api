@@ -1,7 +1,7 @@
 package com.oksusu.susu.client.common.coroutine
 
-import com.oksusu.susu.client.slack.SlackClient
-import com.oksusu.susu.client.slack.model.SlackMessageModel
+import com.oksusu.susu.client.discord.DiscordClient
+import com.oksusu.susu.client.discord.model.DiscordMessageModel
 import com.oksusu.susu.common.extension.LoggingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.errorStack
 import com.oksusu.susu.common.extension.format
@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 
 @Component
 class ErrorPublishingCoroutineExceptionHandler(
-    private val slackClient: SlackClient,
+    private val discordClient: DiscordClient,
     private val environment: Environment,
 ) {
     val handler = CoroutineExceptionHandler { _, throwable ->
@@ -32,10 +32,10 @@ class ErrorPublishingCoroutineExceptionHandler(
 
         if (environment.isProd()) {
             CoroutineScope(Dispatchers.IO + LoggingCoroutineExceptionHandler).launch {
-                slackClient.sendError(
-                    SlackMessageModel(
+                discordClient.sendError(
+                    DiscordMessageModel(
                         """
-                        * 스케줄러 에러 발생 ${LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")}*
+                        **[ 스케줄러 에러 발생 ${LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")} ]**
                         - Message : $errorMessage
                         - Stack Trace
                         

@@ -1,10 +1,7 @@
 package com.oksusu.susu.cache.key
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.oksusu.susu.cache.model.FailedSentSlackMessageCache
-import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
-import com.oksusu.susu.cache.model.SusuEnvelopeStatisticCacheModel
-import com.oksusu.susu.cache.model.UserEnvelopeStatisticCacheModel
+import com.oksusu.susu.cache.model.*
 import com.oksusu.susu.common.consts.*
 import com.oksusu.susu.common.util.toTypeReference
 import java.time.Duration
@@ -94,6 +91,14 @@ data class Cache<VALUE_TYPE>(
         fun getFailedSentSlackMessageCache(time: LocalDateTime): Cache<FailedSentSlackMessageCache> {
             return Cache(
                 key = "$FAILED_SENT_SLACK_MESSAGE_KEY:${time.minute}",
+                type = toTypeReference(),
+                duration = Duration.ofHours(2)
+            )
+        }
+
+        fun getFailedSentDiscordMessageCache(time: LocalDateTime): Cache<FailedSentDiscordMessageCache> {
+            return Cache(
+                key = "$FAILED_SENT_DISCORD_MESSAGE_KEY:${time.minute}",
                 type = toTypeReference(),
                 duration = Duration.ofHours(2)
             )
