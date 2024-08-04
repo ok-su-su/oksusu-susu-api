@@ -6,11 +6,7 @@ import com.oksusu.susu.api.event.model.SlackErrorAlarmEvent
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.api.extension.requestParam
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
-import com.oksusu.susu.client.discord.DiscordClient
-import com.oksusu.susu.client.discord.model.DiscordMessageModel
 import com.oksusu.susu.client.slack.SlackClient
-import com.oksusu.susu.client.slack.model.SlackMessageModel
-import com.oksusu.susu.common.extension.format
 import com.oksusu.susu.common.extension.isProd
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.common.extension.supressedErrorStack
@@ -21,7 +17,6 @@ import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.context.event.EventListener
 import org.springframework.core.env.Environment
 import org.springframework.core.io.buffer.DataBufferUtils
-import java.time.LocalDateTime
 
 @SusuEventListener
 class SlackErrorAlarmEventListener(
@@ -63,4 +58,3 @@ class SlackErrorAlarmEventListener(
         }
     }
 }
-
