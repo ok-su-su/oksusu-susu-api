@@ -5,7 +5,8 @@
     <include resource="src/main/resources/logback-file-spring.xml"/>
 
     <springProperty scope="context" name="logLevel" source="logging.level.root" defaultValue="INFO"/>
-    <springProperty scope="context" name="warningLogToken" source="slack.webhook.warning-log-token" defaultValue=""/>
+    <springProperty scope="context" name="slackWarningLogToken" source="slack.webhook.warning-log-token" defaultValue=""/>
+    <springProperty scope="context" name="discordWarningLogToken" source="discord.webhook.warning-log-token" defaultValue=""/>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
@@ -34,7 +35,14 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>
-        <token>${warningLogToken}</token>
+        <token>${slackWarningLogToken}</token>
+    </appender>
+
+    <appender name="DISCORD_WARNING_LOG" class="com.oksusu.susu.client.appender.DiscordAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <token>${discordWarningLogToken}</token>
     </appender>
 
     <springProfile name="default, dev">
@@ -45,9 +53,10 @@
 
     <springProfile name="prod">
         <root level="${logLevel}">
-            <appender-ref ref="SLACK_WARNING_LOG"/>
+            <appender-ref ref="DISCORD_WARNING_LOG"/>
             <appender-ref ref="STDOUT"/>
-            <!--            <appender-ref ref="SENTRY"/>-->
+<!--            <appender-ref ref="SLACK_WARNING_LOG"/>-->
+<!--            <appender-ref ref="SENTRY"/>-->
         </root>
     </springProfile>
 </configuration>

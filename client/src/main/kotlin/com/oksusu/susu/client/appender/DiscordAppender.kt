@@ -2,10 +2,11 @@ package com.oksusu.susu.client.appender
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
-import com.oksusu.susu.client.slack.SlackService
+import com.oksusu.susu.client.discord.DiscordService
+import com.oksusu.susu.client.discord.model.DiscordMessageModel
 import com.oksusu.susu.client.slack.model.SlackMessageModel
 
-class SlackAppender : AppenderBase<ILoggingEvent>() {
+class DiscordAppender : AppenderBase<ILoggingEvent>() {
     private var token: String = ""
 
     fun setToken(token: String) {
@@ -13,12 +14,12 @@ class SlackAppender : AppenderBase<ILoggingEvent>() {
     }
 
     override fun append(event: ILoggingEvent) {
-        val message = SlackMessageModel(
-            text = """
+        val message = DiscordMessageModel(
+            content = """
                         $event
             """.trimIndent()
         )
 
-        SlackService.sendMessage(message, token)
+        DiscordService.sendMessage(message, token)
     }
 }
