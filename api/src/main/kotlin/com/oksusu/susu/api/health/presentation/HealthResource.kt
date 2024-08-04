@@ -3,7 +3,6 @@ package com.oksusu.susu.api.health.presentation
 import com.oksusu.susu.api.config.web.SwaggerTag
 import com.oksusu.susu.api.extension.wrapOk
 import com.oksusu.susu.api.health.model.HealthResponse
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.core.env.Environment

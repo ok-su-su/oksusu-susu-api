@@ -2,7 +2,6 @@ package com.oksusu.susu.client.discord
 
 import com.oksusu.susu.client.WebClientFactory
 import com.oksusu.susu.client.discord.model.DiscordMessageModel
-import com.oksusu.susu.client.slack.model.SlackMessageModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

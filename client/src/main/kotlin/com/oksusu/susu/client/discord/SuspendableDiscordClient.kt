@@ -58,4 +58,3 @@ class SuspendableDiscordClient(
         cacheService.sSet(Cache.getFailedSentDiscordMessageCache(LocalDateTime.now()), model)
     }
 }
-
