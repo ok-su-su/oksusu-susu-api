@@ -1,5 +1,6 @@
 package com.oksusu.susu.client.config
 
+import com.oksusu.susu.cache.service.CacheService
 import com.oksusu.susu.client.WebClientFactory
 import com.oksusu.susu.client.slack.SlackClient
 import com.oksusu.susu.client.slack.SuspendableSlackClient
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class SlackClientConfig(
     private val webhookConfig: SlackConfig.SlackWebhookConfig,
+    private val cacheService: CacheService,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -21,6 +23,6 @@ class SlackClientConfig(
     fun slackClient(): SlackClient {
         val webClient = WebClientFactory.generate(baseUrl = SLACK_WEBHOOKS_DOMAIN)
         logger.info { "initialized slack client" }
-        return SuspendableSlackClient(webClient, webhookConfig)
+        return SuspendableSlackClient(webClient, webhookConfig, cacheService)
     }
 }

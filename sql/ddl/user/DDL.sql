@@ -14,6 +14,7 @@ CREATE TABLE `user`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 정보';
 CREATE UNIQUE INDEX uidx__oauth_id__oauth_provider ON user (oauth_id, oauth_provider);
+CREATE INDEX idx__created_at ON user (created_at);
 
 -- 유저 상태 정보 타입
 CREATE TABLE `user_status_type`
@@ -53,6 +54,7 @@ CREATE TABLE `user_status_history`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
 CREATE INDEX idx__uid ON user_status_history (uid);
 ALTER TABLE user_status_history ADD (`is_forced` tinyint DEFAULT 0 NOT NULL COMMENT '관리자 실행 여부, 1 : 관리자, 0 : 유저');
+CREATE INDEX idx__created_at ON user_status_history (created_at);
 
 -- 탈퇴 유저 기록
 CREATE TABLE `user_withdraw`
@@ -67,6 +69,7 @@ CREATE TABLE `user_withdraw`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='유저 상태 변경 기록';
 CREATE INDEX idx__uid ON user_withdraw (uid);
+CREATE INDEX idx__created_at ON user_withdraw (created_at);
 
 -- 카테고리
 CREATE TABLE `category`

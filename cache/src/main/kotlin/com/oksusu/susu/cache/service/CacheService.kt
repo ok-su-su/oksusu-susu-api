@@ -14,6 +14,11 @@ interface CacheService {
     suspend fun <VALUE_TYPE : Any> getOrNull(cache: Cache<VALUE_TYPE>): VALUE_TYPE?
     suspend fun <VALUE_TYPE : Any> delete(cache: Cache<VALUE_TYPE>)
 
+    /** set */
+    suspend fun <VALUE_TYPE : Any> sSet(cache: Cache<VALUE_TYPE>, value: VALUE_TYPE)
+    suspend fun <VALUE_TYPE : Any> sGetMembers(cache: Cache<VALUE_TYPE>): List<VALUE_TYPE>
+    suspend fun <VALUE_TYPE : Any> sDelete(cache: Cache<VALUE_TYPE>)
+
     companion object {
         /** key-value */
         suspend fun <VALUE_TYPE : Any> CacheService.set(

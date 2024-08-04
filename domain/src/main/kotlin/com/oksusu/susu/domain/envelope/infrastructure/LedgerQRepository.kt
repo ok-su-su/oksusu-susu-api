@@ -137,7 +137,10 @@ class LedgerQRepositoryImpl : LedgerQRepository, QuerydslRepositorySupport(Ledge
                 )
             )
             .from(qLedger)
-            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qLedger.id.eq(qCategoryAssignment.targetId)
+                    .and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER))
+            )
             .where(qLedger.uid.eq(uid))
             .groupBy(qCategoryAssignment.categoryId)
             .fetch()

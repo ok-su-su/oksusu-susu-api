@@ -10,6 +10,7 @@ CREATE TABLE `friend`
     PRIMARY KEY (`id`)
 ) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='지인 정보';
 CREATE UNIQUE INDEX idx__uid__phone_number ON friend (uid, phone_number);
+CREATE INDEX idx__created_at ON friend (created_at);
 
 -- 지인 관계
 CREATE TABLE `friend_relationship`

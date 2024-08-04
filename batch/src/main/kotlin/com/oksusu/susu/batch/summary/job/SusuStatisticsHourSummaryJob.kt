@@ -1,7 +1,7 @@
 package com.oksusu.susu.batch.summary.job
 
-import com.oksusu.susu.client.slack.SlackClient
-import com.oksusu.susu.client.slack.model.SlackMessageModel
+import com.oksusu.susu.client.discord.DiscordClient
+import com.oksusu.susu.client.discord.model.DiscordMessageModel
 import com.oksusu.susu.common.extension.format
 import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.envelope.infrastructure.EnvelopeRepository
@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 @Component
 class SusuStatisticsHourSummaryJob(
-    private val slackClient: SlackClient,
+    private val discordClient: DiscordClient,
     private val systemActionLogRepository: SystemActionLogRepository,
     private val userRepository: UserRepository,
     private val envelopeRepository: EnvelopeRepository,
@@ -57,7 +57,7 @@ class SusuStatisticsHourSummaryJob(
                 userCount = userCount,
                 userWithdrawCount = userWithdrawCount
             )
-        }.run { slackClient.sendSummary(this.message()) }
+        }.run { discordClient.sendSummary(this.message()) }
     }
 
     private data class HourSummaryMessage(
@@ -70,10 +70,10 @@ class SusuStatisticsHourSummaryJob(
         val userCount: Long,
         val userWithdrawCount: Long,
     ) {
-        fun message(): SlackMessageModel {
-            return SlackMessageModel(
+        fun message(): DiscordMessageModel {
+            return DiscordMessageModel(
                 """
-                *시간단위 통계 알림 ${now.format("yyyy-MM-dd HH:mm:ss")}*
+                **[ 시간단위 통계 알림 ${now.format("yyyy-MM-dd HH:mm:ss")} ]**
                 - ${beforeOneHour.format("HH:mm:ss")} ~ ${now.format("HH:mm:ss")}
                 - api 호출수 : $systemActionLogCount
                 - 장부 생성수 : $ledgerCount
