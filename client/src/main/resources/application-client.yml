@@ -7,6 +7,12 @@ slack:
     error-token: ${SLACK_ERROR_TOKEN}
     warning-log-token: ${SLACK_WARNING_LOG_TOKEN}
 
+discord:
+  webhook:
+    summary-token: ${DISCORD_SUMMARY_TOKEN}
+    error-token: ${DISCORD_ERROR_TOKEN}
+    warning-log-token: ${DISCORD_WARNING_LOG_TOKEN}
+
 # OAUTH
 oauth-url:
   kakao:

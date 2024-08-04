@@ -1,12 +1,12 @@
 package com.oksusu.susu.api.event.listener
 
 import com.oksusu.susu.api.common.aspect.SusuEventListener
+import com.oksusu.susu.api.event.model.DiscordErrorAlarmEvent
 import com.oksusu.susu.api.event.model.ErrorMessage
-import com.oksusu.susu.api.event.model.SlackErrorAlarmEvent
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.api.extension.requestParam
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
-import com.oksusu.susu.client.slack.SlackClient
+import com.oksusu.susu.client.discord.DiscordClient
 import com.oksusu.susu.common.extension.isProd
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.common.extension.supressedErrorStack
@@ -19,13 +19,13 @@ import org.springframework.core.env.Environment
 import org.springframework.core.io.buffer.DataBufferUtils
 
 @SusuEventListener
-class SlackErrorAlarmEventListener(
+class DiscordErrorAlarmEventListener(
     private val environment: Environment,
-    private val slackClient: SlackClient,
+    private val discordClient: DiscordClient,
     private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @EventListener
-    fun execute(event: SlackErrorAlarmEvent) {
+    fun execute(event: DiscordErrorAlarmEvent) {
         /** prod 환경에서만 작동 */
         if (!environment.isProd()) {
             return
@@ -54,7 +54,7 @@ class SlackErrorAlarmEventListener(
                 errorUserIP = errorUserIP,
                 errorRequestParam = errorRequestParam,
                 body = body
-            ).run { slackClient.sendError(this.slackMessage()) }
+            ).run { discordClient.sendError(this.discordMessage()) }
         }
     }
 }
