@@ -16,6 +16,7 @@ import com.oksusu.susu.api.envelope.model.response.GetFriendStatisticsResponse
 import com.oksusu.susu.api.envelope.model.response.SearchEnvelopeResponse
 import com.oksusu.susu.api.event.model.CreateEnvelopeEvent
 import com.oksusu.susu.api.event.model.DeleteEnvelopeEvent
+import com.oksusu.susu.api.event.model.RefreshUserEnvelopeStatisticEvent
 import com.oksusu.susu.api.event.model.UpdateEnvelopeEvent
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.FriendService
@@ -113,6 +114,7 @@ class EnvelopeFacade(
                 ).run { categoryAssignmentService.saveSync(this) }
 
                 publisher.publishEvent(CreateEnvelopeEvent(createdEnvelope, ledger))
+                publisher.publishEvent(RefreshUserEnvelopeStatisticEvent(user.uid))
 
                 createdEnvelope
             }

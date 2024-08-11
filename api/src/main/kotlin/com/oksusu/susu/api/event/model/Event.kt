@@ -121,3 +121,7 @@ data class CreateUserWithdrawEvent(
 data class CacheAppleOidcPublicKeysEvent(
     val keys: OidcPublicKeysCacheModel,
 ) : BaseEvent()
+
+data class RefreshUserEnvelopeStatisticEvent(
+    val uid: Long,
+) : BaseEvent()

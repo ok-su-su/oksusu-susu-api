@@ -25,6 +25,12 @@ class StatisticResource(
         user: AuthUser,
     ) = statisticFacade.getUserEnvelopeStatistic(user).wrapOk()
 
+    @Operation(summary = "나의 통계 새로고침")
+    @GetMapping("/mine/envelope/refresh")
+    suspend fun refreshUserEnvelopeStatistic(
+        user: AuthUser,
+    ) = statisticFacade.refreshUserEnvelopeStatistic(user).wrapOk()
+
     @Operation(summary = "수수 통계")
     @GetMapping("/susu/envelope")
     suspend fun getSusuEnvelopeStatistic(
