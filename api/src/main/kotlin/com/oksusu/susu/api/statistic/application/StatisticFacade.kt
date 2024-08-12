@@ -9,11 +9,9 @@ import com.oksusu.susu.api.statistic.model.response.UserEnvelopeStatisticRespons
 import com.oksusu.susu.api.statistic.model.vo.SusuEnvelopeStatisticRequest
 import com.oksusu.susu.cache.statistic.domain.UserEnvelopeStatistic
 import com.oksusu.susu.common.extension.parZipWithMDC
-import com.oksusu.susu.common.extension.yearMonth
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class StatisticFacade(
@@ -22,7 +20,6 @@ class StatisticFacade(
     private val susuEnvelopeStatisticService: SusuEnvelopeStatisticService,
     private val susuSpecificEnvelopeStatisticService: SusuSpecificEnvelopeStatisticService,
     private val relationshipService: RelationshipService,
-    private val envelopeStatisticService: EnvelopeStatisticService,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     private val logger = KotlinLogging.logger { }
@@ -35,53 +32,29 @@ class StatisticFacade(
             return UserEnvelopeStatisticResponse.from(this)
         }
 
-        val userEnvelopeStatistic = parZipWithMDC(
-            /** 최근 사용 금액 1년 */
-            { envelopeStatisticService.getRecentSpentFor1Year(user.uid) },
-            /** 최다 수수 관계 */
-            { envelopeStatisticService.getMostFrequentRelationship(user.uid) },
-            /** 최다 수수 경조사 */
-            { envelopeStatisticService.getMostFrequentCategory(user.uid) },
-            /** 가장 많이 받은 금액 */
-            { envelopeStatisticService.getMaxReceivedEnvelope(user.uid) },
-            /** 가장 많이 보낸 금액 */
-            { envelopeStatisticService.getMaxSentEnvelope(user.uid) }
-        ) {
-                recentSpent,
-                mostFrequentRelationShip,
-                mostFrequentCategory,
-                maxReceivedEnvelope,
-                maxSentEnvelope,
-            ->
+        val userEnvelopeStatistic = createUserEnvelopeStatistic(user.uid)
 
-            /** 최근 사용 금액 8달 */
-            val before8Month = LocalDate.now().minusMonths(7).yearMonth()
-            val recentSpentForLast8Months = recentSpent?.filter { spent ->
-                spent.title >= before8Month
-            }
+        return UserEnvelopeStatisticResponse.from(userEnvelopeStatistic)
+    }
 
-            /** 경조사비 가장 많이 쓴 달 */
-            val mostSpentMonth = recentSpent?.maxBy { model -> model.value }?.title?.substring(4)?.toLong()
+    suspend fun refreshUserEnvelopeStatistic(user: AuthUser): UserEnvelopeStatisticResponse {
+        val userEnvelopeStatistic = createUserEnvelopeStatistic(user.uid)
 
-            UserEnvelopeStatistic(
-                recentSpent = recentSpentForLast8Months,
-                mostSpentMonth = mostSpentMonth,
-                mostFrequentRelationShip = mostFrequentRelationShip,
-                mostFrequentCategory = mostFrequentCategory,
-                maxReceivedEnvelope = maxReceivedEnvelope,
-                maxSentEnvelope = maxSentEnvelope
-            )
-        }
+        return UserEnvelopeStatisticResponse.from(userEnvelopeStatistic)
+    }
+
+    private suspend fun createUserEnvelopeStatistic(uid: Long): UserEnvelopeStatistic {
+        val userEnvelopeStatistic = userEnvelopeStatisticService.createUserEnvelopeStatistic(uid)
 
         /** 유저 봉투 통계 캐싱 */
         eventPublisher.publishEvent(
             CacheUserEnvelopeStatisticEvent(
-                uid = user.uid,
+                uid = uid,
                 statistic = userEnvelopeStatistic
             )
         )
 
-        return UserEnvelopeStatisticResponse.from(userEnvelopeStatistic)
+        return userEnvelopeStatistic
     }
 
     suspend fun getSusuEnvelopeStatistic(requestParam: SusuEnvelopeStatisticRequest): SusuEnvelopeStatisticResponse {

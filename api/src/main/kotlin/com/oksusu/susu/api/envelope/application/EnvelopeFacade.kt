@@ -112,7 +112,7 @@ class EnvelopeFacade(
                     customCategory = customCategory
                 ).run { categoryAssignmentService.saveSync(this) }
 
-                publisher.publishEvent(CreateEnvelopeEvent(createdEnvelope, ledger))
+                publisher.publishEvent(CreateEnvelopeEvent(createdEnvelope, ledger, user))
 
                 createdEnvelope
             }
@@ -183,7 +183,7 @@ class EnvelopeFacade(
                     this.customCategory = customCategory
                 }.run { categoryAssignmentService.saveSync(this) }
 
-                publisher.publishEvent(UpdateEnvelopeEvent(updatedEnvelope))
+                publisher.publishEvent(UpdateEnvelopeEvent(updatedEnvelope, user))
 
                 updatedEnvelope
             }
@@ -226,7 +226,7 @@ class EnvelopeFacade(
                 targetType = CategoryAssignmentType.ENVELOPE
             )
 
-            DeleteEnvelopeEvent(envelope, user.uid)
+            DeleteEnvelopeEvent(envelope, user)
                 .run { publisher.publishEvent(this) }
         }
     }

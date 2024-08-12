@@ -22,4 +22,10 @@ class HealthResource(
     fun healthCheckV1() = environment.activeProfiles.first()
         .run { HealthResponse.from(this) }
         .wrapOk()
+
+    @Operation(summary = "health-check")
+    @GetMapping("/health")
+    fun healthCheck() = environment.activeProfiles.first()
+        .run { HealthResponse.from(this) }
+        .wrapOk()
 }

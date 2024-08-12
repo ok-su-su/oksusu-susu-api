@@ -8,11 +8,13 @@ import com.oksusu.susu.api.event.model.DeleteEnvelopeEvent
 import com.oksusu.susu.api.event.model.UpdateEnvelopeEvent
 import com.oksusu.susu.api.friend.application.FriendRelationshipService
 import com.oksusu.susu.api.friend.application.FriendService
+import com.oksusu.susu.api.statistic.application.UserEnvelopeStatisticService
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.mdcCoroutineScope
 import com.oksusu.susu.common.extension.parZipWithMDC
 import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 import com.oksusu.susu.domain.envelope.infrastructure.LedgerRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -27,9 +29,13 @@ class EnvelopeEventListener(
     private val ledgerRepository: LedgerRepository,
     private val friendRelationshipService: FriendRelationshipService,
     private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val userEnvelopeStatisticService: UserEnvelopeStatisticService,
 ) {
+    private val logger = KotlinLogging.logger { }
+
     @TransactionalEventListener
     fun handle(event: CreateEnvelopeEvent) {
+        /** 장부 처리 집계 변경 */
         event.ledger?.let { ledger ->
             when (event.envelope.type) {
                 EnvelopeType.RECEIVED -> {
@@ -42,6 +48,20 @@ class EnvelopeEventListener(
             }
 
             ledgerService.saveSync(ledger)
+        }
+
+        /** 통계 캐싱 처리 */
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
+            /** 통계 캐싱 안되어있으면 중단 */
+            userEnvelopeStatisticService.getStatisticOrNull(event.user.uid) ?: run { return@launch }
+
+            logger.info { "[${event.publishAt}] ${event.user.uid} refresh user envelope statistic 시작" }
+
+            val statistic = userEnvelopeStatisticService.createUserEnvelopeStatistic(event.user.uid)
+
+            userEnvelopeStatisticService.save(event.user.uid, statistic)
+
+            logger.info { "[${event.publishAt}] ${event.user.uid} refresh user envelope statistic 끝" }
         }
     }
 
@@ -62,13 +82,27 @@ class EnvelopeEventListener(
                 }
             }
         }
+
+        /** 통계 캐싱 처리 */
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
+            /** 통계 캐싱 안되어있으면 중단 */
+            userEnvelopeStatisticService.getStatisticOrNull(event.user.uid) ?: run { return@launch }
+
+            logger.info { "[${event.publishAt}] ${event.user.uid} refresh user envelope statistic 시작" }
+
+            val statistic = userEnvelopeStatisticService.createUserEnvelopeStatistic(event.user.uid)
+
+            userEnvelopeStatisticService.save(event.user.uid, statistic)
+
+            logger.info { "[${event.publishAt}] ${event.user.uid} refresh user envelope statistic 끝" }
+        }
     }
 
     @TransactionalEventListener
     fun handel(event: DeleteEnvelopeEvent) {
         mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             val count = envelopeService.countByUidAndFriendId(
-                uid = event.uid,
+                uid = event.user.uid,
                 friendId = event.envelope.friendId
             )
 
@@ -91,6 +125,20 @@ class EnvelopeEventListener(
                 friendService.deleteSync(event.envelope.friendId)
                 friendRelationshipService.deleteByFriendIdSync(event.envelope.friendId)
             }
+        }
+
+        /** 통계 캐싱 처리 */
+        mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
+            /** 통계 캐싱 안되어있으면 중단 */
+            userEnvelopeStatisticService.getStatisticOrNull(event.user.uid) ?: run { return@launch }
+
+            logger.info { "[${event.publishAt}] ${event.user.uid} refresh user envelope statistic 시작" }
+
+            val statistic = userEnvelopeStatisticService.createUserEnvelopeStatistic(event.user.uid)
+
+            userEnvelopeStatisticService.save(event.user.uid, statistic)
+
+            logger.info { "[${event.publishAt}] ${event.user.uid} refresh user envelope statistic 끝" }
         }
     }
 }

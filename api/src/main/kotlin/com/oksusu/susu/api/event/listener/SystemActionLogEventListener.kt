@@ -19,15 +19,28 @@ class SystemActionLogEventListener(
     @EventListener
     fun subscribe(event: SystemActionLogEvent) {
         mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
-            SystemActionLog(
-                ipAddress = event.ipAddress,
-                path = event.path,
-                httpMethod = event.method,
-                userAgent = event.userAgent,
-                host = event.host,
-                referer = event.referer,
-                extra = event.extra
-            ).run { systemActionLogService.record(this) }
+            if (check(event)) {
+                SystemActionLog(
+                    ipAddress = event.ipAddress,
+                    path = event.path,
+                    httpMethod = event.method,
+                    userAgent = event.userAgent,
+                    host = event.host,
+                    referer = event.referer,
+                    extra = event.extra
+                ).run { systemActionLogService.record(this) }
+            }
         }
+    }
+
+    private fun check(event: SystemActionLogEvent): Boolean {
+        return !NON_TARGET_PATH.contains(event.path)
+    }
+
+    companion object {
+        private val NON_TARGET_PATH = setOf(
+            "/api/v1/health",
+            "/health"
+        )
     }
 }
