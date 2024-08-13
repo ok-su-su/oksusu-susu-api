@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 
 @Transactional(readOnly = true)
 interface ReportHistoryQRepository {
+    @Transactional
     fun updateAllCreatedAt(createdAt: LocalDateTime): Long
 }
 

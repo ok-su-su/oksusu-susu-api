@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 
 @Transactional(readOnly = true)
 interface UserStatusQRepository {
+    @Transactional
     fun updateAllCreatedAt(createdAt: LocalDateTime): Long
 }
 
