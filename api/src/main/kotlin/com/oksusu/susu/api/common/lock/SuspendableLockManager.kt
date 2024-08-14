@@ -28,6 +28,16 @@ private enum class LockReturn {
      * 등록된 채널 삭제
      */
     DELETE_CHANNEL,
+
+    /**
+     * 락 큐가 안비었음
+     */
+    NOT_EMPTY_QUEUE,
+
+    /**
+     * 락 큐가 비었음
+     */
+    EMPTY_QUEUE,
     ;
 }
 
@@ -40,6 +50,9 @@ private sealed class LockMsg {
 
     /** 등록된 채널 지우기 */
     class DeleteChannel(val channel: SendChannel<LockReturn>) : LockMsg()
+
+    /** 큐 비었는지 확인 */
+    class CheckQueueEmpty(val channel: SendChannel<LockReturn>) : LockMsg()
 }
 
 @ObsoleteCoroutinesApi
@@ -87,6 +100,14 @@ private fun lockActor() = CoroutineScope(Dispatchers.IO).actor<LockMsg> {
                 // 삭제 완료 처리 알리기
                 msg.channel.send(LockReturn.DELETE_CHANNEL)
             }
+
+            is LockMsg.CheckQueueEmpty -> {
+                if (lockQueue.peek() == null) {
+                    msg.channel.send(LockReturn.EMPTY_QUEUE)
+                } else {
+                    msg.channel.send(LockReturn.NOT_EMPTY_QUEUE)
+                }
+            }
         }
     }
 }
@@ -105,25 +126,28 @@ class SuspendableLockManager : LockManager {
         val channel = Channel<LockReturn>()
 
         // key에 해당하는 actor
-        val actor = actorMap.compute(key) { _, value -> value ?: lockActor() }
-            ?: throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
+        val actor = actorMap.computeIfAbsent(key) { _ -> lockActor() }
 
         // 락 설정
         tryLock(actor, channel)
 
         try {
+            // 로직 실행
             return withTimeout(LEASE_TIME) {
-                // 로직 실행
                 block()
             }
         } catch (e: TimeoutCancellationException) {
+            // 락 보유 시간 에러 처리
             throw FailToExecuteException(ErrorCode.LOCK_TIMEOUT_ERROR)
         } catch (e: Exception) {
+            // 나머지 에러 처리
             throw e
         } finally {
             // 락 해제
-            actor.send(LockMsg.UnLock(channel))
-            channel.receive()
+            releaseLock(actor, channel)
+
+            // 큐가 빈 액터 삭제
+            deleteEmptyQueueActor(actor, channel, key)
 
             // 채널 닫기
             channel.close()
@@ -141,9 +165,30 @@ class SuspendableLockManager : LockManager {
             actor.send(LockMsg.DeleteChannel(channel))
             channel.receive()
 
+            // 채널 닫기
             channel.close()
 
             throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
+        }
+    }
+
+    private suspend fun releaseLock(actor: SendChannel<LockMsg>, channel: Channel<LockReturn>){
+        actor.send(LockMsg.UnLock(channel))
+        channel.receive()
+    }
+
+    private suspend fun deleteEmptyQueueActor(actor: SendChannel<LockMsg>, channel: Channel<LockReturn>, key: String) {
+        actorMap.computeIfPresent(key) { _, value ->
+            val rtn = runBlocking(Dispatchers.Unconfined) {
+                value.send(LockMsg.CheckQueueEmpty(channel))
+                channel.receive()
+            }
+
+            if (rtn == LockReturn.EMPTY_QUEUE) {
+                null
+            } else {
+                value
+            }
         }
     }
 }
