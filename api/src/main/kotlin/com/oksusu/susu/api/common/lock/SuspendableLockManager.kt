@@ -100,7 +100,7 @@ class SuspendableLockManager : LockManager {
 
     private val actorMap = ConcurrentHashMap<String, SendChannel<LockMsg>>()
 
-    override suspend fun <T> lock(key: String, block: () -> T): T {
+    override suspend fun <T> lock(key: String, block: suspend () -> T): T {
         // lock 관련 리턴 받을 채널
         val channel = Channel<LockReturn>()
 
@@ -114,17 +114,17 @@ class SuspendableLockManager : LockManager {
         try {
             return withTimeout(LEASE_TIME) {
                 // 로직 실행
-                val rtn = block()
-
-                // 락 해제
-                actor.send(LockMsg.UnLock(channel))
-                channel.receive()
-
-                rtn
+                block()
             }
         } catch (e: TimeoutCancellationException) {
             throw FailToExecuteException(ErrorCode.LOCK_TIMEOUT_ERROR)
+        } catch (e: Exception) {
+            throw e
         } finally {
+            // 락 해제
+            actor.send(LockMsg.UnLock(channel))
+            channel.receive()
+
             // 채널 닫기
             channel.close()
         }

@@ -3,6 +3,7 @@ package com.oksusu.susu.api.post.application
 import com.oksusu.susu.api.ApiIntegrationSpec
 import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
+import com.oksusu.susu.api.executeConcurrency
 import com.oksusu.susu.api.post.model.BoardModel
 import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
@@ -32,6 +33,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.delay
 import org.springframework.data.repository.findByIdOrNull
+import java.util.concurrent.atomic.AtomicLong
 
 class VoteFacadeTest(
     private val voteFacade: VoteFacade,
@@ -548,6 +550,22 @@ class VoteFacadeTest(
 
                 voteFacade.vote(authUser, voteId, req)
                 shouldThrow<InvalidRequestException> { voteFacade.vote(authUser, voteId, req) }
+            }
+
+            it("동시에 여러번 투표하면 한번만 성공") {
+                voteHistoryRepository.deleteAll()
+                val voteId = posts.last().id
+                val req = CreateVoteHistoryRequest(
+                    isCancel = false,
+                    optionId = options.last().id
+                )
+                val successCount = AtomicLong()
+
+                executeConcurrency(successCount){
+                    voteFacade.vote(authUser, voteId, req)
+                }
+
+                successCount.get() shouldBeEqual 1
             }
         }
 

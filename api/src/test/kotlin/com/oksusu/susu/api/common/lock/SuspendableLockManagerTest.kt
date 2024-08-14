@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.common.lock
 
+import com.oksusu.susu.api.executeConcurrency
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.equals.shouldBeEqual
@@ -94,21 +95,5 @@ private class CountService {
 
     fun set(a: Int) {
         counter = a
-    }
-}
-
-private suspend fun <T> executeConcurrency(successCount: AtomicLong, block: suspend () -> T?) {
-    coroutineScope {
-        val deferreds = mutableListOf<Deferred<Long>>()
-        for (i in 1..5) {
-            val deferred = async(Dispatchers.IO) {
-                block()
-                successCount.getAndIncrement()
-            }
-
-            deferreds.add(deferred)
-        }
-
-        awaitAll(*deferreds.toTypedArray())
     }
 }
