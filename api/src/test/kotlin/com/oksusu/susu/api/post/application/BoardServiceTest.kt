@@ -11,6 +11,7 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
 
 class BoardServiceTest : DescribeSpec({
     val logger = KotlinLogging.logger { }
@@ -25,6 +26,8 @@ class BoardServiceTest : DescribeSpec({
 
     beforeSpec {
         boardService.refreshBoards()
+
+        delay(100)
     }
 
     describe("scheduler") {
