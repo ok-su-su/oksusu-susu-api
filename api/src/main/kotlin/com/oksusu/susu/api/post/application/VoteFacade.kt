@@ -3,6 +3,7 @@ package com.oksusu.susu.api.post.application
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.common.dto.SusuPageRequest
 import com.oksusu.susu.api.common.lock.LockManager
+import com.oksusu.susu.api.common.lock.LockType
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
 import com.oksusu.susu.api.post.model.*
@@ -161,7 +162,7 @@ class VoteFacade(
     }
 
     suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
-        lockManager.lock("vote_$id") {
+        lockManager.lock(LockType.VOTE, "$id") {
             when (request.isCancel) {
                 true -> cancelVote(user.uid, id, request.optionId)
                 false -> castVote(user.uid, id, request.optionId)

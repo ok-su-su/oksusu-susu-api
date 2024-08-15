@@ -27,7 +27,7 @@ class SuspendableLockManagerTest : DescribeSpec({
                 val successCount = AtomicLong()
 
                 executeConcurrency(successCount) {
-                    lockManager.lock("1") {
+                    lockManager.lock(LockType.VOTE, "1") {
                         val counter = countService1.counter
                         Thread.sleep(100)
                         logger.info { "1 $counter" }
@@ -46,7 +46,7 @@ class SuspendableLockManagerTest : DescribeSpec({
                     val deferreds = mutableListOf<Deferred<Long>>()
                     for (i in 1..5) {
                         val deferred1 = async(Dispatchers.IO) {
-                            lockManager.lock("1") {
+                            lockManager.lock(LockType.VOTE, "1") {
                                 val counter = countService1.counter
                                 Thread.sleep(100)
                                 logger.info { "1 $counter" }
@@ -55,7 +55,7 @@ class SuspendableLockManagerTest : DescribeSpec({
                             successCount.getAndIncrement()
                         }
                         val deferred2 = async(Dispatchers.IO) {
-                            lockManager.lock("2") {
+                            lockManager.lock(LockType.VOTE, "2") {
                                 val counter = countService2.counter
                                 Thread.sleep(100)
                                 logger.info { "2 $counter" }
@@ -64,7 +64,7 @@ class SuspendableLockManagerTest : DescribeSpec({
                             successCount.getAndIncrement()
                         }
                         val deferred3 = async(Dispatchers.IO) {
-                            lockManager.lock("3") {
+                            lockManager.lock(LockType.VOTE, "3") {
                                 val counter = countService3.counter
                                 Thread.sleep(100)
                                 logger.info { "3 $counter" }
