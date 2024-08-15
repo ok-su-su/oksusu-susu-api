@@ -126,7 +126,8 @@ class SuspendableLockManager : LockManager {
         val channel = Channel<LockReturn>()
 
         // key에 해당하는 actor
-        val actor = actorMap.computeIfAbsent(key) { _ -> lockActor() }
+        val actor = actorMap.compute(key) { _, value -> value ?: lockActor() }
+            ?: throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
 
         // 락 설정
         tryLock(actor, channel)
@@ -172,7 +173,7 @@ class SuspendableLockManager : LockManager {
         }
     }
 
-    private suspend fun releaseLock(actor: SendChannel<LockMsg>, channel: Channel<LockReturn>){
+    private suspend fun releaseLock(actor: SendChannel<LockMsg>, channel: Channel<LockReturn>) {
         actor.send(LockMsg.UnLock(channel))
         channel.receive()
     }
