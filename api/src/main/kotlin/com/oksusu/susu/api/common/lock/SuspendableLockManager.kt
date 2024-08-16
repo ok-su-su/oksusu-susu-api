@@ -55,7 +55,8 @@ private sealed class LockMsg {
     class CheckQueueEmpty(val channel: SendChannel<LockReturn>) : LockMsg()
 }
 
-@ObsoleteCoroutinesApi
+
+@OptIn(ObsoleteCoroutinesApi::class)
 private fun lockActor() = CoroutineScope(Dispatchers.IO).actor<LockMsg> {
     // queue 맨 앞 == 락 설정
     val lockQueue = LinkedList<SendChannel<LockReturn>>()
@@ -121,12 +122,12 @@ class SuspendableLockManager : LockManager {
 
     private val actorMap = ConcurrentHashMap<String, SendChannel<LockMsg>>()
 
-    override suspend fun <T> lock(type: LockType, key: String, block: suspend () -> T): T {
+    override suspend fun <T> lock(key: String, block: suspend () -> T): T {
         // lock 관련 리턴 받을 채널
         val channel = Channel<LockReturn>()
 
         // key에 해당하는 actor
-        val actor = actorMap.compute("${type}_${key}") { _, value -> value ?: lockActor() }
+        val actor = actorMap.compute(key) { _, value -> value ?: lockActor() }
             ?: throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
 
         // 락 설정
@@ -148,7 +149,7 @@ class SuspendableLockManager : LockManager {
             releaseLock(actor, channel)
 
             // 큐가 빈 액터 삭제
-            deleteEmptyQueueActor(type, channel, key)
+            deleteEmptyQueueActor(channel, key)
 
             // 채널 닫기
             channel.close()
@@ -178,7 +179,7 @@ class SuspendableLockManager : LockManager {
         channel.receive()
     }
 
-    private suspend fun deleteEmptyQueueActor(type: LockType, channel: Channel<LockReturn>, key: String) {
+    private suspend fun deleteEmptyQueueActor(channel: Channel<LockReturn>, key: String) {
         actorMap.computeIfPresent(key) { _, value ->
             val rtn = runBlocking(Dispatchers.Unconfined) {
                 value.send(LockMsg.CheckQueueEmpty(channel))

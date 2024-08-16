@@ -3,7 +3,7 @@ package com.oksusu.susu.api.post.application
 import com.oksusu.susu.api.ApiIntegrationSpec
 import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
-import com.oksusu.susu.api.executeConcurrency
+import com.oksusu.susu.api.testExtension.executeConcurrency
 import com.oksusu.susu.api.post.model.BoardModel
 import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
