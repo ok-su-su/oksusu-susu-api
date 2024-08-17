@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.event.model
 
+import com.oksusu.susu.api.auth.model.AUTH_TOKEN_KEY
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.extension.remoteIp
 import com.oksusu.susu.cache.model.OidcPublicKeysCacheModel
@@ -49,6 +50,7 @@ data class SystemActionLogEvent(
     val userAgent: String?,
     val host: String?,
     val referer: String?,
+    val token: String?,
     val extra: String?,
 ) : BaseEvent() {
     companion object {
@@ -66,6 +68,7 @@ data class SystemActionLogEvent(
                 userAgent = request.headers[USER_AGENT].toString(),
                 host = request.headers[HOST].toString(),
                 referer = request.headers[REFERER].toString(),
+                token = request.headers[AUTH_TOKEN_KEY].toString(),
                 extra = mapper.writeValueAsString(request.headers)
             )
         }
