@@ -46,7 +46,7 @@ tasks.getByName("bootJar") {
 }
 
 tasks.getByName("jar") {
-    enabled = false
+    enabled = true
 }
 
 springBoot.buildInfo { properties { } }

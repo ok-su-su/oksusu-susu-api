@@ -17,6 +17,7 @@ interface UserStatusHistoryQRepository {
 
     fun getUidByToStatusId(toStatusId: Long): List<Long>
 
+    @Transactional
     fun updateAllCreatedAt(createdAt: LocalDateTime): Long
 }
 

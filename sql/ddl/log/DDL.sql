@@ -2,6 +2,7 @@
 CREATE TABLE `system_action_log`
 (
     `id`          bigint NOT NULL AUTO_INCREMENT,
+    `uid`         int                             DEFAULT NULL COMMENT 'uid',
     `host`        varchar(255)                    DEFAULT NULL,
     `http_method` varchar(255)                    DEFAULT NULL,
     `ip_address`  varchar(255)                    DEFAULT NULL,
@@ -14,3 +15,4 @@ CREATE TABLE `system_action_log`
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT 'system log';
 CREATE INDEX idx__created_at ON system_action_log (created_at);
+CREATE INDEX idx__uid ON system_action_log (uid);
