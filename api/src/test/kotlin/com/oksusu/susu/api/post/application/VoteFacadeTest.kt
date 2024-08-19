@@ -3,13 +3,13 @@ package com.oksusu.susu.api.post.application
 import com.oksusu.susu.api.ApiIntegrationSpec
 import com.oksusu.susu.api.auth.model.AuthContextImpl
 import com.oksusu.susu.api.auth.model.AuthUserImpl
-import com.oksusu.susu.api.testExtension.executeConcurrency
 import com.oksusu.susu.api.post.model.BoardModel
 import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
 import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
 import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
+import com.oksusu.susu.api.testExtension.executeConcurrency
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.NotFoundException
@@ -561,7 +561,7 @@ class VoteFacadeTest(
                 )
                 val successCount = AtomicLong()
 
-                executeConcurrency(successCount){
+                executeConcurrency(successCount) {
                     voteFacade.vote(authUser, voteId, req)
                 }
 

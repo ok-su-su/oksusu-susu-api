@@ -55,7 +55,6 @@ private sealed class LockMsg {
     class CheckQueueEmpty(val channel: SendChannel<LockReturn>) : LockMsg()
 }
 
-
 @OptIn(ObsoleteCoroutinesApi::class)
 private fun lockActor() = CoroutineScope(Dispatchers.IO).actor<LockMsg> {
     // queue 맨 앞 == 락 설정
