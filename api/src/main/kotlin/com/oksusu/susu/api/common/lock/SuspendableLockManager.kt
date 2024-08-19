@@ -124,42 +124,48 @@ class SuspendableLockManager : LockManager {
 
     override suspend fun <T> lock(key: String, block: suspend () -> T): T {
         // lock 관련 리턴 받을 채널
-        val channel = Channel<LockReturn>()
+        Channel<LockReturn>().run {
+            val channel = this
 
-        // key에 해당하는 actor
-        val actor = actorMap.compute(key) { _, value -> value ?: lockActor() }
-            ?: throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
+            // 락 설정
+            val actor = tryLock(key, channel)
 
-        // 락 설정
-        tryLock(actor, channel)
+            try {
+                // 로직 실행
+                return withTimeout(LEASE_TIME) {
+                    block()
+                }
+            } catch (e: TimeoutCancellationException) {
+                // 락 보유 시간 에러 처리
+                throw FailToExecuteException(ErrorCode.LOCK_TIMEOUT_ERROR)
+            } catch (e: Exception) {
+                // 나머지 에러 처리
+                throw e
+            } finally {
+                // 락 해제
+                releaseLock(actor, channel)
 
-        try {
-            // 로직 실행
-            return withTimeout(LEASE_TIME) {
-                block()
+                // 큐가 빈 액터 삭제
+                deleteEmptyQueueActor(channel, key)
+
+                logger.info { actorMap }
             }
-        } catch (e: TimeoutCancellationException) {
-            // 락 보유 시간 에러 처리
-            throw FailToExecuteException(ErrorCode.LOCK_TIMEOUT_ERROR)
-        } catch (e: Exception) {
-            // 나머지 에러 처리
-            throw e
-        } finally {
-            // 락 해제
-            releaseLock(actor, channel)
-
-            // 큐가 빈 액터 삭제
-            deleteEmptyQueueActor(channel, key)
-
-            // 채널 닫기
-            channel.close()
         }
     }
 
-    private suspend fun tryLock(actor: SendChannel<LockMsg>, channel: Channel<LockReturn>) {
+    private suspend fun tryLock(key: String, channel: Channel<LockReturn>): SendChannel<LockMsg> {
+        val actor = actorMap.compute(key) { _, value ->
+            val actor = value ?: lockActor()
+
+            runBlocking {
+                actor.send(LockMsg.TryLock(channel))
+            }
+
+            actor
+        } ?: throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
+
         try {
             withTimeout(WAIT_TIME) {
-                actor.send(LockMsg.TryLock(channel))
                 channel.receive()
             }
         } catch (e: Exception) {
@@ -167,11 +173,10 @@ class SuspendableLockManager : LockManager {
             actor.send(LockMsg.DeleteChannel(channel))
             channel.receive()
 
-            // 채널 닫기
-            channel.close()
-
             throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
         }
+
+        return actor
     }
 
     private suspend fun releaseLock(actor: SendChannel<LockMsg>, channel: Channel<LockReturn>) {
