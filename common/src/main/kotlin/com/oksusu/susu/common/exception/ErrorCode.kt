@@ -13,6 +13,10 @@ enum class ErrorCode(val status: HttpStatus, val description: String) {
     QUERY_DSL_NOT_EXISTS_ERROR(HttpStatus.NOT_FOUND, "not found query dsl"),
     COROUTINE_CANCELLATION_ERROR(HttpStatus.BAD_REQUEST, "coroutine cancellation error"),
     FAIL_TO_TRANSACTION_TEMPLATE_EXECUTE_ERROR(HttpStatus.BAD_REQUEST, "fail to tx-templates execute error"),
+    FAIL_TO_EXECUTE_LOCK(HttpStatus.BAD_REQUEST, "fail to execute lock"),
+    FAIL_TO_GET_LOCK(HttpStatus.BAD_REQUEST, "fail to get lock"),
+    ACQUIRE_LOCK_TIMEOUT(HttpStatus.BAD_REQUEST, "acquire lock timeout"),
+    LOCK_TIMEOUT_ERROR(HttpStatus.BAD_REQUEST, "lock timeout error"),
     FAIL_TO_REDIS_EXECUTE_ERROR(HttpStatus.BAD_REQUEST, "fail to redis execute error"),
 
     /** Auth Error Code */
