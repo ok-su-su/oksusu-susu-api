@@ -56,11 +56,11 @@ private sealed class LockMsg {
 }
 
 @OptIn(ObsoleteCoroutinesApi::class)
-private fun lockActor() = CoroutineScope(Dispatchers.IO).actor<LockMsg> {
+private fun lockActor() = CoroutineScope(Dispatchers.IO).actor<LockMsg>(capacity = 1000) {
     // queue 맨 앞 == 락 설정
     val lockQueue = LinkedList<SendChannel<LockReturn>>()
 
-    for (msg in channel) { // handle incoming messages
+    for (msg in channel) {
         when (msg) {
             is LockMsg.TryLock -> {
                 // 큐에 채널 등록하기
@@ -156,17 +156,20 @@ class SuspendableLockManager : LockManager {
         val actor = actorMap.compute(key) { _, value ->
             val actor = value ?: lockActor()
 
-            runBlocking {
+            runBlocking(Dispatchers.Unconfined) {
                 actor.send(LockMsg.TryLock(channel))
             }
 
             actor
-        } ?: throw FailToExecuteException(ErrorCode.FAIL_TO_EXECUTE_LOCK)
+        } ?: throw FailToExecuteException(ErrorCode.FAIL_TO_GET_LOCK)
 
         try {
             withTimeout(WAIT_TIME) {
                 channel.receive()
             }
+        } catch (e: TimeoutCancellationException) {
+            // 락 획득 시간 에러 처리
+            throw FailToExecuteException(ErrorCode.ACQUIRE_LOCK_TIMEOUT)
         } catch (e: Exception) {
             // 수신 채널 지우기
             actor.send(LockMsg.DeleteChannel(channel))
