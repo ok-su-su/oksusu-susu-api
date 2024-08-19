@@ -54,21 +54,24 @@ data class SystemActionLogEvent(
     val extra: String?,
 ) : BaseEvent() {
     companion object {
-        private const val USER_AGENT = "User-Agent"
+        private const val USER_AGENT = "user-agent"
         private const val HOST = "Host"
         private const val REFERER = "Referer"
 
         fun from(exchange: ServerWebExchange): SystemActionLogEvent {
             val request = exchange.request
 
+            val headers = exchange.request.headers.toSingleValueMap()
+                .mapKeys { header -> header.key.uppercase() }
+
             return SystemActionLogEvent(
                 ipAddress = request.remoteIp,
                 method = request.method.name(),
                 path = request.uri.path,
-                userAgent = request.headers[USER_AGENT].toString(),
-                host = request.headers[HOST].toString(),
-                referer = request.headers[REFERER].toString(),
-                token = request.headers[AUTH_TOKEN_KEY].toString(),
+                userAgent = headers[USER_AGENT],
+                host = headers[HOST],
+                referer = headers[REFERER],
+                token = headers[AUTH_TOKEN_KEY],
                 extra = mapper.writeValueAsString(request.headers)
             )
         }
