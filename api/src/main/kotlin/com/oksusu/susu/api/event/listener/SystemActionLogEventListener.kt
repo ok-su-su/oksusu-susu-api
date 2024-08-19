@@ -47,7 +47,7 @@ class SystemActionLogEventListener(
     }
 
     private fun check(event: SystemActionLogEvent): Boolean {
-        return !NON_TARGET_PATH.contains(event.path)
+        return NON_TARGET_PATH.contains(event.path)
     }
 
     companion object {

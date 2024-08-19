@@ -54,9 +54,9 @@ data class SystemActionLogEvent(
     val extra: String?,
 ) : BaseEvent() {
     companion object {
-        private const val USER_AGENT = "user-agent"
-        private const val HOST = "Host"
-        private const val REFERER = "Referer"
+        private const val USER_AGENT = "USER-AGENT"
+        private const val HOST = "HOST"
+        private const val REFERER = "REFERER"
 
         fun from(exchange: ServerWebExchange): SystemActionLogEvent {
             val request = exchange.request
