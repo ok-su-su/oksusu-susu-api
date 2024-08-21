@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.common.lock
 
+import com.oksusu.susu.api.config.LockConfig
 import com.oksusu.susu.api.testExtension.CONCURRENT_COUNT
 import com.oksusu.susu.api.testExtension.THREAD_COUNT
 import com.oksusu.susu.api.testExtension.executeConcurrency
@@ -22,10 +23,14 @@ class SuspendableLockManagerTest : DescribeSpec({
     val logger = KotlinLogging.logger { }
 
     val mockCoroutineExceptionHandler = mockk<ErrorPublishingCoroutineExceptionHandler>()
+    val mockLockConfig = mockk<LockConfig.ActorLockConfig>()
 
     every { mockCoroutineExceptionHandler.handler } returns CoroutineExceptionHandler { _, _ -> }
+    every { mockLockConfig.waitTimeMilli } returns 1000
+    every { mockLockConfig.leaseTimeMilli } returns 3000
 
-    val lockManager = SuspendableLockManager(mockCoroutineExceptionHandler)
+
+    val lockManager = SuspendableLockManager(mockCoroutineExceptionHandler, mockLockConfig)
     val countService1 = CountService()
     val countService2 = CountService()
     val countService3 = CountService()

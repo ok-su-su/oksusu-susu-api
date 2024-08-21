@@ -1,8 +1,10 @@
 package com.oksusu.susu.api.common.lock
 
+import com.oksusu.susu.api.config.LockConfig
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.FailToExecuteException
+import com.oksusu.susu.common.extension.milliToSec
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
@@ -12,11 +14,6 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 private val logger = KotlinLogging.logger { }
-
-private const val WAIT_TIME_MILLI = 1000L
-private const val LEASE_TIME_MILLI = 3000L
-private const val WAIT_TIME_SECONDS = WAIT_TIME_MILLI / 1000
-private const val LEASE_TIME_SECONDS = LEASE_TIME_MILLI / 1000
 
 private sealed class LockMsg {
     /** 락 설정 */
@@ -37,17 +34,20 @@ private sealed class LockMsg {
  * msg가 실행된다 == 락을 획득했다 로 여김
  */
 @OptIn(ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-private fun lockActor() = CoroutineScope(Dispatchers.IO).actor<LockMsg>(capacity = 1000) {
+private fun lockActor(
+    waitTimeMilli: Long,
+    leaseTimeMilli: Long,
+) = CoroutineScope(Dispatchers.IO).actor<LockMsg>(capacity = 1000) {
     for (msg in channel) {
         when (msg) {
             is LockMsg.Lock -> {
-                if (msg.requestTime.isBefore(LocalDateTime.now().minusSeconds(WAIT_TIME_SECONDS))) {
+                if (msg.requestTime.isBefore(LocalDateTime.now().minusSeconds(waitTimeMilli.milliToSec()))) {
                     // 락은 획득했지만 락 획득 시간보다 더 오랜 시간이 걸렸다면 timeout 에러 발생
                     msg.result.complete(FailToExecuteException(ErrorCode.ACQUIRE_LOCK_TIMEOUT))
                 } else {
                     try {
                         // 로직 실행 및 deferred에 결과값 넣기
-                        withTimeout(LEASE_TIME_MILLI) {
+                        withTimeout(leaseTimeMilli) {
                             val rtn = msg.block()
 
                             msg.result.complete(rtn)
@@ -86,19 +86,27 @@ private sealed class LockManagerMsg {
  * 키에 해당하는 actor에 요청을 보내는 역할을 하는 actor
  */
 @OptIn(ObsoleteCoroutinesApi::class)
-private fun lockManagerActor() = CoroutineScope(Dispatchers.IO).actor<LockManagerMsg>(capacity = 1000) {
+private fun lockManagerActor(
+    waitTimeMilli: Long,
+    leaseTimeMilli: Long,
+) = CoroutineScope(Dispatchers.IO).actor<LockManagerMsg>(capacity = 1000) {
     val actorMap = HashMap<String, SendChannel<LockMsg>>()
 
     for (msg in channel) {
         when (msg) {
             is LockManagerMsg.TryLock -> {
-                if (msg.requestTime.isBefore(LocalDateTime.now().minusSeconds(WAIT_TIME_SECONDS))) {
+                if (msg.requestTime.isBefore(LocalDateTime.now().minusSeconds(waitTimeMilli.milliToSec()))) {
                     // 락 획득 시간보다 더 오랜 시간이 걸렸다면 timeout 에러 발생
                     msg.result.complete(FailToExecuteException(ErrorCode.ACQUIRE_LOCK_TIMEOUT))
                 } else {
                     try {
                         // actor 가져오기
-                        val actor = actorMap.computeIfAbsent(msg.key) { _ -> lockActor() }
+                        val actor = actorMap.computeIfAbsent(msg.key) { _ ->
+                            lockActor(
+                                waitTimeMilli = waitTimeMilli,
+                                leaseTimeMilli = leaseTimeMilli,
+                            )
+                        }
 
                         // 락 처리 요청
                         actor.send(
@@ -172,9 +180,13 @@ private fun lockManagerActor() = CoroutineScope(Dispatchers.IO).actor<LockManage
  */
 @Component
 class SuspendableLockManager(
-    val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
+    private val lockConfig: LockConfig.ActorLockConfig,
 ) : LockManager {
-    private val actor = lockManagerActor()
+    private val actor = lockManagerActor(
+        waitTimeMilli = lockConfig.waitTimeMilli,
+        leaseTimeMilli = lockConfig.leaseTimeMilli,
+    )
 
     override suspend fun <T> lock(key: String, block: suspend () -> T): T {
         val result = CompletableDeferred<Any?>()
@@ -190,7 +202,7 @@ class SuspendableLockManager(
 
         return try {
             // 서비스 로직 반환값 or 에러
-            val rtn = withTimeout(WAIT_TIME_MILLI + LEASE_TIME_MILLI + 1000) {
+            val rtn = withTimeout(lockConfig.waitTimeMilli + lockConfig.leaseTimeMilli + 1000) {
                 result.await()
             }
 
