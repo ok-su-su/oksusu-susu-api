@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong
 private val logger = KotlinLogging.logger { }
 
 const val THREAD_COUNT = 50
-const val CONCURRENT_COUNT = 10000
+const val CONCURRENT_COUNT = 1000
 
 suspend fun <T> executeConcurrency(successCount: AtomicLong, block: suspend () -> T?) {
     val executorService = Executors.newFixedThreadPool(THREAD_COUNT)

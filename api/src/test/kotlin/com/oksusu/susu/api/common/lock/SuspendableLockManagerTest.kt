@@ -3,10 +3,17 @@ package com.oksusu.susu.api.common.lock
 import com.oksusu.susu.api.testExtension.CONCURRENT_COUNT
 import com.oksusu.susu.api.testExtension.THREAD_COUNT
 import com.oksusu.susu.api.testExtension.executeConcurrency
+import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.equals.shouldBeEqual
-import kotlinx.coroutines.*
+import io.kotest.matchers.ints.shouldBeLessThan
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicLong
@@ -14,7 +21,11 @@ import java.util.concurrent.atomic.AtomicLong
 class SuspendableLockManagerTest : DescribeSpec({
     val logger = KotlinLogging.logger { }
 
-    val lockManager = SuspendableLockManager()
+    val mockCoroutineExceptionHandler = mockk<ErrorPublishingCoroutineExceptionHandler>()
+
+    every { mockCoroutineExceptionHandler.handler } returns CoroutineExceptionHandler { _, _ -> }
+
+    val lockManager = SuspendableLockManager(mockCoroutineExceptionHandler)
     val countService1 = CountService()
     val countService2 = CountService()
     val countService3 = CountService()
@@ -37,8 +48,43 @@ class SuspendableLockManagerTest : DescribeSpec({
                     }
                 }
 
+                lockManager.clearEmptyActor()
+
                 countService1.counter shouldBeEqual CONCURRENT_COUNT
                 successCount.get() shouldBeEqual CONCURRENT_COUNT.toLong()
+            }
+
+            it("여러 쓰레드를 생성해 동작했을 때, 요청에 오랜 시간이 걸린다면 에러가 발생해야한다.") {
+                val successCount = AtomicLong()
+
+                executeConcurrency(successCount) {
+                    lockManager.lock("1") {
+                        countService1.increaseWithDelay500()
+                        logger.info { "1 ${countService1.counter}" }
+                    }
+                }
+
+                lockManager.clearEmptyActor()
+
+                countService1.counter shouldBeLessThan CONCURRENT_COUNT
+                successCount.get() shouldBeLessThan CONCURRENT_COUNT.toLong()
+            }
+
+
+            it("여러 쓰레드를 생성해 동작했을 때, 요청 처리에 시간이 락 획득 시간보다 오래 걸린다면 에러가 발생해야한다.") {
+                val successCount = AtomicLong()
+
+                executeConcurrency(successCount) {
+                    lockManager.lock("1") {
+                        countService1.increaseWithDelay3000()
+                        logger.info { "1 ${countService1.counter}" }
+                    }
+                }
+
+                lockManager.clearEmptyActor()
+
+                countService1.counter shouldBeEqual  0
+                successCount.get() shouldBeEqual  0
             }
 
             it("여러 쓰레드를 생성해 동작했을 때, 키 별로 락이 지정되고, 카운트가 올바르게 증가해야한다.") {
@@ -91,8 +137,15 @@ class SuspendableLockManagerTest : DescribeSpec({
                             latch.countDown()
                         }
                     }
+                    executorService.submit {
+                        runBlocking {
+                            lockManager.clearEmptyActor()
+                        }
+                    }
                 }
                 latch.await()
+
+                lockManager.clearEmptyActor()
 
                 countService1.counter shouldBeEqual CONCURRENT_COUNT
                 countService2.counter shouldBeEqual CONCURRENT_COUNT
@@ -106,9 +159,20 @@ class SuspendableLockManagerTest : DescribeSpec({
 private class CountService {
     var counter: Int = 0
 
-    suspend fun increase() {
+    fun increase() {
         val curCount = counter
-        delay(5)
+        counter = curCount + 1
+    }
+
+    suspend fun increaseWithDelay500() {
+        val curCount = counter
+        delay(500)
+        counter = curCount + 1
+    }
+
+    suspend fun increaseWithDelay3000() {
+        val curCount = counter
+        delay(3000)
         counter = curCount + 1
     }
 }
