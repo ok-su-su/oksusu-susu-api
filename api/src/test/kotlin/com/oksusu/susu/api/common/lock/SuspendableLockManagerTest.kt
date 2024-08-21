@@ -54,10 +54,13 @@ class SuspendableLockManagerTest : DescribeSpec({
                 successCount.get() shouldBeEqual CONCURRENT_COUNT.toLong()
             }
 
-            it("여러 쓰레드를 생성해 동작했을 때, 요청에 오랜 시간이 걸린다면 에러가 발생해야한다.") {
+            it("여러 쓰레드를 생성해 동작했을 때, 앞선 요청 처리에 오랜 시간이 걸린다면 에러가 발생해야한다.") {
                 val successCount = AtomicLong()
 
-                executeConcurrency(successCount) {
+                executeConcurrency(
+                    successCount = successCount,
+                    concurrentCount = 500
+                ) {
                     lockManager.lock("1") {
                         countService1.increaseWithDelay500()
                         logger.info { "1 ${countService1.counter}" }
@@ -70,11 +73,13 @@ class SuspendableLockManagerTest : DescribeSpec({
                 successCount.get() shouldBeLessThan CONCURRENT_COUNT.toLong()
             }
 
-
             it("여러 쓰레드를 생성해 동작했을 때, 요청 처리에 시간이 락 획득 시간보다 오래 걸린다면 에러가 발생해야한다.") {
                 val successCount = AtomicLong()
 
-                executeConcurrency(successCount) {
+                executeConcurrency(
+                    successCount = successCount,
+                    concurrentCount = 500
+                ) {
                     lockManager.lock("1") {
                         countService1.increaseWithDelay3000()
                         logger.info { "1 ${countService1.counter}" }
@@ -83,8 +88,8 @@ class SuspendableLockManagerTest : DescribeSpec({
 
                 lockManager.clearEmptyActor()
 
-                countService1.counter shouldBeEqual  0
-                successCount.get() shouldBeEqual  0
+                countService1.counter shouldBeEqual 0
+                successCount.get() shouldBeEqual 0
             }
 
             it("여러 쓰레드를 생성해 동작했을 때, 키 별로 락이 지정되고, 카운트가 올바르게 증가해야한다.") {
