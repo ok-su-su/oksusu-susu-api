@@ -104,7 +104,7 @@ private fun lockManagerActor(
                         val actor = actorMap.computeIfAbsent(msg.key) { _ ->
                             lockActor(
                                 waitTimeMilli = waitTimeMilli,
-                                leaseTimeMilli = leaseTimeMilli,
+                                leaseTimeMilli = leaseTimeMilli
                             )
                         }
 
@@ -185,10 +185,10 @@ class SuspendableLockManager(
 ) : LockManager {
     private val actor = lockManagerActor(
         waitTimeMilli = lockConfig.waitTimeMilli,
-        leaseTimeMilli = lockConfig.leaseTimeMilli,
+        leaseTimeMilli = lockConfig.leaseTimeMilli
     )
 
-    override suspend fun <T> lock(key: String, block: suspend () -> T): T {
+    override suspend fun <RETURN> lock(key: String, block: suspend () -> RETURN): RETURN {
         val result = CompletableDeferred<Any?>()
 
         // 락 시도
@@ -211,8 +211,8 @@ class SuspendableLockManager(
                 throw rtn
             }
 
-            // TODO: as T 안하는 방법 찾아서 수정 바람
-            rtn as T
+            // TODO: as RETURN 안하는 방법 찾아서 수정 바람
+            rtn as RETURN
         } catch (e: TimeoutCancellationException) {
             // 락 획득 시간 에러 처리
             throw FailToExecuteException(ErrorCode.LOCK_TIMEOUT_ERROR)

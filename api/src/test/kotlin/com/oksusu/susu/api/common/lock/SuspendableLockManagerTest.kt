@@ -29,7 +29,6 @@ class SuspendableLockManagerTest : DescribeSpec({
     every { mockLockConfig.waitTimeMilli } returns 1000
     every { mockLockConfig.leaseTimeMilli } returns 3000
 
-
     val lockManager = SuspendableLockManager(mockCoroutineExceptionHandler, mockLockConfig)
     val countService1 = CountService()
     val countService2 = CountService()

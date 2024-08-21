@@ -8,7 +8,7 @@ import kotlin.reflect.full.declaredMemberProperties
 
 @Configuration
 @EnableConfigurationProperties(
-    LockConfig.ActorLockConfig::class,
+    LockConfig.ActorLockConfig::class
 )
 class LockConfig(
     val actorLockConfig: ActorLockConfig,
