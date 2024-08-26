@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service
 class EnvelopeConfigService(
     private val categoryService: CategoryService,
     private val relationshipService: RelationshipService,
-    private val envelopeService: com.oksusu.susu.api.envelope.application.EnvelopeService,
+    private val envelopeService: EnvelopeService,
 ) {
     suspend fun getCreateEnvelopesConfig(user: AuthUser): CreateEnvelopesConfigResponse {
-        val categories = categoryService.getAll()
+        val categories = categoryService.getAllByActive()
         val relationships = relationshipService.getAll()
 
         return CreateEnvelopesConfigResponse(categories, relationships)

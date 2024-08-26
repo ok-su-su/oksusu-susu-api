@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 class CategoryResource(
     private val categoryService: CategoryService,
 ) {
-    @Operation(summary = "카테고리 전체 조회")
+    @Operation(summary = "카테고리 전체 조회, 활성화된 정보만 제공")
     @GetMapping
-    suspend fun getCategories() = categoryService.getAll().wrapOk()
+    suspend fun getCategories() = categoryService.getAllByActive().wrapOk()
 }
