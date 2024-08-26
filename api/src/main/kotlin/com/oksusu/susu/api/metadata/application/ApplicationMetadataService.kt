@@ -35,7 +35,7 @@ class ApplicationMetadataService(
         fixedRate = 1000 * 60 * 3,
         initialDelayString = "\${oksusu.scheduled-tasks.refresh-application-metadata.initial-delay:0}"
     )
-    fun refreshCategories() {
+    fun refreshApplicationMetadata() {
         CoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler).launch {
             logger.info { "start refresh applicationMetadata" }
 
@@ -56,9 +56,9 @@ class ApplicationMetadataService(
 
     fun checkApplicationVersion(deviceOS: DeviceOS, version: String): CheckApplicationVersionResposne {
         val needForceUpdate = when (deviceOS) {
-            DeviceOS.AOS -> compareVersion(metadata.aosMinSupportVersion, version)
-            DeviceOS.IOS -> compareVersion(metadata.iosMinSupportVersion, version)
-        }.run { this != 1 }
+            DeviceOS.AOS -> compareVersion(version, metadata.aosMinSupportVersion)
+            DeviceOS.IOS -> compareVersion(version, metadata.iosMinSupportVersion)
+        }.run { this < 0 }
 
         return CheckApplicationVersionResposne(
             needForceUpdate = needForceUpdate
@@ -66,9 +66,11 @@ class ApplicationMetadataService(
     }
 
     /**
-     * version1 <= version2 : 1
+     * version1 < version2 : -1
      *
-     * version1 > version2 : -1
+     * version1 = version2 : 0
+     *
+     * version1 > version2 : 1
      */
     private fun compareVersion(version1: String, version2: String): Int {
         val parsedVersion1 = version1.split(".")
@@ -76,10 +78,12 @@ class ApplicationMetadataService(
 
         for (i in 0..2) {
             if (parsedVersion1[i] > parsedVersion2[i]) {
+                return 1
+            } else if (parsedVersion1[i] < parsedVersion2[i]) {
                 return -1
             }
         }
-        return 1
+        return 0
     }
 
     suspend fun findTop1ByIsActiveOrderByCreatedAtDescOrThrow(): ApplicationMetadata {
