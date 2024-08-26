@@ -2,7 +2,6 @@ package com.oksusu.susu.domain.metadata.domain
 
 import com.oksusu.susu.domain.common.BaseEntity
 import jakarta.persistence.*
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "application_metadata")
@@ -11,17 +10,13 @@ class ApplicationMetadata(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
 
-    /** 최신 어플리케이션 버전 */
-    @Column(name = "application_version")
-    val applicationVersion: String,
+    /** ios 최소 지원 어플리케이션 버전 */
+    @Column(name = "ios_min_support_version")
+    val iosMinSupportVersion: String,
 
-    /** 강제 업데이트 날짜 */
-    @Column(name = "forced_update_date")
-    val forcedUpdateDate: LocalDateTime,
-
-    /** 해당 버전의 주요 기능 설명 */
-    @Column(name = "description")
-    val description: String? = null,
+    /** aos 최소 지원 어플리케이션 버전 */
+    @Column(name = "aos_min_support_version")
+    val aosMinSupportVersion: String,
 
     /** 활성화 여부 / 활성화 : 1, 비활성화 : 0 */
     @Column(name = "is_active")
