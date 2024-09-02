@@ -13,6 +13,8 @@ data class CategoryModel(
     val style: String,
     /** 활성화 여부 */
     val isActive: Boolean,
+    /** 커스텀 여부 */
+    val isCustom: Boolean,
 ) {
     companion object {
         fun from(category: Category): CategoryModel {
@@ -21,7 +23,8 @@ data class CategoryModel(
                 seq = category.seq,
                 name = category.name,
                 style = category.style,
-                isActive = category.isActive
+                isActive = category.isActive,
+                isCustom = category.isCustom,
             )
         }
     }
