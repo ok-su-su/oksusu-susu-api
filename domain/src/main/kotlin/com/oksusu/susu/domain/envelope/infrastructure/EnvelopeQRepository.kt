@@ -71,7 +71,7 @@ interface EnvelopeQRepository {
         targetDate: LocalDateTime,
     ): List<CountAvgAmountPerStatisticGroupModel>
 
-    fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope>
+    fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel>
 
     fun findFriendStatistics(spec: SearchFriendStatisticsSpec, pageable: Pageable): Page<FriendStatisticsModel>
 
@@ -342,7 +342,10 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             ).from(qEnvelope)
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId).and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId)
+                    .and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE))
+            )
             .where(
                 qEnvelope.amount.between(minAmount, maxAmount),
                 qEnvelope.uid.notIn(uid),
@@ -355,20 +358,27 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             ).fetch()
     }
 
-    override fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope> {
+    override fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel> {
         /** select */
-        val query = JPAQuery<Envelope>(entityManager)
-            .select(qEnvelope)
+        val query = JPAQuery<QEnvelope>(entityManager)
+            .select(QSearchEnvelopeModel(qEnvelope, qFriend, qFriendRelationship, qCategoryAssignment))
             .from(qEnvelope)
+            .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
+            .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId)
+                    .and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE))
+            )
 
         /** where */
         query.where(
             qEnvelope.uid.eq(spec.uid),
             qEnvelope.friendId.isIn(spec.friendId),
+            qFriend.name.isContains(spec.friendName),
             qEnvelope.ledgerId.isEquals(spec.ledgerId),
             qEnvelope.type.isIn(spec.types),
             qEnvelope.amount.isGoe(spec.fromAmount),
-            qEnvelope.amount.isLoe(spec.toAmount)
+            qEnvelope.amount.isLoe(spec.toAmount),
         )
 
         return querydsl.execute(query, pageable)

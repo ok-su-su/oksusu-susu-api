@@ -67,6 +67,7 @@ class EnvelopeResource(
     /**
      * **검색조건**
      * - types: SENT: 보낸 봉투만, RECEIVED: 받은 봉투만, 그외 케이스는 전체 봉투 정보
+     * - friendName: 친구 이름으로 검색, ex) %동건%
      *
      * **정렬조건**
      * - createdAt: 생성일
