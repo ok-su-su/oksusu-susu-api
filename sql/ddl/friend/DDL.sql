@@ -28,10 +28,11 @@ CREATE UNIQUE INDEX uidx__friend_id__relationship_id ON friend_relationship (fri
 -- 관계
 CREATE TABLE `relationship`
 (
-    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT '관계 정보 id',
-    `relation`    varchar(512) NOT NULL COMMENT '관계',
+    `id`          bigint                 NOT NULL AUTO_INCREMENT COMMENT '관계 정보 id',
+    `relation`    varchar(512)           NOT NULL COMMENT '관계',
     `description` varchar(512) DEFAULT NULL COMMENT '상세 설명',
-    `is_active`   tinyint      NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
+    `is_active`   tinyint                NOT NULL COMMENT '활성화 : 1, 비활성화 : 0',
+    `is_custom`   tinyint      DEFAULT 0 NOT NULL COMMENT '커스텀 여부',
     `created_at`  datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `modified_at` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     PRIMARY KEY (`id`)

@@ -1,12 +1,7 @@
 package com.oksusu.susu.domain.friend.domain
 
 import com.oksusu.susu.domain.common.BaseEntity
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 /** 관계 */
 @Entity
@@ -25,4 +20,8 @@ class Relationship(
     /** 활성화 : 1, 비활성화 : 0 */
     @Column(name = "is_active")
     val isActive: Boolean,
+
+    /** 커스텀 여부 */
+    @Column(name = "is_custom")
+    val isCustom: Boolean = false,
 ) : BaseEntity()

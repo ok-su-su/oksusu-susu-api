@@ -9,13 +9,16 @@ data class RelationshipModel(
     val relation: String,
     /** 설명 */
     val description: String?,
+    /** 커스텀 여부 */
+    val isCustom: Boolean,
 ) {
     companion object {
         fun from(relationship: Relationship): RelationshipModel {
             return RelationshipModel(
                 id = relationship.id,
                 relation = relationship.relation,
-                description = relationship.description
+                description = relationship.description,
+                isCustom = relationship.isCustom
             )
         }
     }
