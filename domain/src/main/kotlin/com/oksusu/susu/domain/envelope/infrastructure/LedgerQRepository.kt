@@ -48,12 +48,14 @@ class LedgerQRepositoryImpl : LedgerQRepository, QuerydslRepositorySupport(Ledge
         val query = JPAQuery<QLedger>(entityManager)
             .select(QSearchLedgerModel(qLedger, qCategoryAssignment))
             .from(qLedger)
-            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qLedger.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            )
             .where(
                 qLedger.uid.eq(spec.uid),
                 qLedger.title.isContains(spec.title),
                 qCategoryAssignment.categoryId.isIn(spec.categoryIds),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER),
                 qLedger.startAt.isGoe(spec.fromStartAt),
                 qLedger.startAt.isLoe(spec.toStartAt)
             )
@@ -65,11 +67,13 @@ class LedgerQRepositoryImpl : LedgerQRepository, QuerydslRepositorySupport(Ledge
         return JPAQuery<QLedger>(entityManager)
             .select(QLedgerDetailModel(qLedger, qCategoryAssignment))
             .from(qLedger)
-            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qLedger.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            )
             .where(
                 qLedger.id.eq(id),
-                qLedger.uid.eq(uid),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+                qLedger.uid.eq(uid)
             ).fetchOne()
     }
 
@@ -82,8 +86,10 @@ class LedgerQRepositoryImpl : LedgerQRepository, QuerydslRepositorySupport(Ledge
                 )
             )
             .from(qLedger)
-            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
-            .where(qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER))
+            .join(qCategoryAssignment).on(
+                qLedger.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            )
             .groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }
@@ -118,9 +124,11 @@ class LedgerQRepositoryImpl : LedgerQRepository, QuerydslRepositorySupport(Ledge
                 )
             )
             .from(qLedger)
-            .join(qCategoryAssignment).on(qLedger.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qLedger.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
+            )
             .where(
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER),
                 qLedger.uid.notIn(uid),
                 qLedger.createdAt.after(targetDate)
             )
@@ -138,8 +146,8 @@ class LedgerQRepositoryImpl : LedgerQRepository, QuerydslRepositorySupport(Ledge
             )
             .from(qLedger)
             .join(qCategoryAssignment).on(
-                qLedger.id.eq(qCategoryAssignment.targetId)
-                    .and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER))
+                qLedger.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.LEDGER)
             )
             .where(qLedger.uid.eq(uid))
             .groupBy(qCategoryAssignment.categoryId)
