@@ -236,64 +236,37 @@ class EnvelopeFacade(
         request: SearchEnvelopeRequest,
         pageRequest: SusuPageRequest,
     ): Page<SearchEnvelopeResponse> {
-        val searchSpec = SearchEnvelopeSpec(
+        val response = envelopeService.search(resolveSearchSpec(user, request), pageRequest.toDefault())
+
+        return response.map { (envelope, friend, friendRelationship, categoryAssignments) ->
+            val category = categoryAssignments?.let { categoryAssignment ->
+                val category = categoryService.getCategory(categoryAssignment.categoryId)
+                CategoryWithCustomModel.of(category, categoryAssignment)
+            }
+            val relationship = friendRelationship?.relationshipId
+                ?.let { relationshipId -> relationshipService.getRelationship(relationshipId) }
+
+            SearchEnvelopeResponse.of(
+                envelope = envelope,
+                category = category,
+                friend = friend,
+                relationship = relationship,
+                friendRelationship = friendRelationship,
+                include = request.include
+            )
+        }
+    }
+
+    private fun resolveSearchSpec(user: AuthUser, request: SearchEnvelopeRequest): SearchEnvelopeSpec {
+        return SearchEnvelopeSpec(
             uid = user.uid,
             friendId = request.friendIds,
+            friendName = request.friendName,
             ledgerId = request.ledgerId,
             types = request.types,
             fromAmount = request.fromAmount,
             toAmount = request.toAmount
         )
-        val pageable = pageRequest.toDefault()
-
-        val response = envelopeService.search(searchSpec, pageable)
-        val friendIds = response.content.map { envelope -> envelope.friendId }
-        val envelopeIds = response.content.map { envelope -> envelope.id }
-
-        return parZipWithMDC(
-            {
-                when (request.includeFriend) {
-                    true -> friendService.findAllByIdIn(friendIds)
-                    false -> emptyList()
-                }.associateBy { friend -> friend.id }
-            },
-            {
-                when (request.includeRelationship || request.includeFriendRelationship) {
-                    true -> friendRelationshipService.findAllByFriendIds(friendIds)
-                    false -> emptyList()
-                }.associateBy { friendRelationShip -> friendRelationShip.friendId }
-            },
-            {
-                when (request.includeCategory) {
-                    true -> categoryAssignmentService.findAllByTypeAndIdIn(CategoryAssignmentType.ENVELOPE, envelopeIds)
-                    false -> emptyList()
-                }.associateBy { categoryAssignment -> categoryAssignment.targetId }
-            }
-        ) { friends, friendRelationships, categoryAssignments ->
-            response.map { envelope ->
-                val category = categoryAssignments[envelope.id]?.let { categoryAssignment ->
-                    val category = categoryService.getCategory(categoryAssignment.categoryId)
-                    CategoryWithCustomModel.of(category, categoryAssignment)
-                }
-                val relationship = friendRelationships[envelope.friendId]?.let { friendRelationship ->
-                    relationshipService.getRelationship(friendRelationship.relationshipId)
-                }
-                val friend = friends[envelope.friendId]?.let { friend ->
-                    FriendModel.from(friend)
-                }
-                val friendRelationship = friendRelationships[envelope.friendId]?.let { friendRelationship ->
-                    FriendRelationshipModel.from(friendRelationship)
-                }
-
-                SearchEnvelopeResponse(
-                    envelope = EnvelopeModel.from(envelope),
-                    category = category,
-                    friend = friend,
-                    relationship = relationship,
-                    friendRelationship = friendRelationship
-                )
-            }
-        }
     }
 
     suspend fun searchFriendStatistics(

@@ -30,6 +30,12 @@ spring:
       dev: common, domain, client, cache
       prod: common, domain, client, cache
 
+# Lock
+lock:
+  actor-lock:
+    wait-time-milli: 3000
+    lease-time-milli: 3000
+
 # DOCS
 springdoc:
   swagger-ui:

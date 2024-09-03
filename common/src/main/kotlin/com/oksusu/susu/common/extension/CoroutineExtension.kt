@@ -31,7 +31,7 @@ suspend fun <T> withJob(
 
 fun mdcCoroutineScope(
     context: CoroutineContext = Dispatchers.IO,
-    traceId: String,
+    traceId: String = MDC.getCopyOfContextMap()?.get(MDC_KEY_TRACE_ID) ?: "",
 ): CoroutineScope {
     val contextMap = MDC.getCopyOfContextMap() ?: emptyMap()
     contextMap.plus(MDC_KEY_TRACE_ID to traceId)

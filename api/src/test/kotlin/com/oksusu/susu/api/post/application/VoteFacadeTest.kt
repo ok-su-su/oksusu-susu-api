@@ -9,6 +9,7 @@ import com.oksusu.susu.api.post.model.VoteOptionWithoutIdModel
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
 import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
+import com.oksusu.susu.api.testExtension.executeConcurrency
 import com.oksusu.susu.common.config.SusuConfig
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.NotFoundException
@@ -32,6 +33,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.delay
 import org.springframework.data.repository.findByIdOrNull
+import java.util.concurrent.atomic.AtomicLong
 
 class VoteFacadeTest(
     private val voteFacade: VoteFacade,
@@ -548,6 +550,22 @@ class VoteFacadeTest(
 
                 voteFacade.vote(authUser, voteId, req)
                 shouldThrow<InvalidRequestException> { voteFacade.vote(authUser, voteId, req) }
+            }
+
+            it("동시에 여러번 투표하면 한번만 성공") {
+                voteHistoryRepository.deleteAll()
+                val voteId = posts.last().id
+                val req = CreateVoteHistoryRequest(
+                    isCancel = false,
+                    optionId = options.last().id
+                )
+                val successCount = AtomicLong()
+
+                executeConcurrency(successCount) {
+                    voteFacade.vote(authUser, voteId, req)
+                }
+
+                successCount.get() shouldBeEqual 1
             }
         }
 

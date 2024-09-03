@@ -5,6 +5,8 @@ import com.oksusu.susu.domain.envelope.domain.vo.EnvelopeType
 data class SearchEnvelopeRequest(
     /** 지인 id */
     val friendIds: Set<Long>?,
+    /** 지인 이름 */
+    val friendName: String?,
     /** 장부 id */
     val ledgerId: Long?,
     /** type: SENT, RECEIVED */
@@ -23,16 +25,4 @@ data class SearchEnvelopeRequest(
         FRIEND_RELATIONSHIP,
         ;
     }
-
-    val includeCategory: Boolean
-        get() = include?.contains(IncludeSpec.CATEGORY) == true
-
-    val includeFriend: Boolean
-        get() = include?.contains(IncludeSpec.FRIEND) == true
-
-    val includeRelationship: Boolean
-        get() = include?.contains(IncludeSpec.RELATIONSHIP) == true
-
-    val includeFriendRelationship: Boolean
-        get() = include?.contains(IncludeSpec.FRIEND_RELATIONSHIP) == true
 }

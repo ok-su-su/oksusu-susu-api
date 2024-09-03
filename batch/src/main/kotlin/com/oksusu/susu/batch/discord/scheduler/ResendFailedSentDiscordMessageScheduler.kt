@@ -1,7 +1,6 @@
 package com.oksusu.susu.batch.discord.scheduler
 
 import com.oksusu.susu.batch.discord.job.ResendFailedSentDiscordMessageJob
-import com.oksusu.susu.batch.slack.job.ResendFailedSentSlackMessageJob
 import com.oksusu.susu.client.common.coroutine.ErrorPublishingCoroutineExceptionHandler
 import com.oksusu.susu.common.extension.isProd
 import com.oksusu.susu.common.extension.resolveCancellation

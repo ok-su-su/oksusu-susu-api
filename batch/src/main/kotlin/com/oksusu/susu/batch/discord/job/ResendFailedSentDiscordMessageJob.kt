@@ -42,15 +42,17 @@ class ResendFailedSentDiscordMessageJob(
         // 재전송
         runCatching {
             coroutineScope {
-                val sendDeferreds = message.map { (token, message) ->
+                val sendDeferreds = message.flatMap { (token, message) ->
                     val discordMessageModel = DiscordMessageModel(content = message)
 
-                    async(Dispatchers.IO) {
-                        discordClient.sendMessage(
-                            message = discordMessageModel,
-                            token = token,
-                            withRecover = false
-                        )
+                    message.chunked(1900).map {
+                        async(Dispatchers.IO) {
+                            discordClient.sendMessage(
+                                message = discordMessageModel,
+                                token = token,
+                                withRecover = false
+                            )
+                        }
                     }
                 }.toTypedArray()
 
@@ -58,8 +60,6 @@ class ResendFailedSentDiscordMessageJob(
             }
         }.onFailure {
             // 재전송 실패시 1분 뒤에 다시 보낼 수 있게, 1분 뒤에 보내는 메세지 목록에 추가
-            logger.warn { "postpone resend discord message" }
-
             postponeResendTimeOfFailedMessage(targetTime, message)
         }
 

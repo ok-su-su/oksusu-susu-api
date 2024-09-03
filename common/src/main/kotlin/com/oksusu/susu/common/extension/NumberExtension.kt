@@ -18,3 +18,7 @@ fun Int.toYearMonth(): String {
 
     return "$year.$month"
 }
+
+fun Long.milliToSec(): Long {
+    return this / 1000
+}

@@ -102,7 +102,7 @@ class EnvelopeService(
         return withMDCContext(Dispatchers.IO) { envelopeRepository.countPerCategoryIdByUid(uid) }
     }
 
-    suspend fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<Envelope> {
+    suspend fun search(spec: SearchEnvelopeSpec, pageable: Pageable): Page<SearchEnvelopeModel> {
         return withMDCContext(Dispatchers.IO) { envelopeRepository.search(spec, pageable) }
     }
 

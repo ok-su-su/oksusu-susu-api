@@ -9,10 +9,7 @@ import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.category.domain.Category
 import com.oksusu.susu.domain.category.infrastructure.CategoryRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
@@ -33,8 +30,9 @@ class CategoryService(
             logger.info { "start refresh categories" }
 
             categories = runCatching {
-                findAllByIsActive(true)
+                findAll()
                     .map { category -> CategoryModel.from(category) }
+                    .sortedBy { category -> category.seq }
                     .associateBy { category -> category.id }
             }.onFailure { e ->
                 logger.resolveCancellation("refreshCategories", e)
@@ -44,12 +42,18 @@ class CategoryService(
         }
     }
 
-    suspend fun getAll(): List<CategoryModel> {
-        return categories.values.toList()
+    suspend fun getAllByActive(active: Boolean = true): List<CategoryModel> {
+        return categories.values
+            .filter { category -> category.isActive }
+            .toList()
     }
 
     suspend fun findAllByIsActive(isActive: Boolean): List<Category> {
         return withMDCContext { categoryRepository.findAllByIsActive(isActive) }
+    }
+
+    suspend fun findAll(): List<Category> {
+        return withContext(Dispatchers.IO) { categoryRepository.findAll() }
     }
 
     fun getCategory(id: Long): CategoryModel {

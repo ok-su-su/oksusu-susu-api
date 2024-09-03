@@ -2,22 +2,16 @@ package com.oksusu.susu.api.post.application
 
 import com.oksusu.susu.api.auth.model.AuthUser
 import com.oksusu.susu.api.common.dto.SusuPageRequest
+import com.oksusu.susu.api.common.lock.LockKey
+import com.oksusu.susu.api.common.lock.LockManager
 import com.oksusu.susu.api.count.application.CountService
 import com.oksusu.susu.api.event.model.DeleteVoteCountEvent
-import com.oksusu.susu.api.post.model.OnboardingVoteOptionCountModel
-import com.oksusu.susu.api.post.model.VoteCountModel
-import com.oksusu.susu.api.post.model.VoteOptionAndHistoryModel
-import com.oksusu.susu.api.post.model.VoteOptionCountModel
-import com.oksusu.susu.api.post.model.VoteOptionModel
+import com.oksusu.susu.api.post.model.*
 import com.oksusu.susu.api.post.model.request.CreateVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.CreateVoteRequest
 import com.oksusu.susu.api.post.model.request.OverwriteVoteHistoryRequest
 import com.oksusu.susu.api.post.model.request.UpdateVoteRequest
-import com.oksusu.susu.api.post.model.response.CreateAndUpdateVoteResponse
-import com.oksusu.susu.api.post.model.response.OnboardingVoteResponse
-import com.oksusu.susu.api.post.model.response.VoteAllInfoResponse
-import com.oksusu.susu.api.post.model.response.VoteAndOptionsWithCountResponse
-import com.oksusu.susu.api.post.model.response.VoteWithCountResponse
+import com.oksusu.susu.api.post.model.response.*
 import com.oksusu.susu.api.post.model.vo.SearchVoteRequest
 import com.oksusu.susu.api.user.application.BlockService
 import com.oksusu.susu.common.config.SusuConfig
@@ -56,6 +50,7 @@ class VoteFacade(
     private val eventPublisher: ApplicationEventPublisher,
     private val onboardingGetVoteConfig: SusuConfig.OnboardingGetVoteConfig,
     private val voteValidateService: VoteValidateService,
+    private val lockManager: LockManager,
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -167,9 +162,11 @@ class VoteFacade(
     }
 
     suspend fun vote(user: AuthUser, id: Long, request: CreateVoteHistoryRequest) {
-        when (request.isCancel) {
-            true -> cancelVote(user.uid, id, request.optionId)
-            false -> castVote(user.uid, id, request.optionId)
+        lockManager.lock(LockKey.getVoteKey(id)) {
+            when (request.isCancel) {
+                true -> cancelVote(user.uid, id, request.optionId)
+                false -> castVote(user.uid, id, request.optionId)
+            }
         }
     }
 

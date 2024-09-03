@@ -18,4 +18,7 @@ class Category(
 
     @Column(name = "is_active")
     val isActive: Boolean,
+
+    @Column(name = "is_custom")
+    val isCustom: Boolean = false,
 ) : BaseEntity()
