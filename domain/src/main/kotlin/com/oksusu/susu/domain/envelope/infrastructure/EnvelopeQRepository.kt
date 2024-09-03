@@ -171,11 +171,13 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             ).from(qEnvelope)
             .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
             .where(
                 qEnvelope.id.eq(id),
                 qEnvelope.uid.eq(uid),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             ).fetchFirst()
     }
 
@@ -232,10 +234,12 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
             .where(
                 qEnvelope.ledgerId.isNull,
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             ).groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }
@@ -248,9 +252,11 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
             .where(
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE),
                 qEnvelope.ledgerId.isNull,
                 qEnvelope.uid.notIn(uid)
             ).groupBy(qCategoryAssignment.categoryId)
@@ -268,9 +274,11 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
             .where(
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE),
                 qEnvelope.ledgerId.isNull,
                 qEnvelope.uid.notIn(uid),
                 qEnvelope.createdAt.after(targetDate)
@@ -286,11 +294,13 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
                     qEnvelope.id.count()
                 )
             ).from(qEnvelope)
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
             .where(
                 qEnvelope.uid.eq(uid),
                 qEnvelope.ledgerId.isNull,
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             ).groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }
@@ -312,7 +322,10 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             ).from(qEnvelope)
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
             .where(
                 qEnvelope.amount.between(minAmount, maxAmount),
                 qEnvelope.uid.notIn(uid)
@@ -343,8 +356,8 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             .join(qUser).on(qEnvelope.uid.eq(qUser.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
             .join(qCategoryAssignment).on(
-                qEnvelope.id.eq(qCategoryAssignment.targetId)
-                    .and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE))
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             )
             .where(
                 qEnvelope.amount.between(minAmount, maxAmount),
@@ -366,8 +379,8 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
             .join(qCategoryAssignment).on(
-                qEnvelope.id.eq(qCategoryAssignment.targetId)
-                    .and(qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE))
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             )
 
         /** where */
@@ -441,12 +454,14 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             ).from(qEnvelope)
             .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
             .join(qFriendRelationship).on(qEnvelope.friendId.eq(qFriendRelationship.friendId))
-            .join(qCategoryAssignment).on(qEnvelope.id.eq(qCategoryAssignment.targetId))
+            .join(qCategoryAssignment).on(
+                qEnvelope.id.eq(qCategoryAssignment.targetId),
+                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
+            )
             .leftJoin(qLedger).on(qEnvelope.ledgerId.eq(qLedger.id))
             .where(
                 qEnvelope.uid.eq(uid),
                 qEnvelope.type.eq(envelopeType),
-                qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             )
 
         return querydsl.executeSlice(query, pageable)
