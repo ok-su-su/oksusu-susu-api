@@ -37,58 +37,58 @@ class SusuStatisticsDailySummaryJob(
         parZipWithMDC(
             { withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(beforeOneDay, now) } },
-            { withContext(Dispatchers.IO) { envelopeRepository.count() } },
             { withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { friendRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { userWithdrawRepository.countByCreatedAtBetween(beforeOneDay, now) } },
-            { withContext(Dispatchers.IO) { reportHistoryRepository.countByCreatedAtBetween(beforeOneDay, now) } }
+            { withContext(Dispatchers.IO) { reportHistoryRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { withContext(Dispatchers.IO) { userRepository.countActiveUsers() } }
         ) {
                 systemActionLogCount,
                 userCount,
-                totalEnvelopeCount,
                 dailyEnvelopeCount,
                 dailyLedgerCount,
                 friendCount,
                 userWithdrawCount,
                 dailyReportHistoryCount,
+                totalActiveUserCount,
             ->
             DailySummaryMessage(
                 now = now,
-                systemActionLogCount = systemActionLogCount,
-                userCount = userCount,
-                totalEnvelopeCount = totalEnvelopeCount,
+                dailySystemActionLogCount = systemActionLogCount,
+                dailyUserCount = userCount,
                 dailyEnvelopeCount = dailyEnvelopeCount,
                 dailyLedgerCount = dailyLedgerCount,
-                friendCount = friendCount,
-                userWithdrawCount = userWithdrawCount,
-                dailyReportHistoryCount = dailyReportHistoryCount
+                dailyFriendCount = friendCount,
+                dailyUserWithdrawCount = userWithdrawCount,
+                dailyReportHistoryCount = dailyReportHistoryCount,
+                totalActiveUserCount = totalActiveUserCount,
             )
         }.run { discordClient.sendSummary(this.message()) }
     }
 
     private data class DailySummaryMessage(
         val now: LocalDateTime,
-        val systemActionLogCount: Long,
-        val userCount: Long,
-        val totalEnvelopeCount: Long,
+        val dailySystemActionLogCount: Long,
+        val dailyUserCount: Long,
         val dailyEnvelopeCount: Long,
         val dailyLedgerCount: Long,
-        val friendCount: Long,
-        val userWithdrawCount: Long,
+        val dailyFriendCount: Long,
+        val dailyUserWithdrawCount: Long,
         val dailyReportHistoryCount: Long,
+        val totalActiveUserCount: Long,
     ) {
         fun message(): DiscordMessageModel {
             return DiscordMessageModel(
                 """
                 **[ 일단위 통계 알림 ${now.format("yyyyMMdd HH:mm:ss")} ]**
-                - 전날 종합 api 호출수 : $systemActionLogCount
-                - 전날 종합 유저 가입수 : $userCount
-                - 전날 종합 봉투 생성수 : $dailyEnvelopeCount
-                - 전체 봉투 생성수 : $totalEnvelopeCount
-                - 전날 종합 장부 생성수 : $dailyLedgerCount
-                - 전날 종합 친구 생성수 : $friendCount
-                - 전날 종합 유저 탈퇴수 : $userWithdrawCount
+                - 전날 종합 api 호출수 : $dailySystemActionLogCount
+                - 총합 실제 유저수 : $totalActiveUserCount
+                - 전날 신규 가입 유저수 : $dailyUserCount
+                - 전날 유저 탈퇴수 : $dailyUserWithdrawCount
+                - 전날 신규 봉투 생성수 : $dailyEnvelopeCount
+                - 전날 신규 장부 생성수 : $dailyLedgerCount
+                - 전날 신규 친구 생성수 : $dailyFriendCount
                 - 전날 종합 신고수 : $dailyReportHistoryCount
                 """.trimIndent()
             )

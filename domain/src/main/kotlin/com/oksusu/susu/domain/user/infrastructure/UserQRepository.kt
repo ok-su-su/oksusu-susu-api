@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 interface UserQRepository {
     fun getUserAndUserStatus(uid: Long): UserAndUserStatusModel?
+
+    fun countActiveUsers(): Long
 }
 
 class UserQRepositoryImpl : UserQRepository, QuerydslRepositorySupport(User::class.java) {
@@ -35,5 +37,16 @@ class UserQRepositoryImpl : UserQRepository, QuerydslRepositorySupport(User::cla
             .join(qUserStatus).on(qUser.id.eq(qUserStatus.uid))
             .where(qUser.id.isEquals(uid))
             .fetchFirst()
+    }
+
+    override fun countActiveUsers(): Long {
+        return JPAQuery<QUser>(entityManager)
+            .select(qUser.count())
+            .from(qUser)
+            .where(
+                qUser.oauthInfo.oAuthId.contains("withdraw").not(),
+                qUser.id.goe(200000)
+            )
+            .fetchOne() ?: 0L
     }
 }
