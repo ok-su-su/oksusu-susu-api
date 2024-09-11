@@ -21,7 +21,12 @@ class DiscordClientConfig(
 
     @Bean
     fun discordClient(): DiscordClient {
-        val webClient = WebClientFactory.generate(baseUrl = DISCORD_WEBHOOKS_DOMAIN)
+        val webClient = WebClientFactory.generate(
+            baseUrl = DISCORD_WEBHOOKS_DOMAIN,
+            connectionTimeoutMillis = 2000,
+            readTimeoutMillis = 2000,
+            writeTimeoutMillis = 2000
+        )
         logger.info { "initialized discord client" }
         return SuspendableDiscordClient(webClient, webhookConfig, cacheService)
     }
