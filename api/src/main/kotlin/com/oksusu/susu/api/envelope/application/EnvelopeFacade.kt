@@ -236,7 +236,15 @@ class EnvelopeFacade(
         request: SearchEnvelopeRequest,
         pageRequest: SusuPageRequest,
     ): Page<SearchEnvelopeResponse> {
-        val response = envelopeService.search(resolveSearchSpec(user, request), pageRequest.toDefault())
+        return search(user.uid, request, pageRequest)
+    }
+
+    suspend fun search(
+        uid: Long,
+        request: SearchEnvelopeRequest,
+        pageRequest: SusuPageRequest,
+    ): Page<SearchEnvelopeResponse> {
+        val response = envelopeService.search(resolveSearchSpec(uid, request), pageRequest.toDefault())
 
         return response.map { (envelope, friend, friendRelationship, categoryAssignments) ->
             val category = categoryAssignments?.let { categoryAssignment ->
@@ -257,9 +265,9 @@ class EnvelopeFacade(
         }
     }
 
-    private fun resolveSearchSpec(user: AuthUser, request: SearchEnvelopeRequest): SearchEnvelopeSpec {
+    private fun resolveSearchSpec(uid: Long, request: SearchEnvelopeRequest): SearchEnvelopeSpec {
         return SearchEnvelopeSpec(
-            uid = user.uid,
+            uid = uid,
             friendId = request.friendIds,
             friendName = request.friendName,
             ledgerId = request.ledgerId,
