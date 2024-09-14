@@ -44,7 +44,7 @@ class SuspendableDiscordClient(
             }
         }.onFailure {
             if (withRecover) {
-                recoverSendMessage(message, token)
+//                recoverSendMessage(message, token)
             }
         }.getOrThrow()
     }
