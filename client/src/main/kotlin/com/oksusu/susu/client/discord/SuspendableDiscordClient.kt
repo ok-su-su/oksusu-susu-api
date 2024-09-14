@@ -39,7 +39,7 @@ class SuspendableDiscordClient(
                     .bodyValue(message)
                     .retrieve()
                     .toBodilessEntity()
-                    .retryWhen(Retry.fixedDelay(2, Duration.ofMillis(500)))
+//                    .retryWhen(Retry.fixedDelay(2, Duration.ofMillis(500)))
                     .awaitSingleOrThrow()
             }
         }.onFailure {
