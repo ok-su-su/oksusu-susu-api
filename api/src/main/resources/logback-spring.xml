@@ -53,7 +53,7 @@
 
     <springProfile name="prod">
         <root level="${logLevel}">
-            <appender-ref ref="DISCORD_WARNING_LOG"/>
+<!--            <appender-ref ref="DISCORD_WARNING_LOG"/>-->
             <appender-ref ref="STDOUT"/>
 <!--            <appender-ref ref="SLACK_WARNING_LOG"/>-->
 <!--            <appender-ref ref="SENTRY"/>-->
