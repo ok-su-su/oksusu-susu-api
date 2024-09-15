@@ -20,10 +20,10 @@ class ResendFailedSentDiscordMessageScheduler(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    @Scheduled(
-        fixedRate = 1000 * 60,
-        initialDelayString = "\${oksusu.scheduled-tasks.resend-failed-sent-discord-message.initial-delay:100}"
-    )
+//    @Scheduled(
+//        fixedRate = 1000 * 60,
+//        initialDelayString = "\${oksusu.scheduled-tasks.resend-failed-sent-discord-message.initial-delay:100}"
+//    )
     fun resendFailedSentDiscordMessageJob() {
         if (environment.isProd()) {
             CoroutineScope(Dispatchers.IO + coroutineExceptionHandler.handler).launch {
