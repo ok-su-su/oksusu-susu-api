@@ -177,7 +177,7 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             )
             .where(
                 qEnvelope.id.eq(id),
-                qEnvelope.uid.eq(uid),
+                qEnvelope.uid.eq(uid)
             ).fetchFirst()
     }
 
@@ -239,7 +239,7 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
                 qCategoryAssignment.targetType.eq(CategoryAssignmentType.ENVELOPE)
             )
             .where(
-                qEnvelope.ledgerId.isNull,
+                qEnvelope.ledgerId.isNull
             ).groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }
@@ -300,7 +300,7 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             )
             .where(
                 qEnvelope.uid.eq(uid),
-                qEnvelope.ledgerId.isNull,
+                qEnvelope.ledgerId.isNull
             ).groupBy(qCategoryAssignment.categoryId)
             .fetch()
     }
@@ -391,7 +391,7 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             qEnvelope.ledgerId.isEquals(spec.ledgerId),
             qEnvelope.type.isIn(spec.types),
             qEnvelope.amount.isGoe(spec.fromAmount),
-            qEnvelope.amount.isLoe(spec.toAmount),
+            qEnvelope.amount.isLoe(spec.toAmount)
         )
 
         return querydsl.execute(query, pageable)
@@ -461,7 +461,7 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             .leftJoin(qLedger).on(qEnvelope.ledgerId.eq(qLedger.id))
             .where(
                 qEnvelope.uid.eq(uid),
-                qEnvelope.type.eq(envelopeType),
+                qEnvelope.type.eq(envelopeType)
             )
 
         return querydsl.executeSlice(query, pageable)
