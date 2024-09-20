@@ -24,7 +24,7 @@ data class CategoryModel(
                 name = category.name,
                 style = category.style,
                 isActive = category.isActive,
-                isCustom = category.isCustom,
+                isCustom = category.isCustom
             )
         }
     }

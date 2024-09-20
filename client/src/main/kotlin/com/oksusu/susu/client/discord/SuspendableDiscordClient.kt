@@ -11,8 +11,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.util.retry.Retry
-import java.time.Duration
 import java.time.LocalDateTime
 
 class SuspendableDiscordClient(

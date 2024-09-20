@@ -62,7 +62,7 @@ class SusuStatisticsDailySummaryJob(
                 dailyFriendCount = friendCount,
                 dailyUserWithdrawCount = userWithdrawCount,
                 dailyReportHistoryCount = dailyReportHistoryCount,
-                totalActiveUserCount = totalActiveUserCount,
+                totalActiveUserCount = totalActiveUserCount
             )
         }.run { discordClient.sendSummary(this.message()) }
     }

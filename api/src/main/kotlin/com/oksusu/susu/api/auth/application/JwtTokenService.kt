@@ -67,6 +67,14 @@ class JwtTokenService(
         return mapper.readValue(payload)
     }
 
+    suspend fun decodeToken(token: AuthUserToken): AuthUserTokenPayload {
+        val payload = JWT.decode(token.value)
+            .payload
+            .decodeBase64()
+
+        return mapper.readValue(payload)
+    }
+
     fun verifyTokenWithExtendedExpiredAt(token: String): AuthUserTokenPayload {
         val payload = runCatching { accessJwtVerifierWithExtendedExpiredAt.verify(token).payload.decodeBase64() }
             .getOrNull() ?: throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
