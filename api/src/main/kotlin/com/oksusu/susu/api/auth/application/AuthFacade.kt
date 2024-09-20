@@ -64,6 +64,10 @@ class AuthFacade(
             }
     }
 
+    suspend fun getUidFromToken(token: AuthUserToken): Long {
+        return jwtTokenService.decodeToken(token).id
+    }
+
     private fun raiseIf(userStatus: UserStatus): UserStatusTypeModel {
         val userStatusType = userStatusTypeService.getStatus(userStatus.accountStatusId)
 
