@@ -64,8 +64,16 @@ class AuthFacade(
             }
     }
 
-    suspend fun getUidFromToken(token: AuthUserToken): Long {
-        return jwtTokenService.decodeToken(token).id
+    suspend fun getUidFromTokenOrNull(token: AuthUserToken): Long? {
+        return try {
+            jwtTokenService.decodeToken(token).id
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun getUidFromTokenOrThrow(token: AuthUserToken): Long {
+        return getUidFromTokenOrNull(token) ?: throw InvalidTokenException(ErrorCode.INVALID_TOKEN)
     }
 
     private fun raiseIf(userStatus: UserStatus): UserStatusTypeModel {
