@@ -1,5 +1,6 @@
 package com.oksusu.susu.batch.summary.job
 
+import arrow.fx.coroutines.parZip
 import com.oksusu.susu.client.discord.DiscordClient
 import com.oksusu.susu.client.discord.model.DiscordMessageModel
 import com.oksusu.susu.common.extension.format
@@ -31,8 +32,21 @@ class SusuStatisticsHourSummaryJob(
     suspend fun runHourSummaryJob() {
         val now = LocalDateTime.now()
         val beforeOneHour = now.minusHours(1)
+        val beforeTwoHour = beforeOneHour.minusHours(2)
 
-        parZipWithMDC(
+        parZip(
+            { dailySummary(beforeOneHour, now) },
+            { dailySummary(beforeTwoHour, beforeOneHour) }
+        ) { beforeOneMessage, beforeTwoMessage ->
+            discordClient.sendSummary(message(beforeOneMessage, beforeTwoMessage))
+        }
+    }
+
+    private suspend fun dailySummary(
+        beforeOneHour: LocalDateTime,
+        now: LocalDateTime,
+    ): HourSummaryMessage {
+        return parZipWithMDC(
             { withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(beforeOneHour, now) } },
             { withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(beforeOneHour, now) } },
             { withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(beforeOneHour, now) } },
@@ -57,10 +71,10 @@ class SusuStatisticsHourSummaryJob(
                 userCount = userCount,
                 userWithdrawCount = userWithdrawCount
             )
-        }.run { discordClient.sendSummary(this.message()) }
+        }
     }
 
-    private data class HourSummaryMessage(
+    data class HourSummaryMessage(
         val beforeOneHour: LocalDateTime,
         val now: LocalDateTime,
         val systemActionLogCount: Long,
@@ -69,20 +83,20 @@ class SusuStatisticsHourSummaryJob(
         val friendCount: Long,
         val userCount: Long,
         val userWithdrawCount: Long,
-    ) {
-        fun message(): DiscordMessageModel {
-            return DiscordMessageModel(
-                """
-                **[ 시간단위 통계 알림 ${now.format("yyyy-MM-dd HH:mm:ss")} ]**
-                - ${beforeOneHour.format("HH:mm:ss")} ~ ${now.format("HH:mm:ss")}
-                - api 호출수 : $systemActionLogCount
-                - 장부 생성수 : $ledgerCount
-                - 봉투 생성수 : $envelopeCount
-                - 친구 생성수 : $friendCount
-                - 유저 생성수 : $userCount
-                - 유저 탈퇴수 : $userWithdrawCount
+    )
+
+    fun message(beforeOneMessage: HourSummaryMessage, beforeTwoMessage: HourSummaryMessage): DiscordMessageModel {
+        return DiscordMessageModel(
+            """
+                **[ 시간단위 통계 알림 ${beforeOneMessage.now.format("yyyy-MM-dd HH:mm:ss")} ]**
+                - ${beforeOneMessage.beforeOneHour.format("HH:mm:ss")} ~ ${beforeOneMessage.now.format("HH:mm:ss")}
+                - api 호출수 : ${beforeOneMessage.systemActionLogCount} [전시간 대비 ${beforeOneMessage.systemActionLogCount - beforeTwoMessage.systemActionLogCount}]
+                - 장부 생성수 : ${beforeOneMessage.ledgerCount} [전시간 대비 ${beforeOneMessage.ledgerCount - beforeTwoMessage.ledgerCount}]
+                - 봉투 생성수 : ${beforeOneMessage.envelopeCount} [전시간 대비 ${beforeOneMessage.envelopeCount - beforeTwoMessage.envelopeCount}]
+                - 친구 생성수 : ${beforeOneMessage.friendCount} [전시간 대비 ${beforeOneMessage.friendCount - beforeTwoMessage.friendCount}]
+                - 유저 생성수 : ${beforeOneMessage.userCount} [전시간 대비 ${beforeOneMessage.userCount - beforeTwoMessage.userCount}]
+                - 유저 탈퇴수 : ${beforeOneMessage.userWithdrawCount} [전시간 대비 ${beforeOneMessage.userWithdrawCount - beforeTwoMessage.userWithdrawCount}]
                 """.trimIndent()
-            )
-        }
+        )
     }
 }

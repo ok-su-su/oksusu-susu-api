@@ -28,7 +28,7 @@ class SystemActionLogEventListener(
         mdcCoroutineScope(Dispatchers.IO + Job() + coroutineExceptionHandler.handler, event.traceId).launch {
             val uid = event.token
                 ?.let { token -> AuthUserToken.from(token) }
-                ?.let { token -> authFacade.getUidFromToken(token) }
+                ?.let { token -> authFacade.getUidFromTokenOrNull(token) }
 
             SystemActionLog(
                 uid = uid,
