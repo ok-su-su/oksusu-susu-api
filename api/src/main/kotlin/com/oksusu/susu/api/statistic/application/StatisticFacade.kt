@@ -25,16 +25,11 @@ class StatisticFacade(
     private val logger = KotlinLogging.logger { }
 
     suspend fun getUserEnvelopeStatistic(user: AuthUser): UserEnvelopeStatisticResponse {
-        /** 통계 캐싱 여부 확인 */
-        userEnvelopeStatisticService.getStatisticOrNull(user.uid)?.run {
-            logger.debug { "${user.uid} user statistic cache hit" }
-
-            return UserEnvelopeStatisticResponse.from(this)
+        return userEnvelopeStatisticService.getStatisticOrNull(user.uid)?.let {
+            UserEnvelopeStatisticResponse.from(it)
+        } ?: createUserEnvelopeStatistic(user.uid).let {
+            UserEnvelopeStatisticResponse.from(it)
         }
-
-        val userEnvelopeStatistic = createUserEnvelopeStatistic(user.uid)
-
-        return UserEnvelopeStatisticResponse.from(userEnvelopeStatistic)
     }
 
     suspend fun refreshUserEnvelopeStatistic(user: AuthUser): UserEnvelopeStatisticResponse {
