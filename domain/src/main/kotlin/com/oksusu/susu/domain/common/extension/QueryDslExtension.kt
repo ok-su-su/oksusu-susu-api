@@ -18,29 +18,27 @@ import org.springframework.data.jpa.repository.support.Querydsl
 import java.time.LocalDateTime
 
 fun <T> Querydsl?.execute(query: JPAQuery<T>, pageable: Pageable): Page<T> {
-    return this.takeUnless { querydsl -> querydsl == null }
-        ?.let { queryDsl ->
-            queryDsl.applyPagination(pageable, query).run {
-                PageImpl(this.fetch(), pageable, this.fetchCount())
-            }
-        } ?: throw SusuException(ErrorCode.QUERY_DSL_NOT_EXISTS_ERROR)
+    return this?.let { queryDsl ->
+        queryDsl.applyPagination(pageable, query).run {
+            PageImpl(this.fetch(), pageable, this.fetchCount())
+        }
+    } ?: throw SusuException(ErrorCode.QUERY_DSL_NOT_EXISTS_ERROR)
 }
 
 fun <T> Querydsl?.executeSlice(query: JPAQuery<T>, pageable: Pageable): Slice<T> {
-    return this.takeUnless { querydsl -> querydsl == null }
-        ?.let { queryDsl ->
-            queryDsl.applyPagination(pageable, query).run {
-                this.limit(pageable.pageSize + 1L)
-                    .fetch()
-            }.run {
-                var hasNext = false
-                if (this.size > pageable.pageSize) {
-                    hasNext = true
-                    this.removeAt(pageable.pageSize)
-                }
-                SliceImpl(this, pageable, hasNext)
+    return this?.let { queryDsl ->
+        queryDsl.applyPagination(pageable, query).run {
+            this.limit(pageable.pageSize + 1L)
+                .fetch()
+        }.run {
+            var hasNext = false
+            if (this.size > pageable.pageSize) {
+                hasNext = true
+                this.removeAt(pageable.pageSize)
             }
-        } ?: throw SusuException(ErrorCode.QUERY_DSL_NOT_EXISTS_ERROR)
+            SliceImpl(this, pageable, hasNext)
+        }
+    } ?: throw SusuException(ErrorCode.QUERY_DSL_NOT_EXISTS_ERROR)
 }
 
 fun StringPath.isEquals(parameter: String?): BooleanExpression? {
