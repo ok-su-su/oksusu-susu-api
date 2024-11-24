@@ -12,6 +12,7 @@ import com.oksusu.susu.domain.friend.domain.QFriend
 import com.oksusu.susu.domain.friend.domain.QFriendRelationship
 import com.oksusu.susu.domain.user.domain.QUser
 import com.querydsl.core.types.dsl.CaseBuilder
+import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQuery
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -468,13 +469,22 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
     }
 
     override fun findLatestFriendEnvelopes(friendIds: Set<Long>): List<Envelope> {
+        /** sub query 질의를 위해, 별칭 지정 */
+        val qSubEnvelope = QEnvelope("subEnvelope")
+
+        /** 전달 기준 점에 대한 정보를 찾기 위한 sub query */
+        val subQuery = JPAExpressions
+            .select(qSubEnvelope.handedOverAt.max())
+            .from(qSubEnvelope)
+            .where(qSubEnvelope.friendId.eq(qEnvelope.friendId))
+
         return JPAQuery<Envelope>(entityManager)
             .select(qEnvelope)
             .from(qEnvelope)
-            .where(qEnvelope.friendId.`in`(friendIds))
-            .groupBy(qEnvelope.friendId)
-            .having(qEnvelope.handedOverAt.eq(qEnvelope.handedOverAt.max()))
-            .fetch()
+            .where(
+                qEnvelope.friendId.`in`(friendIds),
+                qEnvelope.handedOverAt.eq(subQuery)
+            ).fetch()
     }
 
     override fun getMaxAmountEnvelopeInfoByUid(uid: Long, type: EnvelopeType): EnvelopeAndFriendModel? {
