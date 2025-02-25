@@ -1,5 +1,7 @@
 package com.oksusu.susu.api.event.listener
 
+import com.oksusu.susu.api.auth.application.AuthFacade
+import com.oksusu.susu.api.auth.resolver.TokenResolver
 import com.oksusu.susu.api.common.aspect.SusuEventListener
 import com.oksusu.susu.api.event.model.DiscordErrorAlarmEvent
 import com.oksusu.susu.api.event.model.ErrorMessage
@@ -22,6 +24,7 @@ import org.springframework.core.io.buffer.DataBufferUtils
 class DiscordErrorAlarmEventListener(
     private val environment: Environment,
     private val discordClient: DiscordClient,
+    private val authFacade: AuthFacade,
     private val coroutineExceptionHandler: ErrorPublishingCoroutineExceptionHandler,
 ) {
     @EventListener
@@ -45,8 +48,11 @@ class DiscordErrorAlarmEventListener(
                     DataBufferUtils.release(dataBuffer)
                     bytes.decodeToString()
                 }.awaitSingleOrNull() ?: ""
+            val token = TokenResolver(event.request).resolveToken().block()
+            val uid = authFacade.getUidFromTokenOrNull(token!!) ?: -1L
 
             ErrorMessage(
+                uid = uid,
                 url = url,
                 method = method,
                 errorMessage = errorMessage,
