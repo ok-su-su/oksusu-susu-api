@@ -6,6 +6,8 @@ import com.oksusu.susu.common.extension.format
 import java.time.LocalDateTime
 
 internal data class ErrorMessage(
+    val uid: Long,
+    val token: String,
     val url: String,
     val method: String,
     val errorMessage: String,
@@ -18,6 +20,7 @@ internal data class ErrorMessage(
         return SlackMessageModel(
             """
                 **[ 에러 발생 ${LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")} ]**
+                - Uid: $uid
                 - User IP : $errorUserIP
                 - Request Addr : $method - $url
                 - Requset Param : $errorRequestParam
@@ -32,6 +35,8 @@ internal data class ErrorMessage(
         return DiscordMessageModel(
             """
                 **[ 에러 발생 ${LocalDateTime.now().format("yyyy-MM-dd HH:mm:ss")} ]**
+                - Uid: $uid
+                - Token : $token
                 - User IP : $errorUserIP
                 - Request Addr : $method - $url
                 - Requset Param : $errorRequestParam

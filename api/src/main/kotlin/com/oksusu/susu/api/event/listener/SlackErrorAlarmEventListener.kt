@@ -47,7 +47,9 @@ class SlackErrorAlarmEventListener(
                 }.awaitSingleOrNull() ?: ""
 
             ErrorMessage(
+                uid = -1L,
                 url = url,
+                token = "없음",
                 method = method,
                 errorMessage = errorMessage,
                 errorStack = errorStack,
