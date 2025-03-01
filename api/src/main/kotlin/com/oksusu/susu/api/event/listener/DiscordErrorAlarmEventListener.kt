@@ -53,6 +53,7 @@ class DiscordErrorAlarmEventListener(
 
             ErrorMessage(
                 uid = uid,
+                token = token.value,
                 url = url,
                 method = method,
                 errorMessage = errorMessage,
