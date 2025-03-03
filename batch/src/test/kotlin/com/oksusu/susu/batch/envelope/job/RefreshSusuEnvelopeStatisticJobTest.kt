@@ -151,7 +151,7 @@ class RefreshSusuEnvelopeStatisticJobTest(
                 mockFriendRelationships.add(
                     FriendRelationship(
                         friendId = minFriendId + i - 1,
-                        relationshipId = (1L..5L).random()
+                        relationshipId = (1L..5L).random(),
                     )
                 )
             }
