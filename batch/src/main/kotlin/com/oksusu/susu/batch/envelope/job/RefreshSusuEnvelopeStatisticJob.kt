@@ -63,14 +63,14 @@ class RefreshSusuEnvelopeStatisticJob(
         private const val SUSU_SPECIFIC_ENVELOPE_STATISTIC_COUNT_PREFIX = "susu_specific_envelope_statistic_count:"
     }
 
-    suspend fun refreshSusuEnvelopeStatisticAmount() {
+    suspend fun refreshSusuEnvelopeStatisticAmount(): Map<String, Long> {
         logger.info { "start refresh susu envelope statistic amount" }
 
         val (minAmount, maxAmount) = getMaxAndMinAmount()
 
         val from = LocalDateTime.now().minusMonths(12)
         val to = LocalDateTime.now()
-        parZipWithMDC(
+        return parZipWithMDC(
             {
                 withContext(Dispatchers.IO) {
                     envelopeRepository.getCuttingTotalAmountPerHandedOverAtBetweenExceptUid(
@@ -139,6 +139,8 @@ class RefreshSusuEnvelopeStatisticJob(
             withMDCContext(Dispatchers.IO) { cacheService.set(Cache.getSusuEnvelopeStatisticAmountCache(), cache) }
 
             logger.info { "finish refresh susu envelope statistic amount" }
+
+            cache
         }
     }
 
@@ -150,8 +152,12 @@ class RefreshSusuEnvelopeStatisticJob(
         val targetDate = LocalDateTime.now().minusHours(REFRESH_BEFORE_HOURS)
 
         val to = LocalDateTime.now()
+
+        val cachedAmount = withContext(Dispatchers.IO) {
+            cacheService.getOrNull(Cache.getSusuEnvelopeStatisticAmountCache())
+        } ?: refreshSusuEnvelopeStatisticAmount()
+
         parZipWithMDC(
-            { withContext(Dispatchers.IO) { cacheService.getOrNull(Cache.getSusuEnvelopeStatisticAmountCache()) } },
             { withContext(Dispatchers.IO) { envelopeRepository.getUserCountHadEnvelope() } },
             {
                 withContext(Dispatchers.IO) {
@@ -202,7 +208,6 @@ class RefreshSusuEnvelopeStatisticJob(
             { withContext(Dispatchers.IO) { relationshipRepository.findAllByIsActive(true) } },
             { withContext(Dispatchers.IO) { categoryRepository.findAllByIsActive(true) } }
         ) {
-                cachedAmount,
                 totalUserCount,
                 monthlySpentEnvelopAmountForLastYear,
                 relationShipConuts,
