@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 
 @Transactional(readOnly = true)
 @Repository
-interface SystemActionLogRepository : JpaRepository<SystemActionLog, Long> {
+interface SystemActionLogRepository : JpaRepository<SystemActionLog, Long>, SystemActionLogQRepository {
     fun findAllByCreatedAtBefore(createdAt: LocalDateTime): List<SystemActionLog>
 
     fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long

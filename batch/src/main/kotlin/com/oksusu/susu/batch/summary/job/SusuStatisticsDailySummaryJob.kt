@@ -47,6 +47,7 @@ class SusuStatisticsDailySummaryJob(
     private suspend fun dailySummary(beforeOneDay: LocalDateTime, now: LocalDateTime): DailySummaryMessage {
         return parZipWithMDC(
             { withContext(Dispatchers.IO) { systemActionLogRepository.countByCreatedAtBetween(beforeOneDay, now) } },
+            { withContext(Dispatchers.IO) { systemActionLogRepository.countDau(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { userRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { envelopeRepository.countByCreatedAtBetween(beforeOneDay, now) } },
             { withContext(Dispatchers.IO) { ledgerRepository.countByCreatedAtBetween(beforeOneDay, now) } },
@@ -56,6 +57,7 @@ class SusuStatisticsDailySummaryJob(
             { withContext(Dispatchers.IO) { userRepository.countActiveUsers() } }
         ) {
                 systemActionLogCount,
+                dau,
                 userCount,
                 dailyEnvelopeCount,
                 dailyLedgerCount,
@@ -66,6 +68,7 @@ class SusuStatisticsDailySummaryJob(
             ->
             DailySummaryMessage(
                 now = now,
+                dau = dau,
                 dailySystemActionLogCount = systemActionLogCount,
                 dailyUserCount = userCount,
                 dailyEnvelopeCount = dailyEnvelopeCount,
@@ -81,6 +84,7 @@ class SusuStatisticsDailySummaryJob(
     data class DailySummaryMessage(
         val now: LocalDateTime,
         val dailySystemActionLogCount: Long,
+        val dau: Long,
         val dailyUserCount: Long,
         val dailyEnvelopeCount: Long,
         val dailyLedgerCount: Long,
@@ -95,6 +99,7 @@ class SusuStatisticsDailySummaryJob(
             """
                 **[ 일단위 통계 알림 ${today.now.format("yyyyMMdd HH:mm:ss")} ]**
                 - 전날 종합 api 호출수 : ${today.dailySystemActionLogCount} [이틀 대비 ${today.dailySystemActionLogCount - yesterday.dailySystemActionLogCount}]
+                - 전날 dau : ${today.dau} [이틀 대비 ${today.dau - yesterday.dau}]
                 - 총합 실제 유저수 : ${today.totalActiveUserCount} [이틀 대비 ${today.totalActiveUserCount - yesterday.totalActiveUserCount}]
                 - 전날 신규 가입 유저수 : ${today.dailyUserCount} [이틀 대비 ${today.dailyUserCount - yesterday.dailyUserCount}]
                 - 전날 유저 탈퇴수 : ${today.dailyUserWithdrawCount} [이틀 대비 ${today.dailyUserWithdrawCount - yesterday.dailyUserWithdrawCount}]
