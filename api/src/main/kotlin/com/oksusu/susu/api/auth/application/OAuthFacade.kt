@@ -76,14 +76,10 @@ class OAuthFacade(
 
         coroutineScope {
             val validateNotRegistered = async(Dispatchers.IO) {
-                userService.validateNotRegistered(
-                    oauthInfo
-                )
+                userService.validateNotRegistered(oauthInfo)
             }
             val validateExistTerms = async(Dispatchers.IO) {
-                termService.validateExistTerms(
-                    request.termAgreement
-                )
+                termService.validateExistTerms(request.termAgreement)
             }
 
             awaitAll(validateNotRegistered, validateExistTerms)
