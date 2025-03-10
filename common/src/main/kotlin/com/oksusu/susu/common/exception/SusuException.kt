@@ -12,7 +12,7 @@ class InvalidRequestException(errorCode: ErrorCode) : SusuException(errorCode)
 
 class FailToCreateException(errorCode: ErrorCode) : SusuException(errorCode)
 
-class AlreadyException(errorCode: ErrorCode) : SusuException(errorCode)
+class AlreadyException(errorCode: ErrorCode, extra: Map<String, Any>? = null) : SusuException(errorCode)
 
 class NoAuthorityException(errorCode: ErrorCode) : SusuException(errorCode)
 

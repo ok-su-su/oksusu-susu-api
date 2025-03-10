@@ -1,5 +1,6 @@
 package com.oksusu.susu.api.user.application
 
+import com.oksusu.susu.common.exception.AlreadyException
 import com.oksusu.susu.common.exception.ErrorCode
 import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.NotFoundException
@@ -19,8 +20,15 @@ class UserService(
     private val userRepository: UserRepository,
 ) {
     suspend fun validateNotRegistered(oauthInfo: OauthInfo) {
-        existsByOAuthInfo(oauthInfo).takeUnless { isExists -> isExists }
-            ?: throw NotFoundException(ErrorCode.ALREADY_REGISTERED_USER)
+        if (existsByOAuthInfo(oauthInfo)) {
+            /** 중복 가입에 대한 Logging을 확인하기 위한 용도 */
+            val reason: Map<String, Any> = mapOf(
+                "oauthProvider" to oauthInfo.oAuthProvider.name,
+                "oauthId" to oauthInfo.oAuthId
+            )
+
+            throw AlreadyException(ErrorCode.ALREADY_REGISTERED_USER, reason)
+        }
     }
 
     suspend fun existsByOAuthInfo(oauthInfo: OauthInfo): Boolean {
