@@ -96,7 +96,7 @@ class SusuStatisticsHourSummaryJob(
                 - 친구 생성수 : ${beforeOneMessage.friendCount} [전시간 대비 ${beforeOneMessage.friendCount - beforeTwoMessage.friendCount}]
                 - 유저 생성수 : ${beforeOneMessage.userCount} [전시간 대비 ${beforeOneMessage.userCount - beforeTwoMessage.userCount}]
                 - 유저 탈퇴수 : ${beforeOneMessage.userWithdrawCount} [전시간 대비 ${beforeOneMessage.userWithdrawCount - beforeTwoMessage.userWithdrawCount}]
-                """.trimIndent()
+            """.trimIndent()
         )
     }
 }

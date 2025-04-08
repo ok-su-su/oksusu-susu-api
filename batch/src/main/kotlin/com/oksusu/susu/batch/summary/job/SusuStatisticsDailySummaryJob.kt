@@ -39,7 +39,7 @@ class SusuStatisticsDailySummaryJob(
         parZip(
             { dailySummary(beforeOneDay, now) },
             { dailySummary(beforeTwoDay, beforeOneDay) },
-            { totalSummary() },
+            { totalSummary() }
         ) { todayMessage, yesterdayMessage, totalSummary ->
             discordClient.sendSummary(message(todayMessage, yesterdayMessage, totalSummary))
         }
@@ -128,7 +128,7 @@ class SusuStatisticsDailySummaryJob(
                 - 전날 신규 장부 생성수 : ${today.dailyLedgerCount} [이틀 대비 ${today.dailyLedgerCount - yesterday.dailyLedgerCount}] [전체 생성수: ${totalSummary.totalLedgerCount}]
                 - 전날 신규 친구 생성수 : ${today.dailyFriendCount} [이틀 대비 ${today.dailyFriendCount - yesterday.dailyFriendCount}] [전체 생성수: ${totalSummary.totalFriendCount}]
                 - 전날 종합 신고수 : ${today.dailyReportHistoryCount}  [이틀 대비 ${today.dailyReportHistoryCount - yesterday.dailyReportHistoryCount}]
-                """.trimIndent()
+            """.trimIndent()
         )
     }
 }

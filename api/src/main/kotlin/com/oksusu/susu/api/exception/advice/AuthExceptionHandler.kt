@@ -16,7 +16,7 @@ class AuthExceptionHandler {
         logger.warn { "InvalidTokenException ${e.message}" }
         val response = ErrorResponse(
             errorCode = e.errorCode.name,
-            reason = e.message ?: e.errorCode.description,
+            reason = e.message ?: e.errorCode.description
         )
         return ResponseEntity(response, e.errorCode.status)
     }
