@@ -38,9 +38,10 @@ class SusuStatisticsDailySummaryJob(
 
         parZip(
             { dailySummary(beforeOneDay, now) },
-            { dailySummary(beforeTwoDay, beforeOneDay) }
-        ) { todayMessage, yesterdayMessage ->
-            discordClient.sendSummary(message(todayMessage, yesterdayMessage))
+            { dailySummary(beforeTwoDay, beforeOneDay) },
+            { totalSummary() }
+        ) { todayMessage, yesterdayMessage, totalSummary ->
+            discordClient.sendSummary(message(todayMessage, yesterdayMessage, totalSummary))
         }
     }
 
@@ -94,7 +95,27 @@ class SusuStatisticsDailySummaryJob(
         val totalActiveUserCount: Long,
     )
 
-    fun message(today: DailySummaryMessage, yesterday: DailySummaryMessage): DiscordMessageModel {
+    private suspend fun totalSummary(): TotalSummary {
+        return parZipWithMDC(
+            { withContext(Dispatchers.IO) { systemActionLogRepository.count() } },
+            { withContext(Dispatchers.IO) { ledgerRepository.count() } },
+            { withContext(Dispatchers.IO) { friendRepository.count() } }
+        ) { totalEnvelopeCount, totalLedgerCount, totalFriendCount ->
+            TotalSummary(totalEnvelopeCount, totalLedgerCount, totalFriendCount)
+        }
+    }
+
+    data class TotalSummary(
+        val totalEnvelopeCount: Long,
+        val totalLedgerCount: Long,
+        val totalFriendCount: Long,
+    )
+
+    fun message(
+        today: DailySummaryMessage,
+        yesterday: DailySummaryMessage,
+        totalSummary: TotalSummary,
+    ): DiscordMessageModel {
         return DiscordMessageModel(
             """
                 **[ 일단위 통계 알림 ${today.now.format("yyyyMMdd HH:mm:ss")} ]**
@@ -103,11 +124,11 @@ class SusuStatisticsDailySummaryJob(
                 - 총합 실제 유저수 : ${today.totalActiveUserCount} [이틀 대비 ${today.totalActiveUserCount - yesterday.totalActiveUserCount}]
                 - 전날 신규 가입 유저수 : ${today.dailyUserCount} [이틀 대비 ${today.dailyUserCount - yesterday.dailyUserCount}]
                 - 전날 유저 탈퇴수 : ${today.dailyUserWithdrawCount} [이틀 대비 ${today.dailyUserWithdrawCount - yesterday.dailyUserWithdrawCount}]
-                - 전날 신규 봉투 생성수 : ${today.dailyEnvelopeCount} [이틀 대비 ${today.dailyEnvelopeCount - yesterday.dailyEnvelopeCount}]
-                - 전날 신규 장부 생성수 : ${today.dailyLedgerCount} [이틀 대비 ${today.dailyLedgerCount - yesterday.dailyLedgerCount}]
-                - 전날 신규 친구 생성수 : ${today.dailyFriendCount} [이틀 대비 ${today.dailyFriendCount - yesterday.dailyFriendCount}]
+                - 전날 신규 봉투 생성수 : ${today.dailyEnvelopeCount} [이틀 대비 ${today.dailyEnvelopeCount - yesterday.dailyEnvelopeCount}] [전체 생성수: ${totalSummary.totalEnvelopeCount}]
+                - 전날 신규 장부 생성수 : ${today.dailyLedgerCount} [이틀 대비 ${today.dailyLedgerCount - yesterday.dailyLedgerCount}] [전체 생성수: ${totalSummary.totalLedgerCount}]
+                - 전날 신규 친구 생성수 : ${today.dailyFriendCount} [이틀 대비 ${today.dailyFriendCount - yesterday.dailyFriendCount}] [전체 생성수: ${totalSummary.totalFriendCount}]
                 - 전날 종합 신고수 : ${today.dailyReportHistoryCount}  [이틀 대비 ${today.dailyReportHistoryCount - yesterday.dailyReportHistoryCount}]
-                """.trimIndent()
+            """.trimIndent()
         )
     }
 }
