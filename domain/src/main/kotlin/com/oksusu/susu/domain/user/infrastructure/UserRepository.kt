@@ -15,8 +15,4 @@ interface UserRepository : JpaRepository<User, Long>, UserQRepository {
     fun findByOauthInfo(oauthInfo: OauthInfo): User?
 
     fun countByCreatedAtBetween(startAt: LocalDateTime, endAt: LocalDateTime): Long
-
-    fun existsByNewOAuthId(oauthId: String): Boolean
-
-    fun findByNewOAuthId(oauthId: String): User?
 }
