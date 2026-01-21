@@ -17,6 +17,9 @@ import com.oksusu.susu.api.user.application.UserStatusService
 import com.oksusu.susu.api.user.application.UserStatusTypeService
 import com.oksusu.susu.api.user.model.UserDeviceContext
 import com.oksusu.susu.cache.auth.domain.RefreshToken
+import com.oksusu.susu.common.exception.ErrorCode
+import com.oksusu.susu.common.exception.NotFoundException
+import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.common.extension.coExecute
 import com.oksusu.susu.domain.common.extension.coExecuteOrNull
 import com.oksusu.susu.domain.config.database.TransactionTemplates
@@ -29,6 +32,7 @@ import com.oksusu.susu.domain.user.domain.UserStatusHistory
 import com.oksusu.susu.domain.user.domain.vo.AccountRole
 import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import com.oksusu.susu.domain.user.domain.vo.UserStatusAssignmentType
+import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -51,6 +55,7 @@ class OAuthFacade(
     private val userStatusTypeService: UserStatusTypeService,
     private val authValidateService: AuthValidateService,
     private val jwtTokenService: JwtTokenService,
+    private val userRepository: UserRepository,
 ) {
     val logger = KotlinLogging.logger {}
 
@@ -59,6 +64,18 @@ class OAuthFacade(
         val oauthInfo = oAuthService.getOAuthInfo(provider, accessToken)
 
         val isExistUser = userService.existsByOAuthInfo(oauthInfo)
+
+        // TODO: 기등록된건 비교 제거 필요.
+        if (provider == OAuthProvider.APPLE) {
+            val isExists = withMDCContext(Dispatchers.IO) {
+                userRepository.existsByNewOAuthId(
+                    oauthId = oauthInfo.oAuthId
+                )
+            }
+            if (isExists) {
+                return AbleRegisterResponse(!isExistUser)
+            }
+        }
 
         return AbleRegisterResponse(!isExistUser)
     }
@@ -152,7 +169,15 @@ class OAuthFacade(
         deviceContext: UserDeviceContext,
     ): TokenDto {
         val oauthInfo = oAuthService.getOAuthInfo(provider, request.accessToken)
-        val user = userService.findByOAuthInfoOrThrow(oauthInfo)
+
+        // TODO: 신규 발급된 키가 있는지 확인하도록 수정 -> 추후 마이그 이후에 제거해야함.
+        var user = userService.findByOAuthInfoOrNull(oauthInfo)
+
+        if (provider == OAuthProvider.APPLE) {
+            user = userService.findByOAuth(oauthInfo.oAuthId)
+        }
+
+        user ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
 
         val userDevice = UserDevice(
             uid = user.id,
@@ -169,6 +194,7 @@ class OAuthFacade(
             simState = deviceContext.simState
         )
 
+        // TODO: 마이그 데이터에 대한 검증 X -> 어차피 탈퇴회원은 무의미
         txTemplates.writer.coExecuteOrNull(Dispatchers.IO + MDCContext()) {
             eventPublisher.publishEvent(UpdateUserDeviceEvent(userDevice))
         }
