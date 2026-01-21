@@ -6,14 +6,15 @@ import com.oksusu.susu.common.exception.InvalidRequestException
 import com.oksusu.susu.common.exception.NotFoundException
 import com.oksusu.susu.common.extension.withMDCContext
 import com.oksusu.susu.domain.user.domain.User
+import com.oksusu.susu.domain.user.domain.vo.OAuthProvider
 import com.oksusu.susu.domain.user.domain.vo.OauthInfo
 import com.oksusu.susu.domain.user.infrastructure.UserRepository
 import com.oksusu.susu.domain.user.infrastructure.model.UserAndUserStatusModel
+import java.time.LocalDateTime
 import kotlinx.coroutines.Dispatchers
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 class UserService(
@@ -29,6 +30,27 @@ class UserService(
 
             throw AlreadyException(ErrorCode.ALREADY_REGISTERED_USER, reason)
         }
+
+        // TODO :  시점 이슈로, 신규 키값이 들어간 경우를 방지 -> 마이그 이후에 제거 필요
+        if (oauthInfo.oAuthProvider == OAuthProvider.APPLE) {
+            val isExists = withMDCContext {
+                withMDCContext(Dispatchers.IO) {
+                    userRepository.existsByNewOAuthId(
+                        oauthId = oauthInfo.oAuthId
+                    )
+                }
+            }
+
+            if (isExists) {
+                /** 중복 가입에 대한 Logging을 확인하기 위한 용도 */
+                val reason: Map<String, Any> = mapOf(
+                    "oauthProvider" to oauthInfo.oAuthProvider.name,
+                    "oauthId" to oauthInfo.oAuthId
+                )
+
+                throw AlreadyException(ErrorCode.ALREADY_REGISTERED_USER, reason)
+            }
+        }
     }
 
     suspend fun existsByOAuthInfo(oauthInfo: OauthInfo): Boolean {
@@ -42,6 +64,13 @@ class UserService(
 
     suspend fun findByOAuthInfoOrThrow(oauthInfo: OauthInfo): User {
         return findByOAuthInfoOrNull(oauthInfo) ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
+    }
+
+    // TODO: 임시
+    suspend fun findByOAuth(newOAuthId: String): User {
+        return withMDCContext(Dispatchers.IO) {
+            userRepository.findByNewOAuthId(newOAuthId)
+        } ?: throw NotFoundException(ErrorCode.NOT_FOUND_USER_ERROR)
     }
 
     suspend fun findByOAuthInfoOrNull(oauthInfo: OauthInfo): User? {

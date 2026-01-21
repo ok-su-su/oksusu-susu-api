@@ -39,6 +39,17 @@ class User(
      */
     @Enumerated(EnumType.STRING)
     val role: AccountRole,
+
+    // TODO : 아래의 필드들은 apple 인증 마이그레이션을 위한 코드들
+    /** apple 인증 처리를 위한 임시 컬럼 */
+    @Column(name = "transfer_oauth_id")
+    val transferOAuthId: String? = null, // TODO: 추후 제거 필요, 마이그를 위한 임시 코드
+
+    @Column(name = "new_oauth_id")
+    val newOAuthId: String? = null, // TODO: 추후 제거 필요, 마이그를 위한 임시 코드
+
+    @Column(name = "new_email")
+    val newEmail: String? = null, // TODO: 추후 제거 필요, 마이그를 위한 임시 코드
 ) : BaseEntity() {
     override fun toString(): String {
         return "User(id=$id, oauthInfo=$oauthInfo, name='$name', gender=$gender, birth=$birth, profileImageUrl=$profileImageUrl, role=$role)"
