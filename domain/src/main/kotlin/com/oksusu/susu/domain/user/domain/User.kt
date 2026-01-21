@@ -50,6 +50,9 @@ class User(
 
     @Column(name = "new_email")
     val newEmail: String? = null, // TODO: 추후 제거 필요, 마이그를 위한 임시 코드
+
+    @Column(name = "old_sub")
+    val oldSub: String? = null,
 ) : BaseEntity() {
     override fun toString(): String {
         return "User(id=$id, oauthInfo=$oauthInfo, name='$name', gender=$gender, birth=$birth, profileImageUrl=$profileImageUrl, role=$role)"
