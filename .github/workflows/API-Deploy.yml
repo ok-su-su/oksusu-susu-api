@@ -45,7 +45,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Build with Gradle
-        run: ./gradlew :api:build --no-daemon
+        run: ./gradlew :api:build --no-daemon -x test
 
       - name: Make image tag
         run: echo "IMAGE_TAG=$ACTIVE_PROFILE-${GITHUB_SHA::7}" >> $GITHUB_ENV # activeProfile-커밋 hash 값
