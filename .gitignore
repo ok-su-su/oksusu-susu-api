@@ -44,3 +44,8 @@ mysqldata/
 docker-compose.prod.yml
 
 .jqwik-database
+
+.claude/
+.omc/
+package-lock.json
+package.json
