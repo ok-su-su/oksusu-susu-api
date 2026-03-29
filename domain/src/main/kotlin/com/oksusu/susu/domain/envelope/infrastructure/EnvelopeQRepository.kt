@@ -18,6 +18,7 @@ import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
@@ -395,6 +396,18 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             qEnvelope.amount.isLoe(spec.toAmount)
         )
 
+        // friendName 정렬 처리
+        val friendNameOrder = pageable.sort.getOrderFor("friendName")
+        if (friendNameOrder != null) {
+            if (friendNameOrder.isAscending) {
+                query.orderBy(qFriend.name.asc())
+            } else {
+                query.orderBy(qFriend.name.desc())
+            }
+            val filteredPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
+            return querydsl.execute(query, filteredPageable)
+        }
+
         return querydsl.execute(query, pageable)
     }
 
@@ -415,25 +428,54 @@ class EnvelopeQRepositoryImpl : EnvelopeQRepository, QuerydslRepositorySupport(E
             .sum()
 
         val totalAmount = sentAmount.add(receivedAmount)
+        val latestHandedOverAt = qEnvelope.handedOverAt.max() // 집계 표현식
 
         val query = JPAQuery<Envelope>(entityManager)
             .select(
                 QFriendStatisticsModel(
                     qEnvelope.friendId,
+                    qFriend.name,
                     sentAmount,
                     receivedAmount,
-                    qEnvelope.handedOverAt
+                    latestHandedOverAt
                 )
             )
             .from(QEnvelope.envelope)
+            .join(qFriend).on(qEnvelope.friendId.eq(qFriend.id))
             .where(
                 qEnvelope.uid.eq(spec.uid),
                 qEnvelope.friendId.isIn(spec.friendIds)
-            ).groupBy(qEnvelope.friendId)
+            ).groupBy(
+                qEnvelope.friendId,
+                qFriend.name
+            )
             .having(
                 totalAmount.isGoe(spec.fromTotalAmounts),
                 totalAmount.isLoe(spec.toTotalAmounts)
             )
+
+        // friendName 정렬 처리
+        val sortedByFriendNameOrder = pageable.sort.getOrderFor("friendName")
+        if (sortedByFriendNameOrder != null) {
+            if (sortedByFriendNameOrder.isAscending) {
+                query.orderBy(qFriend.name.asc())
+            } else {
+                query.orderBy(qFriend.name.desc())
+            }
+            val filteredPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
+            return querydsl.execute(query, filteredPageable)
+        }
+
+        val sortByLatestHandedOverAt = pageable.sort.getOrderFor("handedOverAt")
+        if (sortByLatestHandedOverAt != null) {
+            if (sortByLatestHandedOverAt.isAscending) {
+                query.orderBy(latestHandedOverAt.asc())
+            } else {
+                query.orderBy(latestHandedOverAt.desc())
+            }
+            val filteredPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
+            return querydsl.execute(query, filteredPageable)
+        }
 
         return querydsl.execute(query, pageable)
     }

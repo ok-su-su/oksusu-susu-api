@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class FriendStatisticsModel @QueryProjection constructor(
     val friendId: Long,
+    val friendName: String,
     val sentAmounts: Long,
     val receivedAmounts: Long,
     val handedOverAt: LocalDateTime,
